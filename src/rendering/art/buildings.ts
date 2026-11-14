@@ -80,11 +80,11 @@ export const BUILDING_SPRITES: SpriteSheet = {
       0AdAABC0
       0AAAAAA0
       0BBBBBC0
-      0B0BB0C0
+      0B0BBBC0
       0cBcBcC0
-      0VTTTUC0
-      0B0aaBC0
-      0BBaaBC0
+      0BBVTTU0
+      0B0BaaC0
+      0BBBaaC0
       00000000
     `),
   ),
@@ -95,10 +95,10 @@ export const BUILDING_SPRITES: SpriteSheet = {
       0fnfnfm0
       0fnfnfm0
       0rrrrrr0
-      07666650
-      071TU650
-      076UU650
-      0uuuuut0
+      0VTTTTU0
+      07616650
+      0766ba50
+      0uuubat0
     `),
   ),
   'bld.HOUSE.2b': S(
@@ -107,9 +107,9 @@ export const BUILDING_SPRITES: SpriteSheet = {
       .0nfnf0.
       0fnfnfm0
       0rrrrrr0
-      0uuuuut0
-      067TU750
-      067UU750
+      0VTTTTU0
+      07171750
+      07171750
       0ttttts0
     `),
   ),
@@ -133,10 +133,10 @@ export const BUILDING_SPRITES: SpriteSheet = {
       0VVVUUU0
       0VV00UU0
       0V0660U0
-      00b66b00
-      066b6650
-      0b6bb6b0
-      066bb650
+      00666600
+      0bbbbbb0
+      06x6aa50
+      0666aa50
       00000000
     `),
   ),
@@ -300,6 +300,43 @@ export const BUILDING_SPRITES: SpriteSheet = {
       00000000
     `),
   ),
+  'bld.ARCOLOGY.7': S(
+    px(`
+      .......00.......
+      .......HG.......
+      ......0760......
+      ......0GG0......
+      .....0jkkj0.....
+      .....07Lq50.....
+      .....07LL50.....
+      .....0GGGG0.....
+      .....07LL50.....
+      .....07LL50.....
+      .....0TTTU0.....
+      ...0jkjkkjkj0...
+      ...07LLqLLL50...
+      ...07LLLLLL50...
+      ...0GGGGGGGG0...
+      ...07LLLLLL50...
+      ...07LqLLLL50...
+      ...0TTTTTTTU0...
+      .0jkjkkjjkkjkj0.
+      .07LLLLLLLLLL50.
+      .0GGGGGGGGGGGG0.
+      .07LLLLLLLLLL50.
+      .07LLL0000LLL50.
+      .07L00qLLq00L50.
+      .070qLjkkLL6050.
+      .00qLjkkjjLL600.
+      .0qLjkkijjkjL60.
+      0qLjkiijjkjjkL60
+      0LjkijjkkijjkjN0
+      0LjjiijjkjiijjN0
+      0766666666666550
+      05G555T55T555G50
+    `),
+    { fw: 2, fh: 2 },
+  ),
 
   // ───────────────────────────── FOOD ─────────────────────────────
   'bld.FARM.0': S(
@@ -324,6 +361,31 @@ export const BUILDING_SPRITES: SpriteSheet = {
       cCccCcCc
       OOOOOOO.
       ooBoooo.
+    `),
+  ),
+  'bld.FARM.3': S(
+    px(`
+      .....00.
+      oO.j0OB0
+      Oo.i0BC0
+      oO.j0CC0
+      Oo.ij.dd
+      oO.ji.cc
+      Oo.ij.dd
+      oO.ji.cc
+      Oo.ij.dd
+    `),
+  ),
+  'bld.FARM.5': S(
+    px(`
+      ihhiihhi
+      hOOOhkkk
+      goooijjj
+      hOOOhkkk
+      goooijjj
+      hOOOhkkk
+      goooijjj
+      hOOOhkkk
     `),
   ),
   'bld.FARM.6': S(
