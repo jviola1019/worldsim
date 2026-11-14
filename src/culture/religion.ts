@@ -137,9 +137,11 @@ export function localBeliefMonthly(sim: Sim, s: Settlement, civ: Civ): void {
   if (civ.techs['spirituality']?.known && s.pop > 120) {
     const stress = clamp01(s.unrest + (s.flows.famine + s.flows.disease) / Math.max(1, s.pop) * 10);
     const vacuum = 1 - faith;
-    const p = 0.0006 * (0.3 + stress) * (0.2 + vacuum) * (1 + civ.personality.piety);
+    const recent = sim.year - (w.milestones[`faith:${civ.id}`] ?? -1e9) < 80;
+    const p = recent ? 0 : 0.00025 * (0.3 + stress) * (0.15 + vacuum) * (1 + civ.personality.piety);
     if (rng.float() < p) {
       const r = foundReligion(sim, s, civ);
+      w.milestones[`faith:${civ.id}`] = sim.year;
       shift(s, r.id, 0.25 + vacuum * 0.3);
       logEvent(sim, {
         type: 'religion_founded',

@@ -107,18 +107,18 @@ const LIST: BuildingDef[] = [
   D('LUMBER', 'Lumber camp', 'extraction', { jobs: 60, sector: SECTOR.RESOURCES, cost: { WOOD: 6 }, labor: 6, placement: 'forest', tiers: [1, 5] }),
   D('QUARRY', 'Quarry', 'extraction', { jobs: 60, sector: SECTOR.RESOURCES, cost: { WOOD: 10 }, labor: 12, placement: 'hills', tiers: [1] }),
   D('MINE', 'Mine', 'extraction', { jobs: 90, sector: SECTOR.RESOURCES, cost: { WOOD: 30, STONE: 10 }, labor: 25, placement: 'deposit', tiers: [1, 5, 6], pollution: 2 }),
-  D('OIL_WELL', 'Oil field', 'extraction', { jobs: 80, sector: SECTOR.RESOURCES, cost: { METAL: 60, MACHINERY: 20 }, labor: 60, placement: 'oil', tiers: [5, 6], pollution: 4 }),
+  D('OIL_WELL', 'Oil field', 'extraction', { jobs: 80, sector: SECTOR.RESOURCES, cost: { METAL: 80 }, labor: 60, placement: 'oil', tiers: [5, 6], pollution: 4 }),
   // industry
   D('WORKSHOP', 'Workshop', 'industry', { jobs: 30, sector: SECTOR.INDUSTRY, cost: { WOOD: 20, STONE: 10 }, labor: 12, minPop: 150, tiers: [1, 3] }),
   D('SMITHY', 'Smithy', 'industry', { jobs: 20, sector: SECTOR.INDUSTRY, cost: { WOOD: 15, STONE: 20 }, labor: 12, minPop: 150, tiers: [1, 3], pollution: 1 }),
   D('MILL', 'Mill', 'industry', { jobs: 15, sector: SECTOR.INDUSTRY, cost: { WOOD: 40, STONE: 30 }, labor: 25, minPop: 400, max: 3, tiers: [3, 4] }),
-  D('FACTORY', 'Factory', 'industry', { jobs: 400, sector: SECTOR.INDUSTRY, cost: { STONE: 300, METAL: 150, MACHINERY: 40 }, labor: 300, minPop: 3000, tiers: [5, 6, 7], pollution: 14 }),
-  D('STEEL_MILL', 'Steel mill', 'industry', { jobs: 300, sector: SECTOR.INDUSTRY, cost: { STONE: 400, METAL: 200, MACHINERY: 60 }, labor: 350, minPop: 5000, max: 2, tiers: [5], pollution: 22 }),
+  D('FACTORY', 'Factory', 'industry', { jobs: 400, sector: SECTOR.INDUSTRY, cost: { STONE: 300, METAL: 150 }, labor: 300, minPop: 3000, tiers: [5, 6, 7], pollution: 14 }),
+  D('STEEL_MILL', 'Steel mill', 'industry', { jobs: 300, sector: SECTOR.INDUSTRY, cost: { STONE: 400, METAL: 200 }, labor: 350, minPop: 5000, max: 2, tiers: [5], pollution: 22 }),
   D('REFINERY', 'Refinery', 'industry', { jobs: 150, sector: SECTOR.INDUSTRY, cost: { METAL: 400, MACHINERY: 120 }, labor: 400, minPop: 8000, max: 2, tiers: [6], pollution: 18 }),
   D('CHIP_FAB', 'Chip fabrication plant', 'industry', { jobs: 250, sector: SECTOR.INDUSTRY, cost: { STONE: 500, METAL: 400, MACHINERY: 400, ELECTRONICS: 50 }, labor: 900, minPop: 50000, max: 2, tiers: [6], pollution: 3 }),
   D('ROBOT_FACTORY', 'Automated factory', 'industry', { jobs: 60, sector: SECTOR.INDUSTRY, cost: { METAL: 800, MACHINERY: 600, ELECTRONICS: 200 }, labor: 900, minPop: 50000, tiers: [7], pollution: 4 }),
   // energy
-  D('POWER_FOSSIL', 'Power station', 'energy', { jobs: 120, sector: SECTOR.INDUSTRY, cost: { STONE: 400, METAL: 300, MACHINERY: 120 }, labor: 400, placement: 'edge', minPop: 3000, tiers: [5, 6], pollution: 30 }),
+  D('POWER_FOSSIL', 'Power station', 'energy', { jobs: 120, sector: SECTOR.INDUSTRY, cost: { STONE: 400, METAL: 300, MACHINERY: 20 }, labor: 400, placement: 'edge', minPop: 3000, tiers: [5, 6], pollution: 30 }),
   D('POWER_NUCLEAR', 'Nuclear plant', 'energy', { jobs: 150, sector: SECTOR.INDUSTRY, cost: { STONE: 1500, METAL: 1000, MACHINERY: 500, ELECTRONICS: 30 }, labor: 1500, placement: 'edge', minPop: 30000, max: 2, tiers: [6] }),
   D('SOLAR', 'Solar farm', 'energy', { jobs: 10, sector: SECTOR.INDUSTRY, cost: { METAL: 150, ELECTRONICS: 40 }, labor: 100, placement: 'open', minPop: 2000, tiers: [6, 7] }),
   D('WIND', 'Wind farm', 'energy', { jobs: 10, sector: SECTOR.INDUSTRY, cost: { METAL: 200, MACHINERY: 40 }, labor: 100, placement: 'open', minPop: 2000, tiers: [6] }),
@@ -163,9 +163,19 @@ const LIST: BuildingDef[] = [
   D('MEGASTRUCTURE', 'Space elevator', 'transport', { jobs: 2000, cost: { METAL: 50000, MACHINERY: 10000, ELECTRONICS: 3000 }, labor: 30000, placement: 'open', minPop: 500000, max: 1, footprint: 2, landmark: true, tiers: [7] }),
 ];
 
+/**
+ * A building tile is a district (~100 km^2): non-agricultural districts employ
+ * thousands. Base job numbers above are per-unit figures scaled here.
+ */
+const DISTRICT_JOB_SCALE = 10;
+const SCALED: BuildingCategory[] = ['industry', 'energy', 'commerce', 'civic', 'military', 'transport'];
+
 export const BUILDINGS: readonly BuildingDef[] = (() => {
   const arr: BuildingDef[] = [];
-  for (const d of LIST) arr[d.id] = d;
+  for (const d of LIST) {
+    if (SCALED.includes(d.category) && d.key !== 'WALL') d.jobs *= DISTRICT_JOB_SCALE;
+    arr[d.id] = d;
+  }
   return arr;
 })();
 

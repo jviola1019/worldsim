@@ -471,6 +471,7 @@ export interface Civ {
 export interface EconAcc {
   prod: number[]; // goods produced (units)
   use: number[]; // goods consumed by industry, households, construction, military
+  want: number[]; // goods requested (met or not) — reveals unmet demand for trade
   cons: number; // household consumption value
   inv: number; // construction investment value
   va: number; // value added (production side)

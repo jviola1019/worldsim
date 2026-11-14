@@ -194,6 +194,7 @@ export function householdDemand(civ: Civ, out: Float64Array = DEMAND_SCRATCH): F
 }
 
 function take(civ: Civ, g: number, amount: number, access: number): number {
+  civ.acc.want[g] += amount;
   const avail = civ.stock[g] * access;
   const got = Math.min(avail, amount);
   civ.stock[g] -= got;
@@ -334,8 +335,9 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
 
   // --- construction labour
   let builders = 0;
-  if (s.construction) {
-    builders = Math.min(free * 0.3, s.construction.labor * 12 * 0.5 + 2);
+  if (s.construction || s.pop > s.housing * 0.85) {
+    const want = (s.construction ? s.construction.labor * 12 * 0.5 : 0) + s.pop * 0.01 + 2;
+    builders = Math.min(free * 0.3, want);
     free -= builders;
   }
   emp[SECTOR.CONSTRUCTION] = builders;
@@ -379,7 +381,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   if (smithStaff > 0) smithing(civ, s, (s.bld[B.SMITHY] * BALANCE.smithyOutput * (1 + caps.crafts) * smithStaff) / 12, armsWanted, access);
   const steelStaff = staff(B.STEEL_MILL, 1 - automation * 0.7);
   if (steelStaff > 0) {
-    const cap = (s.bld[B.STEEL_MILL] * 3200 * steelStaff * (1 + Math.max(0, caps.industry - 1))) / 12;
+    const cap = (s.bld[B.STEEL_MILL] * 32000 * steelStaff * (1 + Math.max(0, caps.industry - 1))) / 12;
     const iron = take(civ, Good.IRON, cap * 1.3, access);
     const coal = take(civ, Good.COAL, cap * 0.6, access);
     const made = Math.min(iron / 1.3, coal / 0.6);
@@ -405,7 +407,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   staff(B.REFINERY, 1 - automation * 0.6);
   const fabStaff = staff(B.CHIP_FAB, 1 - automation * 0.5);
   if (fabStaff > 0) {
-    const cap = (s.bld[B.CHIP_FAB] * 700 * fabStaff * (1 + caps.computing * 0.2)) / 12;
+    const cap = (s.bld[B.CHIP_FAB] * 7000 * fabStaff * (1 + caps.computing * 0.2)) / 12;
     const rare = take(civ, Good.RARE, cap * 0.1, access);
     const mach = take(civ, Good.MACHINERY, cap * 0.05, access);
     const energy = take(civ, Good.ENERGY, cap * 2, access);
@@ -415,7 +417,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   }
   const robStaff = staff(B.ROBOT_FACTORY, 1);
   if (robStaff > 0) {
-    const cap = (s.bld[B.ROBOT_FACTORY] * 2400 * robStaff * (1 + caps.ai)) / 12;
+    const cap = (s.bld[B.ROBOT_FACTORY] * 24000 * robStaff * (1 + caps.ai)) / 12;
     const metal = take(civ, Good.METAL, cap * 0.5, access);
     const elec = take(civ, Good.ELECTRONICS, cap * 0.15, access);
     const energy = take(civ, Good.ENERGY, cap, access);
@@ -437,7 +439,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   if (free > 0) {
     if (!industrial) {
       // household production: gathering wood & stone, crafts, small services
-      const wood = (free * BALANCE.informalMaterials * (0.3 + sites.forestShare * 1.4)) / 12;
+      const wood = (free * BALANCE.informalMaterials * 2.5 * (0.3 + sites.forestShare * 1.4)) / 12;
       const stone = (free * BALANCE.informalMaterials * 0.5 * (0.2 + sites.hillShare * 1.6)) / 12;
       give(civ, Good.WOOD, wood);
       give(civ, Good.STONE, stone);
@@ -447,7 +449,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
       serviceWorkers += free * 0.2;
       free = 0;
     } else {
-      const informal = free * clamp(0.5 - caps.welfare * 0.2, 0.15, 0.5);
+      const informal = free * clamp(0.75 - caps.welfare * 0.2 - caps.automation * 0.3, 0.3, 0.75);
       emp[SECTOR.SERVICES] += informal;
       serviceWorkers += informal * 0.4;
       free -= informal;
@@ -468,6 +470,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   for (const g of HOUSEHOLD_GOODS) {
     const want = (dem[g] * pop) / 12;
     if (want <= 0) continue;
+    civ.acc.want[g] += want;
     const avail = Math.min(civ.stock[g] * access, Math.max(want, civ.stock[g] * share));
     const got = Math.min(want, avail);
     civ.stock[g] -= got;
@@ -528,10 +531,13 @@ function smithing(civ: Civ, s: Settlement, cap: number, armsWanted: boolean, acc
   const tier = civ.caps.metalTier;
   let made = 0;
   if (tier >= 3 && civ.stock[Good.IRON] > 0) {
-    const iron = take(civ, Good.IRON, cap * 1.4, access);
     const fuelG = civ.stock[Good.COAL] > cap * 0.5 ? Good.COAL : Good.WOOD;
-    const fuel = take(civ, fuelG, cap * (fuelG === Good.COAL ? 0.5 : 1), access);
-    made = Math.min(iron / 1.4, fuel / (fuelG === Good.COAL ? 0.5 : 1));
+    const perUnit = fuelG === Good.COAL ? 0.5 : 1;
+    const fuel = take(civ, fuelG, cap * perUnit, access);
+    // without enough charcoal/coal, smiths fall back to marginal fuels at low efficiency
+    const fuelled = Math.min(cap, fuel / perUnit + cap * 0.35);
+    const iron = take(civ, Good.IRON, fuelled * 1.4, access);
+    made = iron / 1.4;
     if (fuelG === Good.COAL) civ.acc.emissions += fuel;
   }
   if (made < cap * 0.5 && tier >= 2 && civ.stock[Good.COPPER] > 0 && civ.stock[Good.TIN] > 0) {
@@ -551,7 +557,9 @@ function smithing(civ: Civ, s: Settlement, cap: number, armsWanted: boolean, acc
     arms = made * 0.35;
     give(civ, Good.ARMS, arms);
   }
-  give(civ, Good.METAL, made - arms);
+  const mach = civ.caps.industry > 0 ? (made - arms) * 0.12 : 0;
+  give(civ, Good.MACHINERY, mach * 0.5);
+  give(civ, Good.METAL, made - arms - mach);
   s.output[Good.METAL] += (made - arms) * 12 * 0.1;
 }
 

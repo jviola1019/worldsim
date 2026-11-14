@@ -64,11 +64,11 @@ export const BALANCE = {
   quarryLabor: 60,
   mineLabor: 90,
   mineYieldMult: 1,
-  smithyOutput: 45,
+  smithyOutput: 450,
   smithyLabor: 20,
-  workshopOutput: 45,
+  workshopOutput: 450,
   workshopLabor: 30,
-  factoryOutput: 1400,
+  factoryOutput: 14000,
   factoryLabor: 400,
   /** Gather rate for wood/stone by general laborers without dedicated buildings. */
   informalMaterials: 0.6,
@@ -101,9 +101,11 @@ export const BALANCE = {
   /** [S] Research points per "effective researcher". */
   researchPerScholar: 0.02,
   /** [S] Research from general population (folk innovation), per capita. */
-  folkResearch: 0.0008,
+  folkResearch: 0.22,
   /** Multiplier applied to all tech costs (global pacing knob). */
   techCostMult: 1,
+  /** Extra cost growth per era on top of the data's 1.9x (pacing). */
+  techEraScale: 1.4,
   /** [S] Diffusion rate per contact intensity. */
   diffusionRate: 0.18,
   /** Annual chance scale for accidental discoveries. */

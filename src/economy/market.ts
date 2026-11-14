@@ -37,7 +37,7 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   for (let g = 0; g < GOOD_COUNT; g++) {
     const def = GOODS[g];
     const supply = acc.prod[g] + civ.stock[g] * 0.25 + 1;
-    const demand = acc.use[g] + 1;
+    const demand = Math.max(acc.use[g], acc.want[g]) + 1;
     const target = def.basePrice * clamp(Math.pow(demand / supply, 0.5), 0.3, 5);
     civ.prices[g] += (target - civ.prices[g]) * BALANCE.priceAdjust;
     const need = Math.max(1, pop * 0.0004);
@@ -53,9 +53,10 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   const servicesVA = acc.services;
   const baseIncome = cons + inv + servicesVA * 0.4;
   const revenue = Math.max(0, civ.taxRate * baseIncome * capacity * (1 + civ.caps.taxEfficiency * 0.3) * (1 - civ.corruption * 0.6));
-  let spending = revenue;
-  // borrowing when the treasury is short and the state can borrow
-  if (civ.caps.banking > 0 && civ.treasury < revenue * 0.2) spending = revenue * 1.12;
+  let spending = revenue * 0.97;
+  // states borrow in wartime and crises (and only if they can borrow at all)
+  const atWar = [...w.wars.values()].some((x) => !x.end && (x.attackers.includes(civ.id) || x.defenders.includes(civ.id)));
+  if (civ.caps.banking > 0 && (atWar || civ.crisis > 0) && civ.treasury < revenue * 0.2) spending = revenue * (atWar ? 1.25 : 1.1);
   const interest = civ.debt * (0.03 + BALANCE.debtPremium * (civ.debt / Math.max(1, baseIncome)) + (1 - civ.inst.ruleOfLaw) * 0.02);
   civ.treasury += revenue - spending - interest;
   if (civ.treasury < 0) {
@@ -78,7 +79,8 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   }
   // debt crisis
   const debtRatio = civ.debt / Math.max(1, baseIncome);
-  if (debtRatio > 1.4 && interest > revenue * 0.35 && civ.crisis <= 0) {
+  if (debtRatio > 1.4 && baseIncome > 100 && interest > revenue * 0.35 && civ.crisis <= 0 && sim.year - ((sim.w.milestones[`default:${civ.id}`] as number | undefined) ?? -1e9) > 25) {
+    sim.w.milestones[`default:${civ.id}`] = sim.year;
     civ.crisis = 3;
     civ.legitimacy = clamp01(civ.legitimacy - 0.12);
     civ.debt *= 0.6; // default / restructuring
@@ -154,6 +156,7 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   // reset accumulators
   acc.prod.fill(0);
   acc.use.fill(0);
+  acc.want.fill(0);
   acc.cons = 0;
   acc.inv = 0;
   acc.va = 0;

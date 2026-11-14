@@ -23,6 +23,11 @@ import { logEvent } from '../history/events';
 import { createPerson } from '../population/persons';
 import { T } from '../world/terrain';
 
+/** Effective research cost: data cost x global multiplier x era scaling (pacing knob). */
+export function effCost(t: TechDef): number {
+  return t.cost * BALANCE.techCostMult * Math.pow(BALANCE.techEraScale, t.era - 1);
+}
+
 export function techState(civ: Civ, id: string): TechState {
   let s = civ.techs[id];
   if (!s) civ.techs[id] = s = { known: false, progress: 0, adoption: 0, year: -1 };
@@ -201,7 +206,7 @@ export function researchOutput(sim: Sim, civ: Civ): number {
   const pop = Math.max(1, folk);
   const eduRate = edu / pop;
   // Folk innovation grows sublinearly with population (Kremer-style scale effect, stylized).
-  const folkRP = BALANCE.folkResearch * Math.pow(pop, 0.75) * 40;
+  const folkRP = BALANCE.folkResearch * Math.pow(pop, 0.62);
   const learnedRP = BALANCE.researchPerScholar * scholars * (1 + institutions * 0.03);
   const spend = 0.6 + 0.4 * clamp01(civ.budget.research * 10) + civ.budget.research * 6;
   const caps = civ.caps;
@@ -363,7 +368,7 @@ export function researchYearly(sim: Sim, civ: Civ): void {
     const def = TECH_BY_ID.get(civ.researchTarget)!;
     const st = techState(civ, def.id);
     st.progress += rp;
-    if (st.progress >= def.cost * BALANCE.techCostMult) grantTech(sim, civ, def.id, 'research');
+    if (st.progress >= effCost(def)) grantTech(sim, civ, def.id, 'research');
   }
   // 2) diffusion from contacts (catch-up is cheaper)
   const absorb = (0.3 + 0.7 * clamp01(avgEducation(sim, civ) * 2 + civ.caps.literacy * 0.5)) * (1 + civ.caps.diffusion) * (1 - 0.4 * Math.max(0, civ.personality.caution - 0.5));
@@ -378,18 +383,18 @@ export function researchYearly(sim: Sim, civ: Civ): void {
       const def = TECH_BY_ID.get(id);
       if (!def || knows(civ, id) || !techAvailable(sim, civ, def)) continue;
       const st = techState(civ, id);
-      st.progress += def.cost * BALANCE.diffusionRate * ci * absorb;
-      if (st.progress >= def.cost * BALANCE.techCostMult) grantTech(sim, civ, id, 'diffusion');
+      st.progress += effCost(def) * BALANCE.diffusionRate * ci * absorb;
+      if (st.progress >= effCost(def)) grantTech(sim, civ, id, 'diffusion');
     }
   }
   // 3) serendipity
   if (rng.chance(BALANCE.serendipity * (1 + civ.personality.science))) {
-    const opts = TECHS.filter((t) => techAvailable(sim, civ, t) && t.cost < (rp + 50) * 8);
+    const opts = TECHS.filter((t) => techAvailable(sim, civ, t) && effCost(t) < (rp + 50) * 8);
     if (opts.length) {
       const t = rng.pick(opts);
       const st = techState(civ, t.id);
-      st.progress += t.cost * rng.range(0.2, 0.6);
-      if (st.progress >= t.cost * BALANCE.techCostMult) grantTech(sim, civ, t.id, 'serendipity');
+      st.progress += effCost(t) * rng.range(0.2, 0.6);
+      if (st.progress >= effCost(t)) grantTech(sim, civ, t.id, 'serendipity');
     }
   }
   // 4) adoption & regression

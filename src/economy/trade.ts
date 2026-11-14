@@ -107,8 +107,10 @@ export function infrastructureYearly(sim: Sim, civ: Civ): void {
   }
 }
 
+/** Positive = exportable surplus; negative = unmet demand (from recorded requests). */
 function surplusOf(civ: Civ, g: number): number {
-  return civ.acc.prod[g] - civ.acc.use[g] + civ.stock[g] * 0.1;
+  const demand = Math.max(civ.acc.use[g], civ.acc.want[g]);
+  return civ.acc.prod[g] - demand + civ.stock[g] * 0.1;
 }
 
 /** Yearly international trade; returns per-civ export/import values. */

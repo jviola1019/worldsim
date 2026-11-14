@@ -19,8 +19,8 @@ export function emigrate(sim: Sim, s: Settlement, civ: Civ, adequacy: number): v
   if (civ.policies.migration === 'closed') return;
   const distress = clamp((1 - adequacy) * 1.2 + Math.max(0, s.unrest - 0.5) + Math.max(0, s.pop / Math.max(1, s.housing) - 1.3) * 0.3, 0, 1);
   if (distress < 0.08) return;
-  const amount = (s.pop * BALANCE.maxEmigration * distress) / 12;
-  if (amount < 3) return;
+  const amount = (s.pop * BALANCE.maxEmigration * distress) / 4; // quarterly
+  if (amount < 5) return;
   // choose destination
   let best: Settlement | null = null;
   let bestScore = 0;

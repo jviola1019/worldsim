@@ -47,7 +47,7 @@ export function onNotableDeath(sim: Sim, p: Person): void {
   }
   for (const a of w.armies.values()) if (a.generalId === p.id) a.generalId = 0;
   for (const r of w.religions.values()) if (r.headId === p.id) r.headId = 0;
-  if (!wasRuler && p.notable && p.role !== 'commoner' && p.role !== 'consort') {
+  if (!wasRuler && p.notable && p.role !== 'commoner' && p.role !== 'consort' && p.role !== 'general' && p.role !== 'heir') {
     logEvent(sim, {
       type: 'notable_death',
       cat: 'demography',

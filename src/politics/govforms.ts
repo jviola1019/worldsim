@@ -55,7 +55,8 @@ export const GOV_FORMS: Record<GovFormKey, GovFormDef> = {
 export function deriveGovForm(civ: Civ, nSettlements: number, nCultures = 1): GovFormKey {
   const i = civ.inst;
   if (nSettlements === 0) return 'band';
-  const small = civ.population < 600 || (civ.era <= 2 && nSettlements <= 2);
+  // State formation needs administrative capacity (writing, bureaucracy), not just numbers.
+  const small = civ.population < 500 || civ.caps.adminCapacity < 0.5;
   if (small) return i.hereditary > 0.5 && i.centralization > 0.35 ? 'chiefdom' : 'tribe';
   if (i.religiousAuthority > 0.68) return 'theocracy';
   if (i.militaryInfluence > 0.68 && i.participation < 0.3) return 'junta';

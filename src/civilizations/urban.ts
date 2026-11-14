@@ -364,7 +364,11 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   cands.sort((a, b) => b.score - a.score || a.type - b.type);
   for (const c of cands.slice(0, 4)) {
     const def = BUILDINGS[c.type];
-    if (!canAfford(civ, def)) continue;
+    if (!canAfford(civ, def)) {
+      // record the unmet need so traders can supply it
+      for (const [g, amt] of Object.entries(def.cost)) civ.acc.want[Good[g as GoodKey]] += (amt as number) * 0.25;
+      continue;
+    }
     const tile = c.upgrade !== undefined ? c.upgrade : findSite(sim, s, def);
     if (tile === null) continue;
     startProject(sim, s, civ, c.type, tile, c.upgrade !== undefined);
@@ -464,6 +468,7 @@ export function progressConstruction(sim: Sim, s: Settlement, civ: Civ, builders
   for (let g = 0; g < GOOD_COUNT; g++) {
     if (job.need[g] <= 0) continue;
     const want = job.need[g] * frac;
+    civ.acc.want[g] += want;
     const got = Math.min(civ.stock[g] * access, want);
     civ.stock[g] -= got;
     civ.acc.use[g] += got;

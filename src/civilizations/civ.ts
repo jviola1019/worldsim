@@ -167,7 +167,7 @@ export function createCiv(sim: Sim, o: NewCiv): Civ {
     credit: 0,
     crisis: 0,
     econ: { gdp: 0, gdpPerCapita: 0, consumption: 0, investment: 0, government: 0, exports: 0, imports: 0, revenue: 0, spending: 0, unemployment: 0, inequality: 0.3, livingStandard: 1, energyUse: 0, emissions: 0, sectors: [0, 0, 0, 0, 0, 0], laborProductivity: 0, growth: 0 },
-    acc: { prod: g.slice(), use: g.slice(), cons: 0, inv: 0, va: 0, services: 0, workers: 0, unemployed: 0, foodNeed: 0, foodShort: 0, energyUse: 0, emissions: 0 },
+    acc: { prod: g.slice(), use: g.slice(), want: g.slice(), cons: 0, inv: 0, va: 0, services: 0, workers: 0, unemployed: 0, foodNeed: 0, foodShort: 0, energyUse: 0, emissions: 0 },
     inst: defaultInstitutions(sim, o.species, culture.values),
     govForm: 'band',
     rulerId: 0,

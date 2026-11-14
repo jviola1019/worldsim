@@ -76,8 +76,8 @@ function raiseArmy(sim: Sim, civ: Civ, s: Settlement, manpower: number, warId: n
   civ.stock[Good.ARMS] -= arms;
   const horses = civ.caps.cavalry > 0 ? Math.min(civ.stock[Good.HORSES], n * 0.1) : 0;
   civ.stock[Good.HORSES] -= horses;
-  const general = createPerson(sim, { born: sim.year - sim.rng.int(28, 50), species: civ.species, civId: civ.id, settlementId: s.id, cultureId: civ.cultureId, religionId: civ.stateReligion, role: 'general', notable: true });
-  general.titles.push('General');
+  const general = n < 300 ? undefined : createPerson(sim, { born: sim.year - sim.rng.int(28, 50), species: civ.species, civId: civ.id, settlementId: s.id, cultureId: civ.cultureId, religionId: civ.stateReligion, role: 'general', notable: true });
+  general?.titles.push('General');
   const a: Army = {
     id: ++w.ids.army,
     civId: civ.id,
@@ -94,7 +94,7 @@ function raiseArmy(sim: Sim, civ: Civ, s: Settlement, manpower: number, warId: n
     morale: 0.8,
     supply: 1,
     tier: unitTier(civ),
-    generalId: general.id,
+    generalId: general?.id ?? 0,
     warId,
     state: 'idle',
     home: s.id,
@@ -403,7 +403,8 @@ function battleTick(sim: Sim, a: Army, war: War | undefined): void {
     war.score = clamp(war.score + (attackerWon ? 1 : -1) * (6 + Math.min(14, loser.manpower / 500)), -100, 100);
     const i = sim.w.map.idx(Math.floor(winner.x), Math.floor(winner.y));
     sim.w.map.hazard[i] |= HAZARD.BATTLEFIELD;
-    if (war.battles <= 3 || (loser.manpower + winner.manpower) > 5000)
+    const big = loser.manpower + winner.manpower > 20000;
+    if (war.battles <= 2 || big)
       logEvent(sim, {
         type: 'battle',
         cat: 'war',
@@ -412,7 +413,7 @@ function battleTick(sim: Sim, a: Army, war: War | undefined): void {
         persons: [winner.generalId, loser.generalId].filter((x) => x),
         x: Math.floor(winner.x),
         y: Math.floor(winner.y),
-        importance: 2,
+        importance: big ? 2 : 1,
       });
     for (const x of [a, b]) {
       x.state = 'idle';

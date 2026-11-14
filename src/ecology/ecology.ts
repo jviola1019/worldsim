@@ -53,6 +53,24 @@ export function herdsNear(sim: Sim, x: number, y: number, r: number): Herd[] {
   return out;
 }
 
+export function countSpeciesNear(sim: Sim, x: number, y: number, r: number, species: string, exclude?: Herd): number {
+  const cells = herdGrid(sim);
+  const gx = Math.ceil(sim.w.map.w / GRID);
+  let n = 0;
+  const r2 = r * r;
+  const x0 = Math.max(0, ((x - r) / GRID) | 0);
+  const x1 = ((x + r) / GRID) | 0;
+  const y0 = Math.max(0, ((y - r) / GRID) | 0);
+  const y1 = ((y + r) / GRID) | 0;
+  for (let cy = y0; cy <= y1; cy++)
+    for (let cx = x0; cx <= x1; cx++) {
+      const arr = cells.get(cy * gx + cx);
+      if (!arr) continue;
+      for (const h of arr) if (h !== exclude && h.species === species && (h.x - x) ** 2 + (h.y - y) ** 2 <= r2) n++;
+    }
+  return n;
+}
+
 export function habitat(sim: Sim, sp: SpeciesDef, i: number): number {
   const m = sim.w.map;
   const t = m.terrain[i];
@@ -145,7 +163,9 @@ function pickTarget(sim: Sim, h: Herd, sp: SpeciesDef): void {
 export function herdsTick(sim: Sim): void {
   const m = sim.w.map;
   const tick = sim.w.tick;
+  const parity = tick & 1;
   for (const h of sim.w.herds.values()) {
+    if ((h.id & 1) !== parity) continue; // half the herds move each tick, at double step
     const sp = SPECIES_BY_KEY[h.species];
     if (!sp) continue;
     const dx = h.tx - h.x;
@@ -155,7 +175,7 @@ export function herdsTick(sim: Sim): void {
       pickTarget(sim, h, sp);
       continue;
     }
-    const step = sp.speed * (0.7 + 0.6 * h.genes[1]);
+    const step = 2 * sp.speed * (0.7 + 0.6 * h.genes[1]);
     const nx = h.x + (dx / d) * Math.min(step, d);
     const ny = h.y + (dy / d) * Math.min(step, d);
     const i = Math.floor(ny) * m.w + Math.floor(nx);
@@ -222,11 +242,13 @@ export function herdsMonthly(sim: Sim): void {
       fed = sp.diet === 'omnivore' ? Math.max(fed * 0.5, herbFed) : herbFed;
     }
     // logistic growth vs starvation and climate stress
-    const capacity = sp.maxHerd * 1.3;
+    const rivals = countSpeciesNear(sim, h.x, h.y, 5, h.species, h);
+    const capacity = (sp.maxHerd * 1.3) / (1 + rivals * 0.5);
     if (fed >= 0.75 && hab > 0.2) h.count += (h.count * sp.growth * (0.6 + 0.8 * h.genes[4]) * hab * (1 - h.count / capacity)) / 12;
     else if (fed < 0.5) h.count -= h.count * (0.5 - fed) * 0.25;
     if (hab < 0.2) h.count -= h.count * 0.04;
-    if (h.count > sp.maxHerd && rng.chance(0.5)) {
+    // split only where the range is not already crowded with the same species
+    if (h.count > sp.maxHerd && rng.chance(0.3) && w.herds.size < (m.n / 30) && countSpeciesNear(sim, h.x, h.y, 8, h.species) < 3) {
       const half = h.count / 2;
       h.count = half;
       const g = h.genes.map((v) => clamp01(v + rng.normal() * 0.01));
@@ -337,7 +359,10 @@ export function evolutionYearly(sim: Sim): void {
     const since = base ? sim.year - base.emerged : sim.year - w.meta.startYear;
     let div = 0;
     for (let k = 0; k < 5; k++) div += Math.abs(h.genes[k] - ref[k]);
-    if (div > 0.35 && since > 150 && rng.chance(0.2)) {
+    const lastKey = `subsp:${h.species}`;
+    const last = w.milestones[lastKey] ?? w.meta.startYear;
+    if (div > 0.45 && since > 150 && sim.year - last > 120 && rng.chance(0.2)) {
+      w.milestones[lastKey] = sim.year;
       const sp = SPECIES_BY_KEY[h.species];
       const name = subspeciesName(h.genes, ref, sp?.name ?? h.species, h.y / m.h);
       const ss: Subspecies = { id: ++w.ids.subspecies, species: h.species, name, parentId: h.subspeciesId, genes: h.genes.slice(), emerged: sim.year };

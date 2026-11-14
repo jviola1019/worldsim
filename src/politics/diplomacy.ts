@@ -181,7 +181,8 @@ function sharedRival(sim: Sim, a: Civ, b: Civ): boolean {
 function considerWar(sim: Sim, civ: Civ, other: Civ, rel: Relation): void {
   const w = sim.w;
   const rng = sim.rng;
-  if (inAnyWar(sim, civ.id) && rng.chance(0.7)) return;
+  if (inAnyWar(sim, civ.id) && rng.chance(0.8)) return;
+  if (sim.year - rel.lastWar < 15 && rng.chance(0.8)) return;
   if (civ.overlord === other.id || other.overlord === civ.id) return;
   const mine = civ.militaryPower;
   const theirs = militaryEstimate(sim, civ, other);
@@ -207,13 +208,13 @@ function considerWar(sim: Sim, civ: Civ, other: Civ, rel: Relation): void {
     { label: 'Perceived military superiority', weight: clamp((ratio - 1) * 0.25, 0, 0.5) },
   ];
   const gain = gains.reduce((a, c) => a + c.weight, 0);
-  let cost = 0.35 + civ.warExhaustion * 0.8 + saturate(rel.trade, 3000) * 0.35 + (ratio < 1 ? (1 - ratio) * 1.2 : 0);
+  let cost = 0.15 + civ.warExhaustion * 0.8 + saturate(rel.trade, 3000) * 0.35 + (ratio < 1 ? (1 - ratio) * 1.2 : 0);
   if (isDemocratic(civ) && isDemocratic(other)) cost += 0.5; // democratic-peace tendency (stylized)
   if (hasTreaty(sim, civ.id, other.id, 'nonaggression')) cost += 0.4 * (1 - civ.personality.aggression * 0.5);
   if (other.nukes > 0 && w.laws.advancedWeapons) cost += 1.5 + (civ.nukes > 0 ? 0.5 : 0); // deterrence
   const dist = distanceBetween(sim, civ, other);
-  cost += clamp(dist / (25 + civ.caps.logistics * 15 + civ.caps.navalTier * 4), 0, 1.5);
-  const propensity = 0.25 * w.meta.settings.aggressiveness;
+  cost += clamp(dist / (40 + civ.caps.logistics * 20 + civ.caps.navalTier * 6) - 0.3, 0, 1.2);
+  const propensity = 0.15 * w.meta.settings.aggressiveness;
   if (gain > cost && rng.chance(propensity * (gain - cost + 0.2))) {
     const goal = resourceWant > 0.2 ? 'resources' : griev > 15 ? 'revenge' : rel.disputes > 8 ? 'border' : 'conquest';
     declareWar(sim, civ, other, goal, [...gains.filter((g) => g.weight > 0.02), { label: `Military balance estimated at ${ratio.toFixed(1)}:1`, weight: 0.05 }]);

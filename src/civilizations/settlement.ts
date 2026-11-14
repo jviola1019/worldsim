@@ -253,13 +253,22 @@ export function settlementMonthly(sim: Sim, s: Settlement): void {
     convertToCohorts(sim, s);
   } else if (s.mode === 'cohort' && s.pop < BALANCE.individualMin && s.pop >= 1) convertToIndividuals(sim, s);
   // 3. construction
-  progressConstruction(sim, s, civ, econ.builders);
-  if (!s.construction && (sim.w.tick / TICKS_PER_MONTH + s.id) % 2 < 1) planConstruction(sim, s, civ);
+  const projects = 1 + Math.min(6, Math.floor(Math.sqrt(s.pop / 8000)));
+  let builders = econ.builders;
+  for (let k = 0; k < projects; k++) {
+    if (!s.construction) planConstruction(sim, s, civ);
+    if (!s.construction) break;
+    const before = s.construction.labor;
+    progressConstruction(sim, s, civ, builders);
+    const used = Math.max(0, (before - (s.construction?.labor ?? 0)) * 12);
+    builders = Math.max(0, builders - used);
+    if (s.construction || builders < 1) break;
+  }
   // 4. health, beliefs, migration
   diseaseMonthly(sim, s, civ);
   localBeliefMonthly(sim, s, civ);
-  s.health = clamp01((lifeExpectancy(q) - 18) / 65);
-  if (econ.adequacy < 0.75 || s.unrest > 0.6 || s.pop > s.housing * 1.4) emigrate(sim, s, civ, econ.adequacy);
+  if (month === 0) s.health = clamp01((lifeExpectancy(q) - 18) / 65);
+  if (month % 3 === 1 && (econ.adequacy < 0.75 || s.unrest > 0.6 || s.pop > s.housing * 1.4)) emigrate(sim, s, civ, econ.adequacy);
   s.unrest = clamp01(s.unrest * 0.97 + (econ.adequacy < 0.85 ? (0.85 - econ.adequacy) * 0.08 : 0));
   // 5. yearly upkeep (first month of the year for this settlement)
   if (month === 0) settlementYearly(sim, s, civ);
