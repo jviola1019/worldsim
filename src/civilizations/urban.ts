@@ -542,7 +542,7 @@ function completeProject(sim: Sim, s: Settlement, civ: Civ): void {
       settlements: [s.id],
       x: m.xOf(job.tile),
       y: m.yOf(job.tile),
-      importance: first && [B.STATION, B.AIRPORT, B.SPACEPORT, B.POWER_NUCLEAR, B.FUSION, B.MEGASTRUCTURE].includes(job.type) ? 4 : 1,
+      importance: first && ([B.STATION, B.AIRPORT, B.SPACEPORT, B.POWER_NUCLEAR, B.FUSION, B.MEGASTRUCTURE] as number[]).includes(job.type) ? 4 : 1,
     });
   }
 }
