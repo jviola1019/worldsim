@@ -10,6 +10,7 @@ import { ANIMAL_SPRITES } from './animals';
 import { VEHICLE_SPRITES } from './vehicles';
 import { EFFECT_SPRITES } from './effects';
 import { BUILDING_SPRITES } from './buildings';
+import { CIVIC_BUILDING_SPRITES } from './buildings_civic';
 import { ICON_SPRITES } from './icons';
 
 export const ALL_SPRITES: SpriteSheet = {
@@ -20,5 +21,6 @@ export const ALL_SPRITES: SpriteSheet = {
   ...VEHICLE_SPRITES,
   ...EFFECT_SPRITES,
   ...BUILDING_SPRITES,
+  ...CIVIC_BUILDING_SPRITES,
   ...ICON_SPRITES,
 };
