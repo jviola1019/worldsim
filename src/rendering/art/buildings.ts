@@ -1,4 +1,353 @@
 /** Economic buildings: residential, food, extraction, industry, energy, commerce (bld.*) */
-import type { SpriteSheet } from './types';
+import { S, type SpriteSheet } from './types';
 
-export const BUILDING_SPRITES: SpriteSheet = {};
+/** Author a frame as a multi-line block; whitespace is ignored, '.' is transparent. */
+const px = (block: string): string[] =>
+  block
+    .split('\n')
+    .map((r) => r.trim())
+    .filter((r) => r.length > 0);
+
+export const BUILDING_SPRITES: SpriteSheet = {
+  // ───────────────────────────── RESIDENTIAL ─────────────────────────────
+  'bld.CAMP.0': S(
+    [
+      px(`
+        .a..a...
+        ..00....
+        .0SE0...
+        .0SE0...
+        0SDDE00.
+        0Saa0SD0
+        ....0TU0
+        .F..0aE0
+        cfc.....
+      `),
+      px(`
+        .a..a...
+        ..00....
+        .0SE0...
+        .0SE0...
+        0SDDE00.
+        0Saa0SD0
+        ....0TU0
+        .o..0aE0
+        cFc.....
+      `),
+    ],
+    { fps: 4 },
+  ),
+  'bld.HUT.0': S(
+    px(`
+      ...00...
+      ..0OB0..
+      .0OBBB0.
+      0OBBBBC0
+      0CBCBCC0
+      .0cccb0.
+      .0eTUd0.
+      .0eUUd0.
+      ..0000..
+    `),
+  ),
+  'bld.HUT.1': S(
+    px(`
+      .000000.
+      0YYYYYX0
+      0YXYXXX0
+      00000000
+      .0BBBC0.
+      .0BTBC0.
+      .0BUBC0.
+      .000000.
+    `),
+  ),
+  'bld.HUT.1b': S(
+    px(`
+      ..0000..
+      .0AAAB0.
+      0AABBBC0
+      0ABBBCC0
+      0BBTBCC0
+      0BBUBCC0
+      .000000.
+    `),
+  ),
+  'bld.HOUSE.1': S(
+    px(`
+      .000000.
+      0AAAAAB0
+      0AdAABC0
+      0AAAAAA0
+      0BBBBBC0
+      0B0BB0C0
+      0cBcBcC0
+      0VTTTUC0
+      0B0aaBC0
+      0BBaaBC0
+      00000000
+    `),
+  ),
+  'bld.HOUSE.2': S(
+    px(`
+      ..0000..
+      .0nfnf0.
+      0fnfnfm0
+      0fnfnfm0
+      0rrrrrr0
+      07666650
+      071TU650
+      076UU650
+      0uuuuut0
+    `),
+  ),
+  'bld.HOUSE.2b': S(
+    px(`
+      ..0000..
+      .0nfnf0.
+      0fnfnfm0
+      0rrrrrr0
+      0uuuuut0
+      067TU750
+      067UU750
+      0ttttts0
+    `),
+  ),
+  'bld.HOUSE.3': S(
+    px(`
+      .000000.
+      0VVVVVT0
+      0VTTTTU0
+      0TTTTTU0
+      0UUUUUU0
+      0656b650
+      06b6bb50
+      0666bb50
+      00000000
+    `),
+  ),
+  'bld.HOUSE.3b': S(
+    px(`
+      .000000.
+      0VVVUUU0
+      0VVVUUU0
+      0VV00UU0
+      0V0660U0
+      00b66b00
+      066b6650
+      0b6bb6b0
+      066bb650
+      00000000
+    `),
+  ),
+  'bld.HOUSE.4': S(
+    px(`
+      .000000.
+      0VVVVTT0
+      0VTTTTU0
+      0UUUUUU0
+      0uuuuuu0
+      0AxAAxB0
+      0AxAAxB0
+      0uuuuuu0
+      0AxaaxB0
+      0AAaaAB0
+      00000000
+    `),
+  ),
+  'bld.TOWNHOUSE.3': S(
+    px(`
+      .000000.
+      0VVVVVT0
+      0VTTTTU0
+      0TTTTTU0
+      0UUUUUU0
+      06b66b60
+      0x6bb6x0
+      00000000
+      06b66b60
+      0x6bb6x0
+      00000000
+      .0b66b0.
+      .0baab0.
+      .000000.
+    `),
+  ),
+  'bld.TOWNHOUSE.4': S(
+    px(`
+      .000000.
+      0VVVTTT0
+      0TTTUUU0
+      0uuuuuu0
+      0AxA6x50
+      0AAA6650
+      0uuuuuu0
+      0AxA6x50
+      0AAA6650
+      0uuuuuu0
+      0AxA6a50
+      0AxA6a50
+      00000000
+    `),
+  ),
+  'bld.TENEMENT.5': S(
+    px(`
+      .10..10.
+      .mr..mr.
+      0mr00mr0
+      03333320
+      0uuuuuu0
+      0mmmmmr0
+      0m1mmOr0
+      0mmmmmr0
+      0mOmm1r0
+      0mmmmmr0
+      0m1mm1r0
+      0VTTTTU0
+      0r1aa1r0
+      00000000
+    `),
+  ),
+  'bld.APARTMENT.6': S(
+    px(`
+      ...000..
+      ...0430.
+      00000000
+      06666650
+      04444430
+      0zL5zL30
+      05555540
+      0zL5zL30
+      0TU5TU40
+      0zL5zL30
+      05555540
+      0zL5zL30
+      0TU5TU40
+      05555540
+      0L4aa4L0
+      00000000
+    `),
+  ),
+  'bld.SUBURB.6': S(
+    px(`
+      .00000..
+      0VVVTT0.
+      0TTTTU00
+      0UUUUU00
+      06z6650j
+      066a6544
+      jjjjj455
+      jhijj455
+      jjjjj455
+      kjjjj455
+    `),
+  ),
+  'bld.TOWER.6': S(
+    px(`
+      ....0...
+      ....1...
+      ...000..
+      ..0TTU0.
+      ..0qzy0.
+      ..0zyx0.
+      .000000.
+      .0qzzyx0
+      .0zzyyx0
+      .0MMMMM0
+      .0qzzyx0
+      .0zzyyx0
+      .0MMMMM0
+      .0qzzyx0
+      .0zzyyx0
+      .0MMMMM0
+      .0zqzyx0
+      .0zzyyx0
+      .0MMMMM0
+      .0zzqyx0
+      .0zzyyx0
+      .0MMMMM0
+      .0L00Lx0
+      .0000000
+    `),
+  ),
+  'bld.TOWER.7': S(
+    px(`
+      ...00...
+      ...HG...
+      ..0760..
+      ..0760..
+      ..0GG0..
+      ..0760..
+      .0jkkj0.
+      .07LL50.
+      .07LL50.
+      .0GGGG0.
+      .07LL50.
+      .07LL50.
+      .0TTTU0.
+      0jkkjkj0
+      07LLLL50
+      07LqLL50
+      0GGGGGG0
+      07LLLL50
+      07LLLL50
+      0jkjkkj0
+      07LLLL50
+      07LLLL50
+      0GGGGGG0
+      07L00L50
+      07L00L50
+      00000000
+    `),
+  ),
+
+  // ───────────────────────────── FOOD ─────────────────────────────
+  'bld.FARM.0': S(
+    px(`
+      ........
+      .cccc...
+      cjcjic..
+      cicjcc..
+      .cccc.c.
+      ....ccjc
+      ...cjcic
+      ....ccc.
+    `),
+  ),
+  'bld.FARM.1': S(
+    px(`
+      .OOOOOO.
+      OoooooBC
+      cCcCcCcc
+      OOOOOOOO
+      oooooBoC
+      cCccCcCc
+      OOOOOOO.
+      ooBoooo.
+    `),
+  ),
+  'bld.FARM.6': S(
+    px(`
+      ..iiii..
+      .ijjjji.
+      ijjkkjji
+      ijk35556
+      ijjkkjji
+      ijjjjjji
+      .ijjjji.
+      ..iiii..
+    `),
+  ),
+  'bld.PASTURE.1': S(
+    px(`
+      bdbdbdbd
+      d......d
+      b.671..b
+      d.55...d
+      b...671b
+      d...55.d
+      b......b
+      bdbdbdbd
+    `),
+  ),
+};
