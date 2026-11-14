@@ -6,3 +6,4 @@ coverage/
 benchmarks/output/
 tests/e2e/output/
 tools/output/
+.claude/worktrees/

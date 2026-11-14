@@ -807,7 +807,8 @@ function placeDeposits(map: TileMap, rng: Rng, bDist: Float32Array, R: number, p
       let cur = lo;
       const size = rng.int(rule.cluster[0], rule.cluster[1]);
       for (let s = 0; s < size; s++) {
-        if (map.isLand(cur) && map.dep[cur] === 0 && map.terrain[cur] !== T.LAKE) {
+        const bdc = bDist[cur] < R ? 1 - bDist[cur] / R : 0;
+        if (map.isLand(cur) && map.dep[cur] === 0 && map.terrain[cur] !== T.LAKE && rule.suit(map, cur, bdc) > 0) {
           map.dep[cur] = rule.dep;
           map.depAmt[cur] = Math.round(rng.range(def.amount[0], def.amount[1]));
         }

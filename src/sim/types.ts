@@ -406,6 +406,8 @@ export interface Civ {
   researchTarget: string;
   researchRate: number;
   caps: Caps;
+  /** Building type ids unlocked by adopted technologies. */
+  unlocked: number[];
   era: number;
   techScore: number;
   // --- economy (national market)
@@ -423,6 +425,8 @@ export interface Civ {
   credit: number; // private leverage index (financial cycle)
   crisis: number; // years remaining of an economic crisis
   econ: EconStats;
+  /** Running accumulators for the current year (serialized so mid-year saves are exact). */
+  acc: EconAcc;
   // --- politics
   inst: Institutions;
   govForm: string;
@@ -462,6 +466,21 @@ export interface Civ {
   prev: { pop: number; gdp: number; territory: number };
   population: number;
   territory: number;
+}
+
+export interface EconAcc {
+  prod: number[]; // goods produced (units)
+  use: number[]; // goods consumed by industry, households, construction, military
+  cons: number; // household consumption value
+  inv: number; // construction investment value
+  va: number; // value added (production side)
+  services: number; // services value added
+  workers: number; // worker-months
+  unemployed: number; // unemployed worker-months
+  foodNeed: number;
+  foodShort: number;
+  energyUse: number;
+  emissions: number;
 }
 
 export interface EconStats {

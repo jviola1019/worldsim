@@ -30,6 +30,8 @@ export interface Sim {
   territoryDirty: Set<number>;
   /** Monotonic counter bumped whenever map hydrology/terrain changes globally. */
   terrainVersion: number;
+  /** Module-private derived caches (rebuildable from WorldState; never serialized). */
+  cache: Record<string, any>;
 }
 
 export interface VisualFx {
