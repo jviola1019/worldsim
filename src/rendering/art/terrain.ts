@@ -911,12 +911,12 @@ T['mtn.hill.0'] = S([
   '.XXXXXX.',
 ]);
 T['mtn.hill.1'] = S([
-  '.kkj....',
-  'kjjji.k.',
-  'kjjjiikj',
-  'jjjiiXji',
-  'jjiiXXiX',
-  'XXXX.XX.',
+  '.....kj.',
+  '.kkj.jji',
+  'kjjjjiiX',
+  'kjjjiiXi',
+  'jjjiiXXX',
+  '.XXXXXX.',
 ]);
 
 /** Volcano: shared cone with per-frame smoke (rows 0-3) and crater glow (row 5). */
