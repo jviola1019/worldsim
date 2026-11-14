@@ -1,4 +1,963 @@
 /** Terrain ground tiles (ter.*), mountains/hills (mtn.*), water details and shore pieces (shore.*) */
-import type { SpriteSheet } from './types';
+import { S, type SpriteSheet } from './types';
 
-export const TERRAIN_SPRITES: SpriteSheet = {};
+/** Register `ter.<name>.0..n` ground tile variants (8x8, fully opaque). */
+function ground(sheet: SpriteSheet, name: string, variants: string[][]): void {
+  variants.forEach((rows, i) => {
+    sheet[`ter.${name}.${i}`] = S(rows);
+  });
+}
+
+const T: SpriteSheet = {};
+
+// ---------------------------------------------------------------- water
+ground(T, 'deep', [
+  [
+    'wwwwwwww',
+    'wwwwwwww',
+    'wxxwwwww',
+    'wwwxwwww',
+    'wwwwwwww',
+    'wwwwwwww',
+    'wwwwwxxw',
+    'wwwwwwwx',
+  ],
+  [
+    'wwwwwwww',
+    'wwwwwxxw',
+    'wwwwwwwx',
+    'wwwwwwww',
+    'wwwwwwww',
+    'wxxwwwww',
+    'wwwxwwww',
+    'wwwwwwww',
+  ],
+  [
+    'wwwwwwww',
+    'wwwwwwxw',
+    'wwwwwwww',
+    'wwxxwwww',
+    'wwwwxwww',
+    'wwwwwwww',
+    'wwwwwwww',
+    'wwwwwwww',
+  ],
+]);
+
+ground(T, 'ocean', [
+  [
+    'xxxxxxxx',
+    'xxxxyyxx',
+    'xxxxxxyx',
+    'xxxxxxxx',
+    'xyyxxxxx',
+    'xxxyxxxx',
+    'xxxxxxxx',
+    'xxxxxxxx',
+  ],
+  [
+    'xxxxxxxx',
+    'xyyxxxxx',
+    'xxxyxxxx',
+    'xxxxxxxx',
+    'xxxxxxxx',
+    'xxxxxyyx',
+    'xxxxxxxy',
+    'xxxxxxxx',
+  ],
+  [
+    'xxxxxxxx',
+    'xxxxxxxx',
+    'xxxxxyyx',
+    'xxxxxxxy',
+    'xxxxxxxx',
+    'xxxxxxxx',
+    'xxyyxxxx',
+    'xxxxyxxx',
+  ],
+]);
+
+ground(T, 'coast', [
+  [
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zyyzzzzz',
+    'zzzyzzzz',
+    'zzzzzzzz',
+    'zzzzzyyz',
+    'zzzzzzzy',
+    'zzzzzzzz',
+  ],
+  [
+    'zzzzzzzz',
+    'zzzzyyzz',
+    'zzzzzzyz',
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zyyzzzzz',
+    'zzzyzzzz',
+    'zzzzzzzz',
+  ],
+  [
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zzzyyzzz',
+    'zzzzzyzz',
+    'zzzzzzzz',
+    'yzzzzzzz',
+    'zzzzzzzz',
+  ],
+]);
+
+ground(T, 'lake', [
+  [
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zzzGzzzz',
+    'zzyyzzzz',
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zzzzzzzz',
+  ],
+  [
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zzzzzzGz',
+    'zzzzzyyz',
+    'zzzzzzzz',
+    'zzzzzzzz',
+  ],
+  [
+    'zzzzzzzz',
+    'zGzzzzzz',
+    'yyzzzzzz',
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zzzzzzzz',
+    'zzzzyzzz',
+  ],
+]);
+
+// ---------------------------------------------------------------- sand
+ground(T, 'beach', [
+  [
+    'AAAAAAAA',
+    'AAAAABAA',
+    'ABAAAAAA',
+    'AAAAAAAA',
+    'AAABBAAA',
+    'AAAAAAAA',
+    'AAAAAAAB',
+    'ABAAAAAA',
+  ],
+  [
+    'AAAAAAAA',
+    'AAAAAAAA',
+    'AAAAABBA',
+    'ABAAAAAA',
+    'AAAAAAAA',
+    'AAAABAAA',
+    'ABBAAAAA',
+    'AAAAAAAA',
+  ],
+  [
+    'AABAAAAA',
+    'AAAAAAAA',
+    'AAAAAAAA',
+    'AAAAAABA',
+    'ABBAAAAA',
+    'AAAAAAAA',
+    'AAAAABAA',
+    'AAAAAAAA',
+  ],
+]);
+
+ground(T, 'desert', [
+  [
+    'BBBBBBBB',
+    'BBAAABBB',
+    'BBBBBCCB',
+    'BBBBBBBB',
+    'BBBBBBBB',
+    'AABBBBBB',
+    'BBCCBBBB',
+    'BBBBBBBB',
+  ],
+  [
+    'BBBBBBBB',
+    'BBBBBBBB',
+    'BAAABBBB',
+    'BBBBCCBB',
+    'BBBBBBBB',
+    'BBBBBAAA',
+    'BBBBBBBB',
+    'BBBBBBBB',
+  ],
+  [
+    'BBBBBAAB',
+    'BBBBBBBB',
+    'BBBBBBBB',
+    'BBBBBBBB',
+    'BBAAABBB',
+    'BBBBBCCB',
+    'BBBBBBBB',
+    'BBBBBBBB',
+  ],
+]);
+
+// ---------------------------------------------------------------- grassland
+ground(T, 'grass', [
+  [
+    'jjjjjkjj',
+    'jijijjjj',
+    'jjijjjjj',
+    'jjjjjjij',
+    'jkjjjjjj',
+    'jjjjjiji',
+    'jjjjjjij',
+    'ijjjjjjj',
+  ],
+  [
+    'jjijjjjj',
+    'jjjjjjjj',
+    'jkjjijij',
+    'jjjjjijj',
+    'jjjjjjjj',
+    'ijijjjjj',
+    'jijjjjkj',
+    'jjjjjjjj',
+  ],
+  [
+    'jjjjjjij',
+    'jijijjjj',
+    'jjijjjjj',
+    'jjjjjjkj',
+    'jjjjjjjj',
+    'jjjijijj',
+    'jkjjijjj',
+    'jjjjjjjj',
+  ],
+]);
+
+ground(T, 'steppe', [
+  [
+    'XXXXXXXX',
+    'XYYXXXXX',
+    'XXXXXXYX',
+    'XXXXXYXX',
+    'XXXXXXXX',
+    'XXjXXXXX',
+    'XXXXXYYX',
+    'YXXXXXXX',
+  ],
+  [
+    'XXXXXYXX',
+    'XXXXXXXX',
+    'XXYXXXXX',
+    'XYXXXXjX',
+    'XXXXXXXX',
+    'XXXXYYXX',
+    'XXXXXXXX',
+    'XYXXXXXX',
+  ],
+  [
+    'XXXXXXXX',
+    'XXXXYYXX',
+    'XjXXXXXX',
+    'XXXXXXXX',
+    'XXXXXXXY',
+    'XYYXXXXX',
+    'XXXXXXYX',
+    'XXXXXXXX',
+  ],
+]);
+
+ground(T, 'savanna', [
+  [
+    'YYYYYYYY',
+    'YYYBBYYY',
+    'YYYYYYYY',
+    'YXYYYYYY',
+    'YYYYYYXY',
+    'YYYYYYYY',
+    'YYBYYYYY',
+    'YYYYYXYY',
+  ],
+  [
+    'YYYYYYYY',
+    'YXYYYYYY',
+    'YYYYYBYY',
+    'YYYYYYYY',
+    'YYYYYYYY',
+    'YYYXYYYY',
+    'YYYYYYBB',
+    'YYYYYYYY',
+  ],
+  [
+    'YYYYYXYY',
+    'YYYYYYYY',
+    'YBBYYYYY',
+    'YYYYYYYY',
+    'YYYYYXYY',
+    'YYYYYYYY',
+    'YYYYYYYY',
+    'YXYYYBYY',
+  ],
+]);
+
+// ---------------------------------------------------------------- woodland floors
+ground(T, 'forest', [
+  [
+    'hhhhhhhh',
+    'hhiihhhh',
+    'hihhhhhh',
+    'hhhhhihh',
+    'hhhhiiih',
+    'hhhhhhhh',
+    'hiihhhhh',
+    'hhhhhhih',
+  ],
+  [
+    'hhhhhihh',
+    'hhhhhhhh',
+    'hhihhhhh',
+    'hiihhhih',
+    'hhhhhiih',
+    'hhhhhhhh',
+    'hhhhihhh',
+    'ihhhhhhh',
+  ],
+  [
+    'hhhhhhhh',
+    'hhhhhiih',
+    'hihhhhhh',
+    'hiihhhhh',
+    'hhhhhhhh',
+    'hhhhhihh',
+    'hhhiihhh',
+    'hhhhhhhh',
+  ],
+]);
+
+ground(T, 'taiga', [
+  [
+    'KKKKKKKK',
+    'KKhhKKKK',
+    'KhKKKKKK',
+    'KKKKKhKK',
+    'KKKKhhhK',
+    'KKKKKKKK',
+    'KhhKKKKK',
+    'KKKKKKhK',
+  ],
+  [
+    'KKKKKhKK',
+    'KKKKKKKK',
+    'KKhKKKKK',
+    'KhhKKKhK',
+    'KKKKKhhK',
+    'KKKKKKKK',
+    'KKKKhKKK',
+    'hKKKKKKK',
+  ],
+  [
+    'KKKKKKKK',
+    'KKKKKhhK',
+    'KhKKKKKK',
+    'KhhKKKKK',
+    'KKKKKKKK',
+    'KKKKKhKK',
+    'KKKhhKKK',
+    'KKKKKKKK',
+  ],
+]);
+
+ground(T, 'jungle', [
+  [
+    'hhghhhhh',
+    'hgghhihh',
+    'hhhhiihh',
+    'ihhhhhhg',
+    'hhhhhhgg',
+    'hhihhhhh',
+    'hiihhghh',
+    'hhhhhggh',
+  ],
+  [
+    'hhhhhhih',
+    'hghhhhhh',
+    'gghhhhhh',
+    'hhhihhgh',
+    'hhiihggh',
+    'hhhhhhhh',
+    'hghhhihh',
+    'hhhhiihg',
+  ],
+  [
+    'hhhhhhhh',
+    'hhhhighh',
+    'hihhgghh',
+    'iihhhhhh',
+    'hhhhhhih',
+    'hghhhiih',
+    'gghhhhhh',
+    'hhhhghhh',
+  ],
+]);
+
+ground(T, 'swamp', [
+  [
+    'KKKKKKKK',
+    'KXKXKKKK',
+    'KKXKKKKK',
+    'KKKKKKKK',
+    'KKKKKyyK',
+    'KKKKKKKK',
+    'KKKKKKXK',
+    'KKyKKKKK',
+  ],
+  [
+    'KKKKKKKK',
+    'KKKKKKKK',
+    'KyyKKXKX',
+    'KKKKKKXK',
+    'KKKKKKKK',
+    'KKKKKKKK',
+    'KXKXKKKK',
+    'KKXKKKyK',
+  ],
+  [
+    'KKKKKXKK',
+    'KKKKKKKK',
+    'KKKKKKKK',
+    'KKKXKXKK',
+    'KKKKXKKK',
+    'KyKKKKKK',
+    'KKKKKKKK',
+    'KKKKyyKK',
+  ],
+]);
+
+// ---------------------------------------------------------------- cold
+ground(T, 'tundra', [
+  [
+    'tttYtttt',
+    'tYYYtttt',
+    'tttttt5t',
+    'ttttYYtt',
+    'YtttYYYt',
+    'ttt5tttt',
+    'ttttttYt',
+    'tYtttttt',
+  ],
+  [
+    'tttttYtt',
+    'tttttttt',
+    'tYYttttt',
+    'YYYttt5t',
+    'tttttYYt',
+    'tt5ttYtt',
+    'ttttttYt',
+    'tYtttttt',
+  ],
+  [
+    'tttttttt',
+    'ttttYYtt',
+    't5ttYYYt',
+    'tttttttt',
+    'tYtttttt',
+    'YYtttt5t',
+    'tYtttttt',
+    'tttttYtt',
+  ],
+]);
+
+ground(T, 'snow', [
+  [
+    '66666666',
+    '66776666',
+    '66665566',
+    '66666666',
+    '66666q66',
+    '76666666',
+    '55666676',
+    '66666655',
+  ],
+  [
+    '66666666',
+    '66666776',
+    '66666655',
+    '6q666666',
+    '66666666',
+    '66776666',
+    '66665566',
+    '66666666',
+  ],
+  [
+    '66666656',
+    '66666666',
+    '67766666',
+    '66655666',
+    '66666666',
+    '666666q6',
+    '66666666',
+    '66666666',
+  ],
+]);
+
+ground(T, 'glacier', [
+  [
+    'qqqqqqqq',
+    'q66qqqqq',
+    'qqqqqzqq',
+    'qqqqzqqq',
+    'qqqzqq6q',
+    'qqqqqqqq',
+    'q6qqqqqq',
+    'qqqqqqqq',
+  ],
+  [
+    'qqqqqqqq',
+    'qqqqq66q',
+    'qzqqqqqq',
+    'qqzqqqqq',
+    'qqqzqqqq',
+    'qqqqqqqq',
+    'qqqqq6qq',
+    'qqqqqqqq',
+  ],
+  [
+    'qqqqqq6q',
+    'qqqqqqqq',
+    'qqqqqqqq',
+    'qq6qqqqq',
+    'qqqqqqzq',
+    'qqqqqzqq',
+    'qqqqzqqq',
+    'qqqqqqqq',
+  ],
+]);
+
+// ---------------------------------------------------------------- relief grounds
+ground(T, 'hills', [
+  [
+    'jjjjjjjj',
+    'jjkjjjjj',
+    'jkjjjjXj',
+    'jjjjjXij',
+    'jjjXXjjj',
+    'jjjjjjjj',
+    'jjjjjjjk',
+    'Xjjjjjjj',
+  ],
+  [
+    'jjjjjXjj',
+    'jjjjXijj',
+    'jjXXjjjj',
+    'jjjjjjjj',
+    'jjjjjjjj',
+    'jjjjkjjj',
+    'jjjkjjjj',
+    'jjjjjjjj',
+  ],
+  [
+    'jjjjjjjj',
+    'jjjjjjjj',
+    'jjjjjjjj',
+    'jkjjjjjj',
+    'kjjjjXjj',
+    'jjjjXijj',
+    'jjXXjjjj',
+    'jjjjjjjj',
+  ],
+]);
+
+ground(T, 'mountain', [
+  [
+    'tttttttt',
+    'ttuttttt',
+    'tutsttst',
+    'ttsttttt',
+    'tttttttt',
+    'tttttutt',
+    'ttsttuts',
+    'tstttsst',
+  ],
+  [
+    'tttttttt',
+    'tttttutt',
+    'tsttutst',
+    'ttsttsst',
+    'tttttttt',
+    'tuttttst',
+    'uttsttts',
+    'tsstttst',
+  ],
+  [
+    'tttsttst',
+    'ttttsttt',
+    'tttttttt',
+    'ttuttttt',
+    'tutsttut',
+    'tssttuts',
+    'tttttsst',
+    'tttttttt',
+  ],
+]);
+
+ground(T, 'volcanic', [
+  [
+    '22222222',
+    '22112222',
+    '22221122',
+    '2s222222',
+    '22222s22',
+    '21122222',
+    '22211222',
+    '22222222',
+  ],
+  [
+    '22222222',
+    '2222s222',
+    '21122222',
+    '22211222',
+    '22222222',
+    '22222112',
+    '2s22222f',
+    '22222222',
+  ],
+  [
+    '22222s22',
+    '22222222',
+    '22221122',
+    '2s111222',
+    '22222222',
+    '22222222',
+    '21122s22',
+    '22212222',
+  ],
+]);
+
+ground(T, 'ash', [
+  [
+    '33333333',
+    '33233333',
+    '33333343',
+    '34333333',
+    '33333233',
+    '33333333',
+    '32333343',
+    '33333333',
+  ],
+  [
+    '33333333',
+    '33333423',
+    '33333333',
+    '32333333',
+    '33334333',
+    '33333333',
+    '33333323',
+    '34333333',
+  ],
+  [
+    '33343333',
+    '33333333',
+    '32333323',
+    '33333333',
+    '33333333',
+    '33243333',
+    '33333333',
+    '33333343',
+  ],
+]);
+
+// ---------------------------------------------------------------- fantasy / alien
+ground(T, 'alien', [
+  [
+    'PPPPPPPP',
+    'PppPPPPP',
+    'PPPPPPQP',
+    'PPPPPPPP',
+    'PPPQPPPP',
+    'PPPPPppP',
+    'PPPPPPPP',
+    'PQPPPPPP',
+  ],
+  [
+    'PPPPPPPP',
+    'PPPPPQPP',
+    'PQPPPPPP',
+    'PPPPPPPP',
+    'PPppPPPP',
+    'PPPPPPPP',
+    'PPPPPPQP',
+    'PPPPPPPP',
+  ],
+  [
+    'PPPPPPPP',
+    'PPPPPPPP',
+    'PPPPPppP',
+    'PQPPPPPP',
+    'PPPPPPPP',
+    'PPPPQPPP',
+    'PppPPPPP',
+    'PPPPPPPP',
+  ],
+]);
+
+ground(T, 'alien_grass', [
+  [
+    'QQQQQQQQ',
+    'QPQPQQQQ',
+    'QQPQQQQQ',
+    'QQQQQQGQ',
+    'QQQQQQQQ',
+    'QQQQPQPQ',
+    'QQQQQPQQ',
+    'QQQQQQQQ',
+  ],
+  [
+    'QQQQQQQQ',
+    'QQQQPQPQ',
+    'QQQQQPQQ',
+    'QQQQQQQQ',
+    'QGQQQQQQ',
+    'QQQQQQQQ',
+    'PQPQQQQQ',
+    'QPQQQQQQ',
+  ],
+  [
+    'QQQQQQQQ',
+    'QQQQQQQQ',
+    'QQPQPQQQ',
+    'QQQPQQQQ',
+    'QQQQQQQQ',
+    'QQQQQQPQ',
+    'QQQQQPQP',
+    'QQQQQQQQ',
+  ],
+]);
+
+ground(T, 'corrupt', [
+  [
+    'pppppppp',
+    'pprrpppp',
+    'ppppppPp',
+    'pppprrrp',
+    'pppppppp',
+    'pPpppppp',
+    'pprrpppp',
+    'pppppprp',
+  ],
+  [
+    'pppppppp',
+    'pppPpppp',
+    'prrppppp',
+    'ppprpppp',
+    'pppppprr',
+    'pppppppp',
+    'ppppPppp',
+    'pppppppp',
+  ],
+  [
+    'pppppppp',
+    'ppppprrp',
+    'pPpppppp',
+    'pppppppp',
+    'pprrrppp',
+    'pppppppp',
+    'pppppPpp',
+    'pppppppp',
+  ],
+]);
+
+ground(T, 'crystal', [
+  [
+    'QQQQQQQQ',
+    'QQQQQQQQ',
+    'QQQHQQQQ',
+    'QQH6QQQQ',
+    'QQQQQQQQ',
+    'QQQQQQQQ',
+    'QQQQQQHQ',
+    'QQQQQHQQ',
+  ],
+  [
+    'QQQQQQQQ',
+    'QQQQQHQQ',
+    'QQQQH6QQ',
+    'QQQQQQQQ',
+    'QQQQQQQQ',
+    'QHQQQQQQ',
+    'QQQQQQQQ',
+    'QQQQQQQQ',
+  ],
+  [
+    'QQQQQQQQ',
+    'QQQQQQQQ',
+    'QQQQQQQQ',
+    'QQQQQQHQ',
+    'QHQQQH6Q',
+    'H6QQQQQQ',
+    'QQQQQQQQ',
+    'QQQQQQQQ',
+  ],
+]);
+
+
+// ---------------------------------------------------------------- relief overlays (transparent, overhang upward)
+// Light comes from the top-left: lit faces use u/t, shadow faces s/2 with a dark 1 rim on the right.
+T['mtn.peak.0'] = S([
+  '...s1...',
+  '..sus1..',
+  '..sut1..',
+  '.suts21.',
+  '.sutss1.',
+  'suutss21',
+  'sutss221',
+  'sutsss21',
+  'utts2221',
+  'utss2221',
+  'ttss2221',
+  'tss22221',
+  'ss222211',
+]);
+T['mtn.peak.1'] = S([
+  '..s1....',
+  '.sus1...',
+  '.sut1s1.',
+  'sutssus1',
+  'sutsuts1',
+  'sutsts21',
+  'utts2s21',
+  'utss2221',
+  'uttss221',
+  'utss2221',
+  'ttss2221',
+  'ss222211',
+]);
+T['mtn.peak.2'] = S([
+  '....s1..',
+  '...su1..',
+  '...sut1.',
+  '..suts1.',
+  '..sutt21',
+  '.suuts21',
+  '.sutss21',
+  'sutts221',
+  'suts2s21',
+  'utts2221',
+  'uttss221',
+  'utss2221',
+  'tss22221',
+  'ss222211',
+]);
+T['mtn.snowpeak.0'] = S([
+  '...54...',
+  '..5764..',
+  '..5764..',
+  '.57654..',
+  '.s76s41.',
+  'su6tss21',
+  'sutss221',
+  'sutsss21',
+  'utts2221',
+  'utss2221',
+  'ttss2221',
+  'tss22221',
+  'ss222211',
+]);
+T['mtn.snowpeak.1'] = S([
+  '..54....',
+  '.5764...',
+  '.576454.',
+  '5765s764',
+  's76s7654',
+  'su6sts21',
+  'utts2s21',
+  'utss2221',
+  'uttss221',
+  'utss2221',
+  'ttss2221',
+  'ss222211',
+]);
+T['mtn.snowpeak.2'] = S([
+  '....54..',
+  '...574..',
+  '...5764.',
+  '..57654.',
+  '..57654.',
+  '.s7765s1',
+  '.su6ts21',
+  'sutts221',
+  'suts2s21',
+  'utts2221',
+  'uttss221',
+  'utss2221',
+  'tss22221',
+  'ss222211',
+]);
+T['mtn.hill.0'] = S([
+  '..kkjj..',
+  '.kkjjji.',
+  'kkjjjjii',
+  'kjjjjiiX',
+  'jjjjiiXX',
+  '.XXXXXX.',
+]);
+T['mtn.hill.1'] = S([
+  '.....kj.',
+  '.kkj.jji',
+  'kjjjjiiX',
+  'kjjjiiXi',
+  'jjjiiXXX',
+  '.XXXXXX.',
+]);
+
+/** Volcano: shared cone with per-frame smoke (rows 0-3) and crater glow (row 5). */
+function volcanoFrame(smoke: string[], lava: string, streak: string): string[] {
+  return [
+    ...smoke,
+    '..2112..',
+    `.2${lava}1.`,
+    `.s3${streak}21.`,
+    '.s3fs21.',
+    's33n2221',
+    's3s2n221',
+    '3ss22n21',
+    '3s2222r1',
+    'ss222211',
+    's2222111',
+  ];
+}
+T['mtn.volcano'] = S(
+  [
+    volcanoFrame(['........', '........', '...44...', '...34...'], 'fOOf', 'nn'),
+    volcanoFrame(['........', '...45...', '..4543..', '...3....'], 'FOof', 'fn'),
+    volcanoFrame(['..4554..', '..3443..', '...3....', '...4....'], 'fooF', 'nf'),
+  ],
+  { fps: 3 },
+);
+
+T['mtn.alien.0'] = S([
+  '...H....',
+  '...HQ...',
+  '..QHPp..',
+  '..QGPp..',
+  '..QGPp..',
+  '..QGPp..',
+  '.HQGPpp.',
+  '.QQGPPp.',
+  'HQPGPPpH',
+  'QPpGPppQ',
+  'QPpQPpPp',
+  'pp.pppp.',
+]);
+
+
+export const TERRAIN_SPRITES: SpriteSheet = T;
