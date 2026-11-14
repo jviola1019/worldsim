@@ -505,7 +505,7 @@ export const BUILDING_SPRITES: SpriteSheet = {
       00000000
     `),
   ),
-  // ─── GROUP3 START ───
+  // ─────────────── FOOD (cont.), EXTRACTION, INDUSTRY, ENERGY, COMMERCE (cont.) ───────────────
   'bld.PASTURE.5': S(
     px(`
       .0000...
@@ -1325,5 +1325,4 @@ export const BUILDING_SPRITES: SpriteSheet = {
       00000000
     `),
   ),
-  // ─── GROUP3 END ───
 };
