@@ -412,4 +412,97 @@ export const BUILDING_SPRITES: SpriteSheet = {
       bdbdbdbd
     `),
   ),
+
+  // ───────────────────────────── COMMERCE ─────────────────────────────
+  'bld.HARBOR.1': S(
+    px(`
+      aeea..c.
+      .dd..VTU
+      .ee..TTU
+      adda..c.
+      .ee.CBBC
+      .dd..CC.
+      aeea....
+      .dd.....
+    `),
+  ),
+  'bld.MARKET.1': S(
+    px(`
+      TVTVT...
+      UTUTU...
+      cbbbc...
+      donjd...
+      cccTVTVT
+      ...UTUTU
+      ...cbbbc
+      ...dojnd
+      ...ccccc
+    `),
+  ),
+  'bld.MARKET.3': S(
+    px(`
+      .000000.
+      0VVVVVT0
+      0VTTTTU0
+      0TTTTTU0
+      0UUUUUU0
+      06b66b60
+      0x6bb6x0
+      0bbbbbb0
+      0uuuuut0
+      0u11u110
+      0u11u110
+      0uo1uB10
+      00000000
+    `),
+  ),
+  'bld.MARKET.6': S(
+    px(`
+      .000000.
+      06666650
+      06qq6q50
+      05555540
+      0T7TTTU0
+      0LzLzLz0
+      0zLzzLz0
+      0444HH40
+      00000000
+    `),
+  ),
+  'bld.HARBOR.4': S(
+    px(`
+      ......0.
+      ....0c0.
+      ..0c..2.
+      ..c...2.
+      ..c..2..
+      ddc..dd.
+      cccT.cc.
+      uuuUuuuu
+      uuuuuuuu
+      tttsttts
+      sssssss2
+      00000000
+    `),
+  ),
+  'bld.HARBOR.6': S(
+    px(`
+      ..0000..
+      ..0TT0..
+      00000000
+      TTTTTTTU
+      U0....0.
+      T...2.T.
+      T...2.T.
+      T...0.T.
+      T..00.T.
+      Tm0yy0T.
+      Tm0yy0T0
+      T0ooii0U
+      U0ooii0U
+      55555555
+      44444444
+      00000000
+    `),
+  ),
 };
