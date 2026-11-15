@@ -136,7 +136,7 @@ export function createCiv(sim: Sim, o: NewCiv): Civ {
     adjective: adjectiveOf(base),
     name: base,
     color: pickColor(sim),
-    emblem: { shape: sim.rng.int(0, 5), symbol: sim.rng.int(0, 11), c2: CIV_COLORS[sim.rng.int(0, CIV_COLORS.length - 1)] },
+    emblem: { shape: sim.rng.int(0, 7), symbol: sim.rng.int(0, 11), c2: CIV_COLORS[sim.rng.int(0, CIV_COLORS.length - 1)] },
     species: o.species,
     alive: true,
     founded: sim.year,

@@ -20,6 +20,7 @@
  * they deter war, and in extreme losing situations may be used with
  * catastrophic humanitarian, environmental and diplomatic consequences.
  */
+import { onBattle } from '../population/development';
 import type { Sim } from '../sim/context';
 import type { Army, Civ, Settlement, War } from '../sim/types';
 import { BALANCE } from '../config/balance';
@@ -415,6 +416,9 @@ function battleTick(sim: Sim, a: Army, war: War | undefined): void {
         y: Math.floor(winner.y),
         importance: big ? 2 : 1,
       });
+    const place = nearestName(sim, winner.x, winner.y);
+    if (winner.generalId) onBattle(sim, winner.generalId, true, place, big);
+    if (loser.generalId) onBattle(sim, loser.generalId, false, place, big);
     for (const x of [a, b]) {
       x.state = 'idle';
       x.battleWith = 0;

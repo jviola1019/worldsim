@@ -9,6 +9,7 @@
  * dynasties) and have children through a yearly "notables" step, even when
  * their home settlement is simulated as aggregate cohorts.
  */
+import { developPerson, developmentMortality, deed } from '../population/development';
 import type { Sim } from '../sim/context';
 import type { Civ, Dynasty, Person } from '../sim/types';
 import { createPerson, killPerson, phonOfCulture } from '../population/persons';
@@ -169,6 +170,7 @@ export function crown(sim: Sim, civ: Civ, person: Person, how: 'founded' | 'inhe
   const title = rulerTitle(civ, person.female);
   const regnal = same > 0 ? ` ${romanNumeral(same + 1)}` : '';
   person.titles.push(title);
+  deed(sim, person, `${how === 'founded' ? 'Founded the realm and took power' : how === 'seized' ? 'Seized power' : how === 'elected' ? 'Elected' : how === 'inherited' ? 'Inherited the throne' : 'Chosen to lead'} as ${title} of ${civ.baseName}`);
   person.reigns.push({ civId: civ.id, start: sim.year, title: `${title} of ${civ.baseName}` });
   if (regnal) person.name = person.name + regnal;
   civ.rulerId = person.id;
@@ -261,12 +263,13 @@ export function notablesYearly(sim: Sim): void {
       schedCache.set(p.civId, q);
     }
     const band = Math.min(16, Math.max(0, Math.floor(age / 5)));
-    let qq = q[band] * (1.3 - 0.6 * p.genes[0]);
+    let qq = q[band] * (1.3 - 0.6 * p.genes[0]) * developmentMortality(p);
     if (p.traits.includes('frail')) qq *= 1.4;
     if (rng.float() < qq) {
       killPerson(sim, p, age > 60 ? 'old age' : age < 5 ? 'childhood illness' : rng.pick(['illness', 'fever', 'an accident', 'a wasting disease']));
       continue;
     }
+    developPerson(sim, p, civ?.alive ? civ : undefined, age);
     if (!civ || !civ.alive) continue;
     const isCore = p.id === civ.rulerId || p.id === civ.heirId;
     // dynastic marriage

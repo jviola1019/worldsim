@@ -25,5 +25,14 @@ if (await skip.count()) await skip.click();
 await page.locator('.playback button').nth(4).click();
 await page.waitForTimeout(Number(process.env.WAIT ?? 15000));
 await page.screenshot({ path: `tools/output/shot-${mode}-game.png` });
+// nations list -> first nation inspector (flags, ruler biography)
+await page.locator('.playback button').nth(0).click();
+await page.getByLabel('Nations').click();
+await page.waitForTimeout(400);
+await page.screenshot({ path: `tools/output/shot-${mode}-nations.png` });
+const row = page.locator('.sheet-body ul.list li button').first();
+if (await row.count()) { await row.click(); await page.waitForTimeout(400); await page.screenshot({ path: `tools/output/shot-${mode}-civ.png` }); }
+const ruler = page.locator('.sheet-body button.person-card').first();
+if (await ruler.count()) { await ruler.click(); await page.waitForTimeout(400); await page.screenshot({ path: `tools/output/shot-${mode}-person.png`, fullPage: true }); }
 console.log('errors:', errors.slice(0, 10));
 await browser.close();

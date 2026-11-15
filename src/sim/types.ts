@@ -123,6 +123,14 @@ export interface Person {
   titles: string[];
   reigns: { civId: number; start: number; end?: number; title: string }[];
   events: number[];
+  /** Development (notables): practice experience per skill. */
+  xp?: { admin: number; military: number; diplomacy: number; learning: number };
+  /** Accumulated strain 0..1 (wars, losses, illegitimacy); raises mortality, can change traits. */
+  stress?: number;
+  battles?: number;
+  victories?: number;
+  /** Life log for biographies: year + what happened (with cause). */
+  deeds?: { y: number; t: string }[];
 }
 
 export interface Dynasty {

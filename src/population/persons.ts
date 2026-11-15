@@ -4,9 +4,10 @@
 import type { Sim } from '../sim/context';
 import type { Person, PersonRole, SpeciesKey } from '../sim/types';
 import { clamp, clamp01 } from '../core/math';
-import { TRAITS, TRAIT_BY_KEY } from './traits';
+import { INNATE_TRAITS, TRAIT_BY_KEY } from './traits';
 import { makeName } from '../culture/language';
 import { onNotableDeath } from '../politics/succession';
+import { onKinDeath } from './development';
 
 export interface NewPerson {
   female?: boolean;
@@ -51,13 +52,13 @@ export function rollTraits(sim: Sim, f?: Person, m?: Person): string[] {
     if (!parent) continue;
     for (const t of parent.traits) {
       const def = TRAIT_BY_KEY[t];
-      if (def && !has(t) && rng.chance(def.heritable)) out.push(t);
+      if (def && def.kind !== 'acquired' && !has(t) && rng.chance(def.heritable)) out.push(t);
     }
   }
   const target = rng.int(1, 3);
   let guard = 0;
   while (out.length < target && guard++ < 20) {
-    const def = TRAITS[rng.int(0, TRAITS.length - 1)];
+    const def = INNATE_TRAITS[rng.int(0, INNATE_TRAITS.length - 1)];
     if (!has(def.key) && rng.chance(def.rarity * 3)) out.push(def.key);
   }
   return out;
@@ -119,6 +120,7 @@ export function createPerson(sim: Sim, a: NewPerson): Person {
     reigns: [],
     events: [],
   };
+  if (p.notable) p.deeds = [{ y: a.born, t: a.born < sim.year ? 'Born' : `Born${f || m ? ' to ' + [f?.name, m?.name].filter(Boolean).join(' and ') : ''}` }];
   w.persons.set(p.id, p);
   if (f) f.children.push(p.id);
   if (m) m.children.push(p.id);
@@ -136,6 +138,7 @@ export function displayName(sim: Sim, p: Person): string {
 
 /** Mark a person as historically notable (kept after death). Also keeps their parents' records. */
 export function makeNotable(sim: Sim, p: Person): void {
+  if (!p.notable) p.deeds ??= [{ y: p.born, t: 'Born' }];
   p.notable = true;
 }
 
@@ -163,6 +166,7 @@ export function killPerson(sim: Sim, p: Person, cause: string): void {
     const sp = w.persons.get(p.spouseId);
     if (sp && sp.spouseId === p.id) sp.spouseId = 0;
   }
+  if (p.notable) onKinDeath(sim, p);
   onNotableDeath(sim, p);
   if (!p.notable) w.persons.delete(p.id);
 }

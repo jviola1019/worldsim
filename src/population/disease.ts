@@ -9,6 +9,7 @@
  * policy. Recovered people are immune for a while. No real pathogen biology is
  * modelled — parameters are abstract (r0, lethality, duration, immunity).
  */
+import { onEpidemicSurvived } from './development';
 import type { Sim } from '../sim/context';
 import type { Civ, Disease, Settlement } from '../sim/types';
 import { BALANCE } from '../config/balance';
@@ -104,6 +105,7 @@ export function diseaseMonthly(sim: Sim, s: Settlement, civ: Civ): void {
     if (e.i > 0.0005) return true;
     const d = w.diseases.get(e.diseaseId);
     s.immunity[e.diseaseId] = Math.max(s.immunity[e.diseaseId] ?? 0, e.r);
+    if (d && e.deaths > Math.max(20, s.pop * 0.03)) onEpidemicSurvived(sim, s.id, d.name);
     if (d && e.deaths > Math.max(20, s.pop * 0.03))
       logEvent(sim, {
         type: 'epidemic',

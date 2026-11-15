@@ -10,6 +10,7 @@
  * (population, roads, rails, trade routes, airports) — they are not
  * simulated individuals and are documented as such.
  */
+import { flagCanvas } from './flag';
 import type { Sim } from '../sim/context';
 import { CHUNK } from '../sim/context';
 import { Atlas } from './atlas';
@@ -303,7 +304,14 @@ export class Renderer {
         const row = Math.floor(k / 4);
         atlas.draw(ctx, unit, a.x * TILE + (col - 1.5) * 4 + (row % 2), a.y * TILE + row * 3 - 3, this.frameIdx(a.state === 'battle' ? 8 : 5, k), civ?.color, flip);
       }
-      atlas.draw(ctx, 'fx.flag', a.x * TILE - 7, a.y * TILE - 4, this.frameIdx(3), civ?.color);
+      if (civ) {
+        // banner pole + the nation's own flag (6×4 art px at world scale)
+        const bx = Math.round(a.x * TILE - 9), by = Math.round(a.y * TILE - 10);
+        ctx.fillStyle = '#3b2a1a';
+        ctx.fillRect(bx, by, 1, 9);
+        const wave = this.frameIdx(3) === 1 ? 1 : 0;
+        ctx.drawImage(flagCanvas(civ), bx + 1, by + wave * 0.5, 6, 4);
+      } else atlas.draw(ctx, 'fx.flag', a.x * TILE - 7, a.y * TILE - 4, this.frameIdx(3));
       if (a.state === 'sieging') atlas.draw(ctx, 'fx.smoke', a.x * TILE + 6, a.y * TILE - 6, this.frameIdx(3));
     }
   }
@@ -504,6 +512,10 @@ export class Renderer {
         ctx.fillStyle = 'rgba(13,20,36,0.75)';
         const tw = ctx.measureText(text).width;
         ctx.fillRect(sx - tw / 2 - 4, sy - 15, tw + 8, 15);
+        if (s.capital && civ) {
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(flagCanvas(civ), Math.round(sx - tw / 2 - 19), sy - 14, 15, 10);
+        }
         ctx.fillStyle = civ?.color ?? '#ece2c8';
         ctx.fillRect(sx - tw / 2 - 4, sy - 2, tw + 8, 2);
         ctx.fillStyle = '#ece2c8';
@@ -518,9 +530,13 @@ export class Renderer {
         const [sx, sy] = cam.worldToScreen(cap.x * TILE, cap.y * TILE);
         ctx.fillStyle = 'rgba(13,20,36,0.7)';
         const tw = ctx.measureText(civ.name).width;
-        ctx.fillRect(sx - tw / 2 - 4, sy - 16, tw + 8, 15);
+        ctx.fillRect(sx - tw / 2 - 22, sy - 16, tw + 26, 15);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(flagCanvas(civ), Math.round(sx - tw / 2 - 19), Math.round(sy - 14), 15, 10);
         ctx.fillStyle = civ.color;
-        ctx.fillText(civ.name, sx, sy - 2);
+        ctx.fillRect(sx - tw / 2 - 22, sy - 2, tw + 26, 2);
+        ctx.fillStyle = '#ece2c8';
+        ctx.fillText(civ.name, sx + 2, sy - 3);
       }
     }
   }

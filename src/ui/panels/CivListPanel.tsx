@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import type { Simulation } from '../../sim/simulation';
-import { Icon, fmt } from '../shared';
+import { Icon, fmt, Flag } from '../shared';
 import { ERA_NAMES } from '../../technology/techData';
 
 export function CivListPanel({ sim, close, open }: { sim: Simulation; close: () => void; open: (id: number) => void }) {
@@ -22,7 +22,7 @@ export function CivListPanel({ sim, close, open }: { sim: Simulation; close: () 
             <li key={c.id}>
               <button onClick={() => open(c.id)}>
                 <div class="row">
-                  <i class="swatch" style={{ background: c.color }} />
+                  <Flag civ={c} size={14} />
                   <strong>{c.name}</strong>
                 </div>
                 <div class="muted">

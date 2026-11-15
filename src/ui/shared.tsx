@@ -1,3 +1,4 @@
+import { flagUrl, type FlagSpec } from '../rendering/flag';
 import { Atlas } from '../rendering/atlas';
 import { formatNumber } from '../core/math';
 
@@ -43,4 +44,10 @@ export function Bar({ value, color }: { value: number; color?: string }) {
       <i style={{ width: `${Math.max(0, Math.min(1, value)) * 100}%`, background: color }} />
     </div>
   );
+}
+
+/** Pixel flag of a civilization (generated from its emblem). */
+export function Flag({ civ, size = 24 }: { civ: FlagSpec | undefined; size?: number }) {
+  if (!civ) return null;
+  return <img class="flag" src={flagUrl(civ)} width={size * 1.5} height={size} alt="" style={{ imageRendering: 'pixelated' }} />;
 }

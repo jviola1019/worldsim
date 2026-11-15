@@ -14,6 +14,7 @@
  * the war's recorded causes. Decisions use noisy power estimates (better with
  * intelligence) — no omniscient AI.
  */
+import { onWarEnd } from '../population/development';
 import type { Sim } from '../sim/context';
 import type { Cause, Civ, IntlOrg, Relation, Treaty, TreatyKind, War } from '../sim/types';
 import { clamp, clamp01, saturate } from '../core/math';
@@ -337,6 +338,7 @@ export function makePeace(sim: Sim, war: War, reason: string): void {
       winner.treasury += reparations;
       outcome = ceded.length ? `${loser.name} ceded ${ceded.map((s) => s.name).join(', ')} to ${winner.name}` : `${loser.name} paid reparations to ${winner.name}`;
     }
+    onWarEnd(sim, winner, loser, war.name, Math.abs(score) > 60);
     const rel = ensureRelation(sim, winner.id, loser.id);
     if (loser.id === rel.a) rel.grievAB += Math.abs(score) * 0.5;
     else rel.grievBA += Math.abs(score) * 0.5;

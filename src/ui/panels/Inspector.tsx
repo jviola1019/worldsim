@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks';
 import type { Simulation } from '../../sim/simulation';
 import type { Civ, HistoryEvent, Person, Settlement } from '../../sim/types';
-import { Icon, Kv, Bar, fmt, pct, Sprite } from '../shared';
+import { Icon, Kv, Bar, fmt, pct, Sprite, Flag } from '../shared';
 import { BUILDINGS, SECTOR_NAMES } from '../../civilizations/buildings';
 import { TERRAIN } from '../../world/terrain';
 import { DEPOSITS, GOODS } from '../../world/resources';
@@ -213,7 +213,7 @@ function SettlementView({ sim, s, setSel, close, focus }: P & { s: Settlement })
   const empTotal = emp.reduce((a, b) => a + b, 0) || 1;
   return (
     <>
-      <Head title={s.name} sub={`${s.capital ? 'Capital · ' : ''}${civ?.name ?? ''} · founded ${s.founded}`} icon={<Icon id={s.capital ? 'ico.crown' : 'ico.found_city'} size={32} />} close={close} />
+      <Head title={s.name} sub={`${s.capital ? 'Capital · ' : ''}${civ?.name ?? ''} · founded ${s.founded}`} icon={civ ? <Flag civ={civ} size={24} /> : <Icon id={s.capital ? 'ico.crown' : 'ico.found_city'} size={32} />} close={close} />
       <div class="sheet-body">
         <Kv rows={[
           ['People', fmt(s.pop)],
@@ -279,6 +279,19 @@ function SettlementView({ sim, s, setSel, close, focus }: P & { s: Settlement })
   );
 }
 
+const SKILL_NAMES = { admin: 'Administration', military: 'Military', diplomacy: 'Diplomacy', learning: 'Learning' };
+
+function traitTip(key: string): string {
+  const d = TRAIT_BY_KEY[key];
+  if (!d) return key;
+  const parts: string[] = [];
+  if (d.desc) parts.push(d.desc);
+  for (const [k, v] of Object.entries(d.skills ?? {})) parts.push(`${(v as number) > 0 ? '+' : ''}${v} ${k}`);
+  for (const [k, v] of Object.entries(d.lead ?? {})) parts.push(`as leader: ${(v as number) > 0 ? '+' : ''}${Math.round((v as number) * 100)}% ${k}`);
+  if (d.health) parts.push(`${d.health > 0 ? '+' : ''}${Math.round(d.health * 100)}% health`);
+  return parts.join(' · ');
+}
+
 function PersonView({ sim, person, setSel, close, focus }: P & { person: Person }) {
   const w = sim.w;
   const age = (person.died ?? sim.year) - person.born;
@@ -296,14 +309,47 @@ function PersonView({ sim, person, setSel, close, focus }: P & { person: Person 
           ['Species', person.species],
           ['Culture', w.cultures.get(person.cultureId)?.name ?? '—'],
           ['Faith', person.religionId ? w.religions.get(person.religionId)?.name ?? '—' : 'none'],
-          ['Administration', person.skills.admin.toFixed(1)],
-          ['Military', person.skills.military.toFixed(1)],
-          ['Diplomacy', person.skills.diplomacy.toFixed(1)],
-          ['Learning', person.skills.learning.toFixed(1)],
+          ...(person.battles ? [['Battles', `${person.battles} fought, ${person.victories ?? 0} won`] as [string, string]] : []),
           ...(person.died !== undefined ? [['Died of', person.deathCause ?? '—'] as [string, string]] : []),
           ...(dyn ? [['Dynasty', `House ${dyn.name}`] as [string, string]] : []),
         ]} />
-        <div class="row">{person.traits.map((t) => <span key={t} class="chip">{TRAIT_BY_KEY[t]?.name ?? t}</span>)}</div>
+        <div class="section">
+          <h3>Skills</h3>
+          {(['admin', 'military', 'diplomacy', 'learning'] as const).map((k) => (
+            <div key={k} class="skill-row">
+              <span>{SKILL_NAMES[k]}</span>
+              <Bar value={person.skills[k] / 10} />
+              <span class="num">{person.skills[k].toFixed(1)}</span>
+            </div>
+          ))}
+          {person.stress !== undefined && person.died === undefined && (
+            <div class="skill-row">
+              <span>Stress</span>
+              <Bar value={person.stress} color="#e2654e" />
+              <span class="num">{Math.round(person.stress * 100)}%</span>
+            </div>
+          )}
+        </div>
+        <div class="section">
+          <h3>Traits</h3>
+          <div class="row">
+            {person.traits.map((t) => {
+              const d = TRAIT_BY_KEY[t];
+              return (
+                <span key={t} class={`chip trait ${d?.kind === 'acquired' ? 'acquired' : ''}`} title={traitTip(t)}>
+                  {d?.name ?? t}
+                </span>
+              );
+            })}
+          </div>
+          <div class="muted small">Outlined traits were earned through life events; others were inborn or inherited.</div>
+        </div>
+        {person.deeds && person.deeds.length > 0 && (
+          <div class="section">
+            <h3>Life</h3>
+            <ul class="list timeline">{person.deeds.map((d, k) => <li key={k}><span class="yr">{d.y}</span> {d.t}</li>)}</ul>
+          </div>
+        )}
         {person.reigns.length > 0 && (
           <div class="section">
             <h3>Reigns</h3>
@@ -348,11 +394,12 @@ function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>('Overview');
   const w = sim.w;
   const ruler = w.persons.get(civ.rulerId);
+  const heir = civ.heirId ? w.persons.get(civ.heirId) : undefined;
   const gov = GOV_FORMS[civ.govForm as GovFormKey];
   const cap = w.settlements.get(civ.capital);
   return (
     <>
-      <Head title={civ.name} sub={civ.alive ? `${gov?.label ?? civ.govForm} · ${ERA_NAMES[civ.era]} era` : `Fell in ${civ.fell}: ${civ.fellCause}`} icon={<span class="swatch" style={{ background: civ.color, width: '26px', height: '26px' }} />} close={close} />
+      <Head title={civ.name} sub={civ.alive ? `${gov?.label ?? civ.govForm} · ${ERA_NAMES[civ.era]} era` : `Fell in ${civ.fell}: ${civ.fellCause}`} icon={<Flag civ={civ} size={26} />} close={close} />
       <div class="tabs" role="tablist">
         {TABS.map((t) => (
           <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}>
@@ -364,7 +411,6 @@ function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
         {tab === 'Overview' && (
           <>
             <Kv rows={[
-              ['Leader', ruler ? `${ruler.titles[ruler.titles.length - 1] ?? ''} ${ruler.name}` : '—'],
               ['People', fmt(civ.population)],
               ['Settlements', String(civ.settlements.length)],
               ['Capital', cap?.name ?? '—'],
@@ -374,6 +420,16 @@ function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
               ['Living standard', civ.econ.livingStandard.toFixed(2)],
               ['Research per year', fmt(civ.researchRate)],
             ]} />
+            <div class="section">
+              <h3>Leadership</h3>
+              {ruler ? (
+                <button class="person-card" onClick={() => setSel({ kind: 'person', id: ruler.id })}>
+                  <strong>{ruler.titles[ruler.titles.length - 1] ?? 'Leader'} {ruler.name}{ruler.family ? ' ' + ruler.family : ''}</strong>
+                  <span class="muted">age {sim.year - ruler.born} · {ruler.traits.map((t) => TRAIT_BY_KEY[t]?.name ?? t).join(', ') || 'no notable traits'}</span>
+                </button>
+              ) : <span class="muted">No recognised leader</span>}
+              {heir && <button class="chip" onClick={() => setSel({ kind: 'person', id: heir.id })}>Heir: {heir.name}</button>}
+            </div>
             <div class="section"><h3>Stability</h3><Bar value={civ.stability} /></div>
             <div class="section"><h3>Legitimacy</h3><Bar value={civ.legitimacy} /></div>
             <div class="section"><h3>Unrest</h3><Bar value={civ.unrest} color="#e2654e" /></div>
