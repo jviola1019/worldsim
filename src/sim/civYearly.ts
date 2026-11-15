@@ -51,8 +51,7 @@ export function civYearly(sim: Sim, civ: Civ): void {
     if (c) c.capital = true;
   }
   researchYearly(sim, civ);
-  const trade = (sim.cache.tradeTotals as Map<number, { exp: number; imp: number }> | undefined)?.get(civ.id) ?? { exp: 0, imp: 0 };
-  civEconomyYearly(sim, civ, trade.exp, trade.imp);
+  civEconomyYearly(sim, civ, civ.tradeExp ?? 0, civ.tradeImp ?? 0);
   politicsYearly(sim, civ);
   if (!civ.alive) return;
   diplomacyYearly(sim, civ);

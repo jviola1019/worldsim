@@ -100,9 +100,14 @@ export class Simulation implements Sim {
     let worldPop = 0;
     for (const s of w.settlements.values()) worldPop += s.pop;
     for (const b of w.bands.values()) worldPop += b.members.length;
-    this.cache.worldPop = worldPop;
+    this.cache.worldPop = worldPop; // display only; the population-cap law recomputes live (see settlement.ts)
     for (const s of w.settlements.values()) s.flows = emptyFlows();
-    this.cache.tradeTotals = tradeYearly(this);
+    const totals = tradeYearly(this);
+    for (const c of w.civs.values()) {
+      const t = totals.get(c.id);
+      c.tradeExp = t?.exp ?? 0;
+      c.tradeImp = t?.imp ?? 0;
+    }
     speciesCensus(this);
     evolutionYearly(this);
     religionYearly(this);

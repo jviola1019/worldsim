@@ -95,11 +95,11 @@ export function infrastructureYearly(sim: Sim, civ: Civ): void {
       if (!s.links.includes(o.id)) s.links.push(o.id);
       if (!o.links.includes(s.id)) o.links.push(s.id);
       if (left <= 0 || civ.caps.roadTier < 1 || s.id > o.id) continue;
-      const key = `path:${s.id}-${o.id}`;
-      let path = sim.cache[key] as number[] | undefined;
+      const routes = (s.routes ??= {});
+      let path = routes[o.id];
       if (!path) {
         path = findPath(m, m.idx(s.x, s.y), m.idx(o.x, o.y), { mode: 'land', maxNodes: 8000 }) ?? [];
-        sim.cache[key] = path;
+        routes[o.id] = path;
       }
       left -= improvePath(sim, civ, path, Math.min(left, 12));
     }

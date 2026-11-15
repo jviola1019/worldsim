@@ -247,7 +247,7 @@ export function settlementMonthly(sim: Sim, s: Settlement): void {
   let tfr = tfrFor(civ, s, q[0], econ.adequacy, s.species);
   // world law: population cap (fertility collapses when the cap is reached)
   const cap = sim.w.laws.populationCap;
-  if (cap > 0 && (sim.cache.worldPop ?? 0) >= cap) tfr *= 0.05;
+  if (cap > 0 && livePopulation(sim) >= cap) tfr *= 0.05;
   const ctx = { q, tfr, adequacy: econ.adequacy };
   if (s.mode === 'cohort') cohortMonth(s, ctx, s.flows);
   else individualMonth(sim, s.members, ctx, { settlementId: s.id, bandId: 0, civId: civ.id, cultureId: s.cultures[0]?.id ?? civ.cultureId, religionId: s.religions[0]?.id ?? 0, species: s.species }, s.flows);
@@ -328,3 +328,14 @@ export function mixShares(target: { id: number; f: number }[], id: number, frac:
 }
 
 export { removePeople };
+
+/** World population from current state, memoized per tick (identical before and after a save/load). */
+function livePopulation(sim: Sim): number {
+  const c = sim.cache.livePop as { tick: number; v: number } | undefined;
+  if (c && c.tick === sim.w.tick) return c.v;
+  let v = 0;
+  for (const s of sim.w.settlements.values()) v += s.pop;
+  for (const b of sim.w.bands.values()) v += b.members.length;
+  sim.cache.livePop = { tick: sim.w.tick, v };
+  return v;
+}

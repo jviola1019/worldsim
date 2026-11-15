@@ -308,6 +308,8 @@ export interface Settlement {
   lastTerritory: number;
   /** Nearest settlements with a trade/road connection (cached ids). */
   links: number[];
+  /** Planned land routes to linked settlements (target id -> tile path), kept so road building resumes identically after a load. */
+  routes?: Record<number, number[]>;
   abandoned?: number;
 }
 
@@ -440,6 +442,9 @@ export interface Civ {
   /** Last year's market stock value and money supply (for ΔInventory and inflation). */
   prevStockValue?: number;
   prevMoney?: number;
+  /** This year's trade totals (computed at year start, used by the civ's yearly economy). */
+  tradeExp?: number;
+  tradeImp?: number;
   // --- politics
   inst: Institutions;
   govForm: string;

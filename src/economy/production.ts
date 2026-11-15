@@ -194,6 +194,7 @@ export function householdDemand(civ: Civ, out: Float64Array = DEMAND_SCRATCH): F
 }
 
 function take(civ: Civ, g: number, amount: number, access: number): number {
+  if (!(amount > 0)) return 0; // negative or NaN requests would create goods from nothing
   civ.acc.want[g] += amount;
   const avail = civ.stock[g] * access;
   const got = Math.min(avail, amount);
@@ -276,7 +277,12 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   // desired annual production: need + reserve gap (+ a little for the national pool)
   const reserve = needYear * BALANCE.foodReserveYears;
   const gap = clamp((reserve - s.food) / Math.max(1, needYear), -0.25, 0.5);
-  let demandYear = needYear * (1 + gap) + (civ.stock[Good.FOOD] < civ.population * 0.15 ? needYear * 0.05 : 0);
+  // National market: when the national reserve is below ~4 months of national need, farms everywhere
+  // produce at capacity for sale to the cities (surplus is moved into the pool below). Otherwise produce
+  // for local need plus a small marketable margin.
+  const nationalNeed = civ.population * BALANCE.foodNeedPerCapita;
+  const nationalShort = civ.stock[Good.FOOD] < nationalNeed * 0.33;
+  let demandYear = nationalShort ? Infinity : needYear * (1 + gap) + needYear * 0.05;
   // sort by food per worker
   srcs.sort((a, b) => b.yieldYear / Math.max(1e-6, b.labor) - a.yieldYear / Math.max(1e-6, a.labor));
   let producedMonth = 0;
@@ -284,7 +290,9 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   for (const src of srcs) {
     if (demandYear <= 0 || free <= 0 || src.labor <= 0 || src.yieldYear <= 0) continue;
     const perWorker = src.yieldYear / src.labor;
-    const wanted = Math.min(src.labor, demandYear / perWorker);
+    // foraging never runs at "capacity" for the market (it would strip the land)
+    if (src.kind === 4 && demandYear === Infinity) demandYear = needYear * (1 + gap);
+    const wanted = Math.min(src.labor, demandYear === Infinity ? src.labor : demandYear / perWorker);
     const assigned = Math.min(free, wanted);
     const staffing = assigned / src.labor;
     let yearRate = src.yieldYear * Math.pow(staffing, 0.85);
@@ -327,8 +335,8 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   civ.acc.foodShort += needMonth - eaten;
   const preservation = clamp01(caps.foodPreservation) * 0.7 + (s.bld[B.GRANARY] > 0 ? 0.25 : 0);
   s.food -= (s.food * BALANCE.foodSpoilage * (1 - clamp(preservation, 0, 0.9))) / 12;
-  if (s.food > reserve * 2) {
-    const surplus = (s.food - reserve * 1.5) * access * 0.5;
+  if (s.food > reserve * (nationalShort ? 1 : 2)) {
+    const surplus = (s.food - reserve * (nationalShort ? 0.8 : 1.5)) * access * (nationalShort ? 0.8 : 0.5);
     s.food -= surplus;
     civ.stock[Good.FOOD] += surplus;
   }
@@ -337,7 +345,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   let builders = 0;
   if (s.construction || s.pop > s.housing * 0.85) {
     const want = (s.construction ? s.construction.labor * 12 * 0.5 : 0) + s.pop * 0.01 + 2;
-    builders = Math.min(free * 0.3, want);
+    builders = Math.max(0, Math.min(free * 0.3, want)); // never negative: free can dip below 0 after allocation rounding
     free -= builders;
   }
   emp[SECTOR.CONSTRUCTION] = builders;

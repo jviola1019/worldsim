@@ -255,18 +255,26 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   const pressure = pop / Math.max(1, s.housing);
   const freeLand = countFree(sim, s);
   const resi = bestResidential(civ, s, freeLand < 4);
-  if (pressure > 0.85) add(resi.id, 3 + (pressure - 0.85) * 12);
+  if (pressure > 0.85) add(resi.id, 3 + Math.min(1, pressure - 0.85) * 12); // capped: crowding is urgent, not infinitely so
   // upgrade an older residential district in place
   if (pressure > 0.7 && freeLand < 6) {
     const old = oldestResidential(sim, s, residentialRank(resi.id));
-    if (old !== null) cands.push({ type: resi.id, score: 2.5 + (pressure - 0.7) * 10, upgrade: old });
+    if (old !== null) cands.push({ type: resi.id, score: 2.5 + Math.min(1, pressure - 0.7) * 10, upgrade: old });
   }
   // food
   if (caps.farming > 0) {
     const needYear = pop * 0.9;
     const farmOut = sites.farmPot * 1300 * (1 + Math.max(0, caps.farming - 1));
-    const deficit = (needYear * 1.15 - farmOut - sites.forage * 0.6) / Math.max(1, needYear);
+    const local = (needYear * 1.15 - farmOut - sites.forage * 0.6) / Math.max(1, needYear);
+    // the national market also signals: hungry cities elsewhere make farmland worth developing here
+    const national = civ.acc.foodNeed > 0 ? civ.acc.foodShort / civ.acc.foodNeed : 0;
+    const deficit = Math.max(local, national > 0.05 && freeLand > 0 ? national * 0.8 : 0);
     if (deficit > 0) add(B.FARM, 2 + deficit * 8);
+    // no free land and real hunger: redevelop an outlying surplus district into farmland
+    if (deficit > 0.2 && freeLand < 2 && hasUnlocked(civ, B.FARM)) {
+      const site = redevelopForFarm(sim, s);
+      if (site !== null) cands.push({ type: B.FARM, score: 2 + deficit * 8, upgrade: site });
+    }
     if (caps.herding > 0 && sites.pastures < Math.max(1, sites.farms / 3)) add(B.PASTURE, 1.5 + deficit * 3);
     if (s.bld[B.GRANARY] === 0 && pop > 250) add(B.GRANARY, 1.2);
   }
@@ -291,8 +299,11 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   }
   // industry & crafts
   const unemployed = s.employment[6] / Math.max(1, pop);
-  if (pop > 150) add(B.WORKSHOP, 1 + pop / 1500 - s.bld[B.WORKSHOP] * 1.2);
-  if (pop > 150 && caps.metalTier >= 1) add(B.SMITHY, 1 + pop / 3000 - s.bld[B.SMITHY] * 1.5);
+  // crafts scale with population up to a target count (factories take over in industrial eras)
+  const workshopTarget = pop / (caps.industry > 0 ? 15000 : 5000);
+  if (pop > 150) add(B.WORKSHOP, 1 + (workshopTarget - s.bld[B.WORKSHOP]) * 1.2);
+  const smithyTarget = pop / 8000;
+  if (pop > 150 && caps.metalTier >= 1) add(B.SMITHY, 1 + (smithyTarget - s.bld[B.SMITHY]) * 1.5);
   if (caps.industry > 0) add(B.FACTORY, 1.5 + unemployed * 20 + pop / 20000 - s.bld[B.FACTORY] * 0.8);
   if (caps.industry > 0 && civ.stock[Good.METAL] < civ.population * 0.01) add(B.STEEL_MILL, 2);
   if (caps.oilExtraction > 0 && civ.stock[Good.OIL] > 100) add(B.REFINERY, 1.5);
@@ -362,13 +373,19 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
 
   if (!cands.length) return;
   cands.sort((a, b) => b.score - a.score || a.type - b.type);
-  for (const c of cands.slice(0, 4)) {
+  if (sim.cache.debugPlan) (sim.cache.debugPlan as unknown[]).push({ s: s.name, cands: cands.map((c) => `${BUILDINGS[c.type].key}:${c.score.toFixed(1)}${c.upgrade !== undefined ? 'U' : ''}${canAfford(civ, BUILDINGS[c.type]) ? '' : '$'}`).join(' ') });
+  // walk down the ranked list: unaffordable wishes record demand but don't block cheaper needs
+  let siteTries = 0;
+  let wishes = 0;
+  for (const c of cands) {
+    if (siteTries >= 4) break;
     const def = BUILDINGS[c.type];
     if (!canAfford(civ, def)) {
-      // record the unmet need so traders can supply it
-      for (const [g, amt] of Object.entries(def.cost)) civ.acc.want[Good[g as GoodKey]] += (amt as number) * 0.25;
+      // record the unmet need so traders can supply it (top wishes only)
+      if (wishes++ < 4) for (const [g, amt] of Object.entries(def.cost)) civ.acc.want[Good[g as GoodKey]] += (amt as number) * 0.25;
       continue;
     }
+    siteTries++;
     const tile = c.upgrade !== undefined ? c.upgrade : findSite(sim, s, def);
     if (tile === null) continue;
     startProject(sim, s, civ, c.type, tile, c.upgrade !== undefined);
@@ -398,6 +415,32 @@ function oldestResidential(sim: Sim, s: Settlement, targetRank: number): number 
     const key = rank * 100 + d2; // lowest tier first, nearest the center first
     if (key < bestKey) {
       bestKey = key;
+      best = i;
+    }
+  });
+  return best;
+}
+
+const REDEVELOPABLE = new Set(['industry', 'military', 'commerce', 'extraction']);
+
+/**
+ * Land-use competition: the outermost non-unique industrial/military/commercial/extraction district
+ * on arable land (never historic, multi-tile or the last of its kind).
+ */
+function redevelopForFarm(sim: Sim, s: Settlement): number | null {
+  const m = sim.w.map;
+  let best: number | null = null;
+  let bestD = -1;
+  m.forRadius(s.x, s.y, s.radius + 1, (i, _x, _y, d2) => {
+    if (m.settle[i] !== s.id) return;
+    const b = m.bld[i];
+    if (!b || m.bldFlags[i] & (BLDF.HISTORIC | BLDF.PART)) return;
+    const def = BUILDINGS[b];
+    if (!def || def.footprint > 1 || !REDEVELOPABLE.has(def.category) || s.bld[b] < 2) return;
+    if (def.placement === 'deposit' || def.placement === 'oil') return; // mines sit on their deposit
+    if (m.fert[i] < 50 || cropSuitability(m.temp[i], m.moist[i], true) < 0.3) return;
+    if (d2 > bestD) {
+      bestD = d2;
       best = i;
     }
   });
@@ -459,9 +502,10 @@ export function progressConstruction(sim: Sim, s: Settlement, civ: Civ, builders
     return;
   }
   const productivity = (1 + civ.caps.construction) * (1 + civ.caps.robotics * 0.6) * (1 + civ.caps.automation * 0.3);
-  const work = (builders / 12) * productivity;
+  const work = (Math.max(0, builders) / 12) * productivity;
+  if (!(work > 0)) return;
   const total = BUILDINGS[job.type].labor || 1;
-  const frac = Math.min(1, work / Math.max(0.001, job.labor));
+  const frac = clamp(work / Math.max(0.001, job.labor), 0, 1);
   // materials consumed in proportion to work done
   let materialsOk = 1;
   const access = s.capital ? 1 : clamp(s.access, 0.2, 1);
@@ -476,7 +520,7 @@ export function progressConstruction(sim: Sim, s: Settlement, civ: Civ, builders
     job.need[g] -= got;
     if (want > 0) materialsOk = Math.min(materialsOk, got / want);
   }
-  const done = work * materialsOk;
+  const done = Math.min(work * materialsOk, Math.max(0, job.labor));
   job.labor -= done;
   civ.acc.inv += done * 0.5; // value of construction labour
   job.progress = clamp(1 - job.labor / total, 0, 1);

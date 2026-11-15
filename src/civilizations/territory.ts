@@ -55,10 +55,14 @@ export function setTileSettlement(sim: Sim, i: number, sid: number): void {
   markOverlay(sim, i);
 }
 
+/**
+ * Built tiles of a settlement, scanned from the map and memoized for the current tick only.
+ * (A long-lived incremental list could drift from the map and make a restored save diverge.)
+ */
 export function bldTiles(sim: Sim, sid: number): number[] {
-  let map = sim.cache.bldTiles as Map<number, number[]> | undefined;
-  if (!map) sim.cache.bldTiles = map = new Map();
-  let arr = map.get(sid);
+  let c = sim.cache.bldTiles as { tick: number; map: Map<number, number[]> } | undefined;
+  if (!c || c.tick !== sim.w.tick) sim.cache.bldTiles = c = { tick: sim.w.tick, map: new Map() };
+  let arr = c.map.get(sid);
   if (!arr) {
     arr = [];
     const s = sim.w.settlements.get(sid);
@@ -66,22 +70,18 @@ export function bldTiles(sim: Sim, sid: number): number[] {
     if (s) m.forRadius(s.x, s.y, 16, (i) => {
       if (m.settle[i] === sid && m.bld[i]) arr!.push(i);
     });
-    map.set(sid, arr);
+    c.map.set(sid, arr);
   }
   return arr;
 }
 
-export function addBldTile(sim: Sim, sid: number, i: number): void {
-  const arr = bldTiles(sim, sid);
-  if (!arr.includes(i)) arr.push(i);
+/** Kept for call sites that announce building changes: drop this tick's memo for the settlement. */
+export function addBldTile(sim: Sim, sid: number, _i: number): void {
+  (sim.cache.bldTiles as { map: Map<number, number[]> } | undefined)?.map.delete(sid);
 }
 
-export function removeBldTile(sim: Sim, sid: number, i: number): void {
-  const map = sim.cache.bldTiles as Map<number, number[]> | undefined;
-  const arr = map?.get(sid);
-  if (!arr) return;
-  const k = arr.indexOf(i);
-  if (k >= 0) arr.splice(k, 1);
+export function removeBldTile(sim: Sim, sid: number, _i: number): void {
+  (sim.cache.bldTiles as { map: Map<number, number[]> } | undefined)?.map.delete(sid);
 }
 
 export function recomputeTerritory(sim: Sim, s: Settlement): void {
