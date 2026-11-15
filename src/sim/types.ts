@@ -251,6 +251,8 @@ export interface Epidemic {
 }
 
 export interface Settlement {
+  /** Cached production-site survey for the current year (see economy/production getSites). Serialized so saves resume exactly. */
+  sites?: import("../economy/production").Sites;
   id: number;
   name: string;
   civId: number;
@@ -435,6 +437,9 @@ export interface Civ {
   econ: EconStats;
   /** Running accumulators for the current year (serialized so mid-year saves are exact). */
   acc: EconAcc;
+  /** Last year's market stock value and money supply (for ΔInventory and inflation). */
+  prevStockValue?: number;
+  prevMoney?: number;
   // --- politics
   inst: Institutions;
   govForm: string;

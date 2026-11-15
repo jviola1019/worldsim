@@ -32,7 +32,7 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   const w = sim.w;
   const acc = civ.acc;
   const pop = Math.max(1, civ.population);
-  const prevStockValue = (sim.cache[`stockv:${civ.id}`] as number | undefined) ?? stockValue(civ);
+  const prevStockValue = civ.prevStockValue ?? stockValue(civ);
   // --- prices & access
   for (let g = 0; g < GOOD_COUNT; g++) {
     const def = GOODS[g];
@@ -90,11 +90,11 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   const prevGdp = civ.econ.gdp;
   if (civ.caps.currency > 0) {
     if (civ.moneySupply <= 0) civ.moneySupply = Math.max(1, baseIncome * 0.5);
-    const growthM = civ.moneySupply / Math.max(1, (sim.cache[`m:${civ.id}`] as number | undefined) ?? civ.moneySupply) - 1;
+    const growthM = civ.moneySupply / Math.max(1, civ.prevMoney ?? civ.moneySupply) - 1;
     const growthY = prevGdp > 0 ? baseIncome / prevGdp - 1 : 0;
     civ.inflation = clamp(civ.inflation * 0.5 + (growthM - growthY) * 0.5 + (civ.crisis > 0 ? 0.02 : 0), -0.2, 3);
     civ.priceLevel *= 1 + civ.inflation;
-    sim.cache[`m:${civ.id}`] = civ.moneySupply;
+    civ.prevMoney = civ.moneySupply;
     civ.moneySupply *= 1 + Math.max(0, growthY) * 0.9; // accommodate real growth
   }
   // credit cycle (financial instability)
@@ -110,18 +110,21 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   if (civ.crisis > 0) civ.crisis--;
   // --- national accounts (expenditure side)
   const sv = stockValue(civ);
-  sim.cache[`stockv:${civ.id}`] = sv;
+  civ.prevStockValue = sv;
   const dInv = sv - prevStockValue;
   const G = spending;
   const NX = exportsValue - importsValue;
+  // a financial crisis depresses private demand (C and I); GDP stays the exact sum of its components
   const crisisDrag = civ.crisis > 0 ? 0.92 : 1;
-  const gdp = Math.max(0, (cons + inv + G + NX + dInv) * crisisDrag);
+  const C = cons * crisisDrag;
+  const I = inv * crisisDrag;
+  const gdp = C + I + G + NX + dInv;
   const e = civ.econ;
   e.growth = prevGdp > 0 ? gdp / prevGdp - 1 : 0;
   e.gdp = gdp;
   e.gdpPerCapita = gdp / pop;
-  e.consumption = cons;
-  e.investment = inv + dInv;
+  e.consumption = C;
+  e.investment = I + dInv;
   e.government = G;
   e.exports = exportsValue;
   e.imports = importsValue;

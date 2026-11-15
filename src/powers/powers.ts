@@ -807,6 +807,6 @@ export function endStroke(sim: Sim, id: string): void {
   if (!p || p.cat !== 'terrain') return;
   computeHydrology(sim.w.map, sim.w.meta.gen.rivers);
   sim.terrainVersion++;
-  sim.cache.sites = undefined;
+  for (const s of sim.w.settlements.values()) s.sites = undefined;
   for (let k = 0; k < sim.chunkDirty.length; k++) sim.chunkDirty[k] = 1;
 }

@@ -8,6 +8,7 @@
  *
  * Model classification: [S] stylized abstraction (magnitudes in config/balance.ts).
  */
+import { bldTiles } from '../civilizations/territory';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement } from '../sim/types';
 import { B } from '../civilizations/buildingTypes';
@@ -81,14 +82,13 @@ export function forageCapacity(sim: Sim, x: number, y: number, r: number): numbe
 }
 
 export function markSitesDirty(sim: Sim, sid: number): void {
-  const cache = sim.cache.sites as Map<number, Sites> | undefined;
-  cache?.delete(sid);
+  const s = sim.w.settlements.get(sid);
+  if (s) s.sites = undefined;
 }
 
 export function getSites(sim: Sim, s: Settlement): Sites {
-  let cache = sim.cache.sites as Map<number, Sites> | undefined;
-  if (!cache) sim.cache.sites = cache = new Map();
-  const c = cache.get(s.id);
+  // cached on the settlement itself (serialized), so a restored save reuses the exact same sites
+  const c = s.sites;
   if (c && c.year === sim.year) return c;
   const m = sim.w.map;
   const civ = sim.w.civs.get(s.civId);
@@ -167,7 +167,7 @@ export function getSites(sim: Sim, s: Settlement): Sites {
   st.forage = forageCapacity(sim, s.x, s.y, Math.min(6, Math.max(3, s.radius + 1)));
   st.forestShare = land ? forest / land : 0;
   st.hillShare = land ? hills / land : 0;
-  cache.set(s.id, st);
+  s.sites = st;
   return st;
 }
 
@@ -608,8 +608,8 @@ function addPollution(sim: Sim, s: Settlement, type: number, factor: number): vo
   // pollute the building tiles of this type (sampled) and the center
   const i = m.idx(s.x, s.y);
   m.pollution[i] = Math.min(255, m.pollution[i] + amount * 0.3);
-  const tiles = (sim.cache.bldTiles as Map<number, number[]> | undefined)?.get(s.id);
-  if (tiles) for (const t of tiles) if (m.bld[t] === type) m.pollution[t] = Math.min(255, m.pollution[t] + amount);
+  const tiles = bldTiles(sim, s.id);
+  for (const t of tiles) if (m.bld[t] === type) m.pollution[t] = Math.min(255, m.pollution[t] + amount);
 }
 
 function produceEnergy(sim: Sim, s: Settlement, civ: Civ, staff: (t: number, l: number) => number, automation: number, sites: Sites, access: number): void {

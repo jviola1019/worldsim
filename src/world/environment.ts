@@ -76,7 +76,7 @@ export function environmentTick(sim: Sim): void {
   const rng = sim.rng;
   const set = fires(sim);
   if (!set.size) return;
-  const cur = [...set];
+  const cur = [...set].sort((a, b) => a - b); // index order: identical after a save/load rebuild
   for (const i of cur) {
     const x = i % m.w;
     const y = (i / m.w) | 0;
