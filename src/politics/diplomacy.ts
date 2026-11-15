@@ -25,6 +25,7 @@ import { phonOfCulture } from '../population/persons';
 import { transferSettlement } from '../civilizations/settlement';
 import { killCiv } from '../civilizations/civ';
 import { Good, GOOD_COUNT } from '../world/resources';
+import { BALANCE } from '../config/balance';
 
 export function militaryEstimate(sim: Sim, observer: Civ, target: Civ): number {
   const noise = 1 + sim.rng.normal() * clamp(0.35 - observer.caps.intelligence * 0.1, 0.05, 0.35);
@@ -214,7 +215,7 @@ function considerWar(sim: Sim, civ: Civ, other: Civ, rel: Relation): void {
   if (other.nukes > 0 && w.laws.advancedWeapons) cost += 1.5 + (civ.nukes > 0 ? 0.5 : 0); // deterrence
   const dist = distanceBetween(sim, civ, other);
   cost += clamp(dist / (40 + civ.caps.logistics * 20 + civ.caps.navalTier * 6) - 0.3, 0, 1.2);
-  const propensity = 0.15 * w.meta.settings.aggressiveness;
+  const propensity = 0.15 * w.meta.settings.aggressiveness * BALANCE.warPropensity;
   if (gain > cost && rng.chance(propensity * (gain - cost + 0.2))) {
     const goal = resourceWant > 0.2 ? 'resources' : griev > 15 ? 'revenge' : rel.disputes > 8 ? 'border' : 'conquest';
     declareWar(sim, civ, other, goal, [...gains.filter((g) => g.weight > 0.02), { label: `Military balance estimated at ${ratio.toFixed(1)}:1`, weight: 0.05 }]);

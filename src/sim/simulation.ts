@@ -97,6 +97,10 @@ export class Simulation implements Sim {
   private yearStart(): void {
     const w = this.w;
     sampleStats(this);
+    let worldPop = 0;
+    for (const s of w.settlements.values()) worldPop += s.pop;
+    for (const b of w.bands.values()) worldPop += b.members.length;
+    this.cache.worldPop = worldPop;
     for (const s of w.settlements.values()) s.flows = emptyFlows();
     this.cache.tradeTotals = tradeYearly(this);
     speciesCensus(this);

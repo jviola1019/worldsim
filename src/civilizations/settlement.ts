@@ -244,7 +244,11 @@ export function settlementMonthly(sim: Sim, s: Settlement): void {
     const urban = 1 + 0.35 * (1 - clamp01(civ.caps.sanitation)) * Math.min(1, Math.log10(s.pop / 5000));
     for (let b = 0; b < AGE_BANDS; b++) q[b] = Math.min(0.95, q[b] * urban);
   }
-  const ctx = { q, tfr: tfrFor(civ, s, q[0], econ.adequacy, s.species), adequacy: econ.adequacy };
+  let tfr = tfrFor(civ, s, q[0], econ.adequacy, s.species);
+  // world law: population cap (fertility collapses when the cap is reached)
+  const cap = sim.w.laws.populationCap;
+  if (cap > 0 && (sim.cache.worldPop ?? 0) >= cap) tfr *= 0.05;
+  const ctx = { q, tfr, adequacy: econ.adequacy };
   if (s.mode === 'cohort') cohortMonth(s, ctx, s.flows);
   else individualMonth(sim, s.members, ctx, { settlementId: s.id, bandId: 0, civId: civ.id, cultureId: s.cultures[0]?.id ?? civ.cultureId, religionId: s.religions[0]?.id ?? 0, species: s.species }, s.flows);
   s.pop = s.mode === 'cohort' ? cohortTotal(s.cohorts) : s.members.length;
