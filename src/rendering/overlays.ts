@@ -3,6 +3,7 @@
  * Overlays render at 4 px per tile so political borders can be drawn as crisp
  * edges; heat-map modes use the same canvas.
  */
+import { decodeTerritory } from '../history/stats';
 import type { Sim } from '../sim/context';
 import { hexToRgb } from './art/palette';
 import { Deposit } from '../world/resources';
@@ -32,7 +33,7 @@ export const OVERLAYS: { mode: OverlayMode; label: string; icon: string; legend:
   { mode: 'pollution', label: 'Pollution', icon: 'ico.ov_pollution', legend: 'Local pollution from industry, power and mining.' },
   { mode: 'climate', label: 'Climate', icon: 'ico.ov_climate', legend: 'Current temperature including climate change and regional anomalies.' },
   { mode: 'infrastructure', label: 'Infrastructure', icon: 'ico.ov_infrastructure', legend: 'Roads (brown), railways (dark), power grids (yellow).' },
-  { mode: 'history', label: 'Settlement age', icon: 'ico.ov_history', legend: 'Older settlements are darker; shows where history began.' },
+  { mode: 'history', label: 'Past borders', icon: 'ico.ov_history', legend: 'Historical territory: nations as they stood in the chosen year (recorded every 25 years).' },
 ];
 
 const DEP_COLORS: Record<number, [number, number, number]> = {
@@ -63,6 +64,19 @@ export class OverlayLayer {
   private img: ImageData;
   mode: OverlayMode = 'political';
   focusCiv = 0;
+  /** Year shown by the historical-territory overlay (nearest earlier snapshot is used). */
+  historyYear = 0;
+  private histCache: { year: number; w: number; grid: Uint16Array } | null = null;
+
+  /** The territory snapshot for `historyYear` (decoded once per selection). */
+  historyGrid(): { year: number; w: number; grid: Uint16Array } | null {
+    const list = this.sim.w.stats.territory ?? [];
+    if (!list.length) return null;
+    let snap = list[0];
+    for (const t of list) if (t.year <= (this.historyYear || this.sim.year)) snap = t;
+    if (!this.histCache || this.histCache.year !== snap.year) this.histCache = { year: snap.year, w: snap.w, grid: decodeTerritory(snap) };
+    return this.histCache;
+  }
   private stamp = -1;
 
   constructor(private sim: Sim) {
@@ -157,9 +171,15 @@ export class OverlayLayer {
         if (v & INFRA.GRID) return [240, 210, 60, 120];
         return [0, 0, 0, 70];
       }
-      case 'history':
-        if (!s) return null;
-        return [...ramp(Math.max(0, 1 - (this.sim.year - s.founded) / 1500)), 140] as any;
+      case 'history': {
+        const h = this.historyGrid();
+        if (!h) return null;
+        const o = h.grid[(((i / w.map.w) | 0) >> 1) * h.w + ((i % w.map.w) >> 1)];
+        const civ = o ? w.civs.get(o) : undefined;
+        if (!civ) return null;
+        const [r, g, b] = hexRgb(civ.color);
+        return [r, g, b, civ.alive ? 150 : 110];
+      }
       default:
         return null;
     }
@@ -198,4 +218,9 @@ export class OverlayLayer {
       }
     this.canvas.getContext('2d')!.putImageData(this.img, 0, 0);
   }
+}
+
+function hexRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1, 7), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }

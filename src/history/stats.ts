@@ -4,7 +4,7 @@
  * decomposition built from recorded demographic flows.
  */
 import type { Sim } from '../sim/context';
-import type { Civ, SeriesStore } from '../sim/types';
+import type { Civ, SeriesStore, TerritorySnapshot } from '../sim/types';
 
 const MAX_SAMPLES = 400;
 
@@ -40,8 +40,52 @@ export function civFlowsTotal(sim: Sim, civ: Civ) {
 }
 
 /** Yearly sampling. Called at year start, after civ yearly updates have run at least once. */
+export const TERRITORY_EVERY = 25;
+const TERRITORY_MAX = 64;
+
+/** Record a downsampled territory map every TERRITORY_EVERY years (thinned when the store fills up). */
+export function sampleTerritory(sim: Sim): void {
+  const w = sim.w;
+  if (sim.year % TERRITORY_EVERY !== 0) return;
+  const m = w.map;
+  const tw = Math.ceil(m.w / 2), th = Math.ceil(m.h / 2);
+  const rle: number[] = [];
+  let cur = -1, run = 0;
+  for (let y = 0; y < th; y++)
+    for (let x = 0; x < tw; x++) {
+      const o = m.owner[Math.min(m.h - 1, y * 2) * m.w + Math.min(m.w - 1, x * 2)];
+      if (o === cur) run++;
+      else {
+        if (run) rle.push(cur, run);
+        cur = o;
+        run = 1;
+      }
+    }
+  if (run) rle.push(cur, run);
+  const list = (w.stats.territory ??= []);
+  if (list.length && list[list.length - 1].year === sim.year) list.pop();
+  list.push({ year: sim.year, w: tw, h: th, rle });
+  // keep the store bounded: drop every second snapshot of the older half
+  if (list.length > TERRITORY_MAX) {
+    const half = list.length >> 1;
+    w.stats.territory = list.filter((_, k) => k >= half || k % 2 === 0);
+  }
+}
+
+/** Decode a snapshot into owner ids per 2×2 block. */
+export function decodeTerritory(t: TerritorySnapshot): Uint16Array {
+  const out = new Uint16Array(t.w * t.h);
+  let p = 0;
+  for (let k = 0; k < t.rle.length; k += 2) {
+    out.fill(t.rle[k], p, p + t.rle[k + 1]);
+    p += t.rle[k + 1];
+  }
+  return out;
+}
+
 export function sampleStats(sim: Sim): void {
   const w = sim.w;
+  sampleTerritory(sim);
   const st = w.stats;
   if (sim.year - st.lastSample < st.interval) return;
   st.lastSample = sim.year;

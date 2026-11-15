@@ -56,3 +56,18 @@ describe('god powers', () => {
     expect(() => sim.runYears(2)).not.toThrow();
   }, 60000);
 });
+
+import { decodeTerritory, TERRITORY_EVERY } from '../../src/history/stats';
+describe('historical territory snapshots', () => {
+  it('are recorded every 25 years, decode to the owner map, and stay bounded', () => {
+    const sim = makeSim('terr-1', 64);
+    sim.runYears(TERRITORY_EVERY * 3 + 1);
+    const list = sim.w.stats.territory ?? [];
+    expect(list.length).toBeGreaterThanOrEqual(3);
+    for (const t of list) expect(t.year % TERRITORY_EVERY).toBe(0);
+    const last = list[list.length - 1];
+    const grid = decodeTerritory(last);
+    expect(grid.length).toBe(last.w * last.h);
+    expect(last.rle.filter((_, k) => k % 2 === 1).reduce((a, b) => a + b, 0)).toBe(last.w * last.h);
+  }, 60000);
+});

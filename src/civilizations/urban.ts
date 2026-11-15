@@ -8,6 +8,7 @@
  * at higher tiers when technology allows, so older districts persist, and old
  * landmarks (temples, walls, monuments, arenas) become protected HISTORIC sites.
  */
+import { BALANCE } from '../config/balance';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement } from '../sim/types';
 import { markTile } from '../sim/context';
@@ -264,7 +265,7 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   // food
   if (caps.farming > 0) {
     const needYear = pop * 0.9;
-    const farmOut = sites.farmPot * 1300 * (1 + Math.max(0, caps.farming - 1));
+    const farmOut = sites.farmPot * BALANCE.farmYield * (1 + Math.max(0, caps.farming - 1) + caps.biotech * 0.4 + caps.irrigation * 0.15);
     const local = (needYear * 1.15 - farmOut - sites.forage * 0.6) / Math.max(1, needYear);
     // the national market also signals: hungry cities elsewhere make farmland worth developing here
     const national = civ.acc.foodNeed > 0 ? civ.acc.foodShort / civ.acc.foodNeed : 0;

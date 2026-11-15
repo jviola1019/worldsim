@@ -31,11 +31,41 @@ export function OverlayPanel({ renderer, close }: { renderer: Renderer; close: (
           ))}
         </div>
         {cur && <p class="muted">{cur.legend}</p>}
+        {mode === 'history' && <HistorySlider renderer={renderer} />}
         <label class="toggle">
           Names on the map
           <input type="checkbox" checked={renderer.showLabels} onChange={(e) => (renderer.showLabels = (e.target as HTMLInputElement).checked)} />
         </label>
       </div>
     </aside>
+  );
+}
+
+function HistorySlider({ renderer }: { renderer: Renderer }) {
+  const snaps = renderer.sim.w.stats.territory ?? [];
+  const [year, setYear] = useState(renderer.overlay.historyYear || renderer.sim.year);
+  if (!snaps.length) return <p class="muted">No borders recorded yet — the first snapshot is taken in the next year divisible by 25.</p>;
+  const first = snaps[0].year;
+  const last = snaps[snaps.length - 1].year;
+  const shown = renderer.overlay.historyGrid()?.year ?? last;
+  return (
+    <label class="slider">
+      <span>Borders in year <strong>{shown}</strong></span>
+      <input
+        type="range"
+        min={first}
+        max={last}
+        step={1}
+        value={Math.min(last, Math.max(first, year))}
+        aria-label="Year shown by the past borders layer"
+        onInput={(e) => {
+          const y = Number((e.target as HTMLInputElement).value);
+          renderer.overlay.historyYear = y;
+          renderer.overlay.update(true);
+          setYear(y);
+        }}
+      />
+      <span class="muted small">{snaps.length} snapshots, {first}–{last}</span>
+    </label>
   );
 }

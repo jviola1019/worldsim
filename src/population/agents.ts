@@ -23,12 +23,12 @@ export function spawnAgent(
   fromY: number,
   toX: number,
   toY: number,
-  o: { pop?: number; cultureId?: number; religionId?: number; species?: SpeciesKey; from?: number; leader?: number; sea?: boolean } = {},
+  o: { pop?: number; cultureId?: number; religionId?: number; species?: SpeciesKey; from?: number; leader?: number; sea?: boolean; path?: number[] } = {},
 ): Agent | null {
   const w = sim.w;
   const m = w.map;
-  const path = findPath(m, m.idx(fromX, fromY), m.idx(toX, toY), { mode: o.sea ? 'any' : 'land', maxNodes: 12000 });
-  if (!path) return null;
+  const path = o.path ?? findPath(m, m.idx(fromX, fromY), m.idx(toX, toY), { mode: o.sea ? 'any' : 'land', maxNodes: 12000 });
+  if (!path || !path.length) return null;
   const a: Agent = {
     id: ++w.ids.agent,
     kind,

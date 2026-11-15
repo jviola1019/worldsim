@@ -168,7 +168,7 @@ t('refining', 'Petroleum Refining', 8, 'industry', ['petroleum_drilling'], { ene
 t('internal_combustion', 'Internal Combustion Engine', 8, 'energy', ['refining'], { landSpeed: 0.2, logistics: 0.2 }, 'Light powerful engines burning oil.', { k: 1, req: { resources: ['OIL'] } });
 t('automobiles', 'Automobiles', 8, 'transport', ['internal_combustion'], { landSpeed: 0.3, housingTier: 6, logistics: 0.2 }, 'Cars and trucks reshape cities; suburbs spread along roads.', { k: 1, req: { resources: ['OIL'] }, ay: 40, unlock: ['SUBURB'] });
 t('assembly_line', 'Assembly Line', 8, 'industry', ['electric_power', 'bessemer_steel'], { industry: 0.4, automation: 0.1 }, 'Mass production makes consumer goods cheap.', { k: 1 });
-t('chemical_fertilizer', 'Chemical Fertilizer', 8, 'agriculture', ['seed_drill', 'electric_power'], { farming: 0.6 }, 'Synthetic nitrogen dramatically raises yields.', { k: 1.1 });
+t('chemical_fertilizer', 'Chemical Fertilizer', 8, 'agriculture', ['seed_drill', 'electric_power'], { farming: 1.4 }, 'Synthetic nitrogen dramatically raises yields.', { k: 1.1 });
 t('germ_theory', 'Germ Theory', 8, 'medicine', ['vaccination', 'optics'], { healthcare: 0.15, infantCare: 0.2, diseaseControl: 0.2 }, 'Microbes cause disease; hygiene and antisepsis save millions.', { k: 1 });
 t('reinforced_concrete', 'Reinforced Concrete', 8, 'materials', ['bessemer_steel'], { housingTier: 5, construction: 0.3 }, 'Steel-reinforced concrete allows tall, dense apartment blocks.', { k: 1, unlock: ['APARTMENT'] });
 t('machine_guns', 'Machine Guns', 8, 'military', ['rifles', 'assembly_line'], { landTier: 8, militaryDefense: 0.2 }, 'Industrial firepower; trench warfare.', { k: 1 });
@@ -209,7 +209,7 @@ t('ballistic_missiles', 'Strategic Missiles', 10, 'military', ['rocketry', 'nucl
 t('satellites', 'Satellites', 10, 'space', ['rocketry', 'transistors'], { spaceTier: 2, communication: 0.6, intelligence: 0.3 }, 'Orbiting satellites for communication, weather and reconnaissance.', { k: 1 });
 t('crewed_spaceflight', 'Crewed Spaceflight', 10, 'space', ['satellites'], { spaceTier: 3, culturalOutput: 0.2 }, 'Humans in orbit.', { k: 1.1 });
 t('transistors', 'Transistors and Early Computers', 10, 'computing', ['radio', 'industrial_research'], { computing: 0.5, research: 0.6, adminCapacity: 0.6 }, 'Electronic computation.', { k: 1 });
-t('green_revolution', 'Green Revolution', 10, 'agriculture', ['mechanized_agriculture', 'chemical_fertilizer'], { farming: 0.8, farmMechanization: 0.1 }, 'High-yield crop varieties and irrigation multiply harvests.', { k: 1 });
+t('green_revolution', 'Green Revolution', 10, 'agriculture', ['mechanized_agriculture', 'chemical_fertilizer'], { farming: 2.0, farmMechanization: 0.1 }, 'High-yield crop varieties and irrigation multiply harvests.', { k: 1 });
 t('television', 'Television', 10, 'communication', ['radio', 'transistors'], { mediaReach: 0.6, culturalOutput: 0.2, communication: 0.6 }, 'Mass visual media.', { k: 0.9 });
 t('international_organizations', 'International Organizations', 10, 'civic', ['telephone', 'universal_suffrage'], { internationalOrgs: 1 }, 'Permanent bodies for diplomacy, standards and collective security.', { k: 1 });
 t('containerization', 'Containerization', 10, 'transport', ['highways', 'steamships'], { tradeEfficiency: 0.15, logistics: 0.3, navalTier: 6 }, 'Standard shipping containers slash transport costs.', { k: 0.9 });

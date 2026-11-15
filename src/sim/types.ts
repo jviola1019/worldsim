@@ -798,6 +798,15 @@ export interface StatsStore {
   /** Sample interval in years (doubles when the store is decimated). */
   interval: number;
   lastSample: number;
+  /** Territory snapshots for the historical-territory overlay: owner per 2×2 block, run-length encoded [owner, count, ...]. */
+  territory?: TerritorySnapshot[];
+}
+
+export interface TerritorySnapshot {
+  year: number;
+  w: number;
+  h: number;
+  rle: number[];
 }
 
 export interface ClimateState {

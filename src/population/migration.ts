@@ -5,6 +5,7 @@
  * destinations depend on migration policies. Migration carries culture and
  * religion with it.
  */
+import { findPath } from '../world/pathfinding';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement } from '../sim/types';
 import { BALANCE } from '../config/balance';
@@ -46,7 +47,17 @@ export function emigrate(sim: Sim, s: Settlement, civ: Civ, adequacy: number): v
   const removed = removePeople(sim, s, amount, 'emigration');
   if (removed <= 0) return;
   s.flows.emigration += removed;
+  // migrants follow known corridors: reuse (and remember) the settlement's planned route to this destination
+  const routes = (s.routes ??= {});
+  let path = routes[best.id];
+  if (!path) {
+    path = findPath(w.map, w.map.idx(s.x, s.y), w.map.idx(best.x, best.y), { mode: 'land', maxNodes: 12000 }) ?? [];
+    routes[best.id] = path;
+    const keys = Object.keys(routes);
+    if (keys.length > 16) delete routes[Number(keys[0])]; // bounded memory per settlement
+  }
   const a = spawnAgent(sim, distress > 0.6 ? 'refugee' : 'migrant', civ.id, s.x, s.y, best.x, best.y, {
+    path,
     pop: removed,
     cultureId: s.cultures[0]?.id ?? civ.cultureId,
     religionId: s.religions[0]?.id ?? 0,
