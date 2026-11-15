@@ -710,6 +710,8 @@ export interface Army {
   state: 'idle' | 'moving' | 'sieging' | 'battle' | 'retreating' | 'garrison' | 'embarked';
   home: number; // settlement id
   siege: number; // siege progress 0..1
+  /** Ticks spent in the current siege (sieges are lifted after ~3 years or when hopeless). */
+  siegeTicks?: number;
   battleWith: number; // army id engaged
   /** Composition weights: infantry, cavalry, artillery, armor, air. */
   comp: number[];

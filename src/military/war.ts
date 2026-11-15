@@ -314,6 +314,7 @@ export function armiesTick(sim: Sim): void {
         if (a.targetKind === 'settlement' && war && !war.end) {
           a.state = 'sieging';
           a.siege = 0;
+          a.siegeTicks = 0;
         } else {
           a.state = 'idle';
           a.targetKind = 'none';
@@ -457,6 +458,16 @@ function siegeTick(sim: Sim, a: Army, civ: Civ, war: War | undefined): void {
   const defense = (s.garrison * 0.5 + s.pop * 0.01 + 20) * (1 + (defender?.caps.landTier ?? 0) * 0.5) * walls * fort;
   const attack = armyStrength(sim, a, civ) * (1 + civ.caps.siege);
   const rate = clamp((attack / Math.max(1, defense)) / BALANCE.siegeBaseTicks, 0.0005, 0.05);
+  a.siegeTicks = (a.siegeTicks ?? 0) + 1;
+  // a hopeless or endless siege is lifted: the army marches home instead of starving at the walls
+  if (attack < defense * 0.2 || a.siegeTicks > 3 * 120) {
+    a.state = 'idle';
+    a.siege = 0;
+    a.siegeTicks = 0;
+    a.targetKind = 'home';
+    a.path = [];
+    return;
+  }
   a.siege += rate;
   if (w.tick % 20 === 0) {
     killSoldiers(sim, a, a.manpower * 0.003 * walls, war);
