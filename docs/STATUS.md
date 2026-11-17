@@ -8,7 +8,7 @@ phases of the implementation plan. Labels:
 - **Experimental:** works, but balance or behavior is not yet validated.
 - **Missing:** not implemented.
 
-Last verified: 2026-11-17. `npm test`: 58 tests pass. E2E: 12/12 checks pass on phone and desktop. Builds cleanly.
+Last verified: 2026-11-17. `tsc` exit 0, `npm test` 62/62, `vite build` exit 0, E2E 12/12 on phone and desktop.
 
 ## Requirements
 
@@ -61,6 +61,11 @@ Each bug was found by a test, benchmark or profile, root-caused and fixed, then 
 | Same | Modern yields only 2× medieval | Tech bonuses too small vs OWID | Fertilizer +1.4 and Green Revolution +2.0 (about 3× medieval). |
 | War integration test | 10-man armies besieged cities for 17 years | Siege rate had a floor and no exit | Lift when hopeless or after 3 years. |
 | CPU profile | 858 ms per year late game | A* search for every migrant group | Reuse persisted routes: 306 ms per year. |
+| Code review (gauntlet round 1) | Migrants with no land route vanished from the world | The fallback recorded immigration but never added the people | They now arrive by boat, with culture and religion blended. |
+| Same | ΔInventories counted price changes as investment (GDP could go negative) | Stock *value* difference at different prices | Quantity change × current price. Red-green test: −124 vs 1.9 under the old rule. |
+| Same | Trait swaps leaked skill bonuses | The opposite trait was removed without reversing its modifiers | Symmetric `applyTraitEffects`; test. |
+| Same | Forage reset national-shortage demand; armies looped march→abandon; route cache evicted the newest entry; routes survived terrain edits; past-borders view could go stale | Various | Each fixed (see commit log). |
+| Regression test (red-green) | Negative or NaN builders created goods | No guard in construction | Test fails without the guard and passes with it. |
 
 ## Multi-seed outcomes (8 seeds × 600 years, 96², current code)
 
@@ -85,3 +90,4 @@ The outcomes differ across seeds, and no fixed sequence repeats.
 4. Late-game performance at 256² (`planConstruction` and `forRadius` scans are the next profile targets).
 5. Favorites and a follow camera (parity gaps in FEATURES.md).
 6. Validate the balance of eras 11–15 and run on physical iOS hardware.
+7. Trait modifiers clamp to 0–10, so add-then-remove is not exactly reversible at the bounds (accepted; minor).

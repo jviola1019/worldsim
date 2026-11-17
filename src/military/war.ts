@@ -170,7 +170,8 @@ export function militaryYearly(sim: Sim, civ: Civ): void {
       if (!a || a.state === 'battle' || a.state === 'sieging') continue;
       a.warId = war.id;
       const tgt = chooseTarget(sim, civ, a, enemies);
-      if (tgt) setArmyTarget(sim, a, tgt.x, tgt.y, 'settlement', tgt.id);
+      // an army that just gave up on a city does not march straight back to it
+      if (tgt && !(tgt.id === a.liftedTarget && sim.year - (a.liftedYear ?? -99) < 5)) setArmyTarget(sim, a, tgt.x, tgt.y, 'settlement', tgt.id);
     }
     // exhaustion
     const isAtt = war.attackers.includes(civ.id);
@@ -461,6 +462,8 @@ function siegeTick(sim: Sim, a: Army, civ: Civ, war: War | undefined): void {
   a.siegeTicks = (a.siegeTicks ?? 0) + 1;
   // a hopeless or endless siege is lifted: the army marches home instead of starving at the walls
   if (attack < defense * 0.2 || a.siegeTicks > 3 * 120) {
+    a.liftedTarget = s.id;
+    a.liftedYear = sim.year;
     a.state = 'idle';
     a.siege = 0;
     a.siegeTicks = 0;

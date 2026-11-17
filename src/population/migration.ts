@@ -5,6 +5,8 @@
  * destinations depend on migration policies. Migration carries culture and
  * religion with it.
  */
+import { mixShares } from '../civilizations/settlement';
+import { addPeople } from './demography';
 import { findPath } from '../world/pathfinding';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement } from '../sim/types';
@@ -53,8 +55,8 @@ export function emigrate(sim: Sim, s: Settlement, civ: Civ, adequacy: number): v
   if (!path) {
     path = findPath(w.map, w.map.idx(s.x, s.y), w.map.idx(best.x, best.y), { mode: 'land', maxNodes: 12000 }) ?? [];
     routes[best.id] = path;
-    const keys = Object.keys(routes);
-    if (keys.length > 16) delete routes[Number(keys[0])]; // bounded memory per settlement
+    const keys = Object.keys(routes).filter((k) => Number(k) !== best!.id);
+    if (keys.length >= 16) delete routes[Number(keys[0])]; // bounded memory per settlement (never the route just added)
   }
   const a = spawnAgent(sim, distress > 0.6 ? 'refugee' : 'migrant', civ.id, s.x, s.y, best.x, best.y, {
     path,
@@ -65,7 +67,13 @@ export function emigrate(sim: Sim, s: Settlement, civ: Civ, adequacy: number): v
     from: s.id,
   });
   if (!a) {
-    // unreachable: they settle directly (short-range move)
+    // no land route (e.g. across a strait): they arrive directly by boat instead of vanishing
+    const cultureId = s.cultures[0]?.id ?? civ.cultureId;
+    const religionId = s.religions[0]?.id ?? 0;
+    addPeople(sim, best, removed, cultureId, religionId);
     best.flows.immigration += removed;
+    const frac = removed / Math.max(1, best.pop);
+    mixShares(best.cultures, cultureId, frac); // same blending as an arriving migrant agent
+    if (religionId) mixShares(best.religions, religionId, frac);
   }
 }

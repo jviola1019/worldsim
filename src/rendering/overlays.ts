@@ -95,6 +95,10 @@ export class OverlayLayer {
       dirty = true;
       sim.overlayDirty[k] = 0;
     }
+    if (this.mode === 'history' && !this.historyYear) {
+      const l = sim.w.stats.territory;
+      if (l?.length && this.histCache?.year !== l[l.length - 1].year) dirty = true; // a newer snapshot was recorded
+    }
     if (!dirty && this.stamp === sim.w.tick) return;
     if (!dirty && this.mode !== 'population' && this.mode !== 'pollution' && this.mode !== 'climate' && this.mode !== 'military' && this.mode !== 'economy' && this.mode !== 'diplomacy' && this.mode !== 'technology') return;
     this.stamp = sim.w.tick;

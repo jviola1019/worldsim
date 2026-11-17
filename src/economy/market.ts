@@ -32,7 +32,7 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   const w = sim.w;
   const acc = civ.acc;
   const pop = Math.max(1, civ.population);
-  const prevStockValue = civ.prevStockValue ?? stockValue(civ);
+  const prevStock = civ.prevStock ?? civ.stock.slice();
   // --- prices & access
   for (let g = 0; g < GOOD_COUNT; g++) {
     const def = GOODS[g];
@@ -109,9 +109,10 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   }
   if (civ.crisis > 0) civ.crisis--;
   // --- national accounts (expenditure side)
-  const sv = stockValue(civ);
-  civ.prevStockValue = sv;
-  const dInv = sv - prevStockValue;
+  // change in inventories = change in QUANTITIES valued at current prices (price changes are holding gains, not output)
+  let dInv = 0;
+  for (let g = 0; g < GOOD_COUNT; g++) if (g !== Good.ENERGY) dInv += (civ.stock[g] - (prevStock[g] ?? 0)) * civ.prices[g];
+  civ.prevStock = civ.stock.slice();
   const G = spending;
   const NX = exportsValue - importsValue;
   // a financial crisis depresses private demand (C and I); GDP stays the exact sum of its components

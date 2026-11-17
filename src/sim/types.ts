@@ -440,7 +440,9 @@ export interface Civ {
   /** Running accumulators for the current year (serialized so mid-year saves are exact). */
   acc: EconAcc;
   /** Last year's market stock value and money supply (for ΔInventory and inflation). */
-  prevStockValue?: number;
+  prevStockValue?: number; // legacy (pre-0.1 saves); superseded by prevStock
+  /** Market stock quantities at the last yearly accounting (for ΔInventories). */
+  prevStock?: number[];
   prevMoney?: number;
   /** This year's trade totals (computed at year start, used by the civ's yearly economy). */
   tradeExp?: number;
@@ -717,6 +719,9 @@ export interface Army {
   siege: number; // siege progress 0..1
   /** Ticks spent in the current siege (sieges are lifted after ~3 years or when hopeless). */
   siegeTicks?: number;
+  /** Settlement whose siege this army last abandoned, and when (prevents march/abandon loops). */
+  liftedTarget?: number;
+  liftedYear?: number;
   battleWith: number; // army id engaged
   /** Composition weights: infantry, cavalry, artillery, armor, air. */
   comp: number[];

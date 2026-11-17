@@ -99,3 +99,22 @@ describe('divine trait editor', () => {
     expect(p.deeds!.some((d) => d.t.includes('touched by the gods'))).toBe(true);
   });
 });
+
+describe('trait effects are symmetric (review finding)', () => {
+  it('replacing brave with craven removes brave\'s bonus; toggling returns to the start', () => {
+    const sim = makeSim('dev-9');
+    const civ = [...sim.w.civs.values()][0];
+    const p = createPerson(sim, { born: sim.year - 30, species: 'human', civId: civ?.id ?? 0, cultureId: civ?.cultureId ?? 0, religionId: 0, notable: true, traits: [] });
+    p.skills.military = 5;
+    p.health = 0.8;
+    gainTrait(sim, p, 'brave', 't');
+    expect(p.skills.military).toBeCloseTo(6.5);
+    gainTrait(sim, p, 'craven', 't');
+    expect(p.skills.military).toBeCloseTo(3.5); // 5 + 1.5 - 1.5 - 1.5
+    gainTrait(sim, p, 'brave', 't');
+    expect(p.skills.military).toBeCloseTo(6.5);
+    divineTrait(sim, p, 'strong', true);
+    divineTrait(sim, p, 'strong', false);
+    expect(p.health).toBeCloseTo(0.8);
+  });
+});

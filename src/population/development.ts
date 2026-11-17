@@ -48,11 +48,13 @@ export function gainTrait(sim: Sim, p: Person, key: string, why: string): boolea
   if (!def) return false;
   if (def.opposite) {
     const k = p.traits.indexOf(def.opposite);
-    if (k >= 0) p.traits.splice(k, 1);
+    if (k >= 0) {
+      p.traits.splice(k, 1);
+      applyTraitEffects(p, def.opposite, -1);
+    }
   }
   p.traits.push(key);
-  if (def.skills) for (const [s, v] of Object.entries(def.skills)) p.skills[s as SkillKey] = clamp(p.skills[s as SkillKey] + (v as number), 0, 10);
-  if (def.health) p.health = clamp01(p.health + def.health);
+  applyTraitEffects(p, key, 1);
   deed(sim, p, `Became ${def.name.toLowerCase()} — ${why}`);
   return true;
 }
@@ -61,9 +63,16 @@ export function loseTrait(sim: Sim, p: Person, key: string, why: string): void {
   const k = p.traits.indexOf(key);
   if (k < 0) return;
   p.traits.splice(k, 1);
+  applyTraitEffects(p, key, -1);
+  deed(sim, p, `No longer ${TRAIT_BY_KEY[key]?.name.toLowerCase() ?? key} — ${why}`);
+}
+
+/** Add (sign 1) or remove (sign -1) a trait's skill and health modifiers. */
+function applyTraitEffects(p: Person, key: string, sign: 1 | -1): void {
   const def = TRAIT_BY_KEY[key];
-  if (def?.skills) for (const [s, v] of Object.entries(def.skills)) p.skills[s as SkillKey] = clamp(p.skills[s as SkillKey] - (v as number), 0, 10);
-  deed(sim, p, `No longer ${def?.name.toLowerCase() ?? key} — ${why}`);
+  if (!def) return;
+  if (def.skills) for (const [s, v] of Object.entries(def.skills)) p.skills[s as SkillKey] = clamp(p.skills[s as SkillKey] + sign * (v as number), 0, 10);
+  if (def.health) p.health = clamp01(p.health + sign * def.health);
 }
 
 /** Potential ceiling for a skill: genes + innate traits + schooling. */

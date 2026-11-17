@@ -71,3 +71,24 @@ describe('historical territory snapshots', () => {
     expect(last.rle.filter((_, k) => k % 2 === 1).reduce((a, b) => a + b, 0)).toBe(last.w * last.h);
   }, 60000);
 });
+
+import { encodeWorld, decodeWorld } from '../../src/persistence/serialize';
+import { Simulation } from '../../src/sim/simulation';
+describe('national accounts: price changes are not inventory investment (review finding)', () => {
+  it('ΔInventories values quantity changes only: inflating last year\'s prices does not change it', () => {
+    const base = makeSim('gdp-1', 64);
+    base.runYears(40);
+    base.syncRng();
+    const A = new Simulation(decodeWorld(encodeWorld(base.w)));
+    const B = new Simulation(decodeWorld(encodeWorld(base.w)));
+    const id = [...A.w.civs.values()].find((c) => c.alive && c.prevStock)!.id;
+    // in B, prices were 3x higher at the last accounting; quantities are identical
+    const cb = B.w.civs.get(id)!;
+    cb.prevStockValue = (cb.prevStockValue ?? 0) * 3;
+    const ca = A.w.civs.get(id)!;
+    // advance both to just past this civ's next yearly accounting
+    for (let k = 0; k < 120; k++) { A.step(); B.step(); }
+    expect(cb.econ.investment).toBeCloseTo(ca.econ.investment, 6);
+    expect(cb.econ.gdp).toBeCloseTo(ca.econ.gdp, 6);
+  }, 60000);
+});

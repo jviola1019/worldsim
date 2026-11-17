@@ -290,9 +290,9 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   for (const src of srcs) {
     if (demandYear <= 0 || free <= 0 || src.labor <= 0 || src.yieldYear <= 0) continue;
     const perWorker = src.yieldYear / src.labor;
-    // foraging never runs at "capacity" for the market (it would strip the land)
-    if (src.kind === 4 && demandYear === Infinity) demandYear = needYear * (1 + gap);
-    const wanted = Math.min(src.labor, demandYear === Infinity ? src.labor : demandYear / perWorker);
+    // foraging never runs at "capacity" for the market (it would strip the land); other sources keep capacity mode
+    const dem = src.kind === 4 && demandYear === Infinity ? Math.max(0, needYear * (1 + gap) - producedMonth * 12) : demandYear;
+    const wanted = Math.min(src.labor, dem === Infinity ? src.labor : dem / perWorker);
     const assigned = Math.min(free, wanted);
     const staffing = assigned / src.labor;
     let yearRate = src.yieldYear * Math.pow(staffing, 0.85);
