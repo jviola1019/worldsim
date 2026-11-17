@@ -91,3 +91,44 @@ The outcomes differ across seeds, and no fixed sequence repeats.
 5. Favorites and a follow camera (parity gaps in FEATURES.md).
 6. Validate the balance of eras 11–15 and run on physical iOS hardware.
 7. Trait modifiers clamp to 0–10, so add-then-remove is not exactly reversible at the bounds (accepted; minor).
+
+## Plan verification (docs/superpowers/plans/2026-11-14-epoch-implementation.md)
+
+Each plan task is checked against the code and tests that exist today. *Built* means the system exists and runs.
+*Planned tests* compares the tests the plan named with the tests that actually exist.
+
+| Task | Built | Planned tests | Notes |
+|---|---|---|---|
+| A1–A6 Delegated art, tech, research | ✓ | ✓ techData (7) | The tech agent produced nothing, so the lead wrote 207 techs. |
+| 3 Worldgen tests | ✓ | ✓ (8) | |
+| 4 Governments and succession | ✓ | ✗ no dedicated unit tests | Covered indirectly by the integration test #6. |
+| 5 World creation and orchestrator | ✓ | ✓ determinism (3) | |
+| 6 Ecology | ✓ | ◐ herd bound checked in the stress test | No predation or extinction unit tests. |
+| 7 Bands and founding | ✓ | ✗ | |
+| 8 Buildings, economy, urban growth | ✓ | ◐ construction regression (2) | |
+| 9 Technology runtime | ✓ | ✗ no research or adoption runtime tests | |
+| 10 Territory, pathfinding, infrastructure | ✓ | ◐ roads (#2); borders consistency in the stress test | `pathAvoidsWater` not written. |
+| 11 Persistence | ✓ | ◐ round trip, corruption | Missing `unavailableStorage` and `migrationFromV0`. |
+| 12 Renderer | ✓ | e2e and screenshots | |
+| 13 Input, powers, undo | ✓ | ✓ classify (4); all powers apply (1) | Undo not unit-tested. |
+| 14 UI shell | ✓ | e2e 12/12 | |
+| 15 Market and public finance | ✓ | ✓ GDP identity, ΔInv valuation | Missing `deficitBuildsDebt` and `printingMoneyInflates`. |
+| 16 Government | ✓ | ✓ #6 | |
+| 17 Diplomacy | ✓ | ✗ | `warHasRecordedCauses` not written. |
+| 18 Military | ✓ | ✓ #4 | Missing `terrainDefenseBonus` and `notAlwaysTotalConquest`. Multi-seed annexations are 2–16 against 47–135 wars, so most wars do not end in conquest. |
+| 19 Religion and culture | ✓ | ✓ #9 | |
+| 20 Disease | ✓ | ✗ | |
+| 21 Trade | ✓ | ✗ #8 | |
+| 22 Environment and climate | ✓ | ✓ #1, #7 | |
+| 23 Future systems | ✓ (experimental) | ✗ | |
+| 24 Era bootstrap and scenarios | ✓ | ✓ presets (7) | |
+| 25 History and analytics | ✓ | ◐ territory snapshots | Decomposition does not reconcile (issue 1). |
+| 26 Statistical and stress | ✓ | ✓ stress (300 y), multi-seed script | |
+| 27 Benchmarks and e2e | ✓ | ✓ | |
+| 28 Audio | ✓ | — | |
+| 29 Audit loop | ✓ one code-review round | — | 8 findings, all fixed and re-verified. Not yet run: `simplify` and `security-review`. |
+| 30 Docs | ✓ | — | |
+| **Added beyond the plan** | Character development, flags, trait editor, past-borders overlay | ✓ (10 + 3 + 1) | From the user's follow-up request. |
+
+Next gauntlet round: write the ✗ tests above, starting with #8 trade interruption, research runtime and disease
+(`densityRaisesR`), then run `simplify` and `security-review`.
