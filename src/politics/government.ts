@@ -15,6 +15,8 @@
  * (e.g. mass participation needs communication & suffrage ideas) but
  * outcomes depend on who holds power.
  */
+import { removePeople } from '../population/demography';
+import { flow } from '../population/ledger';
 import type { Sim } from '../sim/context';
 import type { Cause, Civ, Faction, Institutions, Settlement } from '../sim/types';
 import { clamp, clamp01, saturate } from '../core/math';
@@ -319,7 +321,7 @@ function revolution(sim: Sim, civ: Civ): void {
     civ.legitimacy = clamp01(civ.legitimacy - 0.05);
     civ.inst.liberties = clamp01(civ.inst.liberties - 0.08);
     // repression costs lives
-    for (const s of civSettlements(sim, civ)) if (s.unrest > 0.5) s.flows.war += s.pop * 0.002;
+    for (const s of civSettlements(sim, civ)) if (s.unrest > 0.5) flow(sim, s, 'war', removePeople(sim, s, s.pop * 0.002, 'repression'));
     logEvent(sim, { type: 'uprising_crushed', cat: 'politics', title: `An uprising of the ${rebels.name.toLowerCase()} in ${civ.name} was crushed`, civs: [civ.id], importance: 2, causes });
   }
 }

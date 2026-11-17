@@ -90,6 +90,7 @@ export function encodeWorld(w: WorldState): Uint8Array {
     climate: w.climate,
     milestones: w.milestones,
     interventions: w.interventions,
+    popLedger: w.popLedger,
     speciesStatus: w.speciesStatus,
   };
   for (const k of MAPS) state[k] = [...(w[k] as Map<number, unknown>).values()];
@@ -146,6 +147,7 @@ export function decodeWorld(bytes: Uint8Array): WorldState {
     climate: st.climate,
     milestones: st.milestones,
     interventions: st.interventions ?? [],
+    popLedger: st.popLedger,
     speciesStatus: st.speciesStatus ?? {},
     knowledge,
   };

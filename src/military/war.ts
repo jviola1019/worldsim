@@ -20,6 +20,7 @@
  * they deter war, and in extreme losing situations may be used with
  * catastrophic humanitarian, environmental and diplomatic consequences.
  */
+import { flow } from '../population/ledger';
 import { onBattle } from '../population/development';
 import type { Sim } from '../sim/context';
 import type { Army, Civ, Settlement, War } from '../sim/types';
@@ -129,7 +130,7 @@ function killSoldiers(sim: Sim, a: Army, n: number, war: War | undefined): void 
   if (home) {
     home.garrison = Math.max(0, home.garrison - n);
     const removed = removePeople(sim, home, n, 'war', 1);
-    home.flows.war += removed;
+    flow(sim, home, 'war', removed);
   }
   if (war) war.casualties[a.civId] = (war.casualties[a.civId] ?? 0) + n;
 }
@@ -483,7 +484,7 @@ function siegeTick(sim: Sim, a: Army, civ: Civ, war: War | undefined): void {
     war.score = clamp(war.score + (attackerSide ? 1 : -1) * (s.capital ? 30 : 12), -100, 100);
     // sacking: deaths, destroyed districts, loot, refugees
     const dead = removePeople(sim, s, s.pop * sim.rng.range(0.02, 0.08), 'sack');
-    s.flows.war += dead;
+    flow(sim, s, 'war', dead);
     const loot = (defender?.treasury ?? 0) * 0.1;
     if (defender) defender.treasury -= loot;
     civ.treasury += loot;
@@ -580,7 +581,7 @@ export function nuclearStrike(sim: Sim, s: Settlement, byCiv = 0): void {
   const w = sim.w;
   const m = w.map;
   const dead = removePeople(sim, s, s.pop * sim.rng.range(0.25, 0.45), 'nuclear strike');
-  s.flows.war += dead;
+  flow(sim, s, 'war', dead);
   m.forRadius(s.x, s.y, 3.5, (i, x, y, d2) => {
     if (m.bld[i] && d2 < 6) removeBuilding(sim, i, true);
     if (d2 < 2) {

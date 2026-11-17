@@ -4,6 +4,7 @@
  * human hunting, extinction, slow evolution into subspecies, and optional
  * fantasy monsters.
  */
+import { flow } from '../population/ledger';
 import type { Sim } from '../sim/context';
 import type { Herd, Monster, Subspecies } from '../sim/types';
 import { SPECIES, SPECIES_BY_KEY, MONSTERS, type SpeciesDef } from './species';
@@ -464,8 +465,7 @@ export function monstersMonthly(sim: Sim): void {
       mo.hp -= defense * 0.05;
       const harm = Math.min(s.pop * 0.05, def.harm * sim.rng.range(0.4, 1));
       if (harm > 0.5) {
-        removePeople(sim, s, harm, 'monster attack');
-        s.flows.disaster += harm;
+        flow(sim, s, 'disaster', removePeople(sim, s, harm, 'monster attack'));
         addFx(sim, 'fx.fire', s.x, s.y, 2);
         if (sim.rng.chance(0.15))
           logEvent(sim, { type: 'monster_attack', cat: 'disaster', title: `A ${def.name.toLowerCase()} attacked ${s.name}`, civs: [s.civId], settlements: [s.id], x: s.x, y: s.y, importance: 2 });

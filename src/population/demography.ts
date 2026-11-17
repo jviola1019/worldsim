@@ -14,6 +14,7 @@
  * same rates as monthly Bernoulli trials; couples form; children inherit genes,
  * traits, culture and religion; families and bloodlines emerge.
  */
+import { record } from './ledger';
 import type { Sim } from '../sim/context';
 import type { Civ, Person, Settlement, SpeciesKey, DemographicFlows } from '../sim/types';
 import { AGE_BANDS, BALANCE, FERTILITY_SHAPE, MORTALITY_MODERN, MORTALITY_PRE } from '../config/balance';
@@ -285,6 +286,16 @@ export function convertToCohorts(sim: Sim, s: Settlement): void {
   s.mode = 'cohort';
 }
 
+/** Integer counts per band whose sum is Math.round(total) (largest-remainder method). */
+export function wholeCounts(c: number[]): number[] {
+  const total = Math.round(c.reduce((a, b) => a + b, 0));
+  const out = c.map((v) => Math.floor(Math.max(0, v)));
+  let rest = total - out.reduce((a, b) => a + b, 0);
+  const order = c.map((v, i) => [v - Math.floor(v), i] as const).sort((a, b) => b[0] - a[0] || a[1] - b[1]);
+  for (let k = 0; rest > 0 && k < order.length; k++, rest--) out[order[k][1]]++;
+  return out;
+}
+
 /** Switch a (shrinking) settlement from cohorts back to individuals. */
 export function convertToIndividuals(sim: Sim, s: Settlement): void {
   const rng = sim.rng;
@@ -294,8 +305,12 @@ export function convertToIndividuals(sim: Sim, s: Settlement): void {
   const members: number[] = [];
   const adultsF: Person[] = [];
   const adultsM: Person[] = [];
+  // whole people from fractional cohorts: largest-remainder rounding keeps the total within ±0.5,
+  // and the difference is recorded explicitly as a resolution adjustment (not silently created/destroyed)
+  const counts = wholeCounts(s.cohorts);
+  record(sim, s.civId, 'resolution', counts.reduce((a, b) => a + b, 0) - cohortTotal(s.cohorts));
   for (let b = 0; b < AGE_BANDS; b++) {
-    const n = Math.round(s.cohorts[b]);
+    const n = counts[b];
     for (let k = 0; k < n; k++) {
       const p = createPerson(sim, {
         born: sim.year - (b * 5 + rng.int(0, 4)),
@@ -362,6 +377,7 @@ export function addPeople(sim: Sim, s: Settlement, amount: number, cultureId: nu
     for (let b = 0; b < AGE_BANDS; b++) s.cohorts[b] += amount * profile[b];
   } else {
     const n = Math.round(amount);
+    record(sim, s.civId, 'resolution', n - amount); // whole people only in individual mode
     for (let k = 0; k < n; k++) {
       const p = createPerson(sim, {
         born: sim.year - sim.rng.int(0, 40),

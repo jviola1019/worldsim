@@ -7,6 +7,7 @@
  * with local richness (fish, rivers, game) and sharply once agriculture is
  * known. This is how civilizations spread across an empty planet.
  */
+import { record, transfer } from './ledger';
 import type { Sim } from '../sim/context';
 import type { Band, Civ, SpeciesKey } from '../sim/types';
 import { BALANCE } from '../config/balance';
@@ -151,6 +152,9 @@ export function bandMonthly(sim: Sim, b: Band): void {
   const q = mortalitySchedule(healthIndices(civ, 1), b.species, qScratch);
   const flows = emptyFlows();
   individualMonth(sim, b.members, { q, tfr: tfrFor(civ, { education: 0, prosperity: 1, pop: size }, q[0], adequacy, b.species), adequacy }, { settlementId: 0, bandId: b.id, civId: civ.id, cultureId: b.cultureId, religionId: b.religionId, species: b.species }, flows);
+  record(sim, b.civId, 'births', flows.births);
+  record(sim, b.civId, 'deaths', flows.deaths);
+  record(sim, b.civId, 'famine', flows.famine);
   // move on when local food runs thin
   if (adequacy < 0.9 || sim.rng.chance(0.08)) chooseCamp(sim, b);
   // yearly decisions on the band's own month slot
@@ -192,6 +196,7 @@ function bandYearly(sim: Sim, b: Band, civ: Civ, cap: number, size: number): voi
       target = createCiv(sim, { species: b.species, x: Math.floor(b.x), y: Math.floor(b.y), cultureId: culture.id, parentId: civ.id, inheritFrom: civ, cause: `Split from the ${civ.adjective} people` });
       culture.originCiv = target.id;
     }
+    transfer(sim, civ.id, target.id, leaving.length);
     const nb: Band = { ...b, id: ++w.ids.band, civId: target.id, members: leaving, food: b.food * 0.4, tx: tx + 0.5, ty: ty + 0.5, cultureId: target.cultureId, languageId: target.languageId, founded: sim.year };
     b.food *= 0.6;
     w.bands.set(nb.id, nb);
@@ -213,6 +218,7 @@ function bandYearly(sim: Sim, b: Band, civ: Civ, cap: number, size: number): voi
 
 export function removeBand(sim: Sim, b: Band): void {
   const w = sim.w;
+  record(sim, b.civId, 'destroyed', b.members.length);
   for (const id of b.members) {
     const p = w.persons.get(id);
     if (p && !p.notable) w.persons.delete(id);

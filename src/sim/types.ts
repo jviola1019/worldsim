@@ -446,6 +446,8 @@ export interface Civ {
   prevMoney?: number;
   /** This year's trade totals (computed at year start, used by the civ's yearly economy). */
   tradeExp?: number;
+  /** Cumulative population ledger for this civilization's boundary (see population/ledger.ts). */
+  ledger?: import('../population/ledger').PopLedger;
   tradeImp?: number;
   // --- politics
   inst: Institutions;
@@ -877,6 +879,8 @@ export interface WorldState {
   climate: ClimateState;
   milestones: Milestones;
   interventions: Intervention[];
+  /** Cumulative world population ledger (see population/ledger.ts). */
+  popLedger?: import('../population/ledger').PopLedger;
   /** Per-civ known-tile bitsets (exploration / information). */
   knowledge: Map<number, Uint32Array>;
   /** Global species population totals (key -> count) and extinction years. */

@@ -575,7 +575,7 @@ function CivStats({ sim, civ }: { sim: Simulation; civ: Civ }) {
         <div class="section">
           <h3>Why population changed ({pct(exp.change)} over the last 20 years)</h3>
           <ul class="list">{exp.contributors.slice(0, 6).map((c) => <li key={c.label}>{c.label}: {c.value >= 0 ? '+' : ''}{fmt(c.value)}</li>)}</ul>
-          <p class="muted">Summed from recorded births, deaths and migrations; it shows what happened, not a full causal proof.</p>
+          <p class="muted">From the population ledger: these components add up exactly to the change. They show what happened, not a full causal proof.</p>
         </div>
       )}
       <div class="section"><h3>Output (GDP)</h3><LineChart series={[mk('gdp', 'GDP')]} markers={markers} /></div>

@@ -5,8 +5,9 @@
  * their speed depends on terrain and roads. Arrival effects are applied to
  * real simulation state.
  */
+import { migrate, record } from './ledger';
 import type { Sim } from '../sim/context';
-import type { Agent, AgentKind, SpeciesKey } from '../sim/types';
+import type { Agent, AgentKind, Settlement, SpeciesKey } from '../sim/types';
 import { findPath } from '../world/pathfinding';
 import { BALANCE } from '../config/balance';
 import { addPeople } from './demography';
@@ -95,9 +96,11 @@ function arrive(sim: Sim, a: Agent): void {
   switch (a.kind) {
     case 'settler':
     case 'colonist': {
-      if (!civ || !civ.alive) return;
-      // site may have been taken meanwhile
-      if (m.settle[tile] || m.isWater(tile)) return;
+      // site taken meanwhile, or the nation is gone: settlers join the town there, else return home
+      if (!civ || !civ.alive || m.settle[tile] || m.isWater(tile)) {
+        joinOrLose(sim, a, w.settlements.get(m.settle[tile]) ?? w.settlements.get(a.fromSettlement));
+        return;
+      }
       const s = foundSettlement(sim, civ, tx, ty, { pop: a.pop, cultureId: a.cultureId, religionId: a.religionId, species: a.speciesKey, cause: a.kind === 'colonist' ? 'Overseas colonization' : 'Population pressure in ' + (w.settlements.get(a.fromSettlement)?.name ?? 'the homeland') });
       if (a.fromSettlement) {
         s.links.push(a.fromSettlement);
@@ -108,12 +111,8 @@ function arrive(sim: Sim, a: Agent): void {
     case 'migrant':
     case 'refugee': {
       const dest = w.settlements.get(m.settle[tile]) ?? [...w.settlements.values()].find((s) => s.x === tx && s.y === ty);
-      if (!dest) return;
-      addPeople(sim, dest, a.pop, a.cultureId, a.religionId);
-      dest.flows.immigration += a.pop;
-      const frac = a.pop / Math.max(1, dest.pop + a.pop);
-      mixShares(dest.cultures, a.cultureId, frac);
-      mixShares(dest.religions, a.religionId, frac);
+      // destination vanished on the way: go back to where they came from (or are lost)
+      joinOrLose(sim, a, dest ?? w.settlements.get(a.fromSettlement));
       break;
     }
     case 'missionary': {
@@ -130,4 +129,24 @@ function arrive(sim: Sim, a: Agent): void {
       break;
     }
   }
+}
+
+/**
+ * Put an arriving group's people into settlement `dest` (with culture/faith blending), or record them as
+ * lost when no settlement can take them. Crossing into another nation is recorded as migration.
+ */
+function joinOrLose(sim: Sim, a: Agent, dest: Settlement | undefined): void {
+  if (a.pop <= 0) return;
+  if (!dest) {
+    record(sim, a.civId, 'lost', a.pop);
+    a.pop = 0;
+    return;
+  }
+  addPeople(sim, dest, a.pop, a.cultureId, a.religionId);
+  dest.flows.immigration += a.pop;
+  migrate(sim, a.civId, dest.civId, a.pop);
+  const frac = a.pop / Math.max(1, dest.pop + a.pop);
+  mixShares(dest.cultures, a.cultureId, frac);
+  if (a.religionId) mixShares(dest.religions, a.religionId, frac);
+  a.pop = 0;
 }

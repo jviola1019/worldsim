@@ -3,6 +3,7 @@
  * construction -> health/migration), yearly upkeep (territory, education,
  * access), transfer between civilizations and destruction.
  */
+import { record, residents, transfer } from '../population/ledger';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement, SpeciesKey } from '../sim/types';
 import { AGE_BANDS, BALANCE } from '../config/balance';
@@ -103,8 +104,10 @@ export function foundSettlement(sim: Sim, civ: Civ, x: number, y: number, o: New
   } else if (o.pop) {
     if (o.pop > BALANCE.individualMax) {
       s.mode = 'cohort';
+      // weights sum to 1.007, so normalize: founding must not create people (conservation; see population/ledger.ts)
       const profile = [0.13, 0.12, 0.11, 0.1, 0.09, 0.08, 0.07, 0.065, 0.055, 0.045, 0.04, 0.03, 0.025, 0.02, 0.015, 0.008, 0.004];
-      for (let b = 0; b < AGE_BANDS; b++) s.cohorts[b] = o.pop * profile[b];
+      const norm = profile.reduce((x, y) => x + y, 0);
+      for (let b = 0; b < AGE_BANDS; b++) s.cohorts[b] = (o.pop * profile[b]) / norm;
     } else {
       s.mode = 'cohort';
       s.cohorts = new Array(AGE_BANDS).fill(0);
@@ -159,6 +162,7 @@ export function transferSettlement(sim: Sim, s: Settlement, to: Civ, cause: stri
     }
   }
   s.capital = false;
+  transfer(sim, s.civId, to.id, residents(s));
   s.civId = to.id;
   s.occupiedBy = 0;
   s.loyalty = 0.4;
@@ -196,6 +200,7 @@ export function destroySettlement(sim: Sim, s: Settlement, cause: string): void 
     setTileSettlement(sim, i, 0);
     markTile(sim, i);
   }
+  record(sim, s.civId, 'destroyed', residents(s)); // the last residents disperse or perish with the town
   for (const id of s.members.slice()) {
     const p = w.persons.get(id);
     if (p && !p.notable) w.persons.delete(id);
@@ -249,8 +254,12 @@ export function settlementMonthly(sim: Sim, s: Settlement): void {
   const cap = sim.w.laws.populationCap;
   if (cap > 0 && livePopulation(sim) >= cap) tfr *= 0.05;
   const ctx = { q, tfr, adequacy: econ.adequacy };
+  const f0b = s.flows.births, f0d = s.flows.deaths, f0f = s.flows.famine;
   if (s.mode === 'cohort') cohortMonth(s, ctx, s.flows);
   else individualMonth(sim, s.members, ctx, { settlementId: s.id, bandId: 0, civId: civ.id, cultureId: s.cultures[0]?.id ?? civ.cultureId, religionId: s.religions[0]?.id ?? 0, species: s.species }, s.flows);
+  record(sim, s.civId, 'births', s.flows.births - f0b);
+  record(sim, s.civId, 'deaths', s.flows.deaths - f0d);
+  record(sim, s.civId, 'famine', s.flows.famine - f0f);
   s.pop = s.mode === 'cohort' ? cohortTotal(s.cohorts) : s.members.length;
   if (s.mode === 'individual' && s.pop > BALANCE.individualMax) {
     if (s.capital) protectRulingFamily(sim, civ);

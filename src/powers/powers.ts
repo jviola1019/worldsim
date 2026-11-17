@@ -5,6 +5,7 @@
  * Brush powers apply to a radius around the touched tile; tap powers act on
  * the settlement/civilization under the finger.
  */
+import { record, residents } from '../population/ledger';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement, SpeciesKey } from '../sim/types';
 import { markTile, markOverlay, addFx } from '../sim/context';
@@ -177,6 +178,7 @@ const people = (species: SpeciesKey, label: string): PowerDef => ({
   apply: (sim, x, y) => {
     const b = spawnBand(sim, x, y, species, sim.rng.int(18, 28));
     if (!b) return 'They need dry land';
+    record(sim, b.civId, 'divine', b.members.length);
     logEvent(sim, { type: 'god_people', cat: 'god', title: `Divine hands placed a band of ${species === 'human' ? 'people' : species} on the land`, civs: [b.civId], x, y, importance: 2 });
     return null;
   },
@@ -389,7 +391,8 @@ export const POWERS: PowerDef[] = [
       if (m.settle[i] && m.settle[i] && sim.w.settlements.get(m.settle[i]) && sim.w.settlements.get(m.settle[i])!.x === x && sim.w.settlements.get(m.settle[i])!.y === y) return 'A settlement is already here';
       const owner = m.owner[i] ? sim.w.civs.get(m.owner[i]) : undefined;
       const civ = owner ?? createCiv(sim, { species: 'human', x, y, cause: 'Divine founding' });
-      foundSettlement(sim, civ, x, y, { pop: 40, cause: 'Divine founding' });
+      const fs = foundSettlement(sim, civ, x, y, { pop: 40, cause: 'Divine founding' });
+      record(sim, fs.civId, 'divine', residents(fs));
       return null;
     },
   },
@@ -399,7 +402,9 @@ export const POWERS: PowerDef[] = [
       const s = settlementAt(sim, x, y);
       if (!s) return 'Tap a settlement';
       s.food += s.pop * 0.8;
-      addPeople(sim, s, Math.max(5, s.pop * 0.15), s.cultures[0]?.id ?? 0, s.religions[0]?.id ?? 0);
+      const blessed = Math.max(5, s.pop * 0.15);
+      addPeople(sim, s, blessed, s.cultures[0]?.id ?? 0, s.religions[0]?.id ?? 0);
+      record(sim, s.civId, 'divine', blessed);
       s.prosperity += 0.2;
       addFx(sim, 'fx.sparkle', s.x, s.y, 2);
       return null;
@@ -660,6 +665,7 @@ export const POWERS: PowerDef[] = [
       s.garrison = 0;
       civ.budget.military = Math.min(0.6, civ.budget.military + 0.15);
       addPeople(sim, s, 500, s.cultures[0]?.id ?? 0, s.religions[0]?.id ?? 0);
+      record(sim, s.civId, 'divine', 500);
       return null;
     },
   },

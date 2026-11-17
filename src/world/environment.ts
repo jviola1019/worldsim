@@ -19,6 +19,7 @@
  * (at vents), floods (wet anomalies near rivers), storms (warm coasts),
  * each with real damage to people, buildings, vegetation and soils.
  */
+import { flow } from '../population/ledger';
 import type { Sim } from '../sim/context';
 import { addFx, markTile } from '../sim/context';
 import { BALANCE } from '../config/balance';
@@ -255,7 +256,7 @@ export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r:
     const d = Math.hypot(s.x - x, s.y - y);
     const share = clamp01(1 - d / (r + s.radius + 1)) * severity * (kind === 'storm' ? 0.02 : kind === 'flood' ? 0.03 : 0.08);
     const dead = removePeople(sim, s, s.pop * share, kind);
-    s.flows.disaster += dead;
+    flow(sim, s, 'disaster', dead);
     deaths += dead;
     s.unrest = clamp01(s.unrest + share * 2);
   }

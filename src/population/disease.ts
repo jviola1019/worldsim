@@ -9,6 +9,7 @@
  * policy. Recovered people are immune for a while. No real pathogen biology is
  * modelled — parameters are abstract (r0, lethality, duration, immunity).
  */
+import { flow } from './ledger';
 import { onEpidemicSurvived } from './development';
 import type { Sim } from '../sim/context';
 import type { Civ, Disease, Settlement } from '../sim/types';
@@ -90,7 +91,7 @@ export function diseaseMonthly(sim: Sim, s: Settlement, civ: Civ): void {
       const removed = removePeople(sim, s, deaths, d.name.toLowerCase());
       e.deaths += removed;
       d.totalDeaths += removed;
-      s.flows.disease += removed;
+      flow(sim, s, 'disease', removed);
     }
     // export infection to linked settlements
     if (e.i > 0.01) {

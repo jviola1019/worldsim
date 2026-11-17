@@ -5,6 +5,7 @@
  * destinations depend on migration policies. Migration carries culture and
  * religion with it.
  */
+import { migrate } from './ledger';
 import { mixShares } from '../civilizations/settlement';
 import { addPeople } from './demography';
 import { findPath } from '../world/pathfinding';
@@ -72,6 +73,7 @@ export function emigrate(sim: Sim, s: Settlement, civ: Civ, adequacy: number): v
     const religionId = s.religions[0]?.id ?? 0;
     addPeople(sim, best, removed, cultureId, religionId);
     best.flows.immigration += removed;
+    migrate(sim, s.civId, best.civId, removed);
     const frac = removed / Math.max(1, best.pop);
     mixShares(best.cultures, cultureId, frac); // same blending as an arriving migrant agent
     if (religionId) mixShares(best.religions, religionId, frac);

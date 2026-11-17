@@ -9,6 +9,8 @@
  * can declare independence, creating spacefaring civilizations. Speculative
  * steps are only reachable with the speculative-technology law.
  */
+import { removePeople } from '../population/demography';
+import { record, transfer } from '../population/ledger';
 import type { Sim } from '../sim/context';
 import type { Civ, Colony } from '../sim/types';
 import { B } from '../civilizations/buildingTypes';
@@ -73,6 +75,7 @@ export function spaceYearly(sim: Sim, civ: Civ): void {
     const col = w.colonies.get(id);
     if (!col || col.independentCiv) continue;
     const growth = 0.03 * (1 + c.orbitalIndustry * 0.3);
+    record(sim, col.civId, 'births', col.pop * growth); // net natural increase of the colony (stylized)
     col.pop *= 1 + growth;
     col.output = col.pop * 0.5;
     civ.stock[Good.RARE] += col.pop * 0.002;
@@ -92,7 +95,7 @@ function foundColony(sim: Sim, civ: Civ): void {
     civId: civ.id,
     name: `${phon ? makeName(sim.rng, phon, 'place') : 'New Hope'} ${body === 'Orbit' ? 'Station' : 'Colony'}`,
     body,
-    pop: 500,
+    pop: takeColonists(sim, civ, 500),
     founded: sim.year,
     independence: 0,
     independentCiv: 0,
@@ -110,6 +113,7 @@ function colonyIndependence(sim: Sim, civ: Civ, col: Colony): void {
   const nc = createCiv(sim, { species: civ.species, x: cap?.x ?? 0, y: cap?.y ?? 0, cultureId: culture.id, parentId: civ.id, inheritFrom: civ, quiet: true, name: col.name.split(' ')[0] });
   culture.originCiv = nc.id;
   nc.population = col.pop;
+  transfer(sim, civ.id, nc.id, col.pop);
   col.independentCiv = nc.id;
   col.cultureId = culture.id;
   civ.space.colonies = civ.space.colonies.filter((id) => id !== col.id);
@@ -123,4 +127,10 @@ function colonyIndependence(sim: Sim, civ: Civ, col: Colony): void {
     importance: 4,
     causes: [{ label: 'Distance and separate interests of an off-world society', weight: 0.6 }, { label: `Population of ${Math.round(col.pop).toLocaleString('en-US')}`, weight: 0.4 }],
   });
+}
+
+/** Colonists leave the capital (moving people inside the nation, not creating them). */
+function takeColonists(sim: Sim, civ: Civ, n: number): number {
+  const cap = sim.w.settlements.get(civ.capital);
+  return cap ? removePeople(sim, cap, n, 'emigration') : 0;
 }
