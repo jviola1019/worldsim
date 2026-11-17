@@ -204,3 +204,15 @@ export function onEpidemicSurvived(sim: Sim, settlementId: number, disease: stri
     if (sim.rng.chance(0.5)) gainTrait(sim, p, 'survivor', `lived through the ${disease}`);
   }
 }
+
+/**
+ * Player "divine touch": grant or remove a trait on a living person. Logged as an intervention
+ * (power id `trait_edit`) so the timeline stays reproducible, and written to the person's life log.
+ */
+export function divineTrait(sim: Sim, p: Person, key: string, add: boolean): boolean {
+  if (p.died !== undefined || !TRAIT_BY_KEY[key]) return false;
+  const ok = add ? gainTrait(sim, p, key, 'touched by the gods') : p.traits.includes(key);
+  if (!add && ok) loseTrait(sim, p, key, 'touched by the gods');
+  if (ok) sim.w.interventions.push({ tick: sim.w.tick, power: `trait_${add ? 'add' : 'remove'}:${key}`, x: 0, y: 0, r: 0, target: p.id });
+  return ok;
+}

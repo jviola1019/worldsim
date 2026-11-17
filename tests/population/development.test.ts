@@ -80,3 +80,22 @@ describe('character development', () => {
     expect(withLife.length).toBeGreaterThan(0);
   }, 90000);
 });
+
+import { divineTrait } from '../../src/population/development';
+describe('divine trait editor', () => {
+  it('grants and removes traits, logs the intervention and the life event', () => {
+    const sim = makeSim('dev-8');
+    const civ = [...sim.w.civs.values()][0];
+    const p = createPerson(sim, { born: sim.year - 30, species: 'human', civId: civ?.id ?? 0, cultureId: civ?.cultureId ?? 0, religionId: 0, notable: true });
+    p.traits = ['brave'];
+    const n0 = sim.w.interventions.length;
+    expect(divineTrait(sim, p, 'genius', true)).toBe(true);
+    expect(p.traits).toContain('genius');
+    expect(divineTrait(sim, p, 'craven', true)).toBe(true);
+    expect(p.traits).not.toContain('brave');
+    expect(divineTrait(sim, p, 'genius', false)).toBe(true);
+    expect(p.traits).not.toContain('genius');
+    expect(sim.w.interventions.length).toBe(n0 + 3);
+    expect(p.deeds!.some((d) => d.t.includes('touched by the gods'))).toBe(true);
+  });
+});

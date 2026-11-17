@@ -15,7 +15,8 @@ import { lifeExpectancy, healthIndices, mortalitySchedule, cohortTotal } from '.
 import { LineChart } from '../charts/LineChart';
 import { explainPopulationChange } from '../../history/stats';
 import { effCost } from '../../technology/research';
-import { TRAIT_BY_KEY } from '../../population/traits';
+import { TRAIT_BY_KEY, TRAITS } from '../../population/traits';
+import { divineTrait } from '../../population/development';
 import { DOCTRINES } from '../../culture/religion';
 
 export type Selection = { kind: 'settlement' | 'civ' | 'person' | 'army' | 'herd' | 'band' | 'tile' | 'religion'; id: number };
@@ -292,6 +293,28 @@ function traitTip(key: string): string {
   return parts.join(' · ');
 }
 
+function TraitEditor({ sim, person }: { sim: Simulation; person: Person }) {
+  const [open, setOpen] = useState(false);
+  const [, bump] = useState(0);
+  if (!open) return <button class="chip" onClick={() => setOpen(true)}>Divine touch: edit traits</button>;
+  return (
+    <div class="trait-editor">
+      <div class="muted small">Tap to grant or remove. Opposites replace each other. Recorded as an intervention.</div>
+      <div class="row">
+        {TRAITS.map((t) => {
+          const has = person.traits.includes(t.key);
+          return (
+            <button key={t.key} class={`chip trait ${t.kind === 'acquired' ? 'acquired' : ''}`} aria-pressed={has} title={traitTip(t.key)} onClick={() => { divineTrait(sim, person, t.key, !has); bump((n) => n + 1); }}>
+              {has ? '✓ ' : ''}{t.name}
+            </button>
+          );
+        })}
+      </div>
+      <button class="chip" onClick={() => setOpen(false)}>Done</button>
+    </div>
+  );
+}
+
 function PersonView({ sim, person, setSel, close, focus }: P & { person: Person }) {
   const w = sim.w;
   const age = (person.died ?? sim.year) - person.born;
@@ -343,6 +366,7 @@ function PersonView({ sim, person, setSel, close, focus }: P & { person: Person 
             })}
           </div>
           <div class="muted small">Outlined traits were earned through life events; others were inborn or inherited.</div>
+          {person.died === undefined && <TraitEditor sim={sim} person={person} />}
         </div>
         {person.deeds && person.deeds.length > 0 && (
           <div class="section">
