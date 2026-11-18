@@ -30,6 +30,11 @@ import { foundSettlement, destroySettlement, transferSettlement } from '../civil
 import { addPeople } from '../population/demography';
 import { logEvent } from '../history/events';
 import { nuclearStrike } from '../military/war';
+import { forceExchange } from '../military/nuclear';
+import { asteroidImpact, eruption, solarStorm, gammaRayBurst } from '../world/catastrophes';
+import { releasePathogen, forceAITakeover, startGoo } from '../future/risks';
+import { unleashHorror, horrorsAllowed } from './horrors';
+import type { HorrorKind } from '../sim/types';
 import { infect } from '../population/disease';
 import { HAZARD } from '../world/tilemap';
 import { Good } from '../world/resources';
@@ -205,6 +210,25 @@ const disaster = (kind: string, label: string, icon: string, r: number): PowerDe
       return null;
     }
     triggerDisaster(sim, kind, x, y, Math.max(r, br));
+    return null;
+  },
+});
+
+const horror = (kind: HorrorKind, label: string, icon: string, desc: string): PowerDef => ({
+  id: 'horror_' + kind,
+  cat: 'disaster',
+  label,
+  icon,
+  kind: 'tap',
+  destructive: true,
+  desc: `${desc} God mode only.`,
+  apply: (sim, x, y) => {
+    if (!horrorsAllowed(sim)) return 'Not available in observer worlds';
+    const s = settlementAt(sim, x, y);
+    if (!s) return 'Tap a settlement';
+    unleashHorror(sim, s, kind);
+    addFx(sim, kind === 'blight' ? 'fx.plague' : 'fx.fire', s.x, s.y, 2);
+    logEvent(sim, { type: 'god_horror', cat: 'god', title: kind === 'zombie' ? `The dead rose in ${s.name}` : kind === 'ghoul' ? `Ghouls crept out of the dark around ${s.name}` : `A creeping blight appeared in the fields of ${s.name}`, civs: [s.civId], settlements: [s.id], x: s.x, y: s.y, importance: 4, causes: [{ label: 'Divine intervention', weight: 1 }] });
     return null;
   },
 });
@@ -699,6 +723,10 @@ export const POWERS: PowerDef[] = [
   disaster('meteor', 'Meteor', 'ico.meteor', 2), disaster('earthquake', 'Earthquake', 'ico.earthquake', 5), disaster('volcano', 'Eruption', 'ico.volcano', 4),
   disaster('flood', 'Flood', 'ico.flood', 5), disaster('storm', 'Storm', 'ico.storm', 6), disaster('drought', 'Drought', 'ico.drought', 8),
   disaster('plague', 'Plague', 'ico.plague', 1), disaster('tsunami', 'Tsunami', 'ico.tsunami', 6), disaster('blizzard', 'Blizzard', 'ico.blizzard', 6),
+  // fictional horrors: god mode only (refused in observer worlds)
+  horror('zombie', 'Zombie outbreak', 'ico.plague', 'The dead rise and turn the living. Hordes spread along roads; garrisons fight them and physicians race for a cure.'),
+  horror('ghoul', 'Ghoul pack', 'ico.monster', 'Nocturnal scavengers crawl out of battlefields and ruins to raid the town until driven off.'),
+  horror('blight', 'Creeping Blight', 'ico.fertility_down', 'A fungal rot destroys crops in the fields and in store, and spreads to linked towns.'),
   // ------------------------------------------------------------ modern & future
   {
     id: 'nuke', cat: 'future', label: 'Nuclear strike', icon: 'ico.nuke', kind: 'tap', destructive: true, desc: 'Catastrophic destruction, fallout and global outrage (needs the advanced weapons law).',
@@ -714,8 +742,80 @@ export const POWERS: PowerDef[] = [
   {
     id: 'asteroid', cat: 'future', label: 'Asteroid impact', icon: 'ico.asteroid', kind: 'tap', destructive: true, desc: 'A great impact: firestorms, a crater and years of global cooling.',
     apply: (sim, x, y) => {
-      triggerDisaster(sim, 'meteor', x, y, 6);
-      sim.w.climate.aerosol += 1.2;
+      asteroidImpact(sim, x, y, 'major', [{ label: 'Divine intervention', weight: 1 }]);
+      return null;
+    },
+  },
+  {
+    id: 'supervolcano', cat: 'future', label: 'Supervolcano', icon: 'ico.volcano', kind: 'tap', destructive: true, desc: 'A supervolcano erupts here: ash buries the land and a volcanic winter cools the world for years.',
+    apply: (sim, x, y) => {
+      eruption(sim, 8, [x, y]);
+      return null;
+    },
+  },
+  {
+    id: 'superflare', cat: 'future', label: 'Solar superflare', icon: 'ico.solar_flare', kind: 'tap', destructive: true, desc: 'A superflare burns out power grids and thins the ozone layer, damaging harvests for years.',
+    apply: (sim) => {
+      solarStorm(sim, true);
+      return null;
+    },
+  },
+  {
+    id: 'gamma_burst', cat: 'future', label: 'Gamma-ray burst', icon: 'ico.solar_flare', kind: 'tap', destructive: true, desc: 'A dying star irradiates half the world and strips away the ozone layer.',
+    apply: (sim) => {
+      gammaRayBurst(sim);
+      return null;
+    },
+  },
+  {
+    id: 'nuclear_war', cat: 'future', label: 'Nuclear exchange', icon: 'ico.nuke', kind: 'tap', destructive: true, desc: 'This nation launches its arsenal at the selected (or nearest) nation, which retaliates. Fallout and soot follow (needs the advanced weapons law).',
+    apply: (sim, x, y, _r, ctx) => {
+      if (!sim.w.laws.advancedWeapons) return 'Enable "Advanced weapons" in World laws';
+      const civ = civAt(sim, x, y);
+      if (!civ) return 'Tap a nation';
+      const other = targetCiv(sim, civ, ctx);
+      if (!other) return 'No enemy available';
+      makeContact(sim, civ.id, other.id);
+      forceExchange(sim, civ, other, 6);
+      return null;
+    },
+  },
+  {
+    id: 'engineered_plague', cat: 'future', label: 'Lab-made plague', icon: 'ico.plague', kind: 'tap', destructive: true, desc: 'An engineered pathogen escapes from a laboratory in this nation.',
+    apply: (sim, x, y) => {
+      const civ = civAt(sim, x, y);
+      if (!civ) return 'Tap a nation';
+      releasePathogen(sim, civ, false, [{ label: 'Divine intervention', weight: 1 }]);
+      return null;
+    },
+  },
+  {
+    id: 'infertility_plague', cat: 'future', label: 'Barren plague', icon: 'ico.plague', kind: 'tap', destructive: true, desc: 'A pathogen that leaves its survivors sterile spreads from this nation.',
+    apply: (sim, x, y) => {
+      const civ = civAt(sim, x, y);
+      if (!civ) return 'Tap a nation';
+      releasePathogen(sim, civ, true, [{ label: 'Divine intervention', weight: 1 }]);
+      return null;
+    },
+  },
+  {
+    id: 'ai_uprising', cat: 'future', label: 'Rogue AI', icon: 'ico.ai_awaken', kind: 'tap', destructive: true, desc: 'A misaligned AI system seizes the infrastructure of a nation that has advanced AI.',
+    apply: (sim, x, y) => {
+      const civ = civAt(sim, x, y);
+      if (!civ) return 'Tap a nation';
+      if ((civ.techs['advanced_ai']?.adoption ?? 0) < 0.3) return 'This nation has no advanced AI yet';
+      forceAITakeover(sim, civ);
+      return null;
+    },
+  },
+  {
+    id: 'grey_goo', cat: 'future', label: 'Grey goo', icon: 'ico.anomaly', kind: 'tap', destructive: true, desc: 'Speculative: self-replicating nanomachines break loose (needs speculative technology).',
+    apply: (sim, x, y) => {
+      if (!sim.w.laws.speculativeTech) return 'Enable "Speculative technology" in World laws';
+      const s = settlementAt(sim, x, y);
+      const civ = s ? sim.w.civs.get(s.civId) : undefined;
+      if (!s || !civ) return 'Tap a settlement';
+      startGoo(sim, civ, s, [{ label: 'Divine intervention', weight: 1 }]);
       return null;
     },
   },
@@ -796,10 +896,15 @@ function relationsBrush(sim: Sim, x: number, y: number, r: number, delta: number
 
 export const POWER_BY_ID: Record<string, PowerDef> = Object.fromEntries(POWERS.map((p) => [p.id, p]));
 
+/** Powers that create fictional (god-mode-only) threats. */
+export const HORROR_POWERS: ReadonlySet<string> = new Set(['horror_zombie', 'horror_ghoul', 'horror_blight']);
+
 /** Apply a power and log the intervention (for reproducible timelines). */
 export function applyPower(sim: Sim, id: string, x: number, y: number, r: number, ctx: PowerCtx): string | null {
   const p = POWER_BY_ID[id];
   if (!p || !sim.w.map.inBounds(x, y)) return null;
+  // observer (Realistic) worlds have no god powers at all, and never fictional threats
+  if (sim.w.meta.settings.observer) return 'Observer mode: history runs on its own';
   const res = p.apply(sim, x, y, r, ctx);
   if (res === null) {
     sim.w.interventions.push({ tick: sim.w.tick, power: id, x, y, r, target: ctx.selectedCiv });

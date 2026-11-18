@@ -4,7 +4,8 @@
  * extinction (kept in history).
  */
 import type { Sim } from '../sim/context';
-import type { Civ, Culture, CultureValues, Institutions, Language, Personality, SpeciesKey } from '../sim/types';
+import type { Cause, Civ, Culture, CultureValues, EndingType, Institutions, Language, Personality, SpeciesKey } from '../sim/types';
+import { ENDINGS, inferEnding, makeEnding } from './endings';
 import { generatePhonology, mutatePhonology, makeName, adjectiveOf } from '../culture/language';
 import { uniqueName } from '../culture/naming';
 import { clamp, clamp01 } from '../core/math';
@@ -255,8 +256,15 @@ export function personalityOf(sim: Sim, civ: Civ): Personality {
   return p;
 }
 
-export function killCiv(sim: Sim, civ: Civ, cause: string, by?: Civ): void {
+/**
+ * End a civilization. `ending` gives the structured type and causes of a direct ending (conquest,
+ * union, AI takeover...); without it the ending is inferred from the civ's typed existential pressure
+ * (the dominant recent cause of death), see civilizations/endings.ts.
+ */
+export function killCiv(sim: Sim, civ: Civ, cause: string, by?: Civ, ending?: { type: EndingType; causes?: Cause[] }): void {
   if (!civ.alive) return;
+  const e = ending ?? inferEnding(civ);
+  civ.ending = makeEnding(sim, e.type, e.causes, by);
   civ.alive = false;
   civ.fell = sim.year;
   civ.fellCause = cause;
@@ -270,9 +278,9 @@ export function killCiv(sim: Sim, civ: Civ, cause: string, by?: Civ): void {
     type: 'civ_fell',
     cat: 'politics',
     title: `${civ.name} has fallen`,
-    text: by ? `It was absorbed by ${by.name}.` : cause,
+    text: `${ENDINGS[civ.ending.type].label}. ${by ? `It was absorbed by ${by.name}.` : cause}`,
     civs: by ? [civ.id, by.id] : [civ.id],
     importance: civ.peakPop > 50000 ? 4 : 3,
-    causes: [{ label: cause, weight: 1 }],
+    causes: civ.ending.causes,
   });
 }

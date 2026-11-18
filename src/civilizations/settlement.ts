@@ -27,6 +27,8 @@ import { TICKS_PER_MONTH, monthOf } from '../core/time';
 import { diseaseMonthly } from '../population/disease';
 import { localBeliefMonthly } from '../culture/religion';
 import { emigrate } from '../population/migration';
+import { addPressure, famineType, ecoStressOf } from './endings';
+import { horrorMonthly } from '../powers/horrors';
 
 export interface NewSettlement {
   members?: number[];
@@ -250,6 +252,12 @@ export function settlementMonthly(sim: Sim, s: Settlement): void {
     for (let b = 0; b < AGE_BANDS; b++) q[b] = Math.min(0.95, q[b] * urban);
   }
   let tfr = tfrFor(civ, s, q[0], econ.adequacy, s.species);
+  // an infertility pandemic sterilizes adults; generations born to the fertile slowly replace them
+  if (s.sterility) {
+    tfr *= 1 - s.sterility;
+    s.sterility = s.sterility * (1 - 1 / (12 * 35));
+    if (s.sterility < 0.001) delete s.sterility;
+  }
   // world law: population cap (fertility collapses when the cap is reached)
   const cap = sim.w.laws.populationCap;
   if (cap > 0 && livePopulation(sim) >= cap) tfr *= 0.05;
@@ -260,6 +268,7 @@ export function settlementMonthly(sim: Sim, s: Settlement): void {
   record(sim, s.civId, 'births', s.flows.births - f0b);
   record(sim, s.civId, 'deaths', s.flows.deaths - f0d);
   record(sim, s.civId, 'famine', s.flows.famine - f0f);
+  if (s.flows.famine - f0f > 0) addPressure(sim, s.civId, famineType(sim, s), s.flows.famine - f0f);
   s.pop = s.mode === 'cohort' ? cohortTotal(s.cohorts) : s.members.length;
   if (s.mode === 'individual' && s.pop > BALANCE.individualMax) {
     if (s.capital) protectRulingFamily(sim, civ);
@@ -284,6 +293,7 @@ export function settlementMonthly(sim: Sim, s: Settlement): void {
   }
   // 4. health, beliefs, migration
   diseaseMonthly(sim, s, civ);
+  if (s.horror) horrorMonthly(sim, s, civ);
   localBeliefMonthly(sim, s, civ);
   if (month === 0) s.health = clamp01((lifeExpectancy(q) - 18) / 65);
   if (month % 3 === 1 && (econ.adequacy < 0.75 || s.unrest > 0.6 || s.pop > s.housing * 1.4)) emigrate(sim, s, civ, econ.adequacy);
@@ -312,6 +322,7 @@ function settlementYearly(sim: Sim, s: Settlement, civ: Civ): void {
     s.access = clamp(1.15 - d / Math.max(4, reach), 0.15, 1);
   } else s.access = 1;
   s.loyalty = clamp01(s.loyalty + 0.03 - s.unrest * 0.05);
+  s.ecoStress = ecoStressOf(sim, s);
   revealAround(sim, civ, s.x, s.y, s.radius + 4);
   if (s.flows.famine > s.pop * 0.05 && s.pop > 50)
     logEvent(sim, { type: 'famine', cat: 'demography', title: `Famine struck ${s.name}`, civs: [civ.id], settlements: [s.id], x: s.x, y: s.y, importance: 2, causes: famineCauses(sim, s) });

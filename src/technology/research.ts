@@ -219,6 +219,7 @@ export function researchOutput(sim: Sim, civ: Civ): number {
     (1 + 0.25 * (civ.personality.science - 0.5)) *
     (0.8 + 0.4 * eduRate) *
     mediaResearchMult(civ) *
+    (1 - 0.35 * (civ.sclerosis ?? 0)) *
     w.laws.researchSpeed *
     w.meta.settings.techSpeed;
   return (folkRP + learnedRP * spend) * mult;
@@ -239,7 +240,7 @@ export function chooseResearch(sim: Sim, civ: Civ): string {
         u *= hungry ? 2.2 : 1.1;
         break;
       case 'military':
-        u *= (atWar ? 2.5 : 0.8) * (0.6 + p.aggression);
+        u *= (atWar ? 2.5 : 0.8) * (0.6 + p.aggression) * (1 + (civ.military?.armsRace ?? 0));
         break;
       case 'economy':
       case 'maritime':
@@ -379,16 +380,19 @@ export function researchYearly(sim: Sim, civ: Civ): void {
     if (!other || !other.alive) continue;
     const ci = contactIntensity(sim, civ, other);
     if (ci <= 0) continue;
+    // advantage of backwardness (Gerschenkron): the further behind, the more there is to copy cheaply
+    const backward = 1 + 0.25 * Math.max(0, Math.min(4, other.era - civ.era));
     for (const id in other.techs) {
       const ot = other.techs[id];
       if (!ot.known || ot.adoption < 0.5) continue;
       const def = TECH_BY_ID.get(id);
       if (!def || knows(civ, id) || !techAvailable(sim, civ, def)) continue;
       const st = techState(civ, id);
-      st.progress += effCost(def) * BALANCE.diffusionRate * ci * absorb;
+      st.progress += effCost(def) * BALANCE.diffusionRate * ci * absorb * backward;
       if (st.progress >= effCost(def)) grantTech(sim, civ, id, 'diffusion');
     }
   }
+  leapfrogCheck(sim, civ);
   // 3) serendipity
   if (rng.chance(BALANCE.serendipity * (1 + civ.personality.science))) {
     const opts = TECHS.filter((t) => techAvailable(sim, civ, t) && effCost(t) < (rp + 50) * 8);
@@ -407,9 +411,12 @@ export function researchYearly(sim: Sim, civ: Civ): void {
     if (!st.known) continue;
     const def = TECH_BY_ID.get(id);
     if (!def) continue;
+    if (st.skipped) continue; // a leapfrogged stage is never built
     const before = st.adoption;
     if (resourcesMet(civ, def)) {
-      if (st.adoption < 1) st.adoption = Math.min(1, st.adoption + (investment * (1 + civ.caps.communication * 0.03)) / def.adoptionYears);
+      // latecomers without legacy infrastructure adopt faster; sclerotic institutions adopt slower
+      const late = LEAPFROGS.some((l) => l.successor === id && civ.techs[l.legacy]?.skipped) ? 1.5 : 1;
+      if (st.adoption < 1) st.adoption = Math.min(1, st.adoption + (investment * (1 + civ.caps.communication * 0.03) * late * (1 - 0.35 * (civ.sclerosis ?? 0))) / def.adoptionYears);
     } else if (st.adoption > 0) {
       st.adoption = Math.max(0, st.adoption - 0.06); // lost access to required materials
     }
@@ -432,6 +439,53 @@ export function researchYearly(sim: Sim, civ: Civ): void {
     changed = true;
   }
   if (changed) computeCaps(civ);
+}
+
+/**
+ * Leapfrogs: a legacy infrastructure stage and the newer technology that makes it unnecessary.
+ * `unless`: the legacy stage is skipped only by nations without domestic access to this good
+ * (oil-poor latecomers go straight to solar and wind).
+ */
+export const LEAPFROGS: { legacy: string; successor: string; unless?: GoodKey }[] = [
+  { legacy: 'telegraph', successor: 'telephone' },
+  { legacy: 'telephone', successor: 'mobile_telecom' },
+  { legacy: 'television', successor: 'internet' },
+  { legacy: 'petroleum_drilling', successor: 'solar_power', unless: 'OIL' },
+  { legacy: 'petroleum_drilling', successor: 'wind_power', unless: 'OIL' },
+];
+
+/**
+ * Leapfrogging (yearly, after diffusion): a nation that already knows a successor technology that a
+ * contact uses, while its own build-out of the legacy stage is still low (adoption < 60%), abandons
+ * the legacy stage (it is marked skipped and never built further) and adopts the successor 1.5x
+ * faster: no legacy infrastructure to replace and no incumbents to protect.
+ */
+export function leapfrogCheck(sim: Sim, civ: Civ): void {
+  for (const l of LEAPFROGS) {
+    const leg = civ.techs[l.legacy];
+    const suc = civ.techs[l.successor];
+    if (!leg?.known || leg.skipped || !suc?.known || leg.adoption >= 0.6 || suc.adoption >= 0.5) continue;
+    if (l.unless && (civ.access[Good[l.unless]] ?? 0) >= 0.3) continue;
+    let teacher: Civ | undefined;
+    for (const oid of civ.knownCivs) {
+      const o = sim.w.civs.get(oid);
+      if (o?.alive && (o.techs[l.successor]?.adoption ?? 0) >= 0.5 && contactIntensity(sim, civ, o) > 0) { teacher = o; break; }
+    }
+    if (!teacher) continue;
+    leg.skipped = true;
+    const ld = TECH_BY_ID.get(l.legacy)!;
+    const sd = TECH_BY_ID.get(l.successor)!;
+    logEvent(sim, {
+      type: 'leapfrog', cat: 'technology',
+      title: `${civ.name} leapfrogged straight to ${sd.name}, skipping ${ld.name}`,
+      civs: [civ.id, teacher.id], importance: sd.era >= 10 ? 3 : 2,
+      causes: [
+        { label: `${teacher.name} already uses ${sd.name}`, weight: 0.4 },
+        { label: `Little ${ld.name.toLowerCase()} infrastructure built (${Math.round(leg.adoption * 100)}%)`, weight: 0.4 },
+        ...(l.unless ? [{ label: `No domestic ${l.unless.toLowerCase()}`, weight: 0.2 }] : []),
+      ],
+    });
+  }
 }
 
 export function avgEducation(sim: Sim, civ: Civ): number {

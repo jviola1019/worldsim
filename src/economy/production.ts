@@ -22,6 +22,7 @@ import { growingWeight } from '../core/time';
 import { huntHerds, localHeat } from '../ecology/ecology';
 import { workforceFromCohorts } from '../population/demography';
 import { logEvent } from '../history/events';
+import { coolingYieldMult } from '../civilizations/endings';
 
 // ---------------------------------------------------------------- sites cache
 
@@ -259,7 +260,10 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   const rain = c.rain[cell] ?? 0;
   const temp = m.temp[i0] + localHeat(sim, i0);
   const heatStress = temp > 30 ? Math.max(0.4, 1 - (temp - 30) * 0.06) : 1;
-  const climateMult = clamp(1 + 0.75 * rain, 0.15, 1.25) * heatStress;
+  // global cooling (volcanic, impact or nuclear winter) and ozone-loss UV shorten and damage the growing season
+  // (a god-mode blight rots crops in the fields as well)
+  const winter = coolingYieldMult(sim) * (s.horror?.kind === 'blight' ? 1 - 0.85 * clamp01(s.horror.level) : 1);
+  const climateMult = clamp(1 + 0.75 * rain, 0.15, 1.25) * heatStress * winter;
   const absLat = Math.abs(m.latitude(s.y, w.meta.latSpan));
   const season = growingWeight(month, absLat) / seasonNorm(absLat);
 
@@ -272,7 +276,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
     srcs.push({ yieldYear: sites.farmPot * BALANCE.farmYield * (1 + farmBonus) * climateMult, labor: sites.farms * BALANCE.farmLabor * Math.max(0.03, 1 - mech), seasonal: true, kind: 0 });
   }
   if (sites.pastures > 0 && caps.herding > 0) {
-    srcs.push({ yieldYear: sites.pastures * BALANCE.pastureYield * (1 + Math.max(0, caps.herding - 1)) * (0.45 + sites.pastureVeg / sites.pastures / 255) * clamp(1 + 0.5 * rain, 0.3, 1.2), labor: sites.pastures * BALANCE.pastureLabor * Math.max(0.05, 1 - mech * 0.8), seasonal: false, kind: 1 });
+    srcs.push({ yieldYear: sites.pastures * BALANCE.pastureYield * (1 + Math.max(0, caps.herding - 1)) * (0.45 + sites.pastureVeg / sites.pastures / 255) * clamp(1 + 0.5 * rain, 0.3, 1.2) * winter, labor: sites.pastures * BALANCE.pastureLabor * Math.max(0.05, 1 - mech * 0.8), seasonal: false, kind: 1 });
   }
   if (sites.fisheries > 0) {
     srcs.push({ yieldYear: sites.fishPot * BALANCE.fisheryYield * (1 + caps.fishing), labor: sites.fisheries * BALANCE.fisheryLabor * Math.max(0.1, 1 - mech * 0.5), seasonal: false, kind: 2 });
@@ -281,7 +285,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
     srcs.push({ yieldYear: s.bld[B.GREENHOUSE] * 25000 * (1 + caps.biotech), labor: s.bld[B.GREENHOUSE] * 60 * Math.max(0.2, 1 - caps.automation), seasonal: false, kind: 3 });
   }
   const forProd = BALANCE.foragerProductivity * (1 + caps.forage);
-  const forageYear = sites.forage * (1 + caps.forage * 0.5) * clamp(1 + 0.4 * rain, 0.4, 1.2);
+  const forageYear = sites.forage * (1 + caps.forage * 0.5) * clamp(1 + 0.4 * rain, 0.4, 1.2) * winter;
   srcs.push({ yieldYear: forageYear, labor: forageYear / forProd, seasonal: false, kind: 4 });
 
   // desired annual production: need + reserve gap (+ a little for the national pool)

@@ -30,7 +30,8 @@ import { B } from '../civilizations/buildingTypes';
 import { removeBuilding } from '../civilizations/urban';
 import { removePeople } from '../population/demography';
 import { logEvent } from '../history/events';
-import type { Settlement } from '../sim/types';
+import type { Cause, EndingType, Settlement } from '../sim/types';
+import { addPressure } from '../civilizations/endings';
 
 export function initClimate(w: { map: { w: number; h: number } }) {
   const cellSize = 16;
@@ -120,6 +121,13 @@ export function climateMonthly(sim: Sim): void {
     c.heat[k] = clamp(c.heat[k] * 0.92 + rng.normal() * 0.35, -4, 4);
   }
   c.aerosol = Math.max(0, c.aerosol * 0.95 - 0.002);
+  // stratospheric soot from burning cities lingers for years (e-folding ~5.5 years)
+  if (c.soot) {
+    c.soot *= 0.985;
+    if (c.soot < 0.01) delete c.soot;
+  }
+  const e = w.endings;
+  if (e && e.uv > 0) e.uv = Math.max(0, e.uv * 0.97 - 0.001);
   if (!w.laws.disasters) return;
   const freq = w.meta.settings.disasterFrequency;
   if (freq <= 0) return;
@@ -171,13 +179,13 @@ const DISASTER_NAMES: Record<string, string> = {
 };
 
 /** Apply a disaster's physical and human effects. Also used by god powers. */
-export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r: number, natural = false): void {
+export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r: number, natural = false, pressure: EndingType = 'disaster', severityMult = 1, causes?: Cause[]): void {
   const w = sim.w;
   const m = w.map;
   const rng = sim.rng;
   let deaths = 0;
   let destroyed = 0;
-  const severity = kind === 'meteor' ? 1 : kind === 'volcano' ? 0.8 : kind === 'earthquake' ? 0.6 : kind === 'tsunami' ? 0.7 : 0.4;
+  const severity = (kind === 'meteor' ? 1 : kind === 'volcano' ? 0.8 : kind === 'earthquake' ? 0.6 : kind === 'tsunami' ? 0.7 : 0.4) * severityMult;
   m.forRadius(x, y, r, (i, tx, ty, d2) => {
     const close = 1 - Math.sqrt(d2) / (r + 0.01);
     switch (kind) {
@@ -255,8 +263,9 @@ export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r:
     if (kind === 'drought' || kind === 'fire' || kind === 'lightning') continue;
     const d = Math.hypot(s.x - x, s.y - y);
     const share = clamp01(1 - d / (r + s.radius + 1)) * severity * (kind === 'storm' ? 0.02 : kind === 'flood' ? 0.03 : 0.08);
-    const dead = removePeople(sim, s, s.pop * share, kind);
+    const dead = removePeople(sim, s, s.pop * Math.min(1, share), kind);
     flow(sim, s, 'disaster', dead);
+    addPressure(sim, s.civId, pressure, dead, `${DISASTER_NAMES[kind] ?? 'A disaster'} near ${s.name}`);
     deaths += dead;
     s.unrest = clamp01(s.unrest + share * 2);
   }
@@ -271,7 +280,7 @@ export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r:
       x,
       y,
       importance: deaths > 5000 ? 4 : deaths > 100 || destroyed > 5 ? 3 : 2,
-      causes: natural ? undefined : [{ label: 'Divine intervention', weight: 1 }],
+      causes: causes ?? (natural ? undefined : [{ label: 'Divine intervention', weight: 1 }]),
     });
 }
 
@@ -298,6 +307,16 @@ export function climateYearly(sim: Sim): void {
     const forcing = BALANCE.co2Forcing * Math.log(c.co2 / c.baseCo2);
     const equilibrium = BALANCE.climateSensitivity * forcing;
     c.anomaly += (equilibrium - c.anomaly) * 0.03;
+    // tipping point: past 3 °C, thawing permafrost, burning forests and darkening ice add CO2 on their own
+    if (c.anomaly > 3) {
+      const fb = (c.anomaly - 3) * 2;
+      c.feedback = (c.feedback ?? 0) + fb;
+      c.co2 += fb;
+      if (w.milestones['climate_tipping'] === undefined) {
+        w.milestones['climate_tipping'] = sim.year;
+        logEvent(sim, { type: 'climate_tipping', cat: 'disaster', title: 'The climate passed a tipping point: warming now feeds itself', importance: 5, causes: [{ label: `Global warming of ${c.anomaly.toFixed(1)}°C`, weight: 0.6 }, { label: `CO2 at ${Math.round(c.co2)} ppm`, weight: 0.4 }] });
+      }
+    }
     // thermal expansion + ice melt (stylized, slow)
     c.seaLevel += Math.max(0, c.anomaly) * 0.004;
     if (c.seaLevel > 0.3) floodCoasts(sim, c.seaLevel);

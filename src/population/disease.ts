@@ -21,6 +21,7 @@ import { logEvent } from '../history/events';
 import { makeName } from '../culture/language';
 import { phonOfCulture } from './persons';
 import { B } from '../civilizations/buildingTypes';
+import { addPressure } from '../civilizations/endings';
 
 const NAMES = ['Fever', 'Pox', 'Plague', 'Cough', 'Flux', 'Sweating Sickness', 'Blight', 'Ague', 'Wasting'];
 
@@ -89,12 +90,15 @@ export function diseaseMonthly(sim: Sim, s: Settlement, civ: Civ): void {
     e.s -= newInf;
     e.i += newInf - rec;
     e.r += rec - dead;
+    // an infertility pathogen leaves most of the recovered sterile
+    if (d.sterilizing) s.sterility = clamp01((s.sterility ?? 0) + (rec - dead) * 0.85 * (1 - (s.sterility ?? 0)));
     const deaths = dead * s.pop;
     if (deaths > 0.01) {
       const removed = removePeople(sim, s, deaths, d.name.toLowerCase());
       e.deaths += removed;
       d.totalDeaths += removed;
       flow(sim, s, 'disease', removed);
+      addPressure(sim, s.civId, d.sterilizing ? 'infertility' : d.engineered ? 'engineered_pandemic' : 'pandemic', removed, `The ${d.name}${d.engineered ? ' (engineered)' : ''}`);
     }
     // export infection to linked settlements
     if (e.i > 0.01) {

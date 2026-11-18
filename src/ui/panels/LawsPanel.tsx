@@ -23,7 +23,7 @@ export function LawsPanel({ sim, close }: { sim: Simulation; close: () => void }
     (laws as any)[k] = !(laws as any)[k];
     force((x) => x + 1);
   };
-  const boolKeys = (Object.keys(LAW_LABELS) as (keyof WorldLaws)[]).filter((k) => typeof laws[k] === 'boolean');
+  const boolKeys = (Object.keys(LAW_LABELS) as (keyof WorldLaws)[]).filter((k) => typeof laws[k] === 'boolean' && !(k === 'horrors' && sim.w.meta.settings.observer));
   return (
     <aside class="sheet" aria-label="World laws">
       <div class="sheet-head">
