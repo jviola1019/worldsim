@@ -6,6 +6,14 @@
  * (not by simulated history) — this is recorded in the world history so it is
  * never presented as emergent.
  */
+import { eraToTier } from '../civilizations/buildingTypes';
+import { BUILDINGS } from '../civilizations/buildings';
+import { getSites } from '../economy/production';
+import { findSite, placeBuilding } from '../civilizations/urban';
+import { hasUnlocked } from '../technology/research';
+import { cohortTotal } from '../population/demography';
+import { BALANCE } from '../config/balance';
+import { cropSuitability } from '../economy/production';
 import type { Sim } from './context';
 import type { Civ, SpeciesKey } from './types';
 import type { WorldConfig } from '../config/laws';
@@ -182,9 +190,21 @@ export function developedCiv(sim: Sim, x: number, y: number, species: SpeciesKey
       break;
     }
   }
+  // Size the people to the land BEFORE building (so districts and jobs match the people who live there).
+  // A developed start must be able to feed itself; without this, era presets began in mass famine.
+  const fit = landFit(sim, civ);
+  if (fit < 1) {
+    for (const sid of civ.settlements) {
+      const s = w.settlements.get(sid)!;
+      if (s.mode !== 'cohort') continue;
+      const k = Math.max(fit, 150 / Math.max(1, s.pop));
+      s.cohorts = s.cohorts.map((v) => v * k);
+      s.pop = cohortTotal(s.cohorts);
+    }
+  }
   // stock materials so generated cities can be built
   for (let g = 0; g < GOOD_COUNT; g++) civ.stock[g] = Math.max(civ.stock[g], 200 * era * era);
-  civ.stock[Good.FOOD] = capPop * 0.5;
+  civ.stock[Good.FOOD] = capPop * 0.5 * fit;
   for (const sid of civ.settlements) {
     const s = w.settlements.get(sid)!;
     s.food = s.pop * 0.6;
@@ -200,6 +220,7 @@ export function developedCiv(sim: Sim, x: number, y: number, species: SpeciesKey
     }
     recomputeTerritory(sim, s);
   }
+  layOutFarmland(sim, civ);
   for (let k = 0; k < 6; k++) infrastructureYearly(sim, civ);
   if (era >= 3 && rng.chance(0.85)) {
     const r = foundReligion(sim, cap, civ);
@@ -245,4 +266,63 @@ function applyCollapseScenario(sim: Sim): void {
   logEvent(sim, { type: 'scenario', cat: 'founding', title: 'Survivors emerge among the ruins of a fallen age', importance: 3 });
   void removeBuilding;
   void grantTech;
+}
+
+/**
+ * Share of the planned starting population the civ's land can feed (≤ 1): arable land within reach of its
+ * towns (not water, not another nation's), a third of it farmed at the civ's technology, plus foraging.
+ * An a-priori estimate used only to size developed starts; the running economy then takes over.
+ */
+function landFit(sim: Sim, civ: Civ): number {
+  const w = sim.w;
+  const m = w.map;
+  const caps = civ.caps;
+  const irrigated = caps.irrigation > 0;
+  const bonus = Math.max(0, caps.farming - 1) + caps.biotech * 0.4 + caps.irrigation * 0.15;
+  const seen = new Set<number>();
+  let farmland = 0;
+  let pop = 0;
+  for (const sid of civ.settlements) {
+    const s = w.settlements.get(sid)!;
+    pop += s.pop;
+    m.forRadius(s.x, s.y, 9, (i) => {
+      if (seen.has(i) || m.isWater(i) || (m.owner[i] && m.owner[i] !== civ.id)) return;
+      seen.add(i);
+      farmland += (m.fert[i] / 255) * cropSuitability(m.temp[i], m.moist[i], irrigated);
+    });
+  }
+  const capacity = farmland * 0.33 * BALANCE.farmYield * (1 + (caps.farming > 0 ? bonus : 0));
+  const need = pop * BALANCE.foodNeedPerCapita;
+  return need > 0 ? clamp(capacity / need, 0.05, 1) : 1;
+}
+
+/**
+ * A developed start begins with the farmland that feeds it: farms are placed on each town's best free
+ * land until the civ's annual farm + forage output covers its people (or no suitable land remains).
+ */
+function layOutFarmland(sim: Sim, civ: Civ): void {
+  if (civ.caps.farming <= 0 || !hasUnlocked(civ, B.FARM)) return;
+  const w = sim.w;
+  const bonus = Math.max(0, civ.caps.farming - 1) + civ.caps.biotech * 0.4 + civ.caps.irrigation * 0.15;
+  const tier = eraToTier(civ.era);
+  const supply = () => {
+    let y = 0;
+    for (const sid of civ.settlements) {
+      const st = getSites(sim, w.settlements.get(sid)!);
+      y += st.farmPot * BALANCE.farmYield * (1 + bonus) + st.forage;
+    }
+    return y;
+  };
+  const need = civ.settlements.reduce((a, sid) => a + (w.settlements.get(sid)?.pop ?? 0), 0) * BALANCE.foodNeedPerCapita;
+  for (let guard = 0; guard < 2000 && supply() < need; guard++) {
+    let placed = false;
+    for (const sid of civ.settlements) {
+      const s = w.settlements.get(sid)!;
+      const tile = findSite(sim, s, BUILDINGS[B.FARM]);
+      if (tile === null) continue;
+      placeBuilding(sim, s, B.FARM, tile, tier);
+      placed = true;
+    }
+    if (!placed) break;
+  }
 }

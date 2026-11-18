@@ -310,6 +310,8 @@ export interface Settlement {
   links: number[];
   /** Planned land routes to linked settlements (target id -> tile path), kept so road building resumes identically after a load. */
   routes?: Record<number, number[]>;
+  /** Household goods (incl. food) consumption value per capita per year, last month (drives service demand). */
+  goodsPerCap?: number;
   abandoned?: number;
 }
 

@@ -77,18 +77,21 @@ describe('integration: causal chains', () => {
   });
 
   it('#4 war costs lives and labor compared to peace', () => {
-    // pick the closest pair of civilizations that know each other (war between strangers is not realistic)
-    const civs = alive(base);
+    // precondition: kingdoms with armies (tiny chiefdom wars can legitimately fizzle without contact),
+    // and the closest pair that know each other (war between strangers is not realistic)
+    const kbase = makeSim('int-war', 96, (c) => { c.settings.startEra = 4; });
+    kbase.runYears(30);
+    const civs = alive(kbase);
     let x = civs[0], y = civs[1], bd = Infinity;
     for (const a of civs) for (const b of civs) {
       if (a.id >= b.id || !a.knownCivs.includes(b.id)) continue;
-      const ca = base.w.settlements.get(a.capital), cb = base.w.settlements.get(b.capital);
+      const ca = kbase.w.settlements.get(a.capital), cb = kbase.w.settlements.get(b.capital);
       if (!ca || !cb) continue;
       const d = (ca.x - cb.x) ** 2 + (ca.y - cb.y) ** 2;
       if (d < bd) { bd = d; x = a; y = b; }
     }
     expect(bd).toBeLessThan(Infinity);
-    const A = clone(base), B = clone(base);
+    const A = clone(kbase), B = clone(kbase);
     // keep A at peace with each other (end any existing war between them) for a fair comparison
     const ax = A.w.civs.get(x.id)!, ay = A.w.civs.get(y.id)!;
     declareWar(B, B.w.civs.get(x.id)!, B.w.civs.get(y.id)!, 'conquest', [{ label: 'Test intervention', weight: 1 }]);

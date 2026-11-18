@@ -457,6 +457,17 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
       serviceWorkers += free * 0.2;
       free = 0;
     } else {
+      // Market services are demand-driven (structural change): households buy more services as their
+      // GOODS income rises (lagged one month; goods only, so service jobs cannot inflate their own demand).
+      // Automation cuts the labor each unit of service needs. Building-based service staff count first.
+      const goodsIncome = Math.log2(1 + (s.goodsPerCap ?? 0) / 0.9);
+      const perCapita = 0.04 + 0.3 * clamp((goodsIncome - 0.8) / 2.2, 0, 1);
+      const demandJobs = pop * perCapita * (1 - automation * 0.45);
+      const market = Math.min(free, Math.max(0, demandJobs - serviceWorkers));
+      emp[SECTOR.SERVICES] += market;
+      serviceWorkers += market;
+      free -= market;
+      // what remains: informal work, else unemployment (a safety net lets people search instead)
       const informal = free * clamp(0.75 - caps.welfare * 0.2 - caps.automation * 0.3, 0.3, 0.75);
       emp[SECTOR.SERVICES] += informal;
       serviceWorkers += informal * 0.4;
@@ -488,6 +499,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
     weight += GOODS[g].basePrice;
     if (g === Good.ENERGY) civ.acc.energyUse += got;
   }
+  s.goodsPerCap = pop > 0 ? (consValue * 12) / pop : 0; // goods + food only; drives next month's service demand
   consValue += (serviceWorkers * servProd * 0.6) / 12;
   civ.acc.cons += consValue;
   const perCap = pop > 0 ? (consValue * 12) / pop : 0;

@@ -33,6 +33,7 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   const acc = civ.acc;
   const pop = Math.max(1, civ.population);
   const prevStock = civ.prevStock ?? civ.stock.slice();
+  const spoiled = new Array(GOOD_COUNT).fill(0);
   // --- prices & access
   for (let g = 0; g < GOOD_COUNT; g++) {
     const def = GOODS[g];
@@ -43,7 +44,10 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
     const need = Math.max(1, pop * 0.0004);
     civ.access[g] = clamp01((acc.prod[g] + civ.stock[g] * 0.3) / need);
     // storage losses
-    if (def.storable) civ.stock[g] *= 1 - def.spoilage * (g === Good.FOOD ? 1 - clamp01(civ.caps.foodPreservation) * 0.7 : 1);
+    if (def.storable) {
+      spoiled[g] = civ.stock[g] * def.spoilage * (g === Good.FOOD ? 1 - clamp01(civ.caps.foodPreservation) * 0.7 : 1);
+      civ.stock[g] -= spoiled[g];
+    }
   }
   civ.stock[Good.ENERGY] = 0; // electricity is not storable
   // --- government
@@ -111,7 +115,8 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   // --- national accounts (expenditure side)
   // change in inventories = change in QUANTITIES valued at current prices (price changes are holding gains, not output)
   let dInv = 0;
-  for (let g = 0; g < GOOD_COUNT; g++) if (g !== Good.ENERGY) dInv += (civ.stock[g] - (prevStock[g] ?? 0)) * civ.prices[g];
+  // storage losses are an "other change in volume", not production: they are excluded from ΔInventories
+  for (let g = 0; g < GOOD_COUNT; g++) if (g !== Good.ENERGY) dInv += (civ.stock[g] + spoiled[g] - (prevStock[g] ?? 0)) * civ.prices[g];
   civ.prevStock = civ.stock.slice();
   const G = spending;
   const NX = exportsValue - importsValue;
