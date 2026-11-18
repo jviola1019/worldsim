@@ -501,9 +501,16 @@ export class Renderer {
     const cam = this.cam;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
+    // labels are placed largest-first; one that would overlap an already placed label is skipped
+    const placed: number[][] = [];
+    const free = (x0: number, y0: number, x1: number, y1: number) => {
+      for (const r of placed) if (x0 < r[2] && x1 > r[0] && y0 < r[3] && y1 > r[1]) return false;
+      placed.push([x0, y0, x1, y1]);
+      return true;
+    };
     if (tilePx >= 5) {
       ctx.font = `${tilePx >= 12 ? 13 : 11}px "Pixelify Sans", ui-monospace, monospace`;
-      for (const s of w.settlements.values()) {
+      for (const s of [...w.settlements.values()].sort((a, b) => Number(b.capital) - Number(a.capital) || b.pop - a.pop)) {
         if (s.pop < (tilePx >= 10 ? 0 : 500)) continue;
         const [sx, sy] = cam.worldToScreen((s.x + 0.5) * TILE, s.y * TILE - 10);
         if (sx < -60 || sx > cam.viewW + 60 || sy < -20 || sy > cam.viewH + 20) continue;
@@ -511,6 +518,7 @@ export class Renderer {
         const text = s.capital ? `★ ${s.name}` : s.name;
         ctx.fillStyle = 'rgba(13,20,36,0.75)';
         const tw = ctx.measureText(text).width;
+        if (!free(sx - tw / 2 - (s.capital ? 20 : 4), sy - 15, sx + tw / 2 + 4, sy)) continue;
         ctx.fillRect(sx - tw / 2 - 4, sy - 15, tw + 8, 15);
         if (s.capital && civ) {
           ctx.imageSmoothingEnabled = false;
@@ -523,13 +531,13 @@ export class Renderer {
       }
     } else {
       ctx.font = '12px "Pixelify Sans", ui-monospace, monospace';
-      for (const civ of w.civs.values()) {
-        if (!civ.alive) continue;
+      for (const civ of [...w.civs.values()].filter((c) => c.alive).sort((a, b) => b.population - a.population)) {
         const cap = w.settlements.get(civ.capital);
         if (!cap) continue;
         const [sx, sy] = cam.worldToScreen(cap.x * TILE, cap.y * TILE);
         ctx.fillStyle = 'rgba(13,20,36,0.7)';
         const tw = ctx.measureText(civ.name).width;
+        if (!free(sx - tw / 2 - 22, sy - 16, sx + tw / 2 + 4, sy)) continue;
         ctx.fillRect(sx - tw / 2 - 22, sy - 16, tw + 26, 15);
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(flagCanvas(civ), Math.round(sx - tw / 2 - 19), Math.round(sy - 14), 15, 10);

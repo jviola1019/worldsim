@@ -17,7 +17,7 @@
  * `resolution` is the explicit rounding when cohorts (fractional people) become individuals (whole people).
  */
 import type { Sim } from '../sim/context';
-import type { Settlement, Civ } from '../sim/types';
+import type { Settlement } from '../sim/types';
 import { cohortTotal } from './demography';
 
 export const LEDGER_KEYS = [
@@ -98,4 +98,3 @@ export function ledgerNet(from: PopLedger | undefined, to: PopLedger): number {
   return n;
 }
 
-export type { Civ };

@@ -376,7 +376,6 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
 
   if (!cands.length) return;
   cands.sort((a, b) => b.score - a.score || a.type - b.type);
-  if (sim.cache.debugPlan) (sim.cache.debugPlan as unknown[]).push({ s: s.name, cands: cands.map((c) => `${BUILDINGS[c.type].key}:${c.score.toFixed(1)}${c.upgrade !== undefined ? 'U' : ''}${canAfford(civ, BUILDINGS[c.type]) ? '' : '$'}`).join(' ') });
   // walk down the ranked list: unaffordable wishes record demand but don't block cheaper needs
   let siteTries = 0;
   let wishes = 0;

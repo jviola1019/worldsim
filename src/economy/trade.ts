@@ -210,7 +210,6 @@ export function tradeYearly(sim: Sim): Map<number, { exp: number; imp: number }>
       from.stock[g] -= amount;
       to.stock[g] += amount;
       from.acc.use[g] += amount;
-      to.acc.prod[g] += amount * 0; // imports are not domestic production
       const value = amount * price;
       tot(from.id).exp += value;
       tot(to.id).imp += value;

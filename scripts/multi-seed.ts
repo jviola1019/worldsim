@@ -6,6 +6,7 @@
 import { defaultConfig } from '../src/config/laws';
 import { createSimulation } from '../src/sim/bootstrap';
 import { ERA_NAMES } from '../src/technology/techData';
+import { boundaryPopulation, ledgerNet, emptyLedger } from '../src/population/ledger';
 
 const N = Number(process.argv[2] ?? 8);
 const YEARS = Number(process.argv[3] ?? 600);
@@ -17,6 +18,8 @@ for (let k = 0; k < N; k++) {
   cfg.gen.width = SIZE;
   cfg.gen.height = SIZE;
   const sim = createSimulation(cfg);
+  const pop0 = boundaryPopulation(sim);
+  const led0 = { ...(sim.w.popLedger ?? emptyLedger()) };
   const t0 = performance.now();
   let agriYear = -1;
   for (let y = 0; y < YEARS; y++) {
@@ -42,6 +45,10 @@ for (let k = 0; k < N; k++) {
     pop: Math.round(pop),
     notables: [...sim.w.persons.values()].filter((p) => p.notable).length,
     msPerYear: +((performance.now() - t0) / YEARS).toFixed(1),
+    // invariants (1 = holds)
+    ledgerOk: Math.abs(boundaryPopulation(sim) - pop0 - ledgerNet(led0, sim.w.popLedger ?? emptyLedger())) <= 1e-6 * Math.max(1, boundaryPopulation(sim)) ? 1 : 0,
+    finiteOk: civs.every((c) => Object.values(c.econ).every((v) => typeof v !== 'number' || Number.isFinite(v)) && c.stock.every((v) => Number.isFinite(v) && v >= -1e-6)) ? 1 : 0,
+    gdpOk: civs.filter((c) => c.alive).every((c) => { const e = c.econ; return Math.abs(e.consumption + e.investment + e.government + e.exports - e.imports - e.gdp) <= 1e-6 * Math.max(1, Math.abs(e.gdp)); }) ? 1 : 0,
   };
   rows.push(r);
   console.log(JSON.stringify(r));
