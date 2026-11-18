@@ -49,12 +49,15 @@ describe('sports', () => {
     const B = clone(sim);
     // put every nation at war with every other, so whoever hosts faces enemies
     const cs = alive(B);
-    for (let i = 1; i < cs.length; i++) declareWar(B, cs[i], cs[0], 'conquest', [{ label: 'Test intervention', weight: 1 }]);
-    for (const c of cs) c.stability = 1; // all may bid
+    // one overwhelming bidder hosts; one rival is at war with it
+    for (const c of cs) c.stability = 0.5;
+    cs[0].econ.gdp = 1e15; cs[0].stability = 1; cs[0].prestige = 5;
+    declareWar(B, cs[1], cs[0], 'conquest', [{ label: 'Test intervention', weight: 1 }]);
     const before = new Map(cs.map((c) => [c.id, cs.map((o) => (o.id === c.id ? 0 : ensureRelation(B, c.id, o.id).opinion))]));
     B.w.sports!.next = B.year;
     sportsYearly(B);
     const g = B.w.sports!.held.at(-1)!;
+    expect(g.year).toBe(B.year); // a fresh edition, not last time's record
     const enemies = cs.filter((c) => c.id !== g.hostCiv && [...B.w.wars.values()].some((w) => !w.end && ((w.attackers.includes(c.id) && w.defenders.includes(g.hostCiv)) || (w.attackers.includes(g.hostCiv) && w.defenders.includes(c.id)))));
     expect(enemies.length).toBeGreaterThan(0);
     for (const e of enemies) {

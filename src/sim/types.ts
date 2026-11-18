@@ -41,6 +41,8 @@ export interface WorldLaws {
   populationCap: number;
   /** Multiplier on research output. */
   researchSpeed: number;
+  /** God mode only: random fictional horrors (zombies, ghouls, blight). Absent in older saves (= off). */
+  horrors?: boolean;
 }
 
 /** World-creation settings that shape the simulation (beyond geography). */
@@ -319,6 +321,22 @@ export interface Settlement {
   /** Tick before which construction planning is skipped (set after a pass that found nothing to build). */
   planRetryTick?: number;
   abandoned?: number;
+  /** Share of adults made sterile by an infertility pathogen (0..1, absent = 0). */
+  sterility?: number;
+  /** Land degradation index of the surroundings (0..1: bare, polluted land), refreshed yearly. */
+  ecoStress?: number;
+  /** A fictional horror (god mode only) infesting the settlement. */
+  horror?: Horror;
+}
+
+export type HorrorKind = 'zombie' | 'ghoul' | 'blight';
+
+/** A god-mode-only fictional threat in one settlement. */
+export interface Horror {
+  kind: HorrorKind;
+  /** Zombies/ghouls: size of the horde; blight: share of crops rotting (0..1). */
+  level: number;
+  since: number;
 }
 
 export interface DemographicFlows {
@@ -391,6 +409,8 @@ export interface TechState {
   year: number; // discovery year (or -1)
   /** Number of independent knowledge carriers lost-risk counter. */
   lost?: number;
+  /** Known only as a stage that was leapfrogged: never adopted. */
+  skipped?: boolean;
 }
 
 export interface Personality {
@@ -479,6 +499,22 @@ export interface Civ {
   militaryPower: number;
   mobilization: number; // 0..1 share of manpower mobilized
   nukes: number;
+  /** Nuclear programme and doctrine (absent before a programme starts). */
+  arsenal?: Arsenal;
+  /** Fielded weapon concepts, land doctrine and arms-race pressure (absent in older saves). */
+  military?: MilitaryState;
+  /** Institutional sclerosis (0..1): entrenched interests slow research and adoption. */
+  sclerosis?: number;
+  /** Typed existential pressure (decaying), used to attribute a depopulation ending. */
+  pressure?: Partial<Record<EndingType, number>>;
+  /** Strongest recent cause label per pressure type (for the ending record). */
+  pressureCause?: Partial<Record<EndingType, string>>;
+  /** Births and natural deaths at the last yearly census (for demographic-collapse pressure). */
+  vitalMark?: { births: number; deaths: number };
+  /** How this civilization ended (structured; `fellCause` keeps the plain text). */
+  ending?: CivEnding;
+  /** Set when an AI system rules this state: the AI system id. */
+  ruledByAI?: number;
   // --- diplomacy
   overlord: number;
   knownCivs: number[];
@@ -504,6 +540,68 @@ export interface Civ {
   prev: { pop: number; gdp: number; territory: number };
   population: number;
   territory: number;
+}
+
+// ---------------------------------------------------------------- war & endings
+
+export type NuclearDoctrine = 'no_first_use' | 'retaliation' | 'first_strike';
+export type LandDoctrine = 'massed' | 'firepower' | 'maneuver' | 'networked';
+
+export interface Arsenal {
+  doctrine: NuclearDoctrine;
+  /** Progress toward the next warhead (0..1). */
+  progress: number;
+  /** Year the programme started. */
+  started: number;
+  /** Warheads launched over the nation's history. */
+  launched: number;
+}
+
+export interface MilitaryState {
+  doctrine: LandDoctrine;
+  /** Weapon concept keys currently fielded (see military/weapons.ts). */
+  weapons: string[];
+  /** Arms-race pressure 0..1. */
+  armsRace: number;
+  /** Combined strength multiplier of fielded concepts (attack side). */
+  attackMult: number;
+  defenseMult: number;
+  siegeMult: number;
+}
+
+export type EndingType =
+  | 'conquest' | 'civil_war' | 'union' | 'assimilation' | 'fragmentation' | 'economic_collapse'
+  | 'war' | 'nuclear_war' | 'nuclear_winter' | 'famine' | 'ecological_collapse' | 'climate_runaway'
+  | 'pandemic' | 'engineered_pandemic' | 'infertility' | 'demographic_collapse'
+  | 'asteroid' | 'supervolcano' | 'cosmic' | 'disaster' | 'ai_takeover' | 'grey_goo' | 'dispersal'
+  | 'monsters' | 'zombies' | 'ghouls' | 'blight';
+
+export interface CivEnding {
+  type: EndingType;
+  year: number;
+  causes: Cause[];
+  /** Civ that absorbed it (conquest, union, assimilation, AI successor), 0 if none. */
+  by: number;
+}
+
+/** World-level state for war, catastrophes and technological leadership (optional: older saves lack it). */
+export interface WorldEndings {
+  /** Technology leader, since when, and every change of lead [year, civId] (bounded). */
+  techLead: { civ: number; since: number; changes: number; history: number[] };
+  /** Year chemical weapons were banned by treaty (0 = not banned). */
+  chemBan: number;
+  /** Year of the most recent nuclear use (0 = never): strengthens the taboo and disarmament. */
+  lastNuclearUse: number;
+  /** What last loaded the stratosphere: famine under strong cooling is attributed to it. */
+  coolingSource: EndingType;
+  /** UV stress after ozone loss (0..1, decays): cuts yields. */
+  uv: number;
+  /** Catastrophes that occurred: [year, code, x, y] flattened (bounded). */
+  log: { year: number; type: string; x: number; y: number }[];
+  /** Zombie-cure research progress per civ id (0..1). */
+  cure: Record<number, number>;
+  /** Runaway nanotech fronts. */
+  goo: { x: number; y: number; r: number; since: number; civ: number }[];
 }
 
 // ---------------------------------------------------------------- media & AI
@@ -728,11 +826,15 @@ export interface Disease {
   zoonotic: boolean;
   totalDeaths: number;
   ended?: number;
+  /** Made in a laboratory (accident or weapon). */
+  engineered?: boolean;
+  /** Recovered people are left sterile (infertility pandemic). */
+  sterilizing?: boolean;
 }
 
 // ---------------------------------------------------------------- relations
 
-export type TreatyKind = 'trade' | 'nonaggression' | 'defensive' | 'alliance' | 'vassal' | 'ceasefire' | 'peace' | 'federation' | 'embargo' | 'research' | 'visitors';
+export type TreatyKind = 'trade' | 'nonaggression' | 'defensive' | 'alliance' | 'vassal' | 'ceasefire' | 'peace' | 'federation' | 'embargo' | 'research' | 'visitors' | 'arms_control';
 
 export interface Treaty {
   id: number;
@@ -783,6 +885,8 @@ export interface War {
   battles: number;
   outcome?: string;
   nuclear: boolean;
+  /** Civs that detonated nuclear weapons in this war. */
+  nukesUsedBy?: number[];
   exhaustionA: number;
   exhaustionD: number;
   occupied: number[]; // settlements occupied during the war
@@ -923,6 +1027,10 @@ export interface ClimateState {
   /** Global cooling from volcanic/impact/nuclear aerosols (deg C, decays). */
   aerosol: number;
   cumulativeEmissions: number;
+  /** Stratospheric soot from burning cities (Tg-equivalent; absent = 0). */
+  soot?: number;
+  /** Extra CO2 from warming feedbacks past the tipping point (ppm; absent = 0). */
+  feedback?: number;
 }
 
 export interface Intervention {
@@ -980,6 +1088,8 @@ export interface WorldState {
   interventions: Intervention[];
   /** Cumulative world population ledger (see population/ledger.ts). */
   popLedger?: import('../population/ledger').PopLedger;
+  /** War, catastrophes and technological leadership (absent in older saves; created on first use). */
+  endings?: WorldEndings;
   /** Per-civ known-tile bitsets (exploration / information). */
   knowledge: Map<number, Uint32Array>;
   /** Global species population totals (key -> count) and extinction years. */

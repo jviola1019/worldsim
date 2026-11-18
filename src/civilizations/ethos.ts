@@ -92,7 +92,7 @@ export const ETHOS: Record<EthosKey, EthosDef> = {
   traditionalist: {
     key: 'traditionalist', name: 'Traditionalist', blurb: 'The old ways are proven ways; change comes slowly.',
     research: { culture: 1.3, civic: 1.1 }, build: { [B.TEMPLE]: 1.3, [B.MONUMENT]: 1.3, [B.PALACE]: 1.3 },
-    budget: { religion: 0.02 }, lean: { caution: 0.8 }, adoption: () => 0.75,
+    budget: { religion: 0.02 }, lean: { caution: 0.7 }, adoption: () => 0.75, // wary but not closed: closing trade (caution > 0.8) is the isolationist's choice
   },
   artistic: {
     key: 'artistic', name: 'Artistic', blurb: 'Festivals, stadiums and monuments; prestige through culture.',

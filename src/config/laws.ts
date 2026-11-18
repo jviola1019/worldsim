@@ -23,6 +23,7 @@ export function defaultLaws(): WorldLaws {
     diseases: true,
     populationCap: 0,
     researchSpeed: 1,
+    horrors: false,
   };
 }
 
@@ -42,6 +43,7 @@ export const LAW_LABELS: Record<keyof WorldLaws, string> = {
   diseases: 'Epidemics',
   populationCap: 'Population cap',
   researchSpeed: 'Research speed',
+  horrors: 'Fictional horrors (god mode)',
 };
 
 export function defaultSettings(): WorldSettings {
@@ -98,6 +100,7 @@ export const PRESETS: Preset[] = [
       c.laws.speculativeTech = false;
       c.laws.disasters = true;
       c.laws.diseases = true;
+      c.laws.horrors = false; // fictional threats never appear in observer worlds
     },
   },
   {

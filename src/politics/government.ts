@@ -27,10 +27,11 @@ import { deriveGovForm, civDisplayName, GOV_FORMS, type GovFormKey } from './gov
 import { logEvent } from '../history/events';
 import { createLeader, crown } from './succession';
 import { BALANCE } from '../config/balance';
-import { createCiv, personalityOf } from '../civilizations/civ';
+import { createCiv, killCiv, personalityOf } from '../civilizations/civ';
 import { transferSettlement } from '../civilizations/settlement';
 import { TRAIT_BY_KEY } from '../population/traits';
 import { declareWar } from './diplomacy';
+import { addPressure } from '../civilizations/endings';
 
 // Every institution is contested: a value held by one faction alone would be its goal no matter how
 // weak that faction is (power only sets the speed), so hereditary rule and military influence would
@@ -212,6 +213,8 @@ export function politicsYearly(sim: Sim, civ: Civ): void {
     else if (civ.unrest > BALANCE.revolutionThreshold && rng.chance(0.3)) revolution(sim, civ);
     else secessionCheck(sim, civ);
     if (civ.alive && civ.stability < 0.1 && civ.legitimacy < 0.15 && civ.settlements.length >= 4 && rng.chance(0.2)) collapse(sim, civ);
+    // a prolonged economic crisis in a delegitimized state can bring the whole system down
+    else if (civ.alive && civ.crisis > 0 && civ.stability < 0.2 && civ.legitimacy < 0.25 && civ.settlements.length >= 2 && rng.chance(0.08)) collapse(sim, civ);
   }
   if (!civ.alive) return;
   policyDecisions(sim, civ);
@@ -331,7 +334,11 @@ function revolution(sim: Sim, civ: Civ): void {
     civ.legitimacy = clamp01(civ.legitimacy - 0.05);
     civ.inst.liberties = clamp01(civ.inst.liberties - 0.08);
     // repression costs lives
-    for (const s of civSettlements(sim, civ)) if (s.unrest > 0.5) flow(sim, s, 'war', removePeople(sim, s, s.pop * 0.002, 'repression'));
+    for (const s of civSettlements(sim, civ)) if (s.unrest > 0.5) {
+      const dead = removePeople(sim, s, s.pop * 0.002, 'repression');
+      flow(sim, s, 'war', dead);
+      addPressure(sim, civ.id, 'war', dead, 'Violent repression of uprisings');
+    }
     logEvent(sim, { type: 'uprising_crushed', cat: 'politics', title: `An uprising of the ${rebels.name.toLowerCase()} in ${civ.name} was crushed`, civs: [civ.id], importance: 2, causes });
   }
 }
@@ -361,7 +368,7 @@ function secessionCheck(sim: Sim, civ: Civ): void {
   }
 }
 
-export function secede(sim: Sim, civ: Civ, s: Settlement, causes: Cause[]): Civ {
+export function secede(sim: Sim, civ: Civ, s: Settlement, causes: Cause[], dissolving = false): Civ {
   const w = sim.w;
   const cultureId = s.cultures[0]?.id ?? civ.cultureId;
   const nc = createCiv(sim, { species: s.species, x: s.x, y: s.y, cultureId, parentId: civ.id, inheritFrom: civ, quiet: true });
@@ -376,29 +383,41 @@ export function secede(sim: Sim, civ: Civ, s: Settlement, causes: Cause[]): Civ 
   crown(sim, nc, leader, 'founded');
   logEvent(sim, { type: 'secession', cat: 'politics', title: `${nc.name} declared independence from ${civ.name}`, civs: [civ.id, nc.id], settlements: [s.id], x: s.x, y: s.y, importance: 4, causes });
   // the parent may fight to keep it
-  if (w.laws.warfare && civ.personality.aggression > 0.4 && sim.rng.chance(0.5 + civ.personality.aggression * 0.3)) declareWar(sim, civ, nc, 'reconquest', [{ label: 'Refusal to recognize the secession', weight: 1 }]);
+  if (!dissolving && w.laws.warfare && civ.personality.aggression > 0.4 && sim.rng.chance(0.5 + civ.personality.aggression * 0.3)) declareWar(sim, civ, nc, 'reconquest', [{ label: 'Refusal to recognize the secession', weight: 1 }]);
   return nc;
 }
 
-function collapse(sim: Sim, civ: Civ): void {
-  const w = sim.w;
+/**
+ * State collapse: half the provinces break away. Sometimes (more often in an economic crisis, with
+ * crushing debt or runaway inflation, or when little is left) the state dissolves entirely into
+ * successor states: a 'fragmentation' or 'economic_collapse' ending.
+ */
+export function collapse(sim: Sim, civ: Civ, forceDissolve = false): void {
   const rng = sim.rng;
   const ss = civSettlements(sim, civ).filter((s) => !s.capital).sort((a, b) => b.pop - a.pop);
   const breakaways = ss.slice(0, Math.max(1, Math.floor(ss.length / 2)));
+  const econ = civ.crisis > 0 || civ.debt > Math.max(1, civ.econ.revenue) * 2 || civ.inflation > 0.5;
   const causes: Cause[] = [
     { label: `Stability ${Math.round(civ.stability * 100)}%`, weight: 1 - civ.stability },
     { label: `Legitimacy ${Math.round(civ.legitimacy * 100)}%`, weight: 1 - civ.legitimacy },
     ...(civ.crisis > 0 ? [{ label: 'Economic crisis', weight: 0.4 }] : []),
+    ...(civ.inflation > 0.5 ? [{ label: `Runaway inflation (${Math.round(civ.inflation * 100)}%)`, weight: 0.3 }] : []),
+    ...(civ.debt > Math.max(1, civ.econ.revenue) * 2 ? [{ label: 'Crushing public debt', weight: 0.3 }] : []),
     ...(civ.warExhaustion > 0.3 ? [{ label: 'Exhausted by war', weight: civ.warExhaustion }] : []),
   ];
-  logEvent(sim, { type: 'collapse', cat: 'politics', title: `${civ.name} fragmented into rival states`, civs: [civ.id], importance: 4, causes });
+  const dissolve = forceDissolve || rng.chance(0.15 + (econ ? 0.2 : 0) + (ss.length <= 2 ? 0.2 : 0));
+  logEvent(sim, { type: 'collapse', cat: 'politics', title: dissolve ? `${civ.name} collapsed and dissolved into successor states` : `${civ.name} fragmented into rival states`, civs: [civ.id], importance: dissolve ? 5 : 4, causes });
+  if (dissolve) {
+    for (const s of civSettlements(sim, civ).sort((a, b) => b.pop - a.pop)) if (s.civId === civ.id) secede(sim, civ, s, causes, true);
+    killCiv(sim, civ, econ ? 'Collapsed in an economic and systemic crisis' : 'Dissolved into successor states', undefined, { type: econ ? 'economic_collapse' : 'fragmentation', causes });
+    return;
+  }
   for (const s of breakaways) {
     if (s.civId !== civ.id) continue;
     if (rng.chance(0.7)) secede(sim, civ, s, causes);
   }
   civ.stability = 0.35;
   civ.unrest *= 0.5;
-  void w;
 }
 
 function policyDecisions(sim: Sim, civ: Civ): void {
@@ -409,7 +428,7 @@ function policyDecisions(sim: Sim, civ: Civ): void {
   // budget targets
   const t = {
     admin: 0.2 + civ.inst.centralization * 0.1,
-    military: (atWar ? 0.4 : 0.12) + civ.personality.aggression * 0.08 + civ.inst.militaryInfluence * 0.1,
+    military: (atWar ? 0.4 : 0.12) + civ.personality.aggression * 0.08 + civ.inst.militaryInfluence * 0.1 + (civ.military?.armsRace ?? 0) * 0.08,
     infrastructure: 0.12 + c.roadTier * 0.01,
     education: 0.03 + c.literacy * 0.15 + civ.personality.science * 0.04,
     health: 0.03 + c.healthcare * 0.15,

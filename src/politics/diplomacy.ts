@@ -27,6 +27,7 @@ import { transferSettlement } from '../civilizations/settlement';
 import { killCiv } from '../civilizations/civ';
 import { Good, GOOD_COUNT } from '../world/resources';
 import { BALANCE } from '../config/balance';
+import { deterrenceCost } from '../military/nuclear';
 
 export function militaryEstimate(sim: Sim, observer: Civ, target: Civ): number {
   const noise = 1 + sim.rng.normal() * clamp(0.35 - observer.caps.intelligence * 0.1, 0.05, 0.35);
@@ -180,12 +181,23 @@ function sharedRival(sim: Sim, a: Civ, b: Civ): boolean {
   return false;
 }
 
-function considerWar(sim: Sim, civ: Civ, other: Civ, rel: Relation): void {
+export interface WarUtility {
+  gain: number;
+  cost: number;
+  gains: Cause[];
+  ratio: number;
+  griev: number;
+  resourceWant: number;
+  /** Part of the cost from the target's (and its allies') nuclear arsenals. */
+  deterrence: number;
+}
+
+/**
+ * Expected gains and costs for `civ` of attacking `other` (bounded rationality: the power estimate is
+ * noisy). Nuclear deterrence (military/nuclear.ts) raises the cost.
+ */
+export function warUtility(sim: Sim, civ: Civ, other: Civ, rel: Relation): WarUtility {
   const w = sim.w;
-  const rng = sim.rng;
-  if (inAnyWar(sim, civ.id) && rng.chance(0.8)) return;
-  if (sim.year - rel.lastWar < 15 && rng.chance(0.8)) return;
-  if (civ.overlord === other.id || other.overlord === civ.id) return;
   const mine = civ.militaryPower;
   const theirs = militaryEstimate(sim, civ, other);
   let allies = 0;
@@ -213,9 +225,20 @@ function considerWar(sim: Sim, civ: Civ, other: Civ, rel: Relation): void {
   let cost = 0.15 + civ.warExhaustion * 0.8 + saturate(rel.trade, 3000) * 0.35 + (ratio < 1 ? (1 - ratio) * 1.2 : 0);
   if (isDemocratic(civ) && isDemocratic(other)) cost += 0.5; // democratic-peace tendency (stylized)
   if (hasTreaty(sim, civ.id, other.id, 'nonaggression')) cost += 0.4 * (1 - civ.personality.aggression * 0.5);
-  if (other.nukes > 0 && w.laws.advancedWeapons) cost += 1.5 + (civ.nukes > 0 ? 0.5 : 0); // deterrence
+  const deterrence = deterrenceCost(sim, civ, other);
+  cost += deterrence;
   const dist = distanceBetween(sim, civ, other);
   cost += clamp(dist / (40 + civ.caps.logistics * 20 + civ.caps.navalTier * 6) - 0.3, 0, 1.2);
+  return { gain, cost, gains, ratio, griev, resourceWant, deterrence };
+}
+
+function considerWar(sim: Sim, civ: Civ, other: Civ, rel: Relation): void {
+  const w = sim.w;
+  const rng = sim.rng;
+  if (inAnyWar(sim, civ.id) && rng.chance(0.8)) return;
+  if (sim.year - rel.lastWar < 15 && rng.chance(0.8)) return;
+  if (civ.overlord === other.id || other.overlord === civ.id) return;
+  const { gain, cost, gains, ratio, griev, resourceWant, deterrence } = warUtility(sim, civ, other, rel);
   const propensity = 0.15 * w.meta.settings.aggressiveness * BALANCE.warPropensity;
   if (gain > cost && rng.chance(propensity * (gain - cost + 0.2))) {
     const goal = resourceWant > 0.2 ? 'resources' : griev > 15 ? 'revenge' : rel.disputes > 8 ? 'border' : 'conquest';
@@ -224,7 +247,7 @@ function considerWar(sim: Sim, civ: Civ, other: Civ, rel: Relation): void {
     // threats and failed negotiations sour relations
     rel.opinion -= 8;
     if (rng.chance(0.3))
-      logEvent(sim, { type: 'ultimatum', cat: 'diplomacy', title: `${civ.name} issued an ultimatum to ${other.name}`, civs: [civ.id, other.id], importance: 1 });
+      logEvent(sim, { type: 'ultimatum', cat: 'diplomacy', title: `${civ.name} issued an ultimatum to ${other.name}`, civs: [civ.id, other.id], importance: 1, causes: deterrence > 0.5 ? [{ label: `Deterred by ${other.name}'s nuclear arsenal`, weight: 1 }] : undefined });
   }
 }
 
@@ -323,7 +346,11 @@ export function makePeace(sim: Sim, war: War, reason: string): void {
         const s = w.settlements.get(id);
         if (s) transferSettlement(sim, s, winner, 'Annexation after defeat', true);
       }
-      killCiv(sim, loser, `Conquered in ${war.name}`, winner);
+      const civilWar = (war.goal === 'reconquest' || war.goal === 'independence') && (loser.parentId === winner.id || winner.parentId === loser.id);
+      killCiv(sim, loser, `Conquered in ${war.name}`, winner, {
+        type: civilWar ? 'civil_war' : 'conquest',
+        causes: [{ label: `Total defeat in ${war.name} (war score ${Math.round(Math.abs(score))})`, weight: 0.6 }, ...war.causes.slice(0, 3).map((c) => ({ label: `War cause: ${c.label}`, weight: c.weight * 0.4 }))],
+      });
       outcome = `${loser.name} was annexed by ${winner.name}`;
     } else if (Math.abs(score) > 60 && loser.militaryPower < winner.militaryPower * 0.4 && sim.rng.chance(0.4)) {
       loser.overlord = winner.id;
@@ -375,7 +402,7 @@ export function makePeace(sim: Sim, war: War, reason: string): void {
   });
 }
 
-function federate(sim: Sim, a: Civ, b: Civ): void {
+export function federate(sim: Sim, a: Civ, b: Civ): void {
   // the smaller joins the larger as a federal member; the union keeps both peoples
   const [big, small] = a.population >= b.population ? [a, b] : [b, a];
   for (const id of [...small.settlements]) {
@@ -383,7 +410,7 @@ function federate(sim: Sim, a: Civ, b: Civ): void {
     if (s) transferSettlement(sim, s, big, 'Federal union', true);
   }
   big.inst.federalism = clamp01(big.inst.federalism + 0.15);
-  killCiv(sim, small, `Joined ${big.name} in a federal union`, big);
+  killCiv(sim, small, `Joined ${big.name} in a federal union`, big, { type: 'union', causes: [{ label: 'Close cultural ties and trust', weight: 0.5 }, { label: 'A common rival', weight: 0.5 }] });
   logEvent(sim, { type: 'federation', cat: 'diplomacy', title: `${small.name} united with ${big.name} in a federation`, civs: [big.id, small.id], importance: 4, causes: [{ label: 'Close cultural ties and trust', weight: 0.5 }, { label: 'A common rival', weight: 0.5 }] });
 }
 

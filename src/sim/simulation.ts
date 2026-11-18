@@ -30,6 +30,10 @@ import { sampleStats } from '../history/stats';
 import { emptyFlows } from '../population/demography';
 import { Digest } from '../core/rng';
 import { pruneArchive } from './maintenance';
+import { catastrophesYearly } from '../world/catastrophes';
+import { risksWorldYearly } from '../future/risks';
+import { horrorsYearly } from '../powers/horrors';
+import { techLeadYearly } from '../technology/overtaking';
 
 export const SPEEDS = [0, 20, 60, 150, 400, 1200];
 export const SPEED_LABELS = ['Paused', '1×', '2×', '3×', '4×', 'Max'];
@@ -119,6 +123,10 @@ export class Simulation implements Sim {
     visitorsYearly(this);
     albumYearly(this);
     climateYearly(this);
+    catastrophesYearly(this);
+    risksWorldYearly(this);
+    horrorsYearly(this);
+    techLeadYearly(this);
     notablesYearly(this);
     if (this.year % 10 === 0) pruneArchive(this);
   }

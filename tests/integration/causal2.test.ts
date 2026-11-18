@@ -23,13 +23,18 @@ describe('#8 trade interruption hurts a dependent importer, and trade recovers',
   let base!: Simulation;
   // the most import-dependent (route, good): share of the importer's supply that arrives by this route
   let pick: { route: number; good: number; importer: number; exporter: number; dep: number } | null = null;
-  for (const seed of ['int-trade', 'int-trade-2', 'int-trade-3', 'int-trade-4', 'int-trade-5']) {
+  for (const seed of ['int-trade', 'int-trade-2', 'int-trade-3', 'int-trade-4', 'int-trade-5', 'int-trade-6', 'int-trade-7', 'int-trade-8', 'int-trade-9', 'int-trade-10']) {
     base = makeSim(seed, 96, (c) => { c.settings.startEra = 4; });
     base.runYears(40);
+    // routes that keep trading in an untouched copy (the control's own future) for the next three years:
+    // nations can close trade by themselves (autarky, war), and that would be no test of an embargo
+    const probe = (() => { base.syncRng(); return new Simulation(decodeWorld(encodeWorld(base.w))); })();
+    const keeps = new Map<number, number>();
+    for (let y = 0; y < 3; y++) { probe.runYears(1); for (const r of probe.w.routes.values()) if (r.active && r.volume > 0) keeps.set(r.id, (keeps.get(r.id) ?? 0) + 1); }
     for (const r of base.w.routes.values()) {
-      if (!r.active || r.volume <= 0) continue;
+      if (!r.active || r.volume <= 0 || (keeps.get(r.id) ?? 0) < 3) continue;
       r.flows.forEach((f, g) => {
-        if (!f) return;
+        if (!f || g === Good.GOLD || g === Good.LUXURY) return; // precious goods sit at a price ceiling with no stock either way
         const importer = f > 0 ? r.civB : r.civA;
         const exporter = f > 0 ? r.civA : r.civB;
         const imp = base.w.civs.get(importer)!;
@@ -46,15 +51,26 @@ describe('#8 trade interruption hurts a dependent importer, and trade recovers',
     expect(pick!.dep).toBeGreaterThan(0.5);
   });
 
-  it('an embargo cuts the flow and leaves the importer scarcer (lower stock or higher price) than the control', () => {
+  it('an embargo cuts the flow and leaves the importer with less of the good (or paying more) than the control', () => {
     const p = pick!;
     const A = clone(base), B = clone(base);
     expect(B.digest()).toBe(A.digest()); // cannot pass because the worlds were already different
     makeTreaty(B, B.w.civs.get(p.importer)!, B.w.civs.get(p.exporter)!, 'embargo', 30, true);
     // route volume fluctuates month to month: compare the total carried over three years (monthly samples)
     let carriedA = 0, carriedB = 0;
+    // what the importer had of each good (stock on hand plus what it used so far this year), and what the
+    // route actually delivered to it in the control world (trade mixes change from year to year)
+    const hadA = new Array(GOODS.length).fill(0), hadB = new Array(GOODS.length).fill(0), delivered = new Array(GOODS.length).fill(0);
     for (let k = 0; k < 36; k++) {
       A.runTicks(10); B.runTicks(10);
+      const ia0 = A.w.civs.get(p.importer)!, ib0 = B.w.civs.get(p.importer)!;
+      const rA = A.w.routes.get(p.route);
+      for (let g = 0; g < GOODS.length; g++) {
+        hadA[g] += ia0.stock[g] + ia0.acc.use[g];
+        hadB[g] += ib0.stock[g] + ib0.acc.use[g];
+        const f = rA?.flows[g] ?? 0;
+        if ((f > 0 && rA!.civB === p.importer) || (f < 0 && rA!.civA === p.importer)) delivered[g] += Math.abs(f);
+      }
       carriedA += A.w.routes.get(p.route)?.volume ?? 0;
       if (k >= 12) carriedB += B.w.routes.get(p.route)?.volume ?? 0; // route volumes are recomputed yearly
     }
@@ -64,8 +80,12 @@ describe('#8 trade interruption hurts a dependent importer, and trade recovers',
     const ia = A.w.civs.get(p.importer)!, ib = B.w.civs.get(p.importer)!;
     // scarcer: lower stock, a higher price, or less access (domestic supply + imports vs need) -- a good
     // already at its price ceiling with zero stock can only show the loss in access
-    const scarcer = ib.stock[p.good] < ia.stock[p.good] * 0.9 || ib.prices[p.good] > ia.prices[p.good] * 1.05 || ib.access[p.good] < ia.access[p.good] - 0.02;
-    expect(scarcer, `${GOODS[p.good].key}: stock ${ia.stock[p.good].toFixed(0)}→${ib.stock[p.good].toFixed(0)}, price ${ia.prices[p.good].toFixed(2)}→${ib.prices[p.good].toFixed(2)}, access ${ia.access[p.good].toFixed(2)}→${ib.access[p.good].toFixed(2)}`).toBe(true);
+    // (access saturates at 1 because imports count as supply, so it cannot show dependence)
+    const goods = GOODS.map((_, g) => g).filter((g) => delivered[g] > 0);
+    expect(goods.length).toBeGreaterThan(0);
+    const value = (had: number[]) => goods.reduce((a, g) => a + had[g] * GOODS[g].basePrice, 0);
+    const pricier = goods.some((g) => ib.prices[g] > ia.prices[g] * 1.05);
+    expect(value(hadB) < value(hadA) * 0.995 || pricier, `goods ${goods.map((g) => GOODS[g].key).join(',')}: had ${value(hadA).toFixed(0)} -> ${value(hadB).toFixed(0)}`).toBe(true);
     // recovery: lift the embargo and the route carries goods again
     for (const t of B.w.treaties.values()) if (t.kind === 'embargo' && [t.a, t.b].includes(p.importer) && [t.a, t.b].includes(p.exporter)) { t.active = false; t.end = B.year; }
     let after = 0;

@@ -24,6 +24,12 @@ import { SPECIES_BY_KEY } from '../ecology/species';
 import { clamp } from '../core/math';
 import { removePeople } from '../population/demography';
 import { logEvent } from '../history/events';
+import { absorptionCandidate, addPressure, decayPressure, ENDINGS, inferEnding } from '../civilizations/endings';
+import { risksYearly } from '../future/risks';
+import { sclerosisYearly } from '../technology/overtaking';
+import { transferSettlement } from '../civilizations/settlement';
+import { inAnyWar } from '../politics/diplomacy';
+import { emptyLedger } from '../population/ledger';
 
 export function civYearly(sim: Sim, civ: Civ): void {
   const w = sim.w;
@@ -44,10 +50,14 @@ export function civYearly(sim: Sim, civ: Civ): void {
   civ.population = pop;
   civ.territory = territory;
   civ.peakPop = Math.max(civ.peakPop, pop);
+  vitalPressure(sim, civ);
   if (pop < 1 && civ.settlements.length === 0 && civ.bands.length === 0 && civ.space.colonies.length === 0) {
-    killCiv(sim, civ, civ.peakPop > 0 ? 'Its last people died out or dispersed' : 'Vanished');
+    // the ending is the dominant recent cause of death (typed existential pressure)
+    const e = inferEnding(civ);
+    killCiv(sim, civ, civ.peakPop > 0 ? `Its last people died out (${ENDINGS[e.type].label.toLowerCase()})` : 'Vanished', undefined, e);
     return;
   }
+  decayPressure(civ);
   if (civ.capital && !w.settlements.get(civ.capital)) civ.capital = civ.settlements[0] ?? 0;
   if (civ.capital) {
     const c = w.settlements.get(civ.capital);
@@ -61,9 +71,14 @@ export function civYearly(sim: Sim, civ: Civ): void {
   if (!civ.alive) return;
   diplomacyYearly(sim, civ);
   militaryYearly(sim, civ);
+  if (!civ.alive) return;
   infrastructureYearly(sim, civ);
   spaceYearly(sim, civ);
   mediaYearly(sim, civ);
+  risksYearly(sim, civ);
+  if (!civ.alive) return;
+  sclerosisYearly(sim, civ);
+  if (tryAbsorption(sim, civ, 0.02)) return;
   domestication(sim, civ);
   expansion(sim, civ);
   computeCaps(civ);
@@ -154,4 +169,51 @@ function expansion(sim: Sim, civ: Civ): void {
     s.flows.emigration += removed;
     agent.pop = removed;
   }
+}
+
+/**
+ * Births far below natural deaths for years add demographic-collapse pressure (or infertility
+ * pressure where a sterilizing pathogen has struck).
+ */
+function vitalPressure(sim: Sim, civ: Civ): void {
+  const L = civ.ledger ?? emptyLedger();
+  const mark = civ.vitalMark;
+  civ.vitalMark = { births: L.births, deaths: L.deaths };
+  if (!mark) return;
+  const b = L.births - mark.births;
+  const d = L.deaths - mark.deaths;
+  if (!(d > 5) || b >= 0.75 * d) return;
+  let pop = 0;
+  let sterile = 0;
+  for (const id of civ.settlements) {
+    const s = sim.w.settlements.get(id);
+    if (!s) continue;
+    pop += s.pop;
+    sterile += (s.sterility ?? 0) * s.pop;
+  }
+  const st = pop > 0 ? sterile / pop : 0;
+  if (st > 0.15) addPressure(sim, civ.id, 'infertility', d - b, `${Math.round(st * 100)}% of adults left sterile`);
+  else addPressure(sim, civ.id, 'demographic_collapse', d - b, `Births only ${Math.round((b / d) * 100)}% of deaths`);
+}
+
+/**
+ * Peaceful absorption of a small state into a much larger neighbour that shares its culture (or, for a
+ * state shrunk by demographic collapse, any friendly larger neighbour). Returns true if it happened.
+ */
+export function tryAbsorption(sim: Sim, civ: Civ, chance: number): boolean {
+  if (!civ.alive || civ.settlements.length === 0 || civ.settlements.length > 3) return false;
+  if (inAnyWar(sim, civ.id)) return false;
+  const c = absorptionCandidate(sim, civ);
+  if (!c || inAnyWar(sim, c.by.id) || !sim.rng.chance(chance)) return false;
+  for (const id of [...civ.settlements]) {
+    const s = sim.w.settlements.get(id);
+    if (s) transferSettlement(sim, s, c.by, c.type === 'assimilation' ? 'Peaceful union with a kindred people' : 'Absorbed after demographic decline', true);
+  }
+  logEvent(sim, {
+    type: c.type === 'assimilation' ? 'assimilation' : 'demographic_absorption', cat: 'culture',
+    title: c.type === 'assimilation' ? `${civ.name} merged peacefully into ${c.by.name}, whose culture its people already shared` : `Dwindling ${civ.name} was absorbed by ${c.by.name}`,
+    civs: [civ.id, c.by.id], importance: 3, causes: c.causes,
+  });
+  killCiv(sim, civ, c.type === 'assimilation' ? `Absorbed by ${c.by.name}` : `Absorbed by ${c.by.name} after demographic collapse`, c.by, { type: c.type, causes: c.causes });
+  return true;
 }

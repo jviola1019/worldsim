@@ -95,6 +95,7 @@ export function encodeWorld(w: WorldState): Uint8Array {
     speciesStatus: w.speciesStatus,
     sports: w.sports,
     album: w.album,
+    endings: w.endings,
   };
   for (const k of MAPS) state[k] = [...(w[k] as Map<number, unknown>).values()];
   const header = JSON.stringify({ format: 'epoch-world', saveVersion: SAVE_VERSION, engineVersion: w.meta.engineVersion, state, table });
@@ -183,6 +184,7 @@ function decodeChecked(bytes: Uint8Array): WorldState {
   }
   for (const c of st.civs ?? []) if (!HEX.test(c.color) || (c.emblem && !HEX.test(c.emblem.c2))) throw new SaveError('Save contains an invalid nation colour');
   validateStats(st.stats, W, H);
+  if (st.endings !== undefined) validateEndings(st.endings);
   // --- build
   const buf = bytes.buffer.slice(bytes.byteOffset + binStart, bytes.byteOffset + bytes.length) as ArrayBuffer;
   const map = new TileMap(W, H);
@@ -210,8 +212,10 @@ function decodeChecked(bytes: Uint8Array): WorldState {
     speciesStatus: st.speciesStatus ?? {},
     album: Array.isArray(st.album) && st.album.length <= 5000 && st.album.every((a: any) => isObj(a) && typeof a.cols === 'string' && a.cols.length <= 4096 && isInt(a.n, 1) && a.n <= 256 && HEX.test(a.color)) ? st.album : undefined,
     sports: isObj(st.sports) && Array.isArray(st.sports.held) && Array.isArray(st.sports.cups) && Number.isFinite(st.sports.next) ? st.sports : undefined,
+    endings: isObj(st.endings) ? st.endings : undefined,
     knowledge,
   };
+  if (typeof w.laws.horrors !== 'boolean') w.laws.horrors = false; // law added in round 5
   for (const k of MAPS) w[k] = new Map((st[k] ?? []).map((e: any) => [e.id, e]));
   // id counters added after the first release (older saves start them at the highest id in use)
   for (const [k, list] of [['outlet', 'outlets'], ['ai', 'ais'], ['league', 'leagues']] as const) {
@@ -239,6 +243,16 @@ function validateStats(stats: any, W: number, H: number): void {
       if (sum !== tw * th) throw new SaveError('Save territory history is corrupted');
     }
   }
+}
+
+/** War/catastrophe state (round 5): bounded lists of finite numbers. */
+function validateEndings(e: any): void {
+  const bad = () => { throw new SaveError('Save catastrophe state is corrupted'); };
+  const fin = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
+  if (!isObj(e) || !isObj(e.techLead) || !Array.isArray(e.techLead.history) || e.techLead.history.length > 2000 || !e.techLead.history.every(fin)) bad();
+  if (!Array.isArray(e.log) || e.log.length > 1000 || !e.log.every((x: any) => isObj(x) && fin(x.year) && fin(x.x) && fin(x.y))) bad();
+  if (!Array.isArray(e.goo) || e.goo.length > 100 || !e.goo.every((g: any) => isObj(g) && fin(g.x) && fin(g.y) && fin(g.r) && g.r >= 0 && g.r < MAX_MAP_SIDE)) bad();
+  if (!isObj(e.cure) || !fin(e.uv) || !fin(e.chemBan) || !fin(e.lastNuclearUse)) bad();
 }
 
 function byteLen(e: ArrEntry): number {

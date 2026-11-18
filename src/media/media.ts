@@ -36,6 +36,7 @@ import {
 } from '../culture/naming';
 import { generatePhonology } from '../culture/language';
 import { Rng } from '../core/rng';
+import { addPressure } from '../civilizations/endings';
 
 const adopted = (civ: Civ, key: string, thr = 0.3): boolean => (civ.techs[key]?.adoption ?? 0) >= thr;
 const adoption = (civ: Civ, key: string): number => civ.techs[key]?.adoption ?? 0;
@@ -338,7 +339,11 @@ function aiIncident(sim: Sim, civ: Civ, a: AISystem, m: CivMedia): void {
       break;
     case 'defense': {
       title = `An autonomous weapon directed by ${full} misfired near ${s?.name ?? 'the capital'}`;
-      if (s) flow(sim, s, 'war', removePeople(sim, s, Math.min(500, s.pop * 0.0005), 'autonomous weapon misfire'));
+      if (s) {
+        const dead = removePeople(sim, s, Math.min(500, s.pop * 0.0005), 'autonomous weapon misfire');
+        flow(sim, s, 'war', dead);
+        addPressure(sim, civ.id, 'war', dead, `Misfire of the autonomous weapon ${full}`);
+      }
       civ.legitimacy = clamp01(civ.legitimacy - 0.04);
       break;
     }

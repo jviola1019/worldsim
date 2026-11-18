@@ -17,6 +17,7 @@ import { logEvent } from '../history/events';
 import { B } from '../civilizations/buildingTypes';
 import { markTile, addFx } from '../sim/context';
 import { removePeople } from '../population/demography';
+import { addPressure, globalCooling } from '../civilizations/endings';
 
 const GRID = 16;
 
@@ -92,7 +93,7 @@ export function localHeat(sim: Sim, i: number): number {
   const m = sim.w.map;
   const cx = ((i % m.w) / c.cellSize) | 0;
   const cy = (((i / m.w) | 0) / c.cellSize) | 0;
-  return c.anomaly + (c.heat[cy * c.cellsX + cx] ?? 0) - c.aerosol;
+  return c.anomaly + (c.heat[cy * c.cellsX + cx] ?? 0) - globalCooling(c);
 }
 
 export function newGenes(sim: Sim): number[] {
@@ -469,7 +470,9 @@ export function monstersMonthly(sim: Sim): void {
       mo.hp -= defense * 0.05;
       const harm = Math.min(s.pop * 0.05, def.harm * sim.rng.range(0.4, 1));
       if (harm > 0.5) {
-        flow(sim, s, 'disaster', removePeople(sim, s, harm, 'monster attack'));
+        const dead = removePeople(sim, s, harm, 'monster attack');
+        flow(sim, s, 'disaster', dead);
+        addPressure(sim, s.civId, 'monsters', dead, `Attacks by a ${def.name.toLowerCase()}`);
         addFx(sim, 'fx.fire', s.x, s.y, 2);
         if (sim.rng.chance(0.15))
           logEvent(sim, { type: 'monster_attack', cat: 'disaster', title: `A ${def.name.toLowerCase()} attacked ${s.name}`, civs: [s.civId], settlements: [s.id], x: s.x, y: s.y, importance: 2 });

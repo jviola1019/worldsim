@@ -90,3 +90,71 @@ speciate into subspecies under isolation (rate-limited). *Mostly stylized; the C
 
 Automation displacement, space programs, orbital stations, colonies and fusion are **speculative**. They are gated
 on technology and resources, and their consequences are modeled, not scripted.
+
+## War, nuclear weapons and endings
+
+Design for phase P5. Code: `military/weapons.ts`, `military/nuclear.ts`, `technology/overtaking.ts`, `civilizations/endings.ts`, `world/catastrophes.ts`, `future/risks.ts` and `powers/horrors.ts`. All new state lives on `Civ`, `Settlement`, `Disease`, `ClimateState` or the optional `WorldState.endings`, so it is saved, and older saves load with defaults.
+
+### Weapons and doctrine by era
+
+| System | Implementation | Tag |
+|---|---|---|
+| Weapon concepts | Fielded systems are derived from adopted technology, not bought: massed artillery (gunpowder, then rifled guns), chemical weapons (industrial chemistry plus machine guns), strategic bombing (military aviation), missile defence (radar plus precision weapons), drones (precision weapons plus machine learning), cyberwarfare (internet), hypersonic missiles (precision weapons plus strategic missiles), autonomous swarms (autonomous weapons), high-altitude EMP (nuclear weapons plus missiles), orbital strike platforms (orbital industry), engineered bioweapons (synthetic biology). Strategic systems need the *advanced weapons* law. Each adds to attack, defence or siege strength. | Stylized |
+| Land doctrine | Each nation holds one: *massed* (manpower, morale), *firepower* (artillery, siege), *maneuver* (mobility, armour) or *networked* (precision, drones, cyber). It follows culture, institutions and era, and changes after defeats. | Stylized |
+| Special operations | Yearly, in each active war: cyberattacks cut the enemy's energy stock and can cause an economic crisis; chemical attacks kill soldiers and civilians but cause world outrage and lead to a ban; drone and orbital strikes kill without risking soldiers; an EMP blacks out an electrified enemy. Rule-of-law states keep the chemical ban. Desperate states may break it. | Stylized |
+| Arms races | An *arms race* index rises when a rival or enemy is stronger, raises military spending, and makes military research more likely. | Evidence-informed (direction: Richardson arms-race dynamics) |
+
+### Nuclear weapons
+
+| System | Implementation | Tag |
+|---|---|---|
+| Arsenal | A programme starts once a nation has nuclear weapons technology, uranium and a reason (a nuclear rival, an enemy or an aggressive leadership). Warheads accumulate with industry. The target size grows with rivals' arsenals and shrinks under arms-control treaties and after any nuclear use (the taboo). | Stylized |
+| Doctrine | *No first use* (participatory, law-bound, cautious states), *assured retaliation* (the default) or *first strike* (aggressive or military-led states). It is derived yearly from institutions and personality. | Stylized |
+| Deterrence | War utility (`warUtility`) adds a cost that grows with the target's warheads and its means of delivery, plus a mutual-destruction term when the attacker is armed too. Allies' arsenals add extended deterrence. Test: `nuclearDeterrenceLowersWarUtility`. | Evidence-informed (direction) |
+| Escalation | Use is considered only in desperate wars: losing badly, or with the capital occupied. Doctrine, institutional restraint and autonomous defence AI change the odds. A struck nuclear state retaliates with high probability, so a first use can become an exchange. Missile defence intercepts some warheads; hypersonic missiles evade it. | Stylized |
+| Effects | Blast deaths (ledger `war`), destroyed districts, a crater, a radiation hazard, pollution and fallout deaths and illness in nearby towns. Burning cities loft stratospheric soot (`climate.soot`), which decays with an e-folding time of about 5.5 years. Soot cooling is about 2.5·ln(1 + soot/5) °C, so about 1.7 °C for 5 units and about 8.6 °C for 150 units. That shape follows published nuclear-winter studies (5 Tg about 1.5 °C, 150 Tg about 8 °C), with stylized magnitudes. | Evidence-informed (shape); magnitudes stylized |
+| Nuclear winter | Global cooling (volcanic, impact and nuclear aerosols plus soot) now cuts farm, pasture and forage yields: ×(1 − 0.09·(cooling − 0.3)), floored at 0.08. It also cools the regional temperatures that herds and vegetation use. Famine deaths during strong cooling are attributed to the cooling source. | Evidence-informed (direction: crop-model studies of nuclear winter) |
+| Treaties | Nuclear states on good terms with international organizations sign arms-control treaties that halve their target arsenals and dismantle the surplus. | Stylized |
+
+### Technological overtaking
+
+| System | Implementation | Tag |
+|---|---|---|
+| Leapfrogging | A technology in a leapfrog category (communication, energy, computing, medicine, economy, transport) can diffuse from a contact that uses it even when the receiver lacks one generation of prerequisites. The missing prerequisites become *known but skipped*, so the stage is never built, and adoption of the new technology is faster for latecomers with no legacy infrastructure. An example is going straight to mobile telephony or solar power. Prerequisites stay known, so the invariant "every known technology has its prerequisites known" still holds. | Evidence-informed (direction: latecomer advantage, Gerschenkron) |
+| Institutional sclerosis | A long-lived, uncontested regime builds *sclerosis*: interest groups entrench, corruption grows, and the regime is the technological leader. Sclerosis lowers research and adoption speed by up to 35%. Revolutions, defeats and crises reset it. | Evidence-informed (direction: Olson, *The Rise and Decline of Nations*) |
+| Measurement | `WorldState.endings.techLead` records the technology leader and every change of lead. `scripts/endings-rarity.ts` reports lead changes per run. | Measurement |
+
+### Endings
+
+Every civilization that falls gets a structured `Civ.ending` record: type, year, recorded causes and the nation that absorbed it, if any. `fellCause` keeps its plain-language text. Endings come from mechanisms, not dice rolls on the ending itself:
+
+- **Direct endings.** A mechanism ends the state outright: conquest or annexation, civil war (a parent state annexed by its breakaway), federation, cultural assimilation (a small, peaceful state whose people already share a larger neighbour's culture joins it), fragmentation and economic or systemic collapse (a failing state that dissolves into successor states), and AI takeover (a misaligned, autonomous AI system seizes infrastructure; its people pass to a machine-run state).
+- **Depopulation endings.** Every death source also adds *existential pressure* of a typed kind to the civilization: `nuclear_war`, `war`, `famine`, `nuclear_winter`, `pandemic`, `engineered_pandemic`, `infertility`, `climate_runaway`, `asteroid`, `supervolcano`, `cosmic`, `ecological_collapse`, `grey_goo`, `disaster`, `demographic_collapse` (births far below deaths) and the god-only horrors. Pressure decays by 10% a year. When the last people die out, the ending is the dominant recent pressure, and the top pressures are recorded as its causes. A shrunken civilization dominated by demographic-collapse pressure can also be absorbed peacefully by a neighbour, with ending type `demographic_collapse`.
+
+Base yearly rates in Realistic mode, scaled by disaster frequency:
+
+| Threat | Rate (per world-year unless stated) | Basis |
+|---|---|---|
+| Regional airburst (about 50–100 m) | 1/800 | Order of magnitude of Tunguska-class impact rates |
+| Major asteroid impact (about 1 km) | 1/300,000 | NASA/NEO impact-frequency estimates |
+| Extinction-class impact (about 10 km) | 1/100,000,000 | Same |
+| VEI-7 eruption | 1/1,000 | Ice-core eruption records (order of magnitude) |
+| Supervolcano (VEI-8) | 1/60,000 | Published VEI-8 recurrence estimates (order of magnitude) |
+| Severe geomagnetic storm (affects electrified nations only) | 1/150 | Carrington-class recurrence estimates |
+| Solar superflare | 1/20,000 | Stellar superflare statistics (order of magnitude) |
+| Nearby gamma-ray burst | 1/100,000,000 | Astrophysical estimates of lethal-range bursts |
+| Natural infertility pathogen | 1/40,000 | No recorded instance; a deliberately tiny rate |
+| Engineered pandemic (per nation with synthetic biology) | about 1/1,500 × biotech × weak rule of law | Speculative; stylized |
+| AI takeover (per misaligned, autonomous, highly capable AI system) | about 0.4% × capability excess × alignment deficit | Speculative; stylized |
+| Grey goo (per nation with molecular manufacturing) | about 1/3,000 | Speculative; possible only with speculative technology |
+| Climate runaway | Not rolled: above 3 °C of warming, feedbacks add CO₂, and lethal heat raises deaths in hot regions | Stylized tipping-point feedback |
+
+Rare things stay rare, so most 1,000-year histories see none of the cosmic or geological catastrophes. The measured frequencies are in VALIDATION.md.
+
+### God-mode-only threats
+
+These are never present in Realistic or observer worlds. The powers refuse to apply, and random outbreaks need the *Fictional horrors* law, which the Realistic preset forces off:
+
+- **Zombie outbreak.** A horde grows in a settlement by turning the living (ledger `disease`). It is fought by garrisons and armies, scaled by weapons tier and walls. It spreads along road and trade links. Survivors flee to the nearest uninfected town. Nations with medicine research a cure, which stops new infections. An outbreak is contained when every horde is destroyed.
+- **Ghoul packs.** Nocturnal scavengers rise from battlefields and ruins and raid nearby towns (ledger `disaster`). Garrisons and the light of electrified cities drive them off.
+- **The Creeping Blight.** A fungal rot spreads between neighbouring settlements and destroys crops. Famine during a blight is attributed to it. It burns out over time or can be contained by agricultural science.

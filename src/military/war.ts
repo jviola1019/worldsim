@@ -40,6 +40,9 @@ import { removeBuilding } from '../civilizations/urban';
 import { ensureRelation } from '../civilizations/knowledge';
 import { HAZARD } from '../world/tilemap';
 import { isKnown } from '../civilizations/knowledge';
+import { addPressure } from '../civilizations/endings';
+import { considerNuclearUse, nuclearYearly } from './nuclear';
+import { warOperations, weaponsYearly } from './weapons';
 
 export function armyStrength(sim: Sim, a: Army, civ: Civ | undefined): number {
   if (!civ) return 0;
@@ -47,7 +50,7 @@ export function armyStrength(sim: Sim, a: Army, civ: Civ | undefined): number {
   const tierMult = 1 + a.tier * 0.55;
   const gen = sim.w.persons.get(a.generalId);
   const generalship = gen ? 1 + gen.skills.military * 0.03 : 1;
-  const air = (1 + c.airPower * 0.4 + c.autonomousWeapons * 0.3) * mediaMilitaryMult(civ);
+  const air = (1 + c.airPower * 0.4 + c.autonomousWeapons * 0.3) * mediaMilitaryMult(civ) * (civ.military?.attackMult ?? 1);
   return a.manpower * tierMult * (0.4 + 0.6 * a.equipment) * (0.5 + 0.5 * a.training) * (0.3 + 0.7 * a.morale) * (0.4 + 0.6 * a.supply) * (1 + c.militaryAttack) * generalship * air;
 }
 
@@ -132,6 +135,7 @@ function killSoldiers(sim: Sim, a: Army, n: number, war: War | undefined): void 
     home.garrison = Math.max(0, home.garrison - n);
     const removed = removePeople(sim, home, n, 'war', 1);
     flow(sim, home, 'war', removed);
+    addPressure(sim, home.civId, 'war', removed, war ? `Soldiers killed in ${war.name}` : 'Soldiers lost to attrition');
   }
   if (war) war.casualties[a.civId] = (war.casualties[a.civId] ?? 0) + n;
 }
@@ -185,22 +189,18 @@ export function militaryYearly(sim: Sim, civ: Civ): void {
     if (isAtt) war.exhaustionA = Math.max(war.exhaustionA, ex);
     else war.exhaustionD = Math.max(war.exhaustionD, ex);
     civ.warExhaustion = Math.max(civ.warExhaustion, ex);
-    if (war.leaderA === civ.id || war.leaderD === civ.id) peaceCheck(sim, war);
-    nuclearCheck(sim, civ, war, enemies);
+    if (war.end) continue;
+    warOperations(sim, civ, war, enemies, (a, n) => killSoldiers(sim, a, n, war));
+    if (!civ.alive) return;
+    considerNuclearUse(sim, civ, war, enemies);
+    if (!civ.alive) return;
+    if (!war.end && (war.leaderA === civ.id || war.leaderD === civ.id)) peaceCheck(sim, war);
   }
   if (!atWar) civ.warExhaustion *= 0.8;
-  // strategic arsenal (abstract)
-  if (civ.caps.nuclearWeapons > 0 && w.laws.advancedWeapons) {
-    const want = Math.round(2 + civ.personality.caution * 4 + (civ.caps.missiles > 0.5 ? 6 : 0));
-    if (civ.nukes < want && civ.access[Good.URANIUM] > 0.3 && sim.rng.chance(0.3)) {
-      civ.nukes++;
-      if (civ.nukes === 1) {
-        const first = w.milestones['nuclear_power_state'] === undefined;
-        if (first) w.milestones['nuclear_power_state'] = sim.year;
-        logEvent(sim, { type: 'nuclear_state', cat: 'war', title: `${civ.name} became a nuclear-armed state`, civs: [civ.id], importance: first ? 4 : 3 });
-      }
-    }
-  }
+  // weapons, doctrine and arms race; the strategic arsenal
+  const lost = [...w.wars.values()].some((x) => x.end === sim.year && x.outcome !== undefined && (x.score > 20 ? x.defenders : x.score < -20 ? x.attackers : []).includes(civ.id));
+  weaponsYearly(sim, civ, atWar, lost);
+  nuclearYearly(sim, civ, atWar);
   civ.militaryPower = civMilitaryPower(sim, civ);
 }
 
@@ -373,7 +373,7 @@ function defenseMultiplier(sim: Sim, a: Army): number {
   else if (t === T.FOREST || t === T.JUNGLE || t === T.SWAMP || t === T.TAIGA) mult *= 1.2;
   if (m.river[i] > 0) mult *= 1.1;
   const civ = sim.w.civs.get(a.civId);
-  if (m.owner[i] === a.civId) mult *= 1.1 + (civ?.caps.militaryDefense ?? 0) * 0.5;
+  if (m.owner[i] === a.civId) mult *= (1.1 + (civ?.caps.militaryDefense ?? 0) * 0.5) * (civ?.military?.defenseMult ?? 1);
   return mult;
 }
 
@@ -460,8 +460,8 @@ function siegeTick(sim: Sim, a: Army, civ: Civ, war: War | undefined): void {
   const defender = w.civs.get(s.civId);
   const walls = s.bld[B.WALL] > 0 ? 1 + (defender?.caps.fortification ?? 0) * 0.35 : 1;
   const fort = s.bld[B.FORT] > 0 ? 1.4 : 1;
-  const defense = (s.garrison * 0.5 + s.pop * 0.01 + 20) * (1 + (defender?.caps.landTier ?? 0) * 0.5) * walls * fort;
-  const attack = armyStrength(sim, a, civ) * (1 + civ.caps.siege);
+  const defense = (s.garrison * 0.5 + s.pop * 0.01 + 20) * (1 + (defender?.caps.landTier ?? 0) * 0.5) * walls * fort * (defender?.military?.defenseMult ?? 1);
+  const attack = armyStrength(sim, a, civ) * (1 + civ.caps.siege) * (civ.military?.siegeMult ?? 1);
   const rate = clamp((attack / Math.max(1, defense)) / BALANCE.siegeBaseTicks, 0.0005, 0.05);
   a.siegeTicks = (a.siegeTicks ?? 0) + 1;
   // a hopeless or endless siege is lifted: the army marches home instead of starving at the walls
@@ -488,6 +488,7 @@ function siegeTick(sim: Sim, a: Army, civ: Civ, war: War | undefined): void {
     // sacking: deaths, destroyed districts, loot, refugees
     const dead = removePeople(sim, s, s.pop * sim.rng.range(0.02, 0.08), 'sack');
     flow(sim, s, 'war', dead);
+    addPressure(sim, s.civId, 'war', dead, `${s.name} sacked in ${war.name}`);
     const loot = (defender?.treasury ?? 0) * 0.1;
     if (defender) defender.treasury -= loot;
     civ.treasury += loot;
@@ -538,69 +539,5 @@ function peaceCheck(sim: Sim, war: War): void {
   else if (years >= 1 && Math.abs(war.score) < 10 && sim.rng.chance(0.1)) makePeace(sim, war, 'Ceasefire after inconclusive fighting');
 }
 
-function nuclearCheck(sim: Sim, civ: Civ, war: War, enemies: number[]): void {
-  const w = sim.w;
-  if (civ.nukes <= 0 || !w.laws.advancedWeapons) return;
-  const losing = war.attackers.includes(civ.id) ? war.score < -70 : war.score > 70;
-  const capital = w.settlements.get(civ.capital);
-  const existential = losing && (!capital || capital.occupiedBy !== 0);
-  if (!existential) return;
-  const restraint = civ.personality.caution * 0.5 + civ.inst.participation * 0.3 + civ.inst.ruleOfLaw * 0.2;
-  if (!sim.rng.chance(0.15 * (1 - restraint))) return;
-  // strike the largest enemy city
-  let target: Settlement | undefined;
-  for (const e of enemies) {
-    const ec = w.civs.get(e);
-    for (const sid of ec?.settlements ?? []) {
-      const s = w.settlements.get(sid);
-      if (s && (!target || s.pop > target.pop)) target = s;
-    }
-  }
-  if (!target) return;
-  civ.nukes--;
-  war.nuclear = true;
-  nuclearStrike(sim, target, civ.id);
-  logEvent(sim, {
-    type: 'nuclear_strike',
-    cat: 'war',
-    title: `${civ.name} used a nuclear weapon against ${target.name}`,
-    civs: [civ.id, target.civId],
-    settlements: [target.id],
-    x: target.x,
-    y: target.y,
-    importance: 5,
-    causes: [{ label: 'Facing total defeat in ' + war.name, weight: 0.7 }, { label: 'Weak institutional restraints', weight: 1 - restraint }],
-  });
-  // world outrage
-  for (const o of w.civs.values()) {
-    if (!o.alive || o.id === civ.id) continue;
-    const r = ensureRelation(sim, civ.id, o.id);
-    r.opinion = Math.max(-100, r.opinion - 50);
-  }
-}
-
-/** Abstract catastrophic strike (also used by the god power). */
-export function nuclearStrike(sim: Sim, s: Settlement, byCiv = 0): void {
-  const w = sim.w;
-  const m = w.map;
-  const dead = removePeople(sim, s, s.pop * sim.rng.range(0.25, 0.45), 'nuclear strike');
-  flow(sim, s, 'war', dead);
-  m.forRadius(s.x, s.y, 3.5, (i, x, y, d2) => {
-    if (m.bld[i] && d2 < 6) removeBuilding(sim, i, true);
-    if (d2 < 2) {
-      m.bld[i] = B.CRATER;
-      m.bldFlags[i] = 0;
-    }
-    m.hazard[i] |= HAZARD.RADIATION;
-    m.pollution[i] = Math.min(255, m.pollution[i] + 180);
-    m.veg[i] = 0;
-    m.fire[i] = 120;
-    markTile(sim, i);
-  });
-  w.climate.aerosol += 0.15;
-  s.unrest = 1;
-  addFx(sim, 'fx.nuke', s.x, s.y, 4);
-  void byCiv;
-}
-
+export { nuclearStrike } from './nuclear';
 export { inAnyWar, TERRAIN };
