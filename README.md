@@ -15,7 +15,7 @@ original; see [docs/FEATURES.md](docs/FEATURES.md) for the comparison and
 
 ```bash
 npm install
-npm run dev          # Vite dev server on http://localhost:5173 (also on your LAN, for testing on a phone)
+npm run dev          # Vite dev server on http://localhost:5173 (npm run dev:lan to expose it on your LAN for phone testing)
 ```
 
 Open the address on an iPhone (Safari) or a desktop browser. Choose **New world**,
@@ -24,7 +24,7 @@ then **Create world**. Press the fastest playback button to watch history unfold
 | Command | What it does |
 |---|---|
 | `npm run build` | Type-check, then build a static bundle into `dist/` (relative paths; host it anywhere). |
-| `npm run preview` | Serve `dist/` locally on port 4173. |
+| `npm run preview` | Serve `dist/` locally on port 4173 (`preview:lan` exposes it on the LAN). |
 | `npm test` | Unit, property, integration and round-trip tests (Vitest, ~40 s). |
 | `npm run e2e` | Browser smoke test in emulated iPhone 13 and desktop. Needs `npm run preview` running. |
 | `npm run sim -- <seed> <years> <size>` | Headless run that prints history. |
@@ -39,10 +39,16 @@ then **Create world**. Press the fastest playback button to watch history unfold
 Upload it to any static host, such as GitHub Pages, Netlify or S3. It needs no server: saves stay
 in the browser's IndexedDB, and you can export them as `.epoch` files from the menu.
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs `npm ci`, the typecheck, the tests, the build and the Chromium e2e test on every push. `long-run.yml` runs the 20-seed statistics and the 128² benchmark weekly or on demand.
+
 ## Documentation
 
 | Document | Contents |
 |---|---|
+| [docs/VALIDATION.md](docs/VALIDATION.md) | How everything was verified: tests, seeds, counterfactuals, long runs, browser coverage. |
+| [docs/SECURITY.md](docs/SECURITY.md) | Security and persistence review record. |
 | [docs/STATUS.md](docs/STATUS.md) | What is complete, partial, experimental or missing, per requirement, plus known issues. |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Modules, tick model, data model, determinism rules, rendering, persistence. |
 | [docs/MODEL.md](docs/MODEL.md) | Simulation assumptions, each labeled evidence-informed, stylized or speculative. |

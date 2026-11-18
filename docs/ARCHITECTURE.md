@@ -11,7 +11,7 @@ There are no other runtime dependencies.
 | `config/` | World laws, `BALANCE` constants, world-size presets, scenario presets, engine and save versions. |
 | `world/` | Terrain enum, `TileMap` (typed arrays per field), world generation (plates, rain shadow, hydrology, biomes, deposits), A* pathfinding, environment (fire, disasters, regional climate AR(1), CO₂ forcing, sea level). |
 | `sim/` | `WorldState` types, world creation, the `Simulation` orchestrator, the per-civilization yearly cycle, bootstrap (later-era starts, collapse scenario), maintenance. |
-| `population/` | Individuals (`persons.ts`), traits, **character development** (`development.ts`), demography (age cohorts, mortality and fertility schedules), bands, agents, migration, SIR disease. |
+| `population/` | Individuals (`persons.ts`), traits, **character development** (`development.ts`), demography (age cohorts, mortality and fertility schedules), bands, agents, migration, SIR disease, and the **population ledger** (`ledger.ts`). |
 | `civilizations/` | Settlements (monthly cycle), building types, urban planning and construction, territory, civilization identity, knowledge and contact. |
 | `economy/` | Production per settlement, the national market and public finance (`market.ts`), trade, routes and infrastructure. |
 | `technology/` | 207-tech dependency graph, research with discovery kept separate from adoption, capability aggregation, forgetting. |
@@ -62,9 +62,25 @@ prophets) are always individuals and are kept after death for history and biogra
    - Planned road routes moved to `Settlement.routes`.
    - Building-tile lists and live population are now memoized per tick.
    - Fire iteration is index-ordered.
-3. The tests check that the same seed and config give identical digests after 60 years. A save at an arbitrary
+3. Tick-scoped memos (`bldTiles`, `ownTiles`, `livePop`) are rebuilt from current state within a tick and invalidated on every change to the data they mirror. This is checked by bit-identical digests before and after the memo was introduced.
+4. The tests check that the same seed and config give identical digests after 60 years. A save at an arbitrary
    tick, mid-month and mid-year, followed by a load gives the same digest every year for the next 40 years,
    including in an industrial-era world (`tests/persistence/roundtrip.test.ts`).
+
+## Population accounting
+
+`population/ledger.ts` keeps cumulative ledgers that are never reset, one for each civilization and one for the world. Every population mutation is recorded under exactly one key:
+
+- births;
+- deaths by cause;
+- cross-civ emigration and immigration;
+- territorial transfer in and out;
+- people lost when settlements are destroyed or abandoned;
+- people lost in transit;
+- cohort↔individual rounding (`resolution`);
+- divine intervention.
+
+The boundary of a civilization is its settlements' residents, its band members, its people in transit (agents) and its colonies. Moves inside a boundary are not recorded at that boundary. Because the ledgers are cumulative, statistics store them as series, so any two samples reconcile exactly even after decimation (`explainPopulationChange`).
 
 ## Rendering
 
@@ -82,6 +98,16 @@ The `EPCH` binary format is a JSON header (meta, ids, entity arrays, a typed-arr
 when available. Saves live in IndexedDB slots with metadata (name, thumbnail, year, seed, engine and format
 version, last played) and a rotating autosave. Export and import use `.epoch` files, and branching copies a slot with
 lineage. Corrupt frames (CRC mismatch or failed decompression) raise a typed `SaveError` without touching the store.
+
+Decoding is defensive, because imported files are untrusted:
+- Gzip output is capped while streaming, at 256 MiB.
+- The array table is validated: known keys and types, aligned in-bounds ranges, exact lengths, and arrays located from the header.
+- Map size is limited to 1024, and terrain ids, state shape, entity ids, colours, statistics and territory snapshots are validated.
+- Every failure is a `SaveError`.
+- Saves are atomic: the transaction is aborted on any synchronous `put` failure.
+- `open()` never hangs.
+
+See [SECURITY.md](SECURITY.md).
 
 ## Testing
 

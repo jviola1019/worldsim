@@ -1,134 +1,79 @@
 # Status report
 
-This report tracks completion against the requirements (R-IDs from [REQUIREMENTS.md](REQUIREMENTS.md)) and the
-phases of the implementation plan. Labels:
+This report tracks completion against the requirements (R-IDs from [REQUIREMENTS.md](REQUIREMENTS.md)) and the phases of the implementation plan. Labels:
 
 - **Complete:** implemented, used by the simulation and covered by tests or verified in the browser.
 - **Partial:** works, with the stated gaps.
 - **Experimental:** works, but balance or behavior is not yet validated.
 - **Missing:** not implemented.
 
-Last verified: 2026-11-17. `tsc` exit 0, `npm test` 62/62, `vite build` exit 0, E2E 12/12 on phone and desktop.
+Last verified 2026-11-18 (round 2):
+- `tsc`: exit 0.
+- `npm test`: **125/125** (14 files, 0 skipped).
+- `vite build`: exit 0.
+- E2E: 12/12 (phone and desktop, Chromium).
+- Viewport check: 6/6 device profiles.
+
+Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is in [PERFORMANCE.md](PERFORMANCE.md) and security in [SECURITY.md](SECURITY.md).
 
 ## Requirements
 
 | ID | Area | Status | Evidence / gaps |
 |---|---|---|---|
-| R0 | Principles: autonomy, emergence, original IP, truthful docs | Complete | No scripted history. Multi-seed runs diverge (below). All art is procedural. |
-| R1.1–1.3 | Start menu, New World options, 7 presets | Complete | The `presets` test runs every preset for 20 years. Empty worlds are supported. |
-| R1.4 | No forced quests, energy or ads; optional objectives | Complete | 5 scenarios with optional objectives. |
-| R2.1–2.3 | Tiles, terrains, generation (plates, rain, rivers, biomes) | Complete | 8 worldgen tests (rivers reach water, ocean share, determinism). |
-| R2.4 | Environmental dynamics with causal effects | Complete | Drought → food ↓ and prices ↑ counterfactual test. |
-| R2.5 | Resources, depletion, extraction | Partial | Deposits deplete (`deposit_exhausted` events). Civs without metal deposits still struggle to industrialize (see issues). |
-| R3.1–3.2 | Individuals: life cycle, skills, traits, genes | Complete | Character development: skill growth with age, schooling and practice; stress; 12 acquired traits; life logs. 9 tests. |
-| R3.3 | Demographic response and transition | Complete | Cohort model, transition TFR. Famine fixed (see backtesting log). |
-| R3.4 | Notables with biographies from real events | Complete | Biographies list deeds with causes. Rulers and heirs are reachable from the civ inspector. |
-| R3.5 | Multi-resolution population | Complete | Individuals below 150 people, cohorts above. |
-| R4 | Civilizations: identity, flags, splits, merges, extinction | Complete | Procedural flags from emblems in the inspector, nations list, map labels and army banners. Flag tests. |
-| R5 | Religion | Complete | Cross-border spread test. |
-| R6 | Government and politics | Complete | Legitimacy-collapse → political change counterfactual test. |
-| R7.1–7.3 | Tech graph, research inputs, discovery vs adoption | Complete | 207 techs, 7 tech-graph tests. |
-| R7.4 | Eras, realism modes, knowledge loss | Complete | `settings.realism` filters speculative techs. |
-| R8.1 | Cities and urban form | Partial | Era districts and land-use redevelopment work. City visuals at high density are not reviewed per era. |
-| R8.2 | Transport networks | Complete | The roads → lower path cost test. Routes are persisted. |
-| R8.3 | Economy and accounting identities | Complete | The GDP = C+I+G+NX(+ΔInv) test passes in a 300-year run. |
-| R8.4 | Trade, embargoes, crises | Partial | Embargoes, tariffs and financial and debt crises exist. The planned `tradeInterruptionHurtsDependentCity` test (integration #8) has **not** been written. |
-| R9 | War and diplomacy | Complete | War vs peace counterfactual test. Sieges are lifted when hopeless or after 3 years. |
-| R10.1 | Disease | Complete | SIR with immunity; survivors gain the trait. |
-| R10.2–10.3 | Ecology, optional creatures | Complete | Bounded herds (stress test). |
-| R10.4 | God powers and world laws | Complete | 97 powers in 10 categories, each applied without error (test). 15 laws. Trait editor. |
-| R11 | Modern and future systems | Experimental | They run (a 256² world reached era 14), but late-era balance is not validated. |
-| R12.1–12.2 | Event log with causes | Complete | |
-| R12.3 | Snapshots, branching, newspaper | Complete | Exact save/load: 40 years of identical digests after a mid-month load. |
-| R12.4 | Statistics and charts; change decomposition | Partial | Charts are complete. **Population change decomposition does not sum**: flows miss settlement founding, absorption and resolution switches. |
-| R13.1–13.3 | UI layout, touch, inspector tabs | Complete | iPhone 13 emulation verified with screenshots. Narrow-screen grid and an opaque sheet were fixed in this pass. |
-| R13.4 | 16 overlays incl. historical territory | Complete | "Past borders" overlay with year slider. Snapshot test. |
-| R14 | Art and asset manifest | Complete | [ASSETS.md](ASSETS.md). |
-| R15 | Architecture, determinism, performance | Partial | Determinism complete. Performance measured ([PERFORMANCE.md](PERFORMANCE.md)). Late game at 256² is 0.3–0.6 s per simulated year. Never measured on a real iPhone. |
-| R16 | Persistence | Complete | Round trip, corruption detection, mid-year resume. Tests for quota exhaustion and unavailable storage have **not** been written. |
-| R17 | Tests, benchmarks, docs | Partial | Unit, integration, property, stress, round-trip, e2e and multi-seed exist. Missing: integration #3, #5, #8, #10; real-device mobile tests. |
+| R0 | Principles: autonomy, emergence, original IP, truthful docs | Complete | 20-seed holdout runs diverge (VALIDATION §6). |
+| R1 | World creation, presets, no forced quests | Complete | The presets test covers every preset. Developed (era) starts are now sized to their land and laid out with farmland. |
+| R2.1–2.4 | Terrain, generation, dynamics with causal effects | Complete | Drought counterfactual. Undo now restores land exactly, including valleys flooded by a stroke. |
+| R2.5 | Resources, depletion, extraction | Partial | Deposits deplete. Pre-stocked developed starts mask scarcity for decades: "rich" and "poor" scenarios differ little over 25 years, although metal access does differ. |
+| R3.1–3.2, R3.4–3.5 | Individuals, character development, notables, multi-resolution | Complete | 10 development tests. Cohort↔individual conversions now conserve population, with rounding recorded explicitly. |
+| R3.3 | Demographic response and transition | Partial | Works, but organic late-era worlds reach a **Malthusian ceiling**: food at 41% of need, 26 births and 17 famine deaths per 1,000 per year. The fertility transition needs recalibration (VALIDATION §3). |
+| R4–R6 | Civilizations, religion, government | Complete | Counterfactual tests #6 and #9; flags; secession; alliance obligations. |
+| R7 | Technology | Complete | #10: prerequisites hold across seeds, speculative technology is gated, diffusion needs contact. #3: education raises research capability, with no measurable effect on tech score within 30 years. |
+| R8.1–8.2 | Cities, transport | Complete | housingDrivesConstruction, roads (#2), buildingTierFollowsEra. |
+| R8.3 | Economy, accounting identities | Complete | GDP identity held in all 20 holdout seeds (pre-debt-fix run); the 20-seed rerun is pending in VALIDATION §6. ΔInventories counts quantity changes only, with no holding gains and no spoilage. Public debt can no longer reach Infinity. Unemployment follows service demand rather than a fixed rule. |
+| R8.4 | Trade, embargoes, crises | Complete | Integration #8: an embargo hurts the dependent importer and trade recovers once it is lifted. tradeBalanceSumsToZero passes. |
+| R9 | War and diplomacy | Complete | War counterfactual (#4), recorded causes, alliance obligations. |
+| R10 | Disease, ecology, powers | Complete | Sanitation lowers deaths and predators reduce prey (both counterfactual). All 97 powers apply without error, and the ledger fuzzer applied random powers with no failures. |
+| R11 | Modern and future systems | Experimental | Colonies require space tier and automation displaces labor (tests). Late-era balance is limited by R3.3. |
+| R12.1–12.3 | Event log, causes, snapshots, branching | Complete | Saves resume identically for 20–40 years in eras 1/4/9/10/12. |
+| R12.4 | Statistics and change decomposition | **Complete** | The population ledger reconciles exactly at every tick, for the world and for every civ. Residual: baseline mean 0–11% (worst 40%), now 0%. |
+| R13 | UI, touch, inspectors, 16 overlays | Complete | Tested in Chromium emulation of iPhone SE, iPhone 13 portrait and landscape, iPhone 15 Pro Max, iPad and Galaxy S9+. Map labels no longer overlap. **No WebKit or physical-device testing.** |
+| R14 | Art and asset manifest | Complete | [ASSETS.md](ASSETS.md) |
+| R15 | Architecture, determinism, performance | Partial | Determinism is complete. On identical state the median is about 9% faster. Late game on 256² costs about 0.4–0.5 s per simulated year. **Physical iPhone performance is unverified.** |
+| R16 | Persistence | **Complete** | Validating decoder; gzip-bomb cap; atomic saves; quota failure leaves the old save intact; V0 migration and unavailable storage are tested (29 security tests). |
+| R17 | Tests, benchmarks, docs, CI | Partial | 125 tests, plus a CI workflow (quality gate on every push, weekly long-run job). Missing: WebKit/Firefox and physical-device runs. |
 
-## Backtesting log (verified this pass)
+## Bug ledger, round 2
 
-Each bug was found by a test, benchmark or profile, root-caused and fixed, then re-verified.
+Each fix has a regression test, and "mutation" means the test was confirmed to fail without the fix.
 
-| Found by | Problem | Root cause | Fix |
-|---|---|---|---|
-| Round-trip test | Loaded saves diverged from the original | Runtime caches held state (site survey, last-year economy values, trade totals, routes, building lists, fire order) | Moved to serialized state or memoized per tick (ARCHITECTURE.md §Determinism). |
-| Stress test | GDP ≠ C+I+G+NX during crises | Crisis multiplier applied after summing | Crises now reduce C and I. |
-| 1000-year benchmark | Population became NaN around year 700 | Negative construction requests created goods from nothing | Guards on builders, labor and `take()`. |
-| Late-game flows | A 69% national food shortfall alongside 40% unemployment | Farms planned only for local need; land filled with idle workshops (score unbounded); planner tried only the top 4 wishes | National food market, farmland redevelopment, capped scores, ranked planner. |
-| Same | Modern yields only 2× medieval | Tech bonuses too small vs OWID | Fertilizer +1.4 and Green Revolution +2.0 (about 3× medieval). |
-| War integration test | 10-man armies besieged cities for 17 years | Siege rate had a floor and no exit | Lift when hopeless or after 3 years. |
-| CPU profile | 858 ms per year late game | A* search for every migrant group | Reuse persisted routes: 306 ms per year. |
-| Code review (gauntlet round 1) | Migrants with no land route vanished from the world | The fallback recorded immigration but never added the people | They now arrive by boat, with culture and religion blended. |
-| Same | ΔInventories counted price changes as investment (GDP could go negative) | Stock *value* difference at different prices | Quantity change × current price. Red-green test: −124 vs 1.9 under the old rule. |
-| Same | Trait swaps leaked skill bonuses | The opposite trait was removed without reversing its modifiers | Symmetric `applyTraitEffects`; test. |
-| Same | Forage reset national-shortage demand; armies looped march→abandon; route cache evicted the newest entry; routes survived terrain edits; past-borders view could go stale | Various | Each fixed (see commit log). |
-| Regression test (red-green) | Negative or NaN builders created goods | No guard in construction | Test fails without the guard and passes with it. |
+| # | Severity | Root cause | Fix | Regression evidence |
+|---|---|---|---|---|
+| 1 | High | Population created or destroyed outside any flow: the founding profile summed to 1.007; settlers and migrants vanished; repression deaths were recorded but nobody was removed; colonies started from nothing; per-band rounding. | Cumulative population ledger and conservation fixes | 9 ledger tests (mutation); tick probe and fuzzer clean |
+| 2 | High | Industrial and modern unemployment came from a fixed formula, because formal jobs covered only 2.5% of workers. | Demand-driven market services | Counterfactual test; 5-scenario comparison |
+| 3 | High | Developed starts began with an 84–100% food shortfall. | Size the population to the land and lay out farmland | Fed-starts test |
+| 4 | High | Public debt compounded to Infinity (8 of 20 seeds). | Interest capped at 25%; forced restructuring above 3× income | Test (red→green); 20-seed rerun |
+| 5 | Medium | Spoilage was counted as negative investment, so future-era GDP went negative. | Spoilage excluded from ΔInventories | Test |
+| 6 | Medium | Undo left the land flooded behind a ridge as grass, and left pit-filled elevation in place. | Undo re-derives hydrology; derived changes are captured in the stroke | Test (mutation, both halves) |
+| 7 | Medium | Terrain powers cleared buildings without updating settlement counts. | `removeBuilding` | Covered by the powers test |
+| 8–17 | Medium/Low | Security audit V1–V9 and S1 (gzip bomb, unvalidated decode, non-atomic save, hangs, URL beacon). | See SECURITY.md | 29 tests; 23 of 28 fail against the pre-fix decoder |
+| 18 | Low | `foundSettlement`'s profile also inflated the starting population of developed civs by 0.7%. | Normalized | Ledger tests |
 
-## Multi-seed outcomes (8 seeds × 600 years, 96², current code)
+## Known issues and next steps (ranked)
 
-| Metric | Min | Median | Max |
-|---|---|---|---|
-| Year farming appears | 159 | 175 | 205 |
-| Highest era | Medieval | Medieval | Early Industrial |
-| Nations alive / fallen | 6 / 1 | 8 / 4 | 12 / 8 |
-| Wars | 47 | 83 | 135 |
-| Annexations | 2 | 8 | 16 |
-| Religions | 8 | 15 | 20 |
-| Population | 0.84 M | 1.02 M | 1.86 M |
+1. **Malthusian ceiling in late eras (R3.3).** This has the highest model impact. Next step: recalibrate the fertility transition so that food security, child survival and urbanization lower TFR. Yields alone were tested and rejected.
+2. **No WebKit or physical-device verification (R13, R15).** Run the protocol in VALIDATION §8 on an iPhone.
+3. **Late-game performance on 256²:** about 0.45 s per simulated year. The next targets are migration, settlement monthly bookkeeping and herd updates (PERFORMANCE §1).
+4. **Resource scarcity is masked by pre-stocked developed starts (R2.5).**
+5. **Dev-dependency advisories:** vitest 5 upgrade (SECURITY.md).
+6. **Favorites and follow camera:** not implemented (deferred, as agreed).
+7. **Self-host the Pixelify Sans font:** privacy improvement.
 
-The outcomes differ across seeds, and no fixed sequence repeats.
+## Plan verification
 
-## Known issues and next steps
+Tests the plan named, and where they stand:
 
-1. Population change decomposition does not reconcile with recorded flows (R12.4).
-2. Unemployment stays at 40–49% in industrial and modern eras when metal is scarce. Factory and office districts are
-   unaffordable without metal, and no informal or service sector absorbs the idle workers.
-3. Write the missing integration tests (#3, #5, #8, #10) and the storage-failure tests (R16).
-4. Late-game performance at 256² (`planConstruction` and `forRadius` scans are the next profile targets).
-5. Favorites and a follow camera (parity gaps in FEATURES.md).
-6. Validate the balance of eras 11–15 and run on physical iOS hardware.
-7. Trait modifiers clamp to 0–10, so add-then-remove is not exactly reversible at the bounds (accepted; minor).
-
-## Plan verification (docs/superpowers/plans/2026-11-14-epoch-implementation.md)
-
-Each plan task is checked against the code and tests that exist today. *Built* means the system exists and runs.
-*Planned tests* compares the tests the plan named with the tests that actually exist.
-
-| Task | Built | Planned tests | Notes |
-|---|---|---|---|
-| A1–A6 Delegated art, tech, research | ✓ | ✓ techData (7) | The tech agent produced nothing, so the lead wrote 207 techs. |
-| 3 Worldgen tests | ✓ | ✓ (8) | |
-| 4 Governments and succession | ✓ | ✗ no dedicated unit tests | Covered indirectly by the integration test #6. |
-| 5 World creation and orchestrator | ✓ | ✓ determinism (3) | |
-| 6 Ecology | ✓ | ◐ herd bound checked in the stress test | No predation or extinction unit tests. |
-| 7 Bands and founding | ✓ | ✗ | |
-| 8 Buildings, economy, urban growth | ✓ | ◐ construction regression (2) | |
-| 9 Technology runtime | ✓ | ✗ no research or adoption runtime tests | |
-| 10 Territory, pathfinding, infrastructure | ✓ | ◐ roads (#2); borders consistency in the stress test | `pathAvoidsWater` not written. |
-| 11 Persistence | ✓ | ◐ round trip, corruption | Missing `unavailableStorage` and `migrationFromV0`. |
-| 12 Renderer | ✓ | e2e and screenshots | |
-| 13 Input, powers, undo | ✓ | ✓ classify (4); all powers apply (1) | Undo not unit-tested. |
-| 14 UI shell | ✓ | e2e 12/12 | |
-| 15 Market and public finance | ✓ | ✓ GDP identity, ΔInv valuation | Missing `deficitBuildsDebt` and `printingMoneyInflates`. |
-| 16 Government | ✓ | ✓ #6 | |
-| 17 Diplomacy | ✓ | ✗ | `warHasRecordedCauses` not written. |
-| 18 Military | ✓ | ✓ #4 | Missing `terrainDefenseBonus` and `notAlwaysTotalConquest`. Multi-seed annexations are 2–16 against 47–135 wars, so most wars do not end in conquest. |
-| 19 Religion and culture | ✓ | ✓ #9 | |
-| 20 Disease | ✓ | ✗ | |
-| 21 Trade | ✓ | ✗ #8 | |
-| 22 Environment and climate | ✓ | ✓ #1, #7 | |
-| 23 Future systems | ✓ (experimental) | ✗ | |
-| 24 Era bootstrap and scenarios | ✓ | ✓ presets (7) | |
-| 25 History and analytics | ✓ | ◐ territory snapshots | Decomposition does not reconcile (issue 1). |
-| 26 Statistical and stress | ✓ | ✓ stress (300 y), multi-seed script | |
-| 27 Benchmarks and e2e | ✓ | ✓ | |
-| 28 Audio | ✓ | — | |
-| 29 Audit loop | ✓ one code-review round | — | 8 findings, all fixed and re-verified. Not yet run: `simplify` and `security-review`. |
-| 30 Docs | ✓ | — | |
-| **Added beyond the plan** | Character development, flags, trait editor, past-borders overlay | ✓ (10 + 3 + 1) | From the user's follow-up request. |
-
-Next gauntlet round: write the ✗ tests above, starting with #8 trade interruption, research runtime and disease
-(`densityRaisesR`), then run `simplify` and `security-review`.
+| Status | Tests |
+|---|---|
+| Implemented this round | pathAvoidsWater, buildingTierFollowsEra, housingDrivesConstruction, undoRestoresTiles, seriesMatchState, decompositionSumsToChange (as the ledger tests), tradeBalanceSumsToZero, printingMoneyInflates, deficitBuildsDebt, warHasRecordedCauses, allianceObligationsJoinWar, automationDisplacesLabor, sanitationLowersDeaths, predatorsReducePrey, colonyRequiresSpaceTier, prereqsEnforced, speculativeGated, diffusionFromContact, tradeInterruptionHurtsDependentCity (#8), unavailableStorage, migrationFromV0, quota and interrupted-write handling, corrupted and truncated imports |
+| Covered by equivalent tests | roadsReduceCost (#2), instability (#6), war (#4), religion (#9), drought (#1), pollution (#7) |
+| Not implemented, with reasons | `terrainDefenseBonus` (the defense multiplier is a private function; battle outcomes are covered indirectly). `notAlwaysTotalConquest` (statistical: in the 20-seed sample, median annexations are far below median wars). `densityRaisesR` (sanitation was tested instead; the density term is a monotone formula). `foodConservation`, `historicLandmarksPersist`, `adoptionNeedsResources`, `industrialWorkersPushParticipation`, `nuclearDeterrenceLowersWarUtility`, `overhuntingCausesExtinction`, `secularizationWithDevelopment`, `cultureSurvivesConquest`, `knowledgeLossOnCollapse` (lower risk; next round). |

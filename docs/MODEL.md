@@ -46,9 +46,22 @@ the meaningful outputs. *Stylized.*
 | National market | One stock per nation; prices adjust to the stock-to-demand ratio (`priceAdjust`). Unmet demand (`want`) is recorded and drives trade and building plans. | Stylized |
 | Food market | Farms produce for local need plus a margin. When the national reserve falls below about 4 months, farms everywhere produce at capacity and surplus moves to the national pool, from which cities draw. | Stylized (a market abstraction) |
 | Land-use competition | When a settlement is hungry and has no free land, its outermost surplus industrial, military, commercial or extraction district is converted to farmland. | Stylized |
-| National accounts | GDP = C + I + G + (X − M) + ΔInventories. Crises reduce C and I, never GDP after the fact. A test checks the identity. | Accounting identity (exact) |
+| Market services | In industrial eras, service jobs per person rise with household *goods* income (structural change: from about 4% of the population at subsistence to about 34% when prosperous). Automation reduces them. Building-based service staff count first. Remaining workers do informal work or are unemployed; a welfare safety net raises measured unemployment. | Evidence-informed (direction: Clark–Fisher structural change); magnitudes stylized |
+| Developed starts | Era-preset nations are sized to their land's carrying capacity (a third of arable land farmed at their technology level) before building, and start with the farmland that feeds them. | Design choice (consistent starting conditions) |
+| National accounts | GDP = C + I + G + (X − M) + ΔInventories. ΔInventories values *quantity* changes at current prices: price changes are holding gains, and spoilage is an other change in volume, so neither counts as output. Crises reduce C and I, never GDP after the fact. A test checks the identity. | Accounting identity (exact) |
+| Public debt | Interest equals debt × min(25%, 3% + a risk premium that rises with debt/income). Debt above 3× income is restructured to 1× income. | Stylized (a bounded risk premium is evidence-informed) |
 | Money and prices | Money supply grows with real growth; inflation comes from money growth above real growth plus crisis shocks. A credit cycle, given finance technology, can produce financial crises. | Stylized |
 | Agricultural yields | Pre-modern farming roughly doubles foraging output. Chemical fertilizer (+1.4) and the Green Revolution (+2.0) raise modern yields to about 3× medieval levels. OWID reports cereal output per area roughly tripling since 1961 alone, so this is conservative. | Evidence-informed (direction and order of magnitude) |
+
+## Known model limitation
+
+Organic late-era worlds reach a Malthusian equilibrium: population grows until famine mortality balances births, and the fertility transition does not lower births enough. Measured in a year-800 snapshot: food production at 41% of need, 26 births and 17 famine deaths per 1,000 per year.
+
+Two levers were tested and rejected:
+- Doubling yields: food rose to 59% of need, but births rose to 30 per 1,000.
+- Denser schools: births did not change.
+
+Recalibrating the fertility transition is the documented next step. See VALIDATION §3.
 
 ## Technology
 

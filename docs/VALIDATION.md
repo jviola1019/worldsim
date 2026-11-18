@@ -113,7 +113,7 @@ Every seed checks three invariants:
 - `finiteOk`: no NaN or Infinity, and no negative stock.
 - `gdpOk`: the GDP identity holds.
 
-SEE_TABLE
+*Pending:* the 20-seed rerun after the public-debt fix (bug #4 in STATUS) is in progress. The run before that fix had 12 of 20 seeds passing all invariants. All 8 failures were `finiteOk`, caused by public debt compounding to Infinity, and that is now fixed and tested. The ledger and GDP identity held in all 20 seeds.
 
 ## 7. Performance
 
