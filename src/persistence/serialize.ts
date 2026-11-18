@@ -178,6 +178,7 @@ function decodeChecked(bytes: Uint8Array): WorldState {
   if (!isInt(st.tick) || !Array.isArray(st.rng) || st.rng.length !== 4 || !st.rng.every((v: unknown) => isInt(v))) throw new SaveError('Save clock or random state is invalid');
   if (!isObj(st.meta) || !isObj(st.laws) || !isObj(st.ids) || !isObj(st.climate) || !isObj(st.milestones) || !isObj(st.stats)) throw new SaveError('Save state is incomplete');
   if (!Array.isArray(st.relations) || !Array.isArray(st.events)) throw new SaveError('Save state is incomplete');
+  if (typeof st.meta.name !== 'string' || st.meta.name.length > 200 || (st.meta.seed !== undefined && (typeof st.meta.seed !== 'string' || st.meta.seed.length > 200))) throw new SaveError('Save world name is invalid');
   for (const k of MAPS) {
     const list = st[k] ?? [];
     if (!Array.isArray(list) || !list.every((x: unknown) => isObj(x) && isInt(x.id, 1))) throw new SaveError(`Save list "${k}" is corrupted`);
@@ -250,9 +251,11 @@ function validateEndings(e: any): void {
   const bad = () => { throw new SaveError('Save catastrophe state is corrupted'); };
   const fin = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
   if (!isObj(e) || !isObj(e.techLead) || !Array.isArray(e.techLead.history) || e.techLead.history.length > 2000 || !e.techLead.history.every(fin)) bad();
-  if (!Array.isArray(e.log) || e.log.length > 1000 || !e.log.every((x: any) => isObj(x) && fin(x.year) && fin(x.x) && fin(x.y))) bad();
+  if (!Array.isArray(e.log) || e.log.length > 1000 || !e.log.every((x: any) => isObj(x) && fin(x.year) && fin(x.x) && fin(x.y) && typeof x.type === 'string' && x.type.length <= 40)) bad();
   if (!Array.isArray(e.goo) || e.goo.length > 100 || !e.goo.every((g: any) => isObj(g) && fin(g.x) && fin(g.y) && fin(g.r) && g.r >= 0 && g.r < MAX_MAP_SIDE)) bad();
-  if (!isObj(e.cure) || !fin(e.uv) || !fin(e.chemBan) || !fin(e.lastNuclearUse)) bad();
+  if (!isObj(e.cure) || Object.keys(e.cure).length > 10000 || !Object.values(e.cure).every((v) => fin(v) && (v as number) >= 0 && (v as number) <= 1)) bad();
+  if (e.coolingSource !== undefined && (typeof e.coolingSource !== 'string' || e.coolingSource.length > 40)) bad();
+  if (!fin(e.uv) || !fin(e.chemBan) || !fin(e.lastNuclearUse)) bad();
 }
 
 function byteLen(e: ArrEntry): number {

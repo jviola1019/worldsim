@@ -19,7 +19,10 @@ async function run(label, ctxOpts) {
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+  await page.addInitScript(() => { window.__csp = []; document.addEventListener('securitypolicyviolation', (e) => window.__csp.push(`${e.violatedDirective} ${e.blockedURI}`)); });
   await page.goto(url);
+  const meta = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content').catch(() => null);
+  check(`${label}: production CSP is in force`, !!meta && meta.includes("script-src 'self'") && !meta.includes('unsafe'), meta ? 'meta CSP present' : 'missing');
   await page.getByText('New world').first().click();
   await page.getByText('Create world').click();
   await page.waitForSelector('canvas.canvas', { timeout: 30000 });
@@ -69,7 +72,26 @@ async function run(label, ctxOpts) {
   if (await save.count()) { await save.click(); await page.waitForTimeout(800); }
   const saved = await page.evaluate(() => new Promise((res) => { const r = indexedDB.open('epoch-saves'); r.onsuccess = () => { const db = r.result; res([...db.objectStoreNames].length); }; r.onerror = () => res(0); }));
   check(`${label}: IndexedDB save store exists`, saved > 0);
+  const csp = await page.evaluate(() => window.__csp);
+  check(`${label}: no CSP violations`, csp.length === 0, csp.slice(0, 3).join(' | '));
+  const fonts = await page.evaluate(() => document.fonts.check('16px "Pixelify Sans"'));
+  check(`${label}: self-hosted Pixelify Sans loaded`, fonts);
   check(`${label}: no console errors`, errors.length === 0, errors.slice(0, 3).join(' | '));
+  // dynamic security checks (authorized, local build only): an injected inline script must be blocked by the CSP
+  const blocked = await page.evaluate(() => new Promise((res) => {
+    const s = document.createElement('script');
+    s.textContent = 'window.__pwned = 1';
+    document.head.appendChild(s);
+    setTimeout(() => res(window.__pwned === undefined && window.__csp.some((v) => v.startsWith('script-src'))), 200);
+  }));
+  check(`${label}: CSP blocks an injected inline script`, blocked);
+  // clickjacking fallback: framed by another origin, the game refuses to run and offers its own tab
+  const framer = await ctx.newPage();
+  await framer.setContent(`<iframe src="${url}" style="width:800px;height:600px"></iframe>`);
+  const frame = framer.frameLocator('iframe');
+  await frame.getByText('Open EPOCH in a new tab').waitFor({ timeout: 15000 }).catch(() => {});
+  const refused = (await frame.getByText('Open EPOCH in a new tab').count()) === 1 && (await frame.getByText('New world').count()) === 0;
+  check(`${label}: refuses to run inside a cross-origin frame`, refused);
   await browser.close();
 }
 

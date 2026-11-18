@@ -8,12 +8,32 @@ export interface Prefs {
 
 const KEY = 'epoch-prefs';
 
+export const DEFAULT_PREFS: Readonly<Prefs> = { sound: true, labels: true, autosaveMinutes: 3, tutorialSeen: false, newspaper: true };
+export const AUTOSAVE_CHOICES = [0, 1, 3, 10] as const;
+
+/**
+ * Stored preferences are untrusted (another script on the origin, an extension or a hand edit
+ * can change them): keep only known keys of the right type, so a bad value can neither crash
+ * the game nor add unexpected properties.
+ */
+export function sanitizePrefs(raw: unknown): Prefs {
+  const p: Prefs = { ...DEFAULT_PREFS };
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return p;
+  const r = raw as Record<string, unknown>;
+  for (const k of ['sound', 'labels', 'tutorialSeen', 'newspaper'] as const) {
+    if (Object.prototype.hasOwnProperty.call(r, k) && typeof r[k] === 'boolean') p[k] = r[k] as boolean;
+  }
+  const m = r.autosaveMinutes;
+  if (Object.prototype.hasOwnProperty.call(r, 'autosaveMinutes') && (AUTOSAVE_CHOICES as readonly unknown[]).includes(m)) p.autosaveMinutes = m as number;
+  return p;
+}
+
 export function loadPrefs(): Prefs {
-  const def: Prefs = { sound: true, labels: true, autosaveMinutes: 3, tutorialSeen: false, newspaper: true };
   try {
-    return { ...def, ...JSON.parse(localStorage.getItem(KEY) ?? '{}') };
+    const text = localStorage.getItem(KEY);
+    return sanitizePrefs(text && text.length <= 4096 ? JSON.parse(text) : null);
   } catch {
-    return def;
+    return { ...DEFAULT_PREFS };
   }
 }
 
@@ -54,7 +74,7 @@ export function SettingsScreen({ back, prefs, setPrefs }: { back: () => void; pr
           <div class="field">
             <label>Autosave every</label>
             <div class="seg">
-              {[0, 1, 3, 10].map((m) => (
+              {AUTOSAVE_CHOICES.map((m) => (
                 <button key={m} aria-pressed={prefs.autosaveMinutes === m} onClick={() => update({ autosaveMinutes: m })}>
                   {m === 0 ? 'Off' : `${m} min`}
                 </button>

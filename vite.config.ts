@@ -1,11 +1,19 @@
 /// <reference types="vitest/config" />
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
+import { CSP_META } from './src/security/policy.ts';
+
+/** Content-Security-Policy for the production build only (the dev server needs inline HMR scripts). */
+const csp = (): Plugin => ({
+  name: 'epoch-csp',
+  apply: 'build',
+  transformIndexHtml: () => [{ tag: 'meta', attrs: { 'http-equiv': 'Content-Security-Policy', content: CSP_META }, injectTo: 'head-prepend' }],
+});
 
 export default defineConfig({
   base: './',
-  esbuild: {
-    jsx: 'automatic',
-    jsxImportSource: 'preact',
+  plugins: [csp()],
+  oxc: {
+    jsx: { runtime: 'automatic', importSource: 'preact' },
   },
   build: {
     target: ['es2020', 'safari15'],

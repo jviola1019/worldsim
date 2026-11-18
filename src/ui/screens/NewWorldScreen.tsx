@@ -98,7 +98,7 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
           <div class="field">
             <label for="wseed">Seed (same seed + settings = same world)</label>
             <div class="field-row">
-              <input id="wseed" type="text" value={cfg.gen.seed} onInput={(e) => set((c) => (c.gen.seed = (e.target as HTMLInputElement).value))} />
+              <input id="wseed" type="text" value={cfg.gen.seed} maxLength={64} onInput={(e) => set((c) => (c.gen.seed = (e.target as HTMLInputElement).value))} />
               <button class="btn small" onClick={() => set((c) => (c.gen.seed = randomSeedString()))}>Shuffle</button>
             </div>
           </div>
