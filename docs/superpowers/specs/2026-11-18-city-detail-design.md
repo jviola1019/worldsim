@@ -1,6 +1,6 @@
 # City detail, planning rule and full design review: design
 
-Status: draft for owner approval · 2026-11-18 · branch `claude/epoch-civilizations-unbound-dap8pc`
+Status: **approved by the owner** · 2026-11-18 · branch `claude/epoch-civilizations-unbound-dap8pc`
 
 ## 1. Intent
 
@@ -181,6 +181,11 @@ Save files are unaffected, because no new state is added.
 - **Postcard.** The skyline record already has one column per west–east tile. Rendering inserts a street gap between columns of different blocks, and draws park columns as trees. The snapshot format and album storage are unchanged.
 
 ### 5.8 Full design review
+
+**Owner decisions (2026-11-18).**
+- The review **may change the visual identity**: font pairing (for example a readable body font beside the pixel display font), palette, era frames and HUD layout, where that improves quality.
+- **Fix bar:** fix every high and medium finding, and fix low findings when they are cheap. Every remaining finding goes into `docs/DESIGN-REVIEW.md` as deferred, with a reason.
+- Identity-level changes are shown with before and after screenshots, so the owner can revert them.
 
 **Process.**
 - **Capture every screen** at iPhone SE, iPhone 13, iPhone 13 landscape, iPad and a 1280×800 desktop, using a Playwright script added to `tools/`:
