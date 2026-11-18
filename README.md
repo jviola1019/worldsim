@@ -173,7 +173,7 @@ To stop the game, click the terminal and press **Ctrl + C**. Next time, only ste
 
 ## Publish your own copy online (GitHub Pages)
 
-This repository includes an automatic publishing workflow (`.github/workflows/pages.yml`). Every time `main` changes, it tests the game, builds it and publishes it.
+This repository includes an automatic publishing workflow (`.github/workflows/pages.yml`). Every time the default branch or `main` changes, it tests the game, builds it and publishes the built game (not the source files).
 
 **One-time setup, about 2 minutes:**
 

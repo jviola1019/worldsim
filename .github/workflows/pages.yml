@@ -1,10 +1,12 @@
 name: Deploy to GitHub Pages
 
-# Publishes the built game so it can be played from any browser (iPhone, Android, PC) at
+# Publishes the BUILT game (vite build → dist/) so it can be played from any browser at
 # https://<owner>.github.io/<repo>/. One-time setup: Settings → Pages → Source: "GitHub Actions".
+# Do not use a Jekyll/static template workflow here: the repository root holds the source
+# (index.html loads /src/main.tsx), which only runs after the Vite build.
 on:
   push:
-    branches: [main]
+    branches: [main, claude/epoch-civilizations-unbound-dap8pc]
   workflow_dispatch:
 
 # Least privilege: the build job only reads; only the deploy job can publish.
