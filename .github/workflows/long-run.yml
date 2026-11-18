@@ -1,0 +1,31 @@
+name: Long-run validation
+
+# Expensive multi-seed statistics and throughput benchmarks: weekly and on demand,
+# not on every push.
+on:
+  schedule:
+    - cron: '17 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  long-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run stats -- 20 600 96 | tee multi-seed.txt
+      - run: npm run bench -- 128 900 | tee bench-128.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: long-run-results
+          path: |
+            multi-seed.txt
+            bench-128.txt
