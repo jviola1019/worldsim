@@ -366,7 +366,7 @@ function PersonView({ sim, person, setSel, close, focus }: P & { person: Person 
             })}
           </div>
           <div class="muted small">Outlined traits were earned through life events; others were inborn or inherited.</div>
-          {person.died === undefined && <TraitEditor sim={sim} person={person} />}
+          {person.died === undefined && !sim.w.meta.settings.observer && <TraitEditor sim={sim} person={person} />}
         </div>
         {person.deeds && person.deeds.length > 0 && (
           <div class="section">

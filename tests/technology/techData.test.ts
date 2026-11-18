@@ -66,3 +66,17 @@ describe('tech tree data', () => {
     }
   });
 });
+
+describe('no single regional resource gates industrialization (regression: domestication locked 146 of 207 techs)', () => {
+  it('without domesticable animals only animal-based techs stay out of reach', async () => {
+    const { TECHS } = await import('../../src/technology/techData');
+    const locked = new Set(['domestication']);
+    let grew = true;
+    while (grew) {
+      grew = false;
+      for (const t of TECHS) if (!locked.has(t.id) && t.prereqs.some((p) => locked.has(p))) { locked.add(t.id); grew = true; }
+    }
+    for (const id of ['steam_engine', 'electric_power', 'watermills', 'chemical_fertilizer', 'green_revolution']) expect(locked.has(id), id).toBe(false);
+    expect(locked.size - 1).toBeLessThanOrEqual(10);
+  });
+});

@@ -115,7 +115,7 @@ t('crop_rotation', 'Crop Rotation', 5, 'agriculture', ['heavy_plow'], { farming:
 t('castles', 'Castles', 5, 'military', ['feudalism'], { fortification: 3, militaryDefense: 0.2 }, 'Stone keeps and curtain walls.', { k: 1 });
 t('stirrup', 'Stirrup and Heavy Cavalry', 5, 'military', ['cavalry_tactics', 'feudalism'], { landTier: 4, militaryAttack: 0.15 }, 'Armoured knights dominate battlefields.', { k: 1, req: { resources: ['HORSES'] } });
 t('guilds', 'Guilds', 5, 'economy', ['coinage', 'urban_planning'], { crafts: 0.2, housingTier: 3, markets: 0.15 }, 'Craft associations train apprentices and build dense town quarters.', { k: 1, unlock: ['TOWNHOUSE'] });
-t('watermills', 'Water and Windmills', 5, 'energy', ['engineering', 'heavy_plow'], { energyTier: 1, crafts: 0.15, farming: 0.05 }, 'Mechanical power for grinding, sawing and fulling.', { k: 1, unlock: ['MILL'] });
+t('watermills', 'Water and Windmills', 5, 'energy', ['engineering'], { energyTier: 1, crafts: 0.15, farming: 0.05 }, 'Mechanical power for grinding, sawing and fulling.', { k: 1, unlock: ['MILL'] });
 t('monasticism', 'Monasticism', 5, 'culture', ['priesthood', 'literature'], { literacy: 0.03, research: 0.1, culturalOutput: 0.1 }, 'Monasteries preserve books and learning.', { k: 0.9 });
 t('universities', 'Universities', 5, 'science', ['philosophy', 'monasticism'], { research: 0.4, literacy: 0.05 }, 'Corporations of scholars teach law, medicine and natural philosophy.', { k: 1.1, req: { minPopulation: 20000 }, unlock: ['UNIVERSITY'] });
 t('banking', 'Banking', 5, 'economy', ['guilds', 'mathematics'], { banking: 1, finance: 0.2, markets: 0.1 }, 'Deposits, loans and bills of exchange; states can borrow.', { k: 1.1, unlock: ['BANK'] });
@@ -168,7 +168,7 @@ t('refining', 'Petroleum Refining', 8, 'industry', ['petroleum_drilling'], { ene
 t('internal_combustion', 'Internal Combustion Engine', 8, 'energy', ['refining'], { landSpeed: 0.2, logistics: 0.2 }, 'Light powerful engines burning oil.', { k: 1, req: { resources: ['OIL'] } });
 t('automobiles', 'Automobiles', 8, 'transport', ['internal_combustion'], { landSpeed: 0.3, housingTier: 6, logistics: 0.2 }, 'Cars and trucks reshape cities; suburbs spread along roads.', { k: 1, req: { resources: ['OIL'] }, ay: 40, unlock: ['SUBURB'] });
 t('assembly_line', 'Assembly Line', 8, 'industry', ['electric_power', 'bessemer_steel'], { industry: 0.4, automation: 0.1 }, 'Mass production makes consumer goods cheap.', { k: 1 });
-t('chemical_fertilizer', 'Chemical Fertilizer', 8, 'agriculture', ['seed_drill', 'electric_power'], { farming: 1.4 }, 'Synthetic nitrogen dramatically raises yields.', { k: 1.1 });
+t('chemical_fertilizer', 'Chemical Fertilizer', 8, 'agriculture', ['scientific_method', 'electric_power'], { farming: 1.4 }, 'Synthetic nitrogen dramatically raises yields.', { k: 1.1 });
 t('germ_theory', 'Germ Theory', 8, 'medicine', ['vaccination', 'optics'], { healthcare: 0.15, infantCare: 0.2, diseaseControl: 0.2 }, 'Microbes cause disease; hygiene and antisepsis save millions.', { k: 1 });
 t('reinforced_concrete', 'Reinforced Concrete', 8, 'materials', ['bessemer_steel'], { housingTier: 5, construction: 0.3 }, 'Steel-reinforced concrete allows tall, dense apartment blocks.', { k: 1, unlock: ['APARTMENT'] });
 t('machine_guns', 'Machine Guns', 8, 'military', ['rifles', 'assembly_line'], { landTier: 8, militaryDefense: 0.2 }, 'Industrial firepower; trench warfare.', { k: 1 });
