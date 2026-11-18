@@ -269,7 +269,12 @@ export function settlementMonthly(sim: Sim, s: Settlement): void {
   const projects = 1 + Math.min(6, Math.floor(Math.sqrt(s.pop / 8000)));
   let builders = econ.builders;
   for (let k = 0; k < projects; k++) {
-    if (!s.construction) planConstruction(sim, s, civ);
+    if (!s.construction) {
+      // a planning pass that found nothing to build is not repeated for two months (it scans the town)
+      if (sim.w.tick < (s.planRetryTick ?? 0)) break;
+      planConstruction(sim, s, civ);
+      if (!s.construction) s.planRetryTick = sim.w.tick + 2 * TICKS_PER_MONTH;
+    }
     if (!s.construction) break;
     const before = s.construction.labor;
     progressConstruction(sim, s, civ, builders);

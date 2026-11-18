@@ -8,6 +8,7 @@
  * at higher tiers when technology allows, so older districts persist, and old
  * landmarks (temples, walls, monuments, arenas) become protected HISTORIC sites.
  */
+import { eachOwnTile, forgetOwnTiles } from './territory';
 import { BALANCE } from '../config/balance';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement } from '../sim/types';
@@ -33,6 +34,7 @@ export function placeBuilding(sim: Sim, s: Settlement, type: number, tile: numbe
     m.bldFlags[t] = (tier & BLDF.TIER_MASK) | (t !== tile ? BLDF.PART : 0) | (historic ? BLDF.HISTORIC : 0);
     if (m.settle[t] !== s.id && m.settle[t] === 0) {
       m.settle[t] = s.id;
+      forgetOwnTiles(sim, s.id);
       m.owner[t] = s.civId;
       s.territory++;
     }
@@ -212,7 +214,7 @@ export function findSite(sim: Sim, s: Settlement, def: BuildingDef): number | nu
   let best = -1;
   let bestScore = 0;
   const r = Math.max(2, s.radius + 0.5);
-  m.forRadius(s.x, s.y, r, (i, x, y, d2) => {
+  eachOwnTile(sim, s, r, (i, x, y, d2) => {
     if (!isBuildable(sim, s, i)) return;
     if (def.footprint === 2) {
       for (const [dx, dy] of [[1, 0], [0, 1], [1, 1]]) {
@@ -287,7 +289,7 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   if (stoneLow && caps.quarrying > 0 && sites.hillShare > 0.03) add(B.QUARRY, 2 + (sites.quarries === 0 ? 1.5 : 0));
   // unworked deposits the civ can extract
   if (caps.mining > 0 || caps.oilExtraction > 0) {
-    m.forRadius(s.x, s.y, s.radius, (i) => {
+    eachOwnTile(sim, s, s.radius, (i) => {
       const d = m.dep[i];
       if (!d || m.bld[i] || m.settle[i] !== s.id) return;
       const def = DEPOSITS[d];
@@ -397,7 +399,7 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
 function countFree(sim: Sim, s: Settlement): number {
   const m = sim.w.map;
   let n = 0;
-  m.forRadius(s.x, s.y, Math.max(1.5, s.radius * 0.7), (i) => {
+  eachOwnTile(sim, s, Math.max(1.5, s.radius * 0.7), (i) => {
     if (isBuildable(sim, s, i)) n++;
   });
   return n;
@@ -407,7 +409,7 @@ function oldestResidential(sim: Sim, s: Settlement, targetRank: number): number 
   const m = sim.w.map;
   let best: number | null = null;
   let bestKey = Infinity;
-  m.forRadius(s.x, s.y, s.radius + 1, (i, x, y, d2) => {
+  eachOwnTile(sim, s, s.radius + 1, (i, x, y, d2) => {
     if (m.settle[i] !== s.id) return;
     const b = m.bld[i];
     if (!b || BUILDINGS[b].category !== 'residential' || m.bldFlags[i] & (BLDF.HISTORIC | BLDF.PART)) return;
@@ -432,7 +434,7 @@ function redevelopForFarm(sim: Sim, s: Settlement): number | null {
   const m = sim.w.map;
   let best: number | null = null;
   let bestD = -1;
-  m.forRadius(s.x, s.y, s.radius + 1, (i, _x, _y, d2) => {
+  eachOwnTile(sim, s, s.radius + 1, (i, _x, _y, d2) => {
     if (m.settle[i] !== s.id) return;
     const b = m.bld[i];
     if (!b || m.bldFlags[i] & (BLDF.HISTORIC | BLDF.PART)) return;
@@ -452,7 +454,7 @@ function oldFarm(sim: Sim, s: Settlement, tier: number): number | null {
   const m = sim.w.map;
   if (tier < 1) return null;
   let found: number | null = null;
-  m.forRadius(s.x, s.y, s.radius + 1, (i) => {
+  eachOwnTile(sim, s, s.radius + 1, (i) => {
     if (found !== null || m.settle[i] !== s.id || m.bld[i] !== B.FARM) return;
     if ((m.bldFlags[i] & BLDF.TIER_MASK) < tier - 1) found = i;
   });
@@ -462,7 +464,7 @@ function oldFarm(sim: Sim, s: Settlement, tier: number): number | null {
 function palaceTier(sim: Sim, s: Settlement): { tile: number; tier: number } | null {
   const m = sim.w.map;
   let res: { tile: number; tier: number } | null = null;
-  m.forRadius(s.x, s.y, s.radius + 1, (i) => {
+  eachOwnTile(sim, s, s.radius + 1, (i) => {
     if (res || m.settle[i] !== s.id || m.bld[i] !== B.PALACE || m.bldFlags[i] & BLDF.PART) return;
     res = { tile: i, tier: m.bldFlags[i] & BLDF.TIER_MASK };
   });
@@ -599,7 +601,7 @@ function completeProject(sim: Sim, s: Settlement, civ: Civ): void {
 
 function markHistoric(sim: Sim, s: Settlement, tier: number): void {
   const m = sim.w.map;
-  m.forRadius(s.x, s.y, s.radius + 1, (i) => {
+  eachOwnTile(sim, s, s.radius + 1, (i) => {
     if (m.settle[i] !== s.id || !m.bld[i]) return;
     const def = BUILDINGS[m.bld[i]];
     if (!def?.landmark || def.id === B.PALACE) return;

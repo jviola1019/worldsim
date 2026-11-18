@@ -33,6 +33,8 @@ export function setTileSettlement(sim: Sim, i: number, sid: number): void {
   const m = w.map;
   const prev = m.settle[i];
   if (prev === sid) return;
+  forgetOwnTiles(sim, prev);
+  forgetOwnTiles(sim, sid);
   const b = m.bld[i];
   if (prev) {
     const ps = w.settlements.get(prev);
@@ -89,6 +91,7 @@ export function recomputeTerritory(sim: Sim, s: Settlement): void {
   const m = w.map;
   const civ = w.civs.get(s.civId);
   const r = settlementRadius(s, civ);
+  if (s.radius !== r) forgetOwnTiles(sim, s.id);
   s.radius = r;
   const disputes = new Map<number, number>();
   m.forRadius(s.x, s.y, r, (i, x, y, d2) => {
@@ -137,4 +140,41 @@ export function territoryTiles(sim: Sim, s: Settlement): number[] {
     if (m.settle[i] === s.id) out.push(i);
   });
   return out;
+}
+
+/** A settlement's own tiles near its centre, in raster order (see eachOwnTile). Tick-memoized, derived only. */
+type OwnTiles = { r: number; i: number[]; x: number[]; y: number[]; d2: number[] };
+
+function ownTiles(sim: Sim, s: Settlement): OwnTiles {
+  let c = sim.cache.ownTiles as { tick: number; map: Map<number, OwnTiles> } | undefined;
+  if (!c || c.tick !== sim.w.tick) sim.cache.ownTiles = c = { tick: sim.w.tick, map: new Map() };
+  const R = Math.max(2, s.radius + 1);
+  let t = c.map.get(s.id);
+  if (!t || t.r !== R) {
+    const m = sim.w.map;
+    const nt: OwnTiles = { r: R, i: [], x: [], y: [], d2: [] };
+    m.forRadius(s.x, s.y, R, (i, x, y, d2) => {
+      if (m.settle[i] !== s.id) return;
+      nt.i.push(i); nt.x.push(x); nt.y.push(y); nt.d2.push(d2);
+    });
+    c.map.set(s.id, nt);
+    t = nt;
+  }
+  return t;
+}
+
+/** Drop the memo for a settlement whose tiles changed. */
+export function forgetOwnTiles(sim: Sim, sid: number): void {
+  if (sid) (sim.cache.ownTiles as { map: Map<number, OwnTiles> } | undefined)?.map.delete(sid);
+}
+
+/**
+ * Visit the settlement's own tiles within radius r (r ≤ max(2, radius + 1)) in exactly the order
+ * map.forRadius(s.x, s.y, r, …) would, skipping tiles that belong to other settlements.
+ */
+export function eachOwnTile(sim: Sim, s: Settlement, r: number, fn: (i: number, x: number, y: number, d2: number) => void): void {
+  const t = ownTiles(sim, s);
+  if (r > t.r) throw new Error('eachOwnTile radius beyond memo');
+  const r2 = r * r;
+  for (let k = 0; k < t.i.length; k++) if (t.d2[k] <= r2) fn(t.i[k], t.x[k], t.y[k], t.d2[k]);
 }

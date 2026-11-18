@@ -172,7 +172,9 @@ export function militaryYearly(sim: Sim, civ: Civ): void {
       a.warId = war.id;
       const tgt = chooseTarget(sim, civ, a, enemies);
       // an army that just gave up on a city does not march straight back to it
-      if (tgt && !(tgt.id === a.liftedTarget && sim.year - (a.liftedYear ?? -99) < 5)) setArmyTarget(sim, a, tgt.x, tgt.y, 'settlement', tgt.id);
+      const alreadyOnIt = tgt && a.state === 'moving' && a.targetKind === 'settlement' && a.targetId === tgt.id && a.path.length > 0;
+      // an army that just gave up on a city does not march straight back to it; one already marching keeps its path
+      if (tgt && !alreadyOnIt && !(tgt.id === a.liftedTarget && sim.year - (a.liftedYear ?? -99) < 5)) setArmyTarget(sim, a, tgt.x, tgt.y, 'settlement', tgt.id);
     }
     // exhaustion
     const isAtt = war.attackers.includes(civ.id);

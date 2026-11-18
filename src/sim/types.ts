@@ -312,6 +312,8 @@ export interface Settlement {
   routes?: Record<number, number[]>;
   /** Household goods (incl. food) consumption value per capita per year, last month (drives service demand). */
   goodsPerCap?: number;
+  /** Tick before which construction planning is skipped (set after a pass that found nothing to build). */
+  planRetryTick?: number;
   abandoned?: number;
 }
 

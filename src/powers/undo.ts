@@ -42,12 +42,13 @@ export class UndoStack {
   captureDerived(sim: Sim, fn: () => void): void {
     const m = sim.w.map;
     const before = m.terrain.slice();
+    const elevBefore = m.elev.slice(); // hydrology also fills shallow pits (raises elevation)
     fn();
     const last = this.strokes[this.strokes.length - 1];
     if (!last) return;
     for (let i = 0; i < m.n; i++) {
-      if (m.terrain[i] === before[i] || last.has(i)) continue;
-      last.set(i, { i, elev: m.elev[i], terrain: before[i], moist: m.moist[i], fert: m.fert[i], veg: m.veg[i], dep: m.dep[i], depAmt: m.depAmt[i], temp: m.temp[i] });
+      if ((m.terrain[i] === before[i] && m.elev[i] === elevBefore[i]) || last.has(i)) continue;
+      last.set(i, { i, elev: elevBefore[i], terrain: before[i], moist: m.moist[i], fert: m.fert[i], veg: m.veg[i], dep: m.dep[i], depAmt: m.depAmt[i], temp: m.temp[i] });
     }
   }
 
