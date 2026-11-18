@@ -14,6 +14,7 @@ import type { TileMap } from '../../src/world/tilemap';
 import {
   COLD,
   centreSeaEnclosed,
+  components,
   isHabitable,
   landComponents,
   landFraction,
@@ -179,6 +180,18 @@ describe.each(SIZES.flatMap((size) => SEEDS.map((seed) => ({ size, seed }))))('m
     expect(water / m.n).toBeLessThan(0.2); // measured 0.13-0.15 (natural ~0.61)
     expect(terrainShareOfLand(m, [T.DESERT])).toBeGreaterThan(0.1); // measured 0.13-0.25 (natural 0.01-0.04)
     expect(habitableFresh).toBeGreaterThan(300); // measured 787-1762
+  });
+
+  it('arid: river banks and lake shores stay green (groundwater-fed floodplains)', () => {
+    const m = w('arid');
+    for (let i = 0; i < m.n; i++) if (m.isLand(i) && m.hasFreshWater(i)) expect(m.moist[i]).toBeGreaterThanOrEqual(mapShape('arid').riparianMoisture!);
+  });
+
+  it('arid: dry basins become flats, but small deep spring-fed pools (oases) remain', () => {
+    const m = w('arid');
+    const lakes = components(m, (i) => m.terrain[i] === T.LAKE);
+    expect(lakes.filter((s) => s <= 30).length).toBeGreaterThanOrEqual(8); // measured 15-25 small lakes
+    expect(lakes.reduce((a, b) => a + b, 0) / m.n).toBeLessThan(0.05); // measured lake share 0.012-0.032
   });
 
   it('waterworld: mostly ocean with many separate islands', () => {

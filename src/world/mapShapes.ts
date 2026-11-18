@@ -8,7 +8,7 @@
  *    plate base, so plate boundaries, ridges and noise still shape the coast
  *    and relief inside the outline;
  *  - KNOBS and terrain modifiers: ocean coverage, temperature, moisture,
- *    extra relief, oases and riparian greening.
+ *    extra relief, basin evaporation and riparian greening.
  *
  * Masks are evaluated on domain-warped coordinates so outlines get organic,
  * fractal coasts instead of geometric edges. Everything random comes from a
@@ -73,8 +73,6 @@ export interface MapShapeDef {
   reliefCurve?: number;
   /** Mean basin moisture (0..255) needed for rain to keep a lake against evaporation. */
   lakeMinMoist?: number;
-  /** Spring-fed basins per 10,000 tiles (become oasis lakes). */
-  oases?: number;
   /** Minimum moisture (0..255) next to rivers and lakes: groundwater-fed floodplains. */
   riparianMoisture?: number;
 }
@@ -301,7 +299,6 @@ export const MAP_SHAPES: readonly MapShapeDef[] = [
     knobs: { oceanCoverage: 0.12, moisture: -2, rivers: 0.5, temperature: 0.6, climateVariation: 0.2 },
     reliefCurve: 2.2,
     lakeMinMoist: 150,
-    oases: 3,
     riparianMoisture: 90,
   },
   {

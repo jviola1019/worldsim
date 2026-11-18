@@ -22,7 +22,7 @@
  *  8. Soil fertility, vegetation and geology-aware resource deposits.
  *
  * A map shape (mapShapes.ts) can steer steps 1-2 with a land mask, add
- * relief, mirror the terrain, carve oases and green river corridors.
+ * relief, mirror the terrain, dry out basins and green river corridors.
  *
  * These are stylized physical abstractions — plausible patterns, not a
  * geophysical model. See docs/MODEL.md.
@@ -322,7 +322,6 @@ export function generateWorld(p: WorldGenParams): WorldGenResult {
     else e[i] = -Math.pow(e[i] / minWater, 0.8);
     if (e[i] > 0 && e[i] < 0.004) e[i] = 0.004;
   }
-  if (shape.oases) carveOases(e, W, H, rng, shape.oases);
   map.elev.set(e);
 
   const latSpan = lerp(48, 85, p.climateVariation);
@@ -352,30 +351,6 @@ function blendShapeField(e: Float32Array, field: Float32Array): void {
 /** Mirror-symmetric world: the east half becomes the reflection of the west half. */
 function mirrorWestToEast(e: Float32Array, W: number, H: number): void {
   for (let y = 0; y < H; y++) for (let x = 0; x < W >> 1; x++) e[y * W + (W - 1 - x)] = e[y * W + x];
-}
-
-/**
- * Oases: where an aquifer reaches the surface, springs keep a small basin
- * wet. Each is carved as a shallow closed dent in low land, which the
- * hydrology step then fills as a lake. `perTenThousand` scales with map area.
- */
-function carveOases(e: Float32Array, W: number, H: number, rng: Rng, perTenThousand: number): void {
-  const count = Math.max(1, Math.round((W * H * perTenThousand) / 10000));
-  for (let k = 0, tries = 0; k < count && tries < count * 200; tries++) {
-    const cx = rng.int(4, W - 5);
-    const cy = rng.int(4, H - 5);
-    const c = e[cy * W + cx];
-    if (c <= 0.02 || c > 0.35) continue; // dry lowland only
-    const r = rng.range(1.4, 2.4);
-    for (let y = cy - 3; y <= cy + 3; y++)
-      for (let x = cx - 3; x <= cx + 3; x++) {
-        const i = y * W + x;
-        if (e[i] <= 0) continue;
-        const dent = 0.08 * Math.exp(-((x - cx) ** 2 + (y - cy) ** 2) / (r * r));
-        e[i] = Math.max(0.004, e[i] - dent);
-      }
-    k++;
-  }
 }
 
 /**
