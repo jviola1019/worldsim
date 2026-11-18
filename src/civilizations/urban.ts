@@ -164,6 +164,11 @@ function isBuildable(sim: Sim, s: Settlement, i: number): boolean {
   return TERRAIN[t].buildable && !m.fire[i];
 }
 
+function isDiggable(sim: Sim, s: Settlement, i: number): boolean {
+  const m = sim.w.map;
+  return m.settle[i] === s.id && !m.bld[i] && !isWaterTerrain(m.terrain[i]) && !m.fire[i];
+}
+
 function placementScore(sim: Sim, s: Settlement, def: BuildingDef, i: number, x: number, y: number, d: number): number {
   const m = sim.w.map;
   const t = m.terrain[i];
@@ -232,8 +237,10 @@ export function findSite(sim: Sim, s: Settlement, def: BuildingDef): number | nu
   let best = -1;
   let bestScore = 0;
   const r = Math.max(2, s.radius + 0.5);
+  const dig = def.placement === 'deposit' || def.placement === 'oil';
   eachOwnTile(sim, s, r, (i, x, y, d2) => {
-    if (!isBuildable(sim, s, i)) return;
+    // mines and wells go where the ore is, mountains included
+    if (dig ? !isDiggable(sim, s, i) : !isBuildable(sim, s, i)) return;
     if (def.footprint === 2) {
       for (const [dx, dy] of [[1, 0], [0, 1], [1, 1]]) {
         if (!m.inBounds(x + dx, y + dy)) return;
@@ -323,7 +330,7 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   // crafts scale with population up to a target count (factories take over in industrial eras)
   const workshopTarget = pop / (caps.industry > 0 ? 15000 : 5000);
   if (pop > 150) add(B.WORKSHOP, 1 + (workshopTarget - s.bld[B.WORKSHOP]) * 1.2);
-  const smithyTarget = pop / 8000;
+  const smithyTarget = pop / (caps.industry > 0 ? 60000 : 8000); // steel mills and factories replace the village smithy
   if (pop > 150 && caps.metalTier >= 1) add(B.SMITHY, 1 + (smithyTarget - s.bld[B.SMITHY]) * 1.5);
   if (caps.industry > 0) add(B.FACTORY, 1.5 + unemployed * 20 + pop / 20000 - s.bld[B.FACTORY] * 0.8);
   // the steel industry grows with metal scarcity whenever ore and fuel can be had
@@ -332,7 +339,11 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
     add(B.STEEL_MILL, 2 + 6 * saturate(Math.max(0, metalNeed - civ.stock[Good.METAL]), metalNeed) - s.bld[B.STEEL_MILL]);
   }
   if (caps.oilExtraction > 0 && civ.stock[Good.OIL] > 100) add(B.REFINERY, 1.5);
-  if (caps.computing > 0) add(B.CHIP_FAB, 1.2 + caps.computing * 0.2);
+  // the electronics industry grows with chip scarcity (first fabs are tooled without chips of their own)
+  if (caps.computing > 0) {
+    const chipNeed = civ.population * 0.002 + 1;
+    add(B.CHIP_FAB, 1.2 + caps.computing * 0.2 + 10 * saturate(Math.max(0, chipNeed - civ.stock[Good.ELECTRONICS]), chipNeed) - s.bld[B.CHIP_FAB]);
+  }
   if (caps.robotics > 0) add(B.ROBOT_FACTORY, 1 + caps.robotics);
   if (caps.crafts > 0 && s.river) add(B.MILL, 1);
   // energy deficit
@@ -389,7 +400,9 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   if (caps.navalTier >= 2 && s.coastal) add(B.HARBOR, 2 + civ.personality.trade - s.bld[B.HARBOR] * 1.5);
   if (caps.railTier >= 1) add(B.STATION, 2);
   if (caps.airTier >= 2) add(B.AIRPORT, 2);
-  if (caps.spaceTier >= 1 && s.capital) add(B.SPACEPORT, 1.5 + civ.space.investment * 3);
+  // one launch site per nation, in a large city (not necessarily the capital); priority grows with
+  // space capability and scientific ambition so it is not forever outranked by everyday needs
+  if (caps.spaceTier >= 1 && !civHasBuilding(sim, civ, B.SPACEPORT) && isLargestCity(sim, civ, s)) add(B.SPACEPORT, 2 + caps.spaceTier * 1.2 + civ.personality.science * 2);
   if (caps.spaceTier >= 7) add(B.MEGASTRUCTURE, 1);
   if (caps.biotech > 0 && pop > 20000) add(B.GREENHOUSE, 1 + (civ.econ.livingStandard < 2 ? 1 : 0));
   // replace aging farms with modern ones (cheap tier upgrade)
@@ -414,8 +427,11 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
     let upgrade = c.upgrade !== undefined;
     // Land-use intensification: a built-up city with a strong need (jobs, power, services) replaces
     // its oldest, lowest-density housing instead of giving up -- as long as it is not overcrowded.
-    if (tile === null && c.score >= BALANCE.redevelopScore && pressure < 1.1 && redevelopable(def)) {
-      tile = oldestResidential(sim, s, residentialRank(resi.id));
+    if (tile === null && c.score >= BALANCE.redevelopScore && (redevelopable(def) || (def.category === 'residential' && def.footprint === 1))) {
+      // era-obsolete sites go first (village smithies in a steel age, water mills on the grid, ...);
+      // then, when the city is not overcrowded, its oldest low-density housing
+      if (def.footprint === 2) tile = pressure < 1.1 || def.category === 'residential' ? redevelopBlock(sim, s, civ, residentialRank(resi.id)) : null;
+      else tile = obsoleteSite(sim, s, civ) ?? (pressure < 1.1 && def.category !== 'residential' ? oldestResidential(sim, s, residentialRank(resi.id)) : null);
       upgrade = tile !== null;
     }
     if (tile === null) continue;
@@ -457,7 +473,70 @@ const REDEVELOPABLE = new Set(['industry', 'military', 'commerce', 'extraction']
 const URBAN_PLACEMENTS = new Set(['urban', 'center', 'edge', 'open']);
 /** Buildings that may replace old housing in a full city (single-tile urban uses, not homes or farms). */
 function redevelopable(def: BuildingDef): boolean {
-  return def.footprint === 1 && def.category !== 'residential' && def.category !== 'food' && URBAN_PLACEMENTS.has(def.placement);
+  return def.category !== 'residential' && def.category !== 'food' && URBAN_PLACEMENTS.has(def.placement);
+}
+
+/** A 2x2 block of this settlement's land holding only old low-density housing, farmland or nothing. */
+function redevelopBlock(sim: Sim, s: Settlement, civ: Civ, targetRank: number): number | null {
+  const m = sim.w.map;
+  let best: number | null = null;
+  let bestD = -1;
+  const ok = (j: number): boolean => {
+    if (m.settle[j] !== s.id || !TERRAIN[m.terrain[j]].buildable || isWaterTerrain(m.terrain[j])) return false;
+    const b = m.bld[j];
+    if (!b) return true;
+    if (m.bldFlags[j] & (BLDF.HISTORIC | BLDF.PART)) return false;
+    const def = BUILDINGS[b];
+    if (!def || def.footprint > 1) return false;
+    return (def.category === 'residential' && residentialRank(b) < targetRank) || b === B.FARM || isObsolete(civ, s, b);
+  };
+  eachOwnTile(sim, s, s.radius, (i, x, y, d2) => {
+    if (x + 1 >= m.w || y + 1 >= m.h) return;
+    if (!ok(i) || !ok(i + 1) || !ok(i + m.w) || !ok(i + m.w + 1)) return;
+    if (d2 > bestD) { bestD = d2; best = i; } // outskirts first
+  });
+  return best;
+}
+
+/** Buildings a civilization has outgrown (never landmarks, which are preserved as historic). */
+function isObsolete(civ: Civ, s: Settlement, b: number): boolean {
+  const c = civ.caps;
+  switch (b) {
+    case B.CAMP:
+    case B.HUT:
+      return c.industry > 0;
+    case B.SMITHY:
+      return c.industry > 0 && s.bld[B.SMITHY] > Math.max(1, s.pop / 60000);
+    case B.WORKSHOP:
+      return c.industry > 0 && s.bld[B.WORKSHOP] > Math.max(1, s.pop / 15000);
+    case B.MILL:
+      return c.electrification >= 0.5;
+    case B.GRANARY:
+      return c.industry > 0 && c.foodPreservation >= 0.6 && s.bld[B.GRANARY] > 1;
+  }
+  return false;
+}
+
+function obsoleteSite(sim: Sim, s: Settlement, civ: Civ): number | null {
+  const m = sim.w.map;
+  let best: number | null = null;
+  let bestD = -1;
+  eachOwnTile(sim, s, s.radius + 1, (i, _x, _y, d2) => {
+    if (m.settle[i] !== s.id || !m.bld[i] || m.bldFlags[i] & (BLDF.HISTORIC | BLDF.PART)) return;
+    if (BUILDINGS[m.bld[i]]?.footprint !== 1 || !isObsolete(civ, s, m.bld[i])) return;
+    if (d2 > bestD) { bestD = d2; best = i; }
+  });
+  return best;
+}
+
+function civHasBuilding(sim: Sim, civ: Civ, type: number): boolean {
+  for (const id of civ.settlements) if ((sim.w.settlements.get(id)?.bld[type] ?? 0) > 0) return true;
+  return false;
+}
+
+function isLargestCity(sim: Sim, civ: Civ, s: Settlement): boolean {
+  for (const id of civ.settlements) { const o = sim.w.settlements.get(id); if (o && o.pop > s.pop) return false; }
+  return true;
 }
 
 /**

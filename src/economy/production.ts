@@ -429,7 +429,8 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
     const rare = take(civ, Good.RARE, cap * 0.1, access);
     const mach = take(civ, Good.MACHINERY, cap * 0.05, access);
     const energy = take(civ, Good.ENERGY, cap * 2, access);
-    const made = Math.min(cap, rare / 0.1, mach / 0.05 + cap * 0.5, energy / 2);
+    // silicon and copper are everywhere; rare metals (dopants, specialty alloys) lift a fab from 40% to full output
+    const made = Math.min(cap, rare / 0.1 + cap * 0.4, mach / 0.05 + cap * 0.5, energy / 2);
     give(civ, Good.ELECTRONICS, made);
     out[Good.ELECTRONICS] += made * 12 * 0.1;
   }
@@ -500,7 +501,10 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
     const want = (dem[g] * pop) / 12;
     if (want <= 0) continue;
     civ.acc.want[g] += want;
-    const avail = Math.min(civ.stock[g] * access, Math.max(want, civ.stock[g] * share));
+    // households also leave the builders' stockpile of electronics alone (see take())
+    const reserve = RESERVED.has(g) && industrial ? civ.population * BALANCE.constructionReserve : 0;
+    const stock = Math.max(0, civ.stock[g] - reserve);
+    const avail = Math.min(stock * access, Math.max(want, stock * share));
     const got = Math.min(want, avail);
     civ.stock[g] -= got;
     civ.acc.use[g] += got;

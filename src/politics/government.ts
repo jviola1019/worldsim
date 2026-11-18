@@ -30,15 +30,19 @@ import { transferSettlement } from '../civilizations/settlement';
 import { TRAIT_BY_KEY } from '../population/traits';
 import { declareWar } from './diplomacy';
 
-const IDEALS: Record<string, Partial<Institutions>> = {
-  peasants: { participation: 0.4, welfare: 0.5, federalism: 0.6, centralization: 0.3 },
-  workers: { participation: 0.85, welfare: 0.85, stateEconomy: 0.6, liberties: 0.6 },
-  merchants: { participation: 0.6, liberties: 0.75, ruleOfLaw: 0.85, stateEconomy: 0.1 },
-  nobles: { hereditary: 1, participation: 0.1, centralization: 0.35, federalism: 0.75 },
-  clergy: { religiousAuthority: 0.85, liberties: 0.35 },
+// Every institution is contested: a value held by one faction alone would be its goal no matter how
+// weak that faction is (power only sets the speed), so hereditary rule and military influence would
+// ratchet up everywhere. Commoners, merchants and intellectuals push back; peasants and clergy lean
+// traditional.
+export const IDEALS: Record<string, Partial<Institutions>> = {
+  peasants: { participation: 0.4, welfare: 0.5, federalism: 0.6, centralization: 0.3, hereditary: 0.6, militaryInfluence: 0.4 },
+  workers: { participation: 0.85, welfare: 0.85, stateEconomy: 0.6, liberties: 0.6, hereditary: 0.1, militaryInfluence: 0.3 },
+  merchants: { participation: 0.6, liberties: 0.75, ruleOfLaw: 0.85, stateEconomy: 0.1, hereditary: 0.2, militaryInfluence: 0.25 },
+  nobles: { hereditary: 1, participation: 0.1, centralization: 0.35, federalism: 0.75, militaryInfluence: 0.6 },
+  clergy: { religiousAuthority: 0.85, liberties: 0.35, hereditary: 0.7 },
   military: { militaryInfluence: 0.85, centralization: 0.8, participation: 0.2 },
-  intelligentsia: { liberties: 0.9, participation: 0.8, religiousAuthority: 0.1, ruleOfLaw: 0.8 },
-  technologists: { techGovernance: 0.8, ruleOfLaw: 0.7, stateEconomy: 0.3 },
+  intelligentsia: { liberties: 0.9, participation: 0.8, religiousAuthority: 0.1, ruleOfLaw: 0.8, hereditary: 0, militaryInfluence: 0.15 },
+  technologists: { techGovernance: 0.8, ruleOfLaw: 0.7, stateEconomy: 0.3, militaryInfluence: 0.3 },
   regionalists: { federalism: 0.95, centralization: 0.1 },
 };
 const NAMES: Record<string, string> = {

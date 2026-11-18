@@ -115,7 +115,7 @@ const LIST: BuildingDef[] = [
   D('FACTORY', 'Factory', 'industry', { jobs: 400, sector: SECTOR.INDUSTRY, cost: { STONE: 300, METAL: 150 }, labor: 300, minPop: 3000, tiers: [5, 6, 7], pollution: 14 }),
   D('STEEL_MILL', 'Steel mill', 'industry', { jobs: 300, sector: SECTOR.INDUSTRY, cost: { STONE: 900, METAL: 40 }, labor: 350, minPop: 5000, max: 2, tiers: [5], pollution: 22 }),
   D('REFINERY', 'Refinery', 'industry', { jobs: 150, sector: SECTOR.INDUSTRY, cost: { METAL: 400, MACHINERY: 120 }, labor: 400, minPop: 8000, max: 2, tiers: [6], pollution: 18 }),
-  D('CHIP_FAB', 'Chip fabrication plant', 'industry', { jobs: 250, sector: SECTOR.INDUSTRY, cost: { STONE: 500, METAL: 400, MACHINERY: 400, ELECTRONICS: 50 }, labor: 900, minPop: 50000, max: 2, tiers: [6], pollution: 3 }),
+  D('CHIP_FAB', 'Chip fabrication plant', 'industry', { jobs: 250, sector: SECTOR.INDUSTRY, cost: { STONE: 600, METAL: 400, MACHINERY: 400 }, labor: 900, minPop: 50000, max: 2, tiers: [6], pollution: 3 }),
   D('ROBOT_FACTORY', 'Automated factory', 'industry', { jobs: 60, sector: SECTOR.INDUSTRY, cost: { METAL: 800, MACHINERY: 600, ELECTRONICS: 200 }, labor: 900, minPop: 50000, tiers: [7], pollution: 4 }),
   // energy
   D('POWER_FOSSIL', 'Power station', 'energy', { jobs: 120, sector: SECTOR.INDUSTRY, cost: { STONE: 400, METAL: 300, MACHINERY: 20 }, labor: 400, placement: 'edge', minPop: 3000, tiers: [5, 6], pollution: 30 }),
@@ -154,7 +154,7 @@ const LIST: BuildingDef[] = [
   // transport
   D('STATION', 'Railway station', 'transport', { jobs: 80, cost: { STONE: 200, METAL: 120 }, labor: 150, placement: 'urban', minPop: 2000, max: 1, tiers: [5, 6, 7] }),
   D('AIRPORT', 'Airport', 'transport', { jobs: 600, cost: { STONE: 1500, METAL: 600, MACHINERY: 200, ELECTRONICS: 20 }, labor: 1200, placement: 'open', minPop: 80000, max: 1, footprint: 2, tiers: [6] }),
-  D('SPACEPORT', 'Spaceport', 'transport', { jobs: 800, cost: { STONE: 3000, METAL: 3000, MACHINERY: 1000, ELECTRONICS: 300 }, labor: 3000, placement: 'open', minPop: 100000, max: 1, footprint: 2, tiers: [6, 7] }),
+  D('SPACEPORT', 'Spaceport', 'transport', { jobs: 800, cost: { STONE: 3000, METAL: 3000, MACHINERY: 1000, ELECTRONICS: 300 }, labor: 3000, placement: 'open', minPop: 20000, max: 1, footprint: 2, tiers: [6, 7] }),
   // special
   D('RUINS', 'Ruins', 'special', { tiers: [0, 5] }),
   D('CONSTRUCTION', 'Construction site', 'special', { tiers: [0] }),

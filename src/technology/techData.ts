@@ -164,9 +164,9 @@ t('electric_power', 'Electric Power', 8, 'energy', ['telegraph', 'steam_engine']
 t('bessemer_steel', 'Industrial Steel', 8, 'materials', ['coke_smelting', 'railways'], { metalTier: 5, industry: 0.2, construction: 0.2 }, 'Mass-produced steel for rails, bridges and skyscraper frames.', { k: 1, req: { resources: ['IRON', 'COAL'] }, unlock: ['STEEL_MILL'] });
 t('telephone', 'Telephone', 8, 'communication', ['electric_power'], { communication: 0.8, adminCapacity: 0.4 }, 'Voice over wires.', { k: 0.9 });
 t('petroleum_drilling', 'Petroleum Drilling', 8, 'energy', ['steam_engine', 'bessemer_steel'], { oilExtraction: 1 }, 'Wells tap oil and gas deposits.', { k: 1, unlock: ['OIL_WELL'] });
-t('refining', 'Petroleum Refining', 8, 'industry', ['petroleum_drilling'], { energyTier: 4, industry: 0.1 }, 'Kerosene, gasoline and lubricants.', { k: 1, req: { resources: ['OIL'] }, unlock: ['REFINERY'] });
-t('internal_combustion', 'Internal Combustion Engine', 8, 'energy', ['refining'], { landSpeed: 0.2, logistics: 0.2 }, 'Light powerful engines burning oil.', { k: 1, req: { resources: ['OIL'] } });
-t('automobiles', 'Automobiles', 8, 'transport', ['internal_combustion'], { landSpeed: 0.3, housingTier: 6, logistics: 0.2 }, 'Cars and trucks reshape cities; suburbs spread along roads.', { k: 1, req: { resources: ['OIL'] }, ay: 40, unlock: ['SUBURB'] });
+t('refining', 'Petroleum Refining', 8, 'industry', ['petroleum_drilling'], { energyTier: 4, industry: 0.1 }, 'Kerosene, gasoline and lubricants, from crude oil or as synthetic fuel from coal.', { k: 1, req: { anyResources: ['OIL', 'COAL'] }, unlock: ['REFINERY'] });
+t('internal_combustion', 'Internal Combustion Engine', 8, 'energy', ['refining'], { landSpeed: 0.2, logistics: 0.2 }, 'Light powerful engines burning oil.', { k: 1, req: { anyResources: ['OIL', 'COAL'] } });
+t('automobiles', 'Automobiles', 8, 'transport', ['internal_combustion'], { landSpeed: 0.3, housingTier: 6, logistics: 0.2 }, 'Cars and trucks reshape cities; suburbs spread along roads.', { k: 1, req: { anyResources: ['OIL', 'COAL'] }, ay: 40, unlock: ['SUBURB'] });
 t('assembly_line', 'Assembly Line', 8, 'industry', ['electric_power', 'bessemer_steel'], { industry: 0.4, automation: 0.1 }, 'Mass production makes consumer goods cheap.', { k: 1 });
 t('chemical_fertilizer', 'Chemical Fertilizer', 8, 'agriculture', ['scientific_method', 'electric_power'], { farming: 1.4 }, 'Synthetic nitrogen dramatically raises yields.', { k: 1.1 });
 t('germ_theory', 'Germ Theory', 8, 'medicine', ['vaccination', 'optics'], { healthcare: 0.15, infantCare: 0.2, diseaseControl: 0.2 }, 'Microbes cause disease; hygiene and antisepsis save millions.', { k: 1 });
@@ -180,7 +180,7 @@ t('industrial_research', 'Industrial Research Labs', 8, 'science', ['electric_po
 t('electric_rail', 'Electric Rail and Metros', 8, 'transport', ['electric_power', 'railways'], { railTier: 2, landSpeed: 0.1 }, 'Electric trains, trams and underground metros.', { k: 1 });
 
 // ===================================================================== Era 9 — Early modern
-t('flight', 'Powered Flight', 9, 'transport', ['internal_combustion', 'industrial_research'], { airTier: 1, mobility: 0.1 }, 'Aeroplanes for reconnaissance, mail and war.', { k: 1, req: { resources: ['OIL'] } });
+t('flight', 'Powered Flight', 9, 'transport', ['internal_combustion', 'industrial_research'], { airTier: 1, mobility: 0.1 }, 'Aeroplanes for reconnaissance, mail and war.', { k: 1, req: { anyResources: ['OIL', 'COAL'] } });
 t('military_aviation', 'Military Aviation', 9, 'military', ['flight'], { airPower: 0.4, militaryAttack: 0.1 }, 'Fighters and bombers; air bases.', { k: 1, unlock: ['AIRBASE'] });
 t('commercial_aviation', 'Commercial Aviation', 9, 'transport', ['flight', 'radio'], { airTier: 2, tradeEfficiency: 0.05 }, 'Airliners and airports connect distant cities.', { k: 1, unlock: ['AIRPORT'] });
 t('radio', 'Radio', 9, 'communication', ['telephone', 'industrial_research'], { communication: 1, mediaReach: 0.6, intelligence: 0.1 }, 'Broadcasts reach every household.', { k: 1 });
@@ -203,7 +203,7 @@ t('aircraft_carriers', 'Aircraft Carriers', 9, 'military', ['military_aviation',
 t('nuclear_fission', 'Nuclear Fission', 10, 'science', ['industrial_research', 'radio'], { uraniumMining: 1, research: 0.2 }, 'Splitting the atom.', { k: 1.1 });
 t('nuclear_power', 'Nuclear Power', 10, 'energy', ['nuclear_fission', 'electric_power'], { nuclearPower: 1, energyTier: 5 }, 'Reactors generate vast electricity without combustion — if uranium is available.', { k: 1.1, req: { resources: ['URANIUM'] }, unlock: ['POWER_NUCLEAR'] });
 t('nuclear_weapons', 'Nuclear Weapons', 10, 'military', ['nuclear_fission'], { nuclearWeapons: 1 }, 'Strategic weapons of mass destruction; deterrence and catastrophic risk.', { k: 1.3, adv: true, req: { resources: ['URANIUM'], minPopulation: 1000000 } });
-t('jet_engines', 'Jet Engines', 10, 'transport', ['flight', 'bessemer_steel'], { airTier: 3, airPower: 0.3 }, 'Jet airliners and fighters.', { k: 1, req: { resources: ['OIL'] } });
+t('jet_engines', 'Jet Engines', 10, 'transport', ['flight', 'bessemer_steel'], { airTier: 3, airPower: 0.3 }, 'Jet airliners and fighters.', { k: 1, req: { anyResources: ['OIL', 'COAL'] } });
 t('rocketry', 'Rocketry', 10, 'space', ['jet_engines', 'nuclear_fission'], { spaceTier: 1, missiles: 0.3 }, 'Liquid-fuel rockets reach the edge of space.', { k: 1.1, req: { minPopulation: 1000000 }, unlock: ['SPACEPORT'] });
 t('ballistic_missiles', 'Strategic Missiles', 10, 'military', ['rocketry', 'nuclear_weapons'], { missiles: 0.7 }, 'Intercontinental delivery of strategic weapons; silos and deterrence doctrines.', { k: 1.1, adv: true, unlock: ['SILO'] });
 t('satellites', 'Satellites', 10, 'space', ['rocketry', 'transistors'], { spaceTier: 2, communication: 0.6, intelligence: 0.3 }, 'Orbiting satellites for communication, weather and reconnaissance.', { k: 1 });
@@ -220,7 +220,7 @@ t('combined_arms', 'Combined Arms Doctrine', 10, 'military', ['armored_warfare',
 t('rare_earth_processing', 'Rare Metal Processing', 10, 'materials', ['nuclear_fission', 'bessemer_steel'], { rareExtraction: 1, metalTier: 6 }, 'Extracting and refining lithium, rare earths and specialty alloys.', { k: 1 });
 
 // ===================================================================== Era 11 — Digital
-t('microprocessors', 'Microprocessors', 11, 'computing', ['transistors', 'rare_earth_processing'], { computing: 1, research: 0.5, automation: 0.05 }, 'Integrated circuits put computers everywhere — requires rare metals.', { k: 1.1, req: { resources: ['RARE'] }, unlock: ['CHIP_FAB'] });
+t('microprocessors', 'Microprocessors', 11, 'computing', ['transistors', 'rare_earth_processing'], { computing: 1, research: 0.5, automation: 0.05 }, 'Integrated circuits put computers everywhere; rare metals make fabs far more productive.', { k: 1.1, unlock: ['CHIP_FAB'] });
 t('internet', 'Internet', 11, 'communication', ['microprocessors', 'satellites'], { communication: 1.5, research: 0.8, literacy: 0.1, adminCapacity: 0.6, mediaReach: 0.8, computing: 0.5 }, 'A global network of computers.', { k: 1.1, unlock: ['DATA_CENTER'] });
 t('mobile_telecom', 'Mobile Telecommunications', 11, 'communication', ['internet'], { communication: 0.8, markets: 0.1 }, 'Phones in every pocket.', { k: 0.9 });
 t('industrial_robots', 'Industrial Robots', 11, 'industry', ['microprocessors', 'assembly_line'], { automation: 0.15, robotics: 0.2 }, 'Programmable machines take over repetitive factory work.', { k: 1 });

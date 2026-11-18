@@ -44,17 +44,26 @@ describe('#8 trade interruption hurts a dependent importer, and trade recovers',
     const A = clone(base), B = clone(base);
     expect(B.digest()).toBe(A.digest()); // cannot pass because the worlds were already different
     makeTreaty(B, B.w.civs.get(p.importer)!, B.w.civs.get(p.exporter)!, 'embargo', 30, true);
-    A.runYears(3);
-    B.runYears(3);
-    expect(A.w.routes.get(p.route)!.volume).toBeGreaterThan(0); // control still trades
-    expect(B.w.routes.get(p.route)!.volume).toBe(0); // intervention cut it
+    // route volume fluctuates month to month: compare the total carried over three years (monthly samples)
+    let carriedA = 0, carriedB = 0;
+    for (let k = 0; k < 36; k++) {
+      A.runTicks(10); B.runTicks(10);
+      carriedA += A.w.routes.get(p.route)?.volume ?? 0;
+      if (k >= 12) carriedB += B.w.routes.get(p.route)?.volume ?? 0; // route volumes are recomputed yearly
+    }
+    expect(carriedA).toBeGreaterThan(0); // control keeps trading
+    expect(carriedB).toBe(0); // the embargo cut the route
+    expect(B.w.routes.get(p.route)!.volume).toBe(0);
     const ia = A.w.civs.get(p.importer)!, ib = B.w.civs.get(p.importer)!;
-    const scarcer = ib.stock[p.good] < ia.stock[p.good] * 0.9 || ib.prices[p.good] > ia.prices[p.good] * 1.05;
-    expect(scarcer, `${GOODS[p.good].key}: stock ${ia.stock[p.good].toFixed(0)}→${ib.stock[p.good].toFixed(0)}, price ${ia.prices[p.good].toFixed(2)}→${ib.prices[p.good].toFixed(2)}`).toBe(true);
+    // scarcer: lower stock, a higher price, or less access (domestic supply + imports vs need) -- a good
+    // already at its price ceiling with zero stock can only show the loss in access
+    const scarcer = ib.stock[p.good] < ia.stock[p.good] * 0.9 || ib.prices[p.good] > ia.prices[p.good] * 1.05 || ib.access[p.good] < ia.access[p.good] - 0.02;
+    expect(scarcer, `${GOODS[p.good].key}: stock ${ia.stock[p.good].toFixed(0)}→${ib.stock[p.good].toFixed(0)}, price ${ia.prices[p.good].toFixed(2)}→${ib.prices[p.good].toFixed(2)}, access ${ia.access[p.good].toFixed(2)}→${ib.access[p.good].toFixed(2)}`).toBe(true);
     // recovery: lift the embargo and the route carries goods again
     for (const t of B.w.treaties.values()) if (t.kind === 'embargo' && [t.a, t.b].includes(p.importer) && [t.a, t.b].includes(p.exporter)) { t.active = false; t.end = B.year; }
-    B.runYears(2);
-    expect(B.w.routes.get(p.route)!.volume).toBeGreaterThan(0);
+    let after = 0;
+    for (let k = 0; k < 24; k++) { B.runTicks(10); after += B.w.routes.get(p.route)?.volume ?? 0; }
+    expect(after).toBeGreaterThan(0);
   }, 120000);
 });
 
