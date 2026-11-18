@@ -242,6 +242,8 @@ export interface Construction {
   need: number[];
   labor: number; // remaining person-years of labor
   upgrade: boolean;
+  /** Remaining amount of each good that concrete may still stand in for (fixed when work starts). */
+  subLeft?: number[];
 }
 
 export interface Epidemic {

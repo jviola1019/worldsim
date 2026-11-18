@@ -113,7 +113,7 @@ const LIST: BuildingDef[] = [
   D('SMITHY', 'Smithy', 'industry', { jobs: 20, sector: SECTOR.INDUSTRY, cost: { WOOD: 15, STONE: 20 }, labor: 12, minPop: 150, tiers: [1, 3], pollution: 1 }),
   D('MILL', 'Mill', 'industry', { jobs: 15, sector: SECTOR.INDUSTRY, cost: { WOOD: 40, STONE: 30 }, labor: 25, minPop: 400, max: 3, tiers: [3, 4] }),
   D('FACTORY', 'Factory', 'industry', { jobs: 400, sector: SECTOR.INDUSTRY, cost: { STONE: 300, METAL: 150 }, labor: 300, minPop: 3000, tiers: [5, 6, 7], pollution: 14 }),
-  D('STEEL_MILL', 'Steel mill', 'industry', { jobs: 300, sector: SECTOR.INDUSTRY, cost: { STONE: 400, METAL: 200 }, labor: 350, minPop: 5000, max: 2, tiers: [5], pollution: 22 }),
+  D('STEEL_MILL', 'Steel mill', 'industry', { jobs: 300, sector: SECTOR.INDUSTRY, cost: { STONE: 900, METAL: 40 }, labor: 350, minPop: 5000, max: 2, tiers: [5], pollution: 22 }),
   D('REFINERY', 'Refinery', 'industry', { jobs: 150, sector: SECTOR.INDUSTRY, cost: { METAL: 400, MACHINERY: 120 }, labor: 400, minPop: 8000, max: 2, tiers: [6], pollution: 18 }),
   D('CHIP_FAB', 'Chip fabrication plant', 'industry', { jobs: 250, sector: SECTOR.INDUSTRY, cost: { STONE: 500, METAL: 400, MACHINERY: 400, ELECTRONICS: 50 }, labor: 900, minPop: 50000, max: 2, tiers: [6], pollution: 3 }),
   D('ROBOT_FACTORY', 'Automated factory', 'industry', { jobs: 60, sector: SECTOR.INDUSTRY, cost: { METAL: 800, MACHINERY: 600, ELECTRONICS: 200 }, labor: 900, minPop: 50000, tiers: [7], pollution: 4 }),

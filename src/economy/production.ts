@@ -193,10 +193,16 @@ export function householdDemand(civ: Civ, out: Float64Array = DEMAND_SCRATCH): F
   return out;
 }
 
+/** Construction materials that industry may not draw below a reserve held for builders. */
+const RESERVED = new Set<number>([Good.WOOD, Good.METAL, Good.MACHINERY, Good.ELECTRONICS]);
+
 function take(civ: Civ, g: number, amount: number, access: number): number {
   if (!(amount > 0)) return 0; // negative or NaN requests would create goods from nothing
   civ.acc.want[g] += amount;
-  const avail = civ.stock[g] * access;
+  // industrial economies keep a construction stockpile: producers compete for steel and timber,
+  // so new plants, homes and schools are not starved by the factories they would supply
+  const reserve = RESERVED.has(g) && civ.caps.industry > 0 ? civ.population * BALANCE.constructionReserve : 0;
+  const avail = Math.max(0, civ.stock[g] - reserve) * access;
   const got = Math.min(avail, amount);
   civ.stock[g] -= got;
   civ.acc.use[g] += got;
@@ -238,7 +244,10 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   const out = s.output;
   for (let k = 0; k < GOOD_COUNT; k++) out[k] *= 0.9; // decay of the annualized display value
 
-  let free = Math.max(0, workforce(sim, s, childLabor) - s.garrison);
+  // Working time falls as productivity rises (annual hours roughly halved 1870-2000): automated,
+  // welfare-state economies supply fewer full-time-equivalent workers per working-age person.
+  const hours = industrial ? 1 - clamp(BALANCE.hoursPerAutomation * caps.automation + 0.08 * clamp01(caps.welfare), 0, 0.45) : 1;
+  let free = Math.max(0, workforce(sim, s, childLabor) * hours - s.garrison);
   emp[SECTOR.MILITARY] = Math.min(s.garrison, free + s.garrison);
   const totalWorkers = free;
 
@@ -368,7 +377,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   // extraction
   const lumberStaff = staff(B.LUMBER, 1 - robotics * 0.6);
   if (lumberStaff > 0) {
-    const wood = (sites.lumber * BALANCE.lumberYield * (1 + caps.woodcutting) * clamp(sites.lumberVeg / 180, 0.2, 1.3) * lumberStaff) / 12;
+    const wood = (sites.lumber * BALANCE.lumberYield * (1 + caps.woodcutting) * (1 + BALANCE.industrialExtraction * 0.5 * Math.max(0, caps.industry)) * clamp(sites.lumberVeg / 180, 0.2, 1.3) * lumberStaff) / 12;
     give(civ, Good.WOOD, wood);
     out[Good.WOOD] += wood * 12 * 0.1;
   }
@@ -411,7 +420,8 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
     give(civ, Good.LUXURY, gold * 5);
   }
   const factoryStaff = staff(B.FACTORY, 1 - automation);
-  if (factoryStaff > 0 && caps.industry > 0) manufacture(sim, civ, s, (s.bld[B.FACTORY] * BALANCE.factoryOutput * (1 + Math.max(0, caps.industry - 1)) * factoryStaff) / 12, armsWanted, access);
+  // automation both cuts the labor a plant needs (staffing above) and raises what each plant turns out
+  if (factoryStaff > 0 && caps.industry > 0) manufacture(sim, civ, s, (s.bld[B.FACTORY] * BALANCE.factoryOutput * (1 + Math.max(0, caps.industry - 1)) * (1 + automation) * factoryStaff) / 12, armsWanted, access);
   staff(B.REFINERY, 1 - automation * 0.6);
   const fabStaff = staff(B.CHIP_FAB, 1 - automation * 0.5);
   if (fabStaff > 0) {
@@ -461,14 +471,14 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
       // GOODS income rises (lagged one month; goods only, so service jobs cannot inflate their own demand).
       // Automation cuts the labor each unit of service needs. Building-based service staff count first.
       const goodsIncome = Math.log2(1 + (s.goodsPerCap ?? 0) / 0.9);
-      const perCapita = 0.04 + 0.3 * clamp((goodsIncome - 0.8) / 2.2, 0, 1);
-      const demandJobs = pop * perCapita * (1 - automation * 0.45);
+      const perCapita = 0.04 + BALANCE.serviceDemandMax * clamp((goodsIncome - 0.6) / 2, 0, 1);
+      const demandJobs = pop * perCapita * (1 - automation * 0.2);
       const market = Math.min(free, Math.max(0, demandJobs - serviceWorkers));
       emp[SECTOR.SERVICES] += market;
       serviceWorkers += market;
       free -= market;
       // what remains: informal work, else unemployment (a safety net lets people search instead)
-      const informal = free * clamp(0.75 - caps.welfare * 0.2 - caps.automation * 0.3, 0.3, 0.75);
+      const informal = free * clamp(0.75 - caps.welfare * 0.2 - caps.automation * 0.15, 0.3, 0.75);
       emp[SECTOR.SERVICES] += informal;
       serviceWorkers += informal * 0.4;
       free -= informal;
@@ -604,8 +614,10 @@ function manufacture(sim: Sim, civ: Civ, s: Settlement, cap: number, armsWanted:
     civ.acc.emissions += coal;
   }
   const effective = cap * clamp01(energyOk);
-  const metal = take(civ, Good.METAL, effective * 0.16, access);
-  const units = Math.min(effective, metal / 0.16);
+  // industrial economies recycle scrap: part of the metal input comes back from worn-out goods
+  const perUnit = 0.16 * (1 - clamp(BALANCE.scrapPerIndustry * civ.caps.industry, 0, 0.45));
+  const metal = take(civ, Good.METAL, effective * perUnit, access);
+  const units = Math.min(effective, metal / perUnit);
   const machShare = 0.18;
   const armsShare = armsWanted ? 0.15 : 0;
   give(civ, Good.MACHINERY, units * machShare * 0.4);
@@ -677,7 +689,7 @@ function produceEnergy(sim: Sim, s: Settlement, civ: Civ, staff: (t: number, l: 
   }
 }
 
-function extractDeposits(sim: Sim, s: Settlement, civ: Civ, tiles: number[], staffing: number, wells: boolean): void {
+export function extractDeposits(sim: Sim, s: Settlement, civ: Civ, tiles: number[], staffing: number, wells: boolean): void {
   const m = sim.w.map;
   const c = civ.caps;
   const deplete = sim.w.laws.resourceDepletion;
@@ -688,11 +700,18 @@ function extractDeposits(sim: Sim, s: Settlement, civ: Civ, tiles: number[], sta
     const capKey = def.extractCap as keyof typeof c;
     if (def.extractCap !== 'forage' && def.extractCap !== 'farming' && !((c[capKey] ?? 0) > 0)) continue;
     if (wells !== (d === Deposit.OIL || d === Deposit.GAS)) continue;
-    const bonus = 1 + Math.max(0, c.mining - 1) * 0.5 + c.deepMining * 0.4 + c.robotics * 0.5 + (wells ? c.oilExtraction * 0.3 : 0);
+    // Industrial extraction (powered drills, explosives, mechanized haulage, ore processing) multiplies
+    // output per worker AND makes lower-grade ore economic, so the same factor scales the extraction
+    // rate and the recoverable reserve: depletion time is unchanged, industrial supply becomes feasible.
+    const industrial = 1 + BALANCE.industrialExtraction * Math.max(0, c.industry);
+    const bonus = (1 + Math.max(0, c.mining - 1) * 0.5 + c.deepMining * 0.4 + c.robotics * 0.5 + (wells ? c.oilExtraction * 0.3 : 0)) * industrial;
     let amount = (def.baseYield * BALANCE.mineYieldMult * bonus * staffing) / 12;
     if (!def.renewable && deplete) {
-      amount = Math.min(amount, m.depAmt[i]);
-      m.depAmt[i] -= amount;
+      // Reserve growth: better mining technology makes lower-grade ore recoverable, so each unit
+      // extracted draws down less of the deposit (recoverable reserves grow with technology).
+      const recovery = (1 + BALANCE.reserveGrowth * (c.deepMining + c.robotics)) * industrial;
+      amount = Math.min(amount, m.depAmt[i] * recovery);
+      m.depAmt[i] -= amount / recovery;
       if (m.depAmt[i] <= 0.5) {
         m.dep[i] = Deposit.NONE;
         m.depAmt[i] = 0;

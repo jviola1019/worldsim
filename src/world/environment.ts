@@ -290,7 +290,10 @@ export function climateYearly(sim: Sim): void {
     }
     c.cumulativeEmissions += emissions;
     // emissions -> ppm (stylized conversion), minus slow natural uptake toward baseline
-    c.co2 += (emissions - capture) * BALANCE.emissionToPpm * 1e6 - (c.co2 - c.baseCo2) * 0.004;
+    // The map is the whole planet: a larger map holds more fossil fuel but not a larger atmosphere, so
+    // the conversion is normalized to the 128x128 reference world.
+    const areaScale = 16384 / (m.w * m.h);
+    c.co2 += (emissions - capture) * BALANCE.emissionToPpm * areaScale * 1e6 - (c.co2 - c.baseCo2) * 0.004;
     c.co2 = Math.max(c.baseCo2 * 0.9, c.co2);
     const forcing = BALANCE.co2Forcing * Math.log(c.co2 / c.baseCo2);
     const equilibrium = BALANCE.climateSensitivity * forcing;

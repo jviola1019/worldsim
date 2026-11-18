@@ -30,11 +30,17 @@ export const BALANCE = {
   tfrMax: 6.4,
   /** [S] Floor of TFR in fully developed societies. */
   tfrMin: 1.45,
+  /** [S] Development index at which the fertility transition begins. */
+  transitionOnset: 0.25,
+  /** [S] Development index at which the transition is complete (TFR reaches its floor given contraception). */
+  transitionFull: 0.85,
   /** Population thresholds for individual <-> cohort representation (hysteresis). */
   individualMax: 150,
   individualMin: 60,
   /** [S] Famine: mortality multiplier slope (q * (1 + k * hunger * vulnerability)). Severe famine ~15-20%/yr deaths. */
   famineMortality: 6,
+  /** [S] Starvation: additive annual death probability slope (k * hunger² * vulnerability); a 35% shortfall kills ~6%/yr of average adults. */
+  starvationMortality: 0.5,
   /** [S] Max yearly emigration share under distress. */
   maxEmigration: 0.06,
   bandSplitSize: 90,
@@ -64,6 +70,20 @@ export const BALANCE = {
   quarryLabor: 60,
   mineLabor: 90,
   mineYieldMult: 1,
+  /** [S] Reserve growth: recoverable reserves scale by 1 + k * (deepMining + robotics). */
+  reserveGrowth: 1.5,
+  /** [S] Industrial extraction multiplier per unit of industry capability (scales both mine output and recoverable reserves). */
+  industrialExtraction: 5,
+  /** [S] Minimum construction priority for a full city to replace old housing with another use. */
+  redevelopScore: 3,
+  /** [S] Per-capita stock of construction materials industry leaves for builders (industrial eras). */
+  constructionReserve: 0.002,
+  /** [S] Maximum market-service jobs per capita at high goods income. */
+  serviceDemandMax: 0.42,
+  /** [E] Reduction of full-time-equivalent labor supply per unit of automation (working-time decline). */
+  hoursPerAutomation: 0.35,
+  /** [E] Scrap share of factory metal input per unit of industry capability (capped at 45%; real steel is ~30-40% scrap). */
+  scrapPerIndustry: 0.12,
   smithyOutput: 450,
   smithyLabor: 20,
   workshopOutput: 450,
@@ -148,8 +168,8 @@ export const BALANCE = {
   co2Forcing: 5.35,
   /** [S] Equilibrium warming per W/m^2 (~3 C per CO2 doubling, IPCC AR6 central). */
   climateSensitivity: 0.8,
-  /** [S] Emission units -> ppm conversion. */
-  emissionToPpm: 2.2e-9,
+  /** [S] Emission units -> ppm conversion for the 128x128 reference world (scaled by map area). Recalibrated when industrial extraction made fossil supply ~10x larger. */
+  emissionToPpm: 6e-11,
 
   // ---------------- disease
   /** [S] Base annual chance of a new pathogen per settlement at reference density. */

@@ -42,9 +42,10 @@ for (let y = 1; y <= YEARS; y++) {
       life += s.health * s.pop;
     }
     const wf = emp.reduce((a, b) => a + b, 0) || 1;
-    lines.push(`  year ${String(sim.year).padStart(4)} · ${ERA_NAMES[top.era].padEnd(26)} pop ${String(Math.round(pop)).padStart(9)} · urban ${(100 * urban / Math.max(1, pop)).toFixed(0).padStart(3)}% · literacy ${top.caps.literacy.toFixed(2)} · electrification ${top.caps.electrification.toFixed(2)} · life-exp index ${(life / Math.max(1, pop)).toFixed(2)} · agri ${(100 * emp[SECTOR.FOOD] / wf).toFixed(0)}% industry ${(100 * emp[SECTOR.INDUSTRY] / wf).toFixed(0)}% services ${(100 * emp[SECTOR.SERVICES] / wf).toFixed(0)}% unemployed ${(100 * emp[SECTOR.UNEMPLOYED] / wf).toFixed(0)}% · GDP/cap ${top.econ.gdpPerCapita.toFixed(2)}`);
+    lines.push(`  year ${String(sim.year).padStart(4)} · ${ERA_NAMES[top.era].padEnd(26)} pop ${String(Math.round(pop)).padStart(9)} · urban ${(100 * urban / Math.max(1, pop)).toFixed(0).padStart(3)}% · literacy ${top.caps.literacy.toFixed(2)} · electrification ${top.caps.electrification.toFixed(2)} · life-exp index ${(life / Math.max(1, pop)).toFixed(2)} · agri ${(100 * emp[SECTOR.FOOD] / wf).toFixed(0)}% industry ${(100 * emp[SECTOR.INDUSTRY] / wf).toFixed(0)}% services ${(100 * emp[SECTOR.SERVICES] / wf).toFixed(0)}% unemployed ${(100 * emp[SECTOR.UNEMPLOYED] / wf).toFixed(0)}% · GDP/cap ${top.econ.gdpPerCapita.toFixed(2)} · food short ${(100 * top.acc.foodShort / Math.max(1, top.acc.foodNeed)).toFixed(0)}%`);
   }
 }
+if (process.env.SAVE_DIR) (await import('node:fs')).writeFileSync(`${process.env.SAVE_DIR}/${seed}-final.bin`, (await import('../src/persistence/serialize')).encodeWorld(sim.w));
 const ev = sim.w.events;
 const natural = ev.filter((e) => e.type === 'disaster' && !e.causes?.length);
 const byKind: Record<string, number> = {};

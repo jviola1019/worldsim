@@ -298,7 +298,8 @@ function settlementYearly(sim: Sim, s: Settlement, civ: Civ): void {
   recomputeTerritory(sim, s);
   recomputeHousing(s);
   // education converges slowly toward what literacy, schools and spending allow
-  const schools = s.bld[B.SCHOOL] * 8000 + s.bld[B.LIBRARY] * 2000 + s.bld[B.UNIVERSITY] * 20000 + s.bld[B.TEMPLE] * 300;
+  // mass schooling systems serve far more pupils per school site than a medieval cathedral school
+  const schools = s.bld[B.SCHOOL] * 8000 * (1 + 2 * civ.caps.literacy) + s.bld[B.LIBRARY] * 2000 + s.bld[B.UNIVERSITY] * 20000 + s.bld[B.TEMPLE] * 300;
   const coverage = clamp01(schools / Math.max(1, s.pop));
   const target = clamp01(civ.caps.literacy * (0.25 + 0.75 * coverage) * (0.6 + 0.4 * clamp01(civ.budget.education * 8)));
   s.education += (target - s.education) * 0.06;

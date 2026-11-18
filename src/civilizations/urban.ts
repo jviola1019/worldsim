@@ -113,9 +113,26 @@ interface Project {
   score: number;
 }
 
+/**
+ * Concrete substitution: once a civ is industrial, masonry/concrete (STONE) can replace timber
+ * entirely and up to half of the structural metal in construction, at CONCRETE_RATIO stone per unit.
+ */
+const CONCRETE_RATIO = 2;
+export function concreteShare(civ: Civ, g: number): number {
+  if (civ.caps.industry <= 0) return 0;
+  return g === Good.WOOD ? 1 : g === Good.METAL ? 0.5 : 0;
+}
+
 function canAfford(civ: Civ, def: BuildingDef, frac = 0.25): boolean {
+  let stoneLeft = civ.stock[Good.STONE] - ((def.cost.STONE ?? 0) as number) * frac;
   for (const [g, amt] of Object.entries(def.cost)) {
-    if (civ.stock[Good[g as GoodKey]] < (amt as number) * frac) return false;
+    const gi = Good[g as GoodKey];
+    const want = (amt as number) * frac;
+    const have = civ.stock[gi];
+    if (have >= want) continue;
+    const sub = Math.min(want * concreteShare(civ, gi), want - have);
+    if (have + sub < want - 1e-9 || stoneLeft < sub * CONCRETE_RATIO) return false;
+    stoneLeft -= sub * CONCRETE_RATIO;
   }
   return true;
 }
@@ -127,7 +144,8 @@ function bestResidential(civ: Civ, s: Settlement, landScarce: boolean): Building
     if ((def.housingTier ?? 0) > tierCap) continue;
     if (def.id !== B.CAMP && !hasUnlocked(civ, def.id)) continue;
     if (def.id === B.SUBURB && (landScarce || s.pop < 20000 || civ.caps.roadTier < 3)) continue;
-    if ((def.housingTier ?? 0) >= (best.housingTier ?? 0)) best = def;
+    // the best dwelling the nation can actually build (a tower nobody can afford houses nobody)
+    if ((def.housingTier ?? 0) >= (best.housingTier ?? 0) && (def.id === B.CAMP || canAfford(civ, def))) best = def;
   }
   // suburbs are an alternative, not a replacement, for dense housing
   if (best.id === B.SUBURB) best = RESIDENTIAL.filter((d) => d.id !== B.SUBURB && (d.housingTier ?? 0) <= tierCap && (d.id === B.CAMP || hasUnlocked(civ, d.id))).pop() ?? best;
@@ -308,7 +326,11 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   const smithyTarget = pop / 8000;
   if (pop > 150 && caps.metalTier >= 1) add(B.SMITHY, 1 + (smithyTarget - s.bld[B.SMITHY]) * 1.5);
   if (caps.industry > 0) add(B.FACTORY, 1.5 + unemployed * 20 + pop / 20000 - s.bld[B.FACTORY] * 0.8);
-  if (caps.industry > 0 && civ.stock[Good.METAL] < civ.population * 0.01) add(B.STEEL_MILL, 2);
+  // the steel industry grows with metal scarcity whenever ore and fuel can be had
+  if (caps.industry > 0 && (civ.access[Good.IRON] > 0.2 || civ.stock[Good.IRON] > 100) && (civ.access[Good.COAL] > 0.2 || civ.stock[Good.COAL] > 100)) {
+    const metalNeed = civ.population * 0.01 + 1;
+    add(B.STEEL_MILL, 2 + 6 * saturate(Math.max(0, metalNeed - civ.stock[Good.METAL]), metalNeed) - s.bld[B.STEEL_MILL]);
+  }
   if (caps.oilExtraction > 0 && civ.stock[Good.OIL] > 100) add(B.REFINERY, 1.5);
   if (caps.computing > 0) add(B.CHIP_FAB, 1.2 + caps.computing * 0.2);
   if (caps.robotics > 0) add(B.ROBOT_FACTORY, 1 + caps.robotics);
@@ -380,7 +402,7 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   let siteTries = 0;
   let wishes = 0;
   for (const c of cands) {
-    if (siteTries >= 4) break;
+    if (siteTries >= 8) break;
     const def = BUILDINGS[c.type];
     if (!canAfford(civ, def)) {
       // record the unmet need so traders can supply it (top wishes only)
@@ -388,9 +410,16 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
       continue;
     }
     siteTries++;
-    const tile = c.upgrade !== undefined ? c.upgrade : findSite(sim, s, def);
+    let tile = c.upgrade !== undefined ? c.upgrade : findSite(sim, s, def);
+    let upgrade = c.upgrade !== undefined;
+    // Land-use intensification: a built-up city with a strong need (jobs, power, services) replaces
+    // its oldest, lowest-density housing instead of giving up -- as long as it is not overcrowded.
+    if (tile === null && c.score >= BALANCE.redevelopScore && pressure < 1.1 && redevelopable(def)) {
+      tile = oldestResidential(sim, s, residentialRank(resi.id));
+      upgrade = tile !== null;
+    }
     if (tile === null) continue;
-    startProject(sim, s, civ, c.type, tile, c.upgrade !== undefined);
+    startProject(sim, s, civ, c.type, tile, upgrade);
     return;
   }
 }
@@ -424,6 +453,12 @@ function oldestResidential(sim: Sim, s: Settlement, targetRank: number): number 
 }
 
 const REDEVELOPABLE = new Set(['industry', 'military', 'commerce', 'extraction']);
+
+const URBAN_PLACEMENTS = new Set(['urban', 'center', 'edge', 'open']);
+/** Buildings that may replace old housing in a full city (single-tile urban uses, not homes or farms). */
+function redevelopable(def: BuildingDef): boolean {
+  return def.footprint === 1 && def.category !== 'residential' && def.category !== 'food' && URBAN_PLACEMENTS.has(def.placement);
+}
 
 /**
  * Land-use competition: the outermost non-unique industrial/military/commercial/extraction district
@@ -515,10 +550,23 @@ export function progressConstruction(sim: Sim, s: Settlement, civ: Civ, builders
     if (job.need[g] <= 0) continue;
     const want = job.need[g] * frac;
     civ.acc.want[g] += want;
-    const got = Math.min(civ.stock[g] * access, want);
+    let got = Math.min(civ.stock[g] * access, want);
     civ.stock[g] -= got;
     civ.acc.use[g] += got;
     civ.acc.inv += got * civ.prices[g];
+    // concrete stands in for missing timber/steel (counted as stone use and investment)
+    // the allowance is a share of the job's materials when work starts, not of each month's remainder
+    // (otherwise repeated halving would let concrete replace all the steel)
+    job.subLeft ??= job.need.map((v, k) => v * concreteShare(civ, k));
+    if (got < want && job.subLeft[g] > 0) {
+      const maxSub = Math.min(want - got, job.subLeft[g]);
+      const stone = Math.min(civ.stock[Good.STONE] * access, maxSub * CONCRETE_RATIO);
+      civ.stock[Good.STONE] -= stone;
+      civ.acc.use[Good.STONE] += stone;
+      civ.acc.inv += stone * civ.prices[Good.STONE];
+      got += stone / CONCRETE_RATIO;
+      job.subLeft[g] -= stone / CONCRETE_RATIO;
+    }
     job.need[g] -= got;
     if (want > 0) materialsOk = Math.min(materialsOk, got / want);
   }

@@ -24,6 +24,19 @@ import { createPerson, killPerson, absorbPerson } from './persons';
 /** Age-band famine vulnerability (young children and the elderly suffer most). */
 const VULN = [2.2, 1.1, 0.6, 0.5, 0.5, 0.5, 0.5, 0.5, 0.6, 0.7, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0];
 
+/**
+ * Annual death probability under hunger. Starvation is ADDITIVE to baseline mortality: medicine
+ * lowers ordinary deaths but does not make people need less food, so a modern population with a
+ * chronic calorie deficit dies of it too. The older multiplicative term is kept as a floor so
+ * pre-modern famines (where hunger amplifies disease) are unchanged.
+ */
+export function famineQ(q: number, hunger: number, vuln: number): number {
+  if (hunger <= 0) return q;
+  const mult = q * (1 + BALANCE.famineMortality * hunger * vuln);
+  const add = q + (1 - q) * Math.min(0.9, BALANCE.starvationMortality * hunger * hunger * vuln);
+  return clamp(Math.max(mult, add), 0, 0.95);
+}
+
 export const SPECIES_DEMOGRAPHY: Record<SpeciesKey, { oldMortality: number; fertility: number; maturity: number }> = {
   human: { oldMortality: 1, fertility: 1, maturity: 1 },
   sylvan: { oldMortality: 0.45, fertility: 0.7, maturity: 1.2 },
@@ -94,10 +107,13 @@ export function tfrFor(civ: Civ | undefined, s: { education: number; prosperity:
   if (civ) {
     const childSurvival = Math.pow(1 - q0, 5); // ~0.68 pre-modern .. 0.99 modern
     const survivalFactor = clamp01((childSurvival - 0.7) / 0.28);
-    const urban = clamp01(Math.log10(Math.max(1, s.pop) / 5000) / 2.5);
+    const urban = clamp01(Math.log10(Math.max(1, s.pop) / 5000) / 2);
     const dev = clamp01(0.35 * s.education + 0.3 * survivalFactor + 0.2 * urban + 0.15 * clamp01(s.prosperity / 1.6));
+    // Development drives the decline (child survival, schooling, cities, living standards); modern
+    // contraception accelerates it but does not gate it: European fertility fell from the 19th century,
+    // before modern methods existed. Below a development threshold fertility stays near natural.
     const access = clamp01(civ.caps.contraception);
-    const transition = clamp01(dev * (0.25 + 0.75 * access));
+    const transition = clamp01((dev - BALANCE.transitionOnset) / (BALANCE.transitionFull - BALANCE.transitionOnset)) * (0.65 + 0.35 * access);
     tfr = tfr - (tfr - BALANCE.tfrMin * sp.fertility) * transition;
     // cultural/religious pronatalism (small)
     tfr *= 1 + 0.08 * (civ.inst.religiousAuthority - 0.3);
@@ -125,7 +141,7 @@ export function cohortMonth(s: Settlement, ctx: DemoCtx, flows: DemographicFlows
   const hunger = 1 - clamp01(ctx.adequacy);
   for (let b = 0; b < AGE_BANDS; b++) {
     const base = 1 - Math.pow(1 - ctx.q[b], 1 / 12);
-    const qf = clamp(ctx.q[b] * (1 + BALANCE.famineMortality * hunger * VULN[b]), 0, 0.95);
+    const qf = famineQ(ctx.q[b], hunger, VULN[b]);
     const total = 1 - Math.pow(1 - qf, 1 / 12);
     const d = c[b] * total;
     deaths += c[b] * base;
@@ -200,7 +216,7 @@ export function individualMonth(sim: Sim, members: number[], ctx: DemoCtx, place
     if (p.traits.includes('frail')) q *= 1.4;
     if (p.traits.includes('strong')) q *= 0.75;
     const qBase = q;
-    q = clamp(q * (1 + BALANCE.famineMortality * hunger * VULN[b]), 0, 0.95);
+    q = famineQ(q, hunger, VULN[b]);
     const pm = 1 - Math.pow(1 - q, 1 / 12);
     if (rng.float() < pm) {
       const isFamine = rng.float() > qBase / q;
