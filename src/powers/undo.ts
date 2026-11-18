@@ -2,6 +2,7 @@
 import type { Sim } from '../sim/context';
 import { markTile, markOverlay } from '../sim/context';
 import { computeHydrology } from '../world/worldgen';
+import { mapShape } from '../world/mapShapes';
 
 interface TileSnap {
   i: number;
@@ -82,7 +83,7 @@ export class UndoStack {
  * drop terrain-derived plans (site surveys, routes) and redraw everything.
  */
 export function afterTerrainEdit(sim: Sim): void {
-  computeHydrology(sim.w.map, sim.w.meta.gen.rivers);
+  computeHydrology(sim.w.map, sim.w.meta.gen.rivers, mapShape(sim.w.meta.gen.shape).lakeMinMoist);
   sim.terrainVersion++;
   for (const s of sim.w.settlements.values()) {
     s.sites = undefined;
