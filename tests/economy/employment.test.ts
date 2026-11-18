@@ -55,3 +55,20 @@ describe('employment and national accounts (round-2 economy fixes)', () => {
     expect(civ.econ.gdp).toBeGreaterThan(-1e-6);
   });
 });
+
+describe('public debt stays finite (regression: seed ms-2 debt reached Infinity at year 589)', () => {
+  it('an over-indebted state with flat revenue defaults instead of compounding to infinity', () => {
+    const sim = makeSim('debt-1', 64, (c) => { c.settings.startEra = 7; });
+    sim.runYears(2);
+    const civ = [...sim.w.civs.values()].find((c) => c.alive && c.settlements.length)!;
+    civ.caps.banking = Math.max(1, civ.caps.banking);
+    for (let y = 0; y < 120; y++) {
+      // a state that always overspends: treasury drained, debt pre-loaded at 2x its income base
+      civ.treasury = 0;
+      if (y === 0) civ.debt = Math.max(1e4, (civ.acc.cons + civ.acc.inv) * 2);
+      civEconomyYearly(sim, civ, 0, 0);
+      expect(Number.isFinite(civ.debt), `year ${y}: debt ${civ.debt}`).toBe(true);
+      expect(Number.isFinite(civ.econ.spending)).toBe(true);
+    }
+  });
+});

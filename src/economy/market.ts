@@ -61,7 +61,10 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   // states borrow in wartime and crises (and only if they can borrow at all)
   const atWar = [...w.wars.values()].some((x) => !x.end && (x.attackers.includes(civ.id) || x.defenders.includes(civ.id)));
   if (civ.caps.banking > 0 && (atWar || civ.crisis > 0) && civ.treasury < revenue * 0.2) spending = revenue * (atWar ? 1.25 : 1.1);
-  const interest = civ.debt * (0.03 + BALANCE.debtPremium * (civ.debt / Math.max(1, baseIncome)) + (1 - civ.inst.ruleOfLaw) * 0.02);
+  // risk premium rises with indebtedness but saturates (lenders ration credit rather than charge 10^60%):
+  // without the cap, interest ~ debt² compounded to Infinity within a decade
+  const rate = Math.min(0.25, 0.03 + BALANCE.debtPremium * (civ.debt / Math.max(1, baseIncome)) + (1 - civ.inst.ruleOfLaw) * 0.02);
+  const interest = civ.debt * rate;
   civ.treasury += revenue - spending - interest;
   if (civ.treasury < 0) {
     if (civ.caps.centralBanking > 0 && civ.debt > baseIncome * 0.9) {
@@ -83,11 +86,13 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   }
   // debt crisis
   const debtRatio = civ.debt / Math.max(1, baseIncome);
-  if (debtRatio > 1.4 && baseIncome > 100 && interest > revenue * 0.35 && civ.crisis <= 0 && sim.year - ((sim.w.milestones[`default:${civ.id}`] as number | undefined) ?? -1e9) > 25) {
+  // unpayable debt (> 3x the income base) is restructured whatever the time since the last default
+  const unpayable = debtRatio > 3;
+  if (unpayable || (debtRatio > 1.4 && baseIncome > 100 && interest > revenue * 0.35 && civ.crisis <= 0 && sim.year - ((sim.w.milestones[`default:${civ.id}`] as number | undefined) ?? -1e9) > 25)) {
     sim.w.milestones[`default:${civ.id}`] = sim.year;
     civ.crisis = 3;
     civ.legitimacy = clamp01(civ.legitimacy - 0.12);
-    civ.debt *= 0.6; // default / restructuring
+    civ.debt = unpayable ? Math.max(1, baseIncome) : civ.debt * 0.6; // default / restructuring
     logEvent(sim, { type: 'debt_crisis', cat: 'economy', title: `${civ.name} defaulted on its debts`, civs: [civ.id], importance: 3, causes: [{ label: `Debt at ${Math.round(debtRatio * 100)}% of output`, weight: debtRatio }, { label: 'Interest exceeding a third of revenue', weight: interest / Math.max(1, revenue) }] });
   }
   // money & inflation (quantity-theory style)
