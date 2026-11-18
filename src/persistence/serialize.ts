@@ -11,6 +11,7 @@
  */
 import type { WorldState } from '../sim/types';
 import { TileMap } from '../world/tilemap';
+import { TERRAIN } from '../world/terrain';
 import { SAVE_VERSION } from '../config/laws';
 import { migrate } from './migrations';
 
@@ -109,7 +110,31 @@ export function encodeWorld(w: WorldState): Uint8Array {
   return out;
 }
 
+/** Largest world side a save may declare (the biggest preset is 320; headroom for custom sizes). */
+export const MAX_MAP_SIDE = 1024;
+/** Largest decompressed save accepted (a 512² world is ~7 MB; this guards against gzip bombs). */
+export const MAX_SAVE_BYTES = 256 * 1024 * 1024;
+
+const ARR_TYPES: ReadonlySet<string> = new Set(['u8', 'i8', 'u16', 'u32', 'f32']);
+const HEX = /^#[0-9a-f]{6}$/i;
+const isInt = (v: unknown, min = 0): v is number => Number.isSafeInteger(v) && (v as number) >= min;
+const isObj = (v: unknown): v is Record<string, any> => typeof v === 'object' && v !== null && !Array.isArray(v);
+
+/**
+ * Decode an EPCH world. Every value that sizes an allocation or indexes an array is validated first;
+ * any malformed input raises SaveError (never a raw TypeError/RangeError, never a half-valid world).
+ */
 export function decodeWorld(bytes: Uint8Array): WorldState {
+  try {
+    return decodeChecked(bytes);
+  } catch (e) {
+    if (e instanceof SaveError) throw e;
+    throw new SaveError(`Save file is malformed (${e instanceof Error ? e.message : String(e)})`);
+  }
+}
+
+function decodeChecked(bytes: Uint8Array): WorldState {
+  if (bytes.length < 8) throw new SaveError('Not an EPOCH world file');
   const magic = new TextDecoder().decode(bytes.subarray(0, 4));
   if (magic !== MAGIC) throw new SaveError('Not an EPOCH world file');
   const hlen = new DataView(bytes.buffer, bytes.byteOffset).getUint32(4, true);
@@ -120,20 +145,52 @@ export function decodeWorld(bytes: Uint8Array): WorldState {
   } catch {
     throw new SaveError('Save header is corrupted');
   }
+  if (!isObj(parsed)) throw new SaveError('Save header is corrupted');
   parsed = migrate(parsed);
-  const table: ArrEntry[] = parsed.table;
-  const binBytes = table.reduce((a, e) => Math.max(a, e.offset + Math.ceil(byteLen(e) / 4) * 4), 0);
-  const binStart = bytes.length - binBytes;
-  if (binStart < 8 + hlen) throw new SaveError('Save data is truncated');
-  const buf = bytes.buffer.slice(bytes.byteOffset + binStart, bytes.byteOffset + bytes.length) as ArrayBuffer;
+  if (!isObj(parsed) || !isObj(parsed.state) || !Array.isArray(parsed.table)) throw new SaveError('Save header is incomplete');
   const st = parsed.state;
-  const map = new TileMap(st.mapSize[0], st.mapSize[1]);
+  // --- map size bounds every allocation below
+  const [W, H] = Array.isArray(st.mapSize) ? st.mapSize : [];
+  if (!isInt(W, 1) || !isInt(H, 1) || W > MAX_MAP_SIDE || H > MAX_MAP_SIDE) throw new SaveError('Save declares an invalid world size');
+  const n = W * H;
+  // --- array table: known keys and types, in-bounds aligned ranges, exact lengths
+  const binStart = 8 + hlen + ((4 - ((8 + hlen) % 4)) % 4); // where encodeWorld writes the arrays
+  const binLen = bytes.length - binStart;
+  if (binLen < 0) throw new SaveError('Save data is truncated');
+  const fields = new Set<string>(TileMap.FIELDS as readonly string[]);
+  const table: ArrEntry[] = parsed.table;
+  const seen = new Set<string>();
+  for (const e of table) {
+    if (!isObj(e) || typeof e.key !== 'string' || !ARR_TYPES.has(e.type) || !isInt(e.offset) || !isInt(e.length) || e.offset % 4 !== 0) throw new SaveError('Save array table is corrupted');
+    const isMap = e.key.startsWith('map.') && fields.has(e.key.slice(4));
+    const isKnow = /^know\.\d+$/.test(e.key);
+    if (!isMap && !isKnow) throw new SaveError(`Unknown array "${e.key}" in save`);
+    if (isMap && e.length !== n) throw new SaveError(`Array ${e.key} does not match the world size`);
+    if (isKnow && e.length > n) throw new SaveError('Knowledge array is too large');
+    if (e.offset + byteLen(e) > binLen) throw new SaveError('Save data is truncated');
+    seen.add(e.key);
+  }
+  for (const f of fields) if (!seen.has('map.' + f)) throw new SaveError(`Save is missing map layer "${f}"`);
+  // --- state shape
+  if (!isInt(st.tick) || !Array.isArray(st.rng) || st.rng.length !== 4 || !st.rng.every((v: unknown) => isInt(v))) throw new SaveError('Save clock or random state is invalid');
+  if (!isObj(st.meta) || !isObj(st.laws) || !isObj(st.ids) || !isObj(st.climate) || !isObj(st.milestones) || !isObj(st.stats)) throw new SaveError('Save state is incomplete');
+  if (!Array.isArray(st.relations) || !Array.isArray(st.events)) throw new SaveError('Save state is incomplete');
+  for (const k of MAPS) {
+    const list = st[k] ?? [];
+    if (!Array.isArray(list) || !list.every((x: unknown) => isObj(x) && isInt(x.id, 1))) throw new SaveError(`Save list "${k}" is corrupted`);
+  }
+  for (const c of st.civs ?? []) if (!HEX.test(c.color) || (c.emblem && !HEX.test(c.emblem.c2))) throw new SaveError('Save contains an invalid nation colour');
+  validateStats(st.stats, W, H);
+  // --- build
+  const buf = bytes.buffer.slice(bytes.byteOffset + binStart, bytes.byteOffset + bytes.length) as ArrayBuffer;
+  const map = new TileMap(W, H);
   const knowledge = new Map<number, Uint32Array>();
   for (const e of table) {
     const arr = make(e.type, buf, e.offset, e.length);
     if (e.key.startsWith('map.')) (map as any)[e.key.slice(4)] = arr;
-    else if (e.key.startsWith('know.')) knowledge.set(Number(e.key.slice(5)), arr as Uint32Array);
+    else knowledge.set(Number(e.key.slice(5)), arr as Uint32Array);
   }
+  for (let i = 0; i < n; i++) if (map.terrain[i] >= TERRAIN.length) throw new SaveError('Save contains unknown terrain');
   const w: any = {
     meta: st.meta,
     laws: st.laws,
@@ -155,14 +212,57 @@ export function decodeWorld(bytes: Uint8Array): WorldState {
   return w as WorldState;
 }
 
+/** Statistics drive allocations and loops in the UI and sampler: bound them. */
+function validateStats(stats: any, W: number, H: number): void {
+  const series = (s: any) => {
+    if (!isObj(s) || !Array.isArray(s.years) || !isObj(s.data) || s.years.length > 1000) throw new SaveError('Save statistics are corrupted');
+    for (const k of Object.keys(s.data)) if (!Array.isArray(s.data[k]) || s.data[k].length !== s.years.length) throw new SaveError('Save statistics are corrupted');
+  };
+  series(stats.global);
+  if (!isObj(stats.civs)) throw new SaveError('Save statistics are corrupted');
+  for (const k of Object.keys(stats.civs)) series(stats.civs[k]);
+  if (stats.territory !== undefined) {
+    if (!Array.isArray(stats.territory) || stats.territory.length > 200) throw new SaveError('Save territory history is corrupted');
+    const tw = Math.ceil(W / 2), th = Math.ceil(H / 2);
+    for (const t of stats.territory) {
+      if (!isObj(t) || t.w !== tw || t.h !== th || !Array.isArray(t.rle)) throw new SaveError('Save territory history is corrupted');
+      let sum = 0;
+      for (let k = 1; k < t.rle.length; k += 2) sum += isInt(t.rle[k], 1) ? t.rle[k] : NaN;
+      if (sum !== tw * th) throw new SaveError('Save territory history is corrupted');
+    }
+  }
+}
+
 function byteLen(e: ArrEntry): number {
   return e.type === 'f32' || e.type === 'u32' ? e.length * 4 : e.type === 'u16' ? e.length * 2 : e.length;
 }
 
-async function pipe(bytes: Uint8Array, stream: CompressionStream | DecompressionStream): Promise<Uint8Array> {
-  const blob = new Blob([bytes as BlobPart]);
-  const res = new Response(blob.stream().pipeThrough(stream as any));
-  return new Uint8Array(await res.arrayBuffer());
+/** Gunzip with an output cap (throws SaveError past `limit` bytes; guards against decompression bombs). */
+export function gunzipCapped(bytes: Uint8Array, limit: number): Promise<Uint8Array> {
+  return pipe(bytes, new DecompressionStream('gzip'), limit);
+}
+
+async function pipe(bytes: Uint8Array, stream: CompressionStream | DecompressionStream, limit = Infinity): Promise<Uint8Array> {
+  const reader = (new Blob([bytes as BlobPart]).stream().pipeThrough(stream as any) as ReadableStream<Uint8Array>).getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.length;
+    if (total > limit) {
+      await reader.cancel();
+      throw new SaveError('Save is too large to load');
+    }
+    chunks.push(value);
+  }
+  const out = new Uint8Array(total);
+  let p = 0;
+  for (const c of chunks) {
+    out.set(c, p);
+    p += c.length;
+  }
+  return out;
 }
 
 /** Outer frame: "EPZ1" | u32 crc | u8 compressed? | payload. */
@@ -197,8 +297,9 @@ export async function unpackWorld(bytes: Uint8Array): Promise<WorldState> {
   if (bytes[8] === 1) {
     if (typeof DecompressionStream === 'undefined') throw new SaveError('This browser cannot read compressed saves');
     try {
-      body = await pipe(body, new DecompressionStream('gzip'));
-    } catch {
+      body = await gunzipCapped(body, MAX_SAVE_BYTES);
+    } catch (e) {
+      if (e instanceof SaveError) throw e;
       throw new SaveError('Save data is corrupted (decompression failed)');
     }
   }

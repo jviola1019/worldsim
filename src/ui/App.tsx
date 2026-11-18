@@ -23,7 +23,7 @@ export function App() {
   const [storeReady, setStoreReady] = useState(false);
 
   useEffect(() => {
-    store.open().then(() => setStoreReady(true));
+    store.open().finally(() => setStoreReady(true)); // ready even when storage is unavailable (import still works)
   }, []);
 
   const startWorld = async (cfg: WorldConfig) => {
@@ -33,6 +33,8 @@ export function App() {
       const s = await createWorldAsync(cfg);
       setSim(s);
       setScreen('game');
+    } catch (e) {
+      alert(`The world could not be created: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setBusy('');
     }

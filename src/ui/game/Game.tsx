@@ -134,11 +134,21 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
     let uiTimer = 0;
     let raf = 0;
     let saveTimer = 0;
+    let faulted = false;
     const loop = (now: number) => {
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
       const st = stateRef.current;
-      sim.advance(dt * 1000, SPEEDS[st.speed], 9);
+      try {
+        if (!faulted) sim.advance(dt * 1000, SPEEDS[st.speed], 9);
+      } catch (err) {
+        // never freeze silently, and never autosave a world in an inconsistent state
+        faulted = true;
+        st.speed = 0;
+        setSpeed(0);
+        toast(`The simulation stopped on an error and was paused (${err instanceof Error ? err.message : String(err)}). Your autosaves are untouched.`, true);
+        console.error(err);
+      }
       r.frame(dt);
       uiTimer += dt;
       if (uiTimer > 0.25) {
@@ -146,7 +156,7 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
         setUi((x) => x + 1);
       }
       saveTimer += dt;
-      if (prefs.autosaveMinutes > 0 && saveTimer > prefs.autosaveMinutes * 60 && store.available && st.speed > 0) {
+      if (!faulted && prefs.autosaveMinutes > 0 && saveTimer > prefs.autosaveMinutes * 60 && store.available && st.speed > 0) {
         saveTimer = 0;
         sim.syncRng();
         store.autosave(sim.w, r.thumbnail()).catch(() => toast('Autosave failed — storage may be full', true));

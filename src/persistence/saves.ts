@@ -53,7 +53,14 @@ export class SaveStore {
         if (!db.objectStoreNames.contains('meta')) db.createObjectStore('meta', { keyPath: 'slot' });
         if (!db.objectStoreNames.contains('data')) db.createObjectStore('data');
       };
-      this.db = await req(open);
+      // never hang: a blocked upgrade (another tab) or a stalled store degrades to "unavailable"
+      const db = await new Promise<IDBDatabase>((res, rej) => {
+        const timer = setTimeout(() => rej(new Error('Browser storage did not respond')), 8000);
+        open.onblocked = () => { clearTimeout(timer); rej(new Error('Storage is in use by another tab of this game')); };
+        req(open).then((d) => { clearTimeout(timer); res(d); }, (e) => { clearTimeout(timer); rej(e); });
+      });
+      db.onversionchange = () => db.close(); // let a newer tab upgrade instead of blocking it
+      this.db = db;
       this.available = true;
     } catch (e) {
       this.available = false;
@@ -88,8 +95,13 @@ export class SaveStore {
       ...extra,
     };
     const tx = this.db.transaction(['meta', 'data'], 'readwrite');
-    tx.objectStore('data').put(bytes, slot);
-    tx.objectStore('meta').put(meta);
+    try {
+      tx.objectStore('data').put(bytes, slot);
+      tx.objectStore('meta').put(meta);
+    } catch (e) {
+      tx.abort(); // all-or-nothing: never data without its slot entry, or a slot entry for old data
+      throw e instanceof SaveError ? e : new SaveError('Save failed: ' + (e instanceof Error ? e.message : String(e)));
+    }
     await new Promise<void>((res, rej) => {
       tx.oncomplete = () => res();
       tx.onerror = () => rej(tx.error ?? new SaveError('Save failed'));
@@ -111,7 +123,11 @@ export class SaveStore {
     const tx = this.db.transaction(['meta', 'data'], 'readwrite');
     tx.objectStore('meta').delete(slot);
     tx.objectStore('data').delete(slot);
-    await new Promise<void>((res) => (tx.oncomplete = () => res()));
+    await new Promise<void>((res, rej) => {
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error ?? new SaveError('Delete failed'));
+      tx.onabort = () => rej(tx.error ?? new SaveError('Delete aborted'));
+    });
   }
 
   /** Autosave alternates between two slots so one good copy always survives. */

@@ -6,9 +6,11 @@
   "description": "EPOCH: Civilizations Unbound - a pixel-art civilization god simulator for mobile and desktop browsers",
   "license": "MIT",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite",
+    "dev:lan": "vite --host",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview --host",
+    "preview": "vite preview",
+    "preview:lan": "vite preview --host",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

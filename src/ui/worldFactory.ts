@@ -20,11 +20,20 @@ function genInWorker(cfg: WorldConfig): Promise<WorldGenResult> {
     }, 30000);
     worker.onmessage = (e) => {
       clearTimeout(timer);
-      const { w, h, latSpan, arrays } = e.data;
-      const map = new TileMap(w, h);
-      for (const f of TileMap.FIELDS) (map as any)[f] = arrays[f];
       worker.terminate();
-      resolve({ map, latSpan });
+      try {
+        const { w, h, latSpan, arrays } = e.data;
+        const map = new TileMap(w, h);
+        for (const f of TileMap.FIELDS) (map as any)[f] = arrays[f];
+        resolve({ map, latSpan });
+      } catch (err) {
+        reject(err); // never leave world creation hanging (the caller falls back to the main thread)
+      }
+    };
+    worker.onmessageerror = () => {
+      clearTimeout(timer);
+      worker.terminate();
+      reject(new Error('worker message could not be read'));
     };
     worker.onerror = (err) => {
       clearTimeout(timer);

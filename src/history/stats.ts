@@ -21,7 +21,10 @@ function push(store: SeriesStore, year: number, values: Record<string, number>):
   for (const [k, v] of Object.entries(values)) (store.data[k] ??= []).push(Number.isFinite(v) ? v : 0);
   // pad missing series
   const n = store.years.length;
-  for (const k of Object.keys(store.data)) while (store.data[k].length < n) store.data[k].unshift(0);
+  for (const k of Object.keys(store.data)) {
+    const a = store.data[k];
+    if (a.length < n) store.data[k] = new Array(n - a.length).fill(0).concat(a); // one pass (was O(n²) unshift)
+  }
 }
 
 function decimate(store: SeriesStore): void {

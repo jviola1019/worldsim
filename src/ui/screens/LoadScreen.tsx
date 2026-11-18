@@ -26,6 +26,8 @@ export function LoadScreen({ back, open, setBusy }: { back: () => void; open: (w
   const importFile = async (f: File) => {
     setBusy('Importing world…');
     try {
+      // a real save is a few MB; refuse anything far larger before reading it into memory
+      if (f.size > 64 * 1024 * 1024) throw new Error('the file is too large to be an EPOCH world');
       open(await importBytes(new Uint8Array(await f.arrayBuffer())));
     } catch (e) {
       setError(`Could not import "${f.name}": ${e instanceof Error ? e.message : e}`);
