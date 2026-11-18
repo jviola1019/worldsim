@@ -1,5 +1,6 @@
 import { useState } from 'preact/hooks';
-import { defaultConfig, PRESETS, WORLD_SIZES, randomizeConfig, randomSeedString, type WorldConfig } from '../../config/laws';
+import { applyMapShape, defaultConfig, PRESETS, WORLD_SIZES, randomizeConfig, randomSeedString, type WorldConfig } from '../../config/laws';
+import { MAP_SHAPES, SHAPE_FAMILY_LABELS, mapShape, type MapShape, type MapShapeFamily } from '../../world/mapShapes';
 import { ERA_NAMES } from '../../technology/techData';
 import { SCENARIOS } from '../../scenarios/scenarios';
 
@@ -11,6 +12,27 @@ function Slider({ label, value, min, max, step, onInput, show }: { label: string
         <span>{show ? show(value) : value.toFixed(2)}</span>
       </div>
       <input type="range" min={min} max={max} step={step} value={value} aria-label={label} onInput={(e) => onInput(Number((e.target as HTMLInputElement).value))} />
+    </div>
+  );
+}
+
+const SHAPE_FAMILIES = Object.keys(SHAPE_FAMILY_LABELS) as MapShapeFamily[];
+
+/** Map shape picker: a native select grouped by family (compact and touch-friendly), with the shape's description below. */
+function MapShapeField({ value, onChange }: { value: MapShape; onChange: (key: MapShape) => void }) {
+  return (
+    <div class="field">
+      <label for="wshape">Map shape</label>
+      <select id="wshape" value={value} onChange={(e) => onChange((e.target as HTMLSelectElement).value as MapShape)}>
+        {SHAPE_FAMILIES.map((fam) => (
+          <optgroup key={fam} label={SHAPE_FAMILY_LABELS[fam]}>
+            {MAP_SHAPES.filter((s) => s.family === fam).map((s) => (
+              <option key={s.key} value={s.key}>{s.name}</option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+      <span class="footnote">{mapShape(value).description}</span>
     </div>
   );
 }
@@ -43,6 +65,8 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
     }
     const sc = SCENARIOS.find((x) => x.key === key);
     if (sc) sc.apply(c);
+    const shape = cfg.gen.shape ?? 'natural';
+    if (shape !== 'natural') applyMapShape(c.gen, shape); // keep the chosen map shape across presets
     setPreset(key);
     setCfg(c);
   };
@@ -91,6 +115,7 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
         </section>
         <section class="fieldset">
           <h2>Geography</h2>
+          <MapShapeField value={cfg.gen.shape ?? 'natural'} onChange={(key) => set((c) => applyMapShape(c.gen, key))} />
           <div class="field">
             <label>Landmass</label>
             <div class="seg">
@@ -101,13 +126,13 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
               ))}
             </div>
           </div>
-          <Slider label="Ocean coverage" value={cfg.gen.oceanCoverage} min={0.25} max={0.85} step={0.01} onInput={(v) => set((c) => (c.gen.oceanCoverage = v))} show={(v) => `${Math.round(v * 100)}%`} />
+          <Slider label="Ocean coverage" value={cfg.gen.oceanCoverage} min={0.1} max={0.9} step={0.01} onInput={(v) => set((c) => (c.gen.oceanCoverage = v))} show={(v) => `${Math.round(v * 100)}%`} />
           <Slider label="Continental fragmentation" value={cfg.gen.fragmentation} min={0} max={1} step={0.01} onInput={(v) => set((c) => (c.gen.fragmentation = v))} show={lvl} />
           <Slider label="Mountains" value={cfg.gen.mountains} min={0} max={1} step={0.01} onInput={(v) => set((c) => (c.gen.mountains = v))} show={lvl} />
           <Slider label="Rivers" value={cfg.gen.rivers} min={0} max={1} step={0.01} onInput={(v) => set((c) => (c.gen.rivers = v))} show={lvl} />
           <Slider label="Climate variation" value={cfg.gen.climateVariation} min={0} max={1} step={0.01} onInput={(v) => set((c) => (c.gen.climateVariation = v))} show={lvl} />
-          <Slider label="Temperature" value={cfg.gen.temperature} min={-1} max={1} step={0.05} onInput={(v) => set((c) => (c.gen.temperature = v))} show={(v) => (v < -0.3 ? 'Ice age' : v > 0.3 ? 'Hothouse' : 'Temperate')} />
-          <Slider label="Moisture" value={cfg.gen.moisture} min={-1} max={1} step={0.05} onInput={(v) => set((c) => (c.gen.moisture = v))} show={(v) => (v < -0.3 ? 'Arid' : v > 0.3 ? 'Wet' : 'Moderate')} />
+          <Slider label="Temperature" value={cfg.gen.temperature} min={-2} max={2} step={0.05} onInput={(v) => set((c) => (c.gen.temperature = v))} show={(v) => (v < -1.2 ? 'Frozen' : v < -0.3 ? 'Ice age' : v > 1.2 ? 'Scorching' : v > 0.3 ? 'Hothouse' : 'Temperate')} />
+          <Slider label="Moisture" value={cfg.gen.moisture} min={-2} max={2} step={0.05} onInput={(v) => set((c) => (c.gen.moisture = v))} show={(v) => (v < -1.2 ? 'Desert world' : v < -0.3 ? 'Arid' : v > 1.2 ? 'Drenched' : v > 0.3 ? 'Wet' : 'Moderate')} />
           <Slider label="Resource abundance" value={cfg.gen.resources} min={0.2} max={2} step={0.05} onInput={(v) => set((c) => (c.gen.resources = v))} show={mult} />
         </section>
         <section class="fieldset">

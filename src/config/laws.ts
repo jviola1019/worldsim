@@ -1,6 +1,7 @@
 import type { WorldLaws, WorldSettings } from '../sim/types';
 import type { WorldGenParams } from '../world/worldgen';
 import { DEFAULT_GEN } from '../world/worldgen';
+import { mapShape, type MapShape } from '../world/mapShapes';
 
 export const ENGINE_VERSION = '0.1.0';
 export const SAVE_VERSION = 1;
@@ -167,6 +168,15 @@ export const PRESETS: Preset[] = [
     apply: () => {},
   },
 ];
+
+/** Geography knobs a map shape may set; reset to defaults when a shape is chosen. */
+const SHAPE_KNOBS = ['landmass', 'oceanCoverage', 'fragmentation', 'mountains', 'rivers', 'climateVariation', 'temperature', 'moisture'] as const;
+
+/** Select a map shape: geography knobs go back to defaults, then take the shape's values. */
+export function applyMapShape(gen: WorldGenParams, key: MapShape): WorldGenParams {
+  const defaults = Object.fromEntries(SHAPE_KNOBS.map((k) => [k, DEFAULT_GEN[k]]));
+  return Object.assign(gen, defaults, mapShape(key).knobs, { shape: key });
+}
 
 export function defaultConfig(): WorldConfig {
   return {

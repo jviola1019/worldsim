@@ -21,6 +21,9 @@
  *     elevation classes, beaches, wetlands and volcanic land.
  *  8. Soil fertility, vegetation and geology-aware resource deposits.
  *
+ * A map shape (mapShapes.ts) can steer steps 1-2 with a land mask, add
+ * relief, mirror the terrain, dry out basins and green river corridors.
+ *
  * These are stylized physical abstractions — plausible patterns, not a
  * geophysical model. See docs/MODEL.md.
  */
@@ -31,6 +34,7 @@ import { clamp, clamp01, lerp, smoothstep, DX8, DY8, DX4, DY4 } from '../core/ma
 import { TileMap, HAZARD } from './tilemap';
 import { T, TERRAIN, isWaterTerrain } from './terrain';
 import { Deposit, DEPOSITS } from './resources';
+import { buildShapeField, mapShape, type MapShape } from './mapShapes';
 
 export type LandmassType = 'continents' | 'pangaea' | 'archipelago' | 'islands';
 
@@ -39,7 +43,7 @@ export interface WorldGenParams {
   width: number;
   height: number;
   landmass: LandmassType;
-  /** Fraction of the map covered by water, 0.2..0.9. */
+  /** Fraction of the map covered by water, 0.1..0.9. */
   oceanCoverage: number;
   /** 0 = few large plates/smooth coasts, 1 = many plates/fragmented coasts. */
   fragmentation: number;
@@ -49,14 +53,16 @@ export interface WorldGenParams {
   rivers: number;
   /** Latitude span / climate contrast 0..1. */
   climateVariation: number;
-  /** Planet temperature offset -1 (ice age) .. 1 (hothouse). */
+  /** Planet temperature offset, -2 (frozen) .. 2 (hothouse); 1 unit = 9 degrees C. */
   temperature: number;
-  /** Planet moisture -1 (arid) .. 1 (wet). */
+  /** Planet moisture, -2 (desert world) .. 2 (wet); each unit doubles or halves rainfall. */
   moisture: number;
   /** Resource abundance multiplier 0..2. */
   resources: number;
   alien: boolean;
   fantasy: boolean;
+  /** Map shape preset; missing (older saves) means 'natural'. */
+  shape?: MapShape;
 }
 
 export const DEFAULT_GEN: WorldGenParams = {
@@ -74,6 +80,7 @@ export const DEFAULT_GEN: WorldGenParams = {
   resources: 1,
   alien: false,
   fantasy: false,
+  shape: 'natural',
 };
 
 export interface WorldGenResult {
@@ -125,6 +132,8 @@ export function generateWorld(p: WorldGenParams): WorldGenResult {
   const nRidge = new Simplex2(p.seed + ':ridge');
   const nClim = new Simplex2(p.seed + ':climate');
   const map = new TileMap(W, H);
+  const shape = mapShape(p.shape);
+  const field = buildShapeField(shape, W, H, p.seed);
 
   // ---------- 1. tectonic plates ----------
   const sizeFactor = Math.sqrt(n / 65536);
@@ -166,18 +175,23 @@ export function generateWorld(p: WorldGenParams): WorldGenResult {
   // choose continental plates
   const continental = new Uint8Array(plateCount);
   const targetLand = (1 - p.oceanCoverage) * n * 1.25;
-  const order = Array.from({ length: plateCount }, (_, k) => k);
-  if (p.landmass === 'pangaea') {
-    order.sort((a, b) => (px[a] - W / 2) ** 2 + (py[a] - H / 2) ** 2 - ((px[b] - W / 2) ** 2 + (py[b] - H / 2) ** 2));
+  if (field) {
+    // a shaped world: plates whose seed lies inside the outline carry continental crust
+    for (let k = 0; k < plateCount; k++) continental[k] = field[Math.floor(py[k]) * W + Math.floor(px[k])] > 0 ? 1 : 0;
   } else {
-    rng.shuffle(order);
-  }
-  let landArea = 0;
-  for (const k of order) {
-    if (landArea >= targetLand) break;
-    if (p.landmass === 'islands' && landArea > targetLand * 0.4) break;
-    continental[k] = 1;
-    landArea += area[k];
+    const order = Array.from({ length: plateCount }, (_, k) => k);
+    if (p.landmass === 'pangaea') {
+      order.sort((a, b) => (px[a] - W / 2) ** 2 + (py[a] - H / 2) ** 2 - ((px[b] - W / 2) ** 2 + (py[b] - H / 2) ** 2));
+    } else {
+      rng.shuffle(order);
+    }
+    let landArea = 0;
+    for (const k of order) {
+      if (landArea >= targetLand) break;
+      if (p.landmass === 'islands' && landArea > targetLand * 0.4) break;
+      continental[k] = 1;
+      landArea += area[k];
+    }
   }
 
   // ---------- 2. boundary effects (multi-source BFS) ----------
@@ -235,6 +249,7 @@ export function generateWorld(p: WorldGenParams): WorldGenResult {
   const e = new Float32Array(n);
   for (let i = 0; i < n; i++) e[i] = continental[plate[i]] ? 0.42 : -0.5;
   boxBlur(e, W, H, Math.max(2, Math.round(S * 0.03)), 3);
+  if (field) blendShapeField(e, field);
   const f = lerp(2.2, 5.5, p.fragmentation) / S;
   const ridgeF = 4.5 / S;
   const mStrength = lerp(0.25, 1.25, p.mountains);
@@ -270,6 +285,8 @@ export function generateWorld(p: WorldGenParams): WorldGenResult {
       // ancient interior ranges
       const r2 = nRidge.ridged(x * ridgeF * 0.7 + 50, y * ridgeF * 0.7 - 20, 4);
       v += p.mountains * 0.22 * Math.max(0, r2 - 0.55);
+      // highland worlds: broad massifs of ridged uplift, valleys left between the ridges
+      if (shape.relief) v += shape.relief * Math.max(0, nRidge.ridged(x * ridgeF * 1.3 - 70, y * ridgeF * 1.3 + 40, 5) - 0.35);
       for (const [hx, hy, hr, ha] of hotspots) {
         const d2 = (x - hx) ** 2 + (y - hy) ** 2;
         if (d2 < hr * hr * 9) v += ha * Math.exp(-d2 / (2 * hr * hr));
@@ -283,6 +300,7 @@ export function generateWorld(p: WorldGenParams): WorldGenResult {
       if (edge < 1) v -= (1 - edge) * (1 - edge) * 1.3;
       e[i] = v;
     }
+  if (shape.mirror) mirrorWestToEast(e, W, H);
   // sea level by quantile
   const sea = quantile(e, clamp(p.oceanCoverage, 0.05, 0.95));
   let minWater = -1e-6;
@@ -296,9 +314,11 @@ export function generateWorld(p: WorldGenParams): WorldGenResult {
   // normalize land by a high percentile (not the single highest peak) so that
   // mountain/hill fractions are stable across seeds; the mountains parameter
   // shifts that percentile.
-  const pk = landElev.length ? landElev[Math.floor((landElev.length - 1) * lerp(0.995, 0.955, p.mountains))] : 1;
+  const peakQ = shape.peakQuantile ?? lerp(0.995, 0.955, p.mountains);
+  const pk = landElev.length ? landElev[Math.floor((landElev.length - 1) * peakQ)] : 1;
+  const reliefCurve = shape.reliefCurve ?? 1.1;
   for (let i = 0; i < n; i++) {
-    if (e[i] > 0) e[i] = Math.min(1, Math.pow(e[i] / pk, 1.1));
+    if (e[i] > 0) e[i] = Math.min(1, Math.pow(e[i] / pk, reliefCurve));
     else e[i] = -Math.pow(e[i] / minWater, 0.8);
     if (e[i] > 0 && e[i] < 0.004) e[i] = 0.004;
   }
@@ -307,13 +327,53 @@ export function generateWorld(p: WorldGenParams): WorldGenResult {
   const latSpan = lerp(48, 85, p.climateVariation);
   computeTemperature(map, latSpan, p.temperature, nClim);
   computeMoisture(map, latSpan, p.moisture, nClim);
-  computeHydrology(map, p.rivers);
+  computeHydrology(map, p.rivers, shape.lakeMinMoist);
+  if (shape.riparianMoisture) greenRiparianZones(map, shape.riparianMoisture);
   carveAndSmooth(map);
   computeTemperature(map, latSpan, p.temperature, nClim);
   classifyBiomes(map, rng, bDist, bConv, bOcean, R, p);
   computeSoilAndVegetation(map, rng, nClim);
   placeDeposits(map, rng, bDist, R, p);
   return { map, latSpan };
+}
+
+/**
+ * Replace most of the random plate base with the shape's land target. A
+ * little plate base is kept so shelves and interior basins still vary. The
+ * sea side sinks steeply (a sharp continental margin) while the land side is
+ * raised only gently, so interiors stay lowland and relief comes from the
+ * usual ridges and noise rather than from one high plateau.
+ */
+function blendShapeField(e: Float32Array, field: Float32Array): void {
+  for (let i = 0; i < e.length; i++) e[i] = 0.2 * e[i] + field[i] * (field[i] > 0 ? 0.12 : 0.6);
+}
+
+/** Mirror-symmetric world: the east half becomes the reflection of the west half. */
+function mirrorWestToEast(e: Float32Array, W: number, H: number): void {
+  for (let y = 0; y < H; y++) for (let x = 0; x < W >> 1; x++) e[y * W + (W - 1 - x)] = e[y * W + x];
+}
+
+/**
+ * Riparian greening: rivers and lakes feed groundwater to their banks, so
+ * floodplains stay green even where rain is scarce (desert river valleys).
+ * Raises moisture next to fresh water to at least `minMoist`.
+ */
+function greenRiparianZones(map: TileMap, minMoist: number): void {
+  const { w: W, h: H, n } = map;
+  // runs before biome classification, so land is read from elevation, not terrain
+  const wet = (j: number) => map.terrain[j] === T.LAKE || (map.river[j] > 0 && map.elev[j] > 0);
+  for (let i = 0; i < n; i++) {
+    if (map.elev[i] <= 0 || map.terrain[i] === T.LAKE || map.moist[i] >= minMoist) continue;
+    const x = i % W;
+    const y = (i / W) | 0;
+    let near = map.river[i] > 0;
+    for (let d = 0; d < 8 && !near; d++) {
+      const nx = x + DX8[d];
+      const ny = y + DY8[d];
+      if (nx >= 0 && ny >= 0 && nx < W && ny < H) near = wet(ny * W + nx);
+    }
+    if (near) map.moist[i] = minMoist;
+  }
 }
 
 /** Annual mean temperature from latitude, elevation and noise. */
@@ -392,12 +452,17 @@ export function computeMoisture(map: TileMap, latSpan: number, moistureParam: nu
   for (let i = 0; i < n; i++) map.moist[i] = clamp(Math.round(255 * (1 - Math.exp((-0.6 * mult * precip[i]) / med))), 0, 255);
 }
 
+/** Basin depth (elevation units) below which a dry basin cannot reach groundwater. */
+const SPRING_DEPTH = 0.05;
+/** Largest pool (tiles) that springs alone can keep filled against evaporation. */
+const SPRING_MAX_TILES = 30;
+
 /**
  * Priority-flood depression filling, lake formation, D8 flow directions and
  * rainfall-weighted flow accumulation -> rivers. Safe to call again after
  * terrain edits (god powers): existing lakes are re-derived from elevation.
  */
-export function computeHydrology(map: TileMap, riverDensity: number): void {
+export function computeHydrology(map: TileMap, riverDensity: number, lakeMinMoist = 0): void {
   const { w: W, h: H, n } = map;
   const e = map.elev;
   const filled = new Float32Array(n);
@@ -456,7 +521,17 @@ export function computeHydrology(map: TileMap, riverDensity: number): void {
         }
       }
     }
-    const asLake = members.length >= 3;
+    // A basin holds a lake if rain keeps up with evaporation, or if it is a
+    // small, deep pit reaching groundwater (a spring-fed oasis: evaporation
+    // grows with area, so springs only sustain small pools). Other dry basins
+    // stay dry flats (playas).
+    let wet = 0;
+    let depth = 0;
+    for (const m of members) {
+      wet += map.moist[m];
+      depth = Math.max(depth, filled[m] - e[m]);
+    }
+    const asLake = members.length >= 3 && (wet / members.length >= lakeMinMoist || (depth >= SPRING_DEPTH && members.length <= SPRING_MAX_TILES));
     for (const m of members) {
       if (asLake) map.terrain[m] = T.LAKE;
       else {
