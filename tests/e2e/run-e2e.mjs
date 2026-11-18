@@ -46,6 +46,15 @@ async function run(label, ctxOpts) {
   await page.getByLabel('Nations').click();
   const flags = await page.locator('img.flag').count();
   check(`${label}: nations list renders flags`, flags > 0, `${flags} flags`);
+  // nation overview: key figures, live aerial photo and postcard, album tab
+  await page.locator('.sheet-body ul.list li button').first().click();
+  await page.waitForTimeout(800);
+  const pics = await page.locator('.photo canvas').count();
+  const tiles = await page.locator('.stat-tile').count();
+  check(`${label}: nation overview shows key figures and city pictures`, pics >= 2 && tiles >= 6, `${tiles} figures, ${pics} pictures`);
+  await page.getByRole('tab', { name: 'Album' }).click();
+  await page.waitForTimeout(300);
+  check(`${label}: album tab opens`, (await page.locator('.album, .sheet-body p.muted').count()) > 0);
   await page.getByLabel('Close').first().click();
   // news feed: posts in the medium of their time
   await page.getByLabel('News feed').click();

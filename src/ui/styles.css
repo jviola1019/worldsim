@@ -306,3 +306,15 @@ img.flag { image-rendering: pixelated; border: 1px solid rgba(0,0,0,.5); box-sha
 .frame-holo .frame-title { text-shadow: 0 0 8px rgba(79,227,255,.7); }
 .frame-holo .frame-side { background: rgba(79,227,255,.08); border: 1px solid rgba(79,227,255,.4); }
 @container (min-width: 620px) { .frame-holo .frame-body { grid-template-columns: 1fr 190px; } }
+
+/* ---------------------------------------------------------------- nation overview: key figures and pictures */
+.stat-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-bottom: 8px; }
+.stat-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px; border-radius: 8px; border: 2px solid var(--line); background: rgba(255,255,255,.04); color: inherit; text-align: left; min-width: 0; }
+.stat-tile .v { font-weight: 800; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.stat-tile .k { font-size: 11px; opacity: .75; }
+.photo-row { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.photo { margin: 0; }
+.photo canvas { width: 100%; height: auto; border-radius: 6px; image-rendering: pixelated; display: block; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+.photo canvas.aerial { aspect-ratio: 1; }
+.photo figcaption { justify-content: space-between; margin-top: 4px; }
+.album { display: grid; grid-template-columns: 1fr; gap: 12px; }

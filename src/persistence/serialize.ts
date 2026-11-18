@@ -94,6 +94,7 @@ export function encodeWorld(w: WorldState): Uint8Array {
     popLedger: w.popLedger,
     speciesStatus: w.speciesStatus,
     sports: w.sports,
+    album: w.album,
   };
   for (const k of MAPS) state[k] = [...(w[k] as Map<number, unknown>).values()];
   const header = JSON.stringify({ format: 'epoch-world', saveVersion: SAVE_VERSION, engineVersion: w.meta.engineVersion, state, table });
@@ -207,6 +208,7 @@ function decodeChecked(bytes: Uint8Array): WorldState {
     interventions: st.interventions ?? [],
     popLedger: st.popLedger,
     speciesStatus: st.speciesStatus ?? {},
+    album: Array.isArray(st.album) && st.album.length <= 5000 && st.album.every((a: any) => isObj(a) && typeof a.cols === 'string' && a.cols.length <= 4096 && isInt(a.n, 1) && a.n <= 256 && HEX.test(a.color)) ? st.album : undefined,
     sports: isObj(st.sports) && Array.isArray(st.sports.held) && Array.isArray(st.sports.cups) && Number.isFinite(st.sports.next) ? st.sports : undefined,
     knowledge,
   };

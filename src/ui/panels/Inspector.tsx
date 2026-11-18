@@ -3,6 +3,7 @@ import type { Simulation } from '../../sim/simulation';
 import type { Civ, HistoryEvent, Person, Settlement } from '../../sim/types';
 import { Icon, Kv, Bar, fmt, pct, Sprite, Flag } from '../shared';
 import { PostList } from './FeedPanel';
+import { CityPictures, Album } from './CivPhotos';
 import { ETHOS } from '../../civilizations/ethos';
 import { MISSIONS, missionMetric, assignMission, type MissionKind } from '../../civilizations/missions';
 import { BUILDINGS, SECTOR_NAMES } from '../../civilizations/buildings';
@@ -415,7 +416,7 @@ function ReligionView({ sim, sel, close }: P) {
   );
 }
 
-const TABS = ['Overview', 'Feed', 'History', 'Technology', 'Military', 'Economy', 'Culture', 'Diplomacy', 'Statistics'] as const;
+const TABS = ['Overview', 'Feed', 'Album', 'History', 'Technology', 'Military', 'Economy', 'Culture', 'Diplomacy', 'Statistics'] as const;
 
 function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>('Overview');
@@ -437,6 +438,15 @@ function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
       <div class="sheet-body">
         {tab === 'Overview' && (
           <>
+            <div class="stat-tiles" role="group" aria-label="Key figures (tap for details)">
+              <button class="stat-tile" onClick={() => setTab('Statistics')}><span class="v">{fmt(civ.population)}</span><span class="k">people</span></button>
+              <button class="stat-tile" onClick={() => setTab('History')}><span class="v">{(civ.alive ? sim.year : civ.fell ?? sim.year) - civ.founded}</span><span class="k">years {civ.alive ? 'alive' : 'lasted'}</span></button>
+              <button class="stat-tile" onClick={() => setTab('Technology')}><span class="v">{ERA_NAMES[civ.era]}</span><span class="k">era</span></button>
+              <button class="stat-tile" onClick={() => setTab('Economy')}><span class="v">{civ.econ.gdpPerCapita.toFixed(2)}</span><span class="k">output per person</span></button>
+              <button class="stat-tile" onClick={() => setTab('Military')}><span class="v">{fmt(civ.militaryPower)}</span><span class="k">military power</span></button>
+              <button class="stat-tile" onClick={() => setTab('Diplomacy')}><span class="v">{civ.knownCivs.length}</span><span class="k">known nations</span></button>
+            </div>
+            <CityPictures sim={sim} civ={civ} />
             <Kv rows={[
               ['People', fmt(civ.population)],
               ['Settlements', String(civ.settlements.length)],
@@ -477,6 +487,7 @@ function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
           </>
         )}
         {tab === 'Feed' && <PostList sim={sim} civId={civ.id} focus={focus} />}
+        {tab === 'Album' && <Album sim={sim} civ={civ} />}
         {tab === 'History' && <EventList sim={sim} ids={civ.events} focus={focus} limit={40} />}
         {tab === 'Technology' && <TechTab civ={civ} />}
         {tab === 'Military' && (

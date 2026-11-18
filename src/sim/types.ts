@@ -968,6 +968,8 @@ export interface WorldState {
   outlets: Map<number, MediaOutlet>;
   ais: Map<number, AISystem>;
   leagues: Map<number, import('../culture/sports').League>;
+  /** Postcard layout records every 50 years (absent before round 5). */
+  album?: import('../history/album').CitySnapshot[];
   /** World games and cups (absent before round 5). */
   sports?: import('../culture/sports').SportsState;
   relations: Map<string, Relation>;
