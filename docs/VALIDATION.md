@@ -113,7 +113,22 @@ Every seed checks three invariants:
 - `finiteOk`: no NaN or Infinity, and no negative stock.
 - `gdpOk`: the GDP identity holds.
 
-*Pending:* the 20-seed rerun after the public-debt fix (bug #4 in STATUS) is in progress. The run before that fix had 12 of 20 seeds passing all invariants. All 8 failures were `finiteOk`, caused by public debt compounding to Infinity, and that is now fixed and tested. The ledger and GDP identity held in all 20 seeds.
+| Metric (year 600, 96²) | Baseline `5571bc8`, 8 seeds (min / median / max) | Now, 20 holdout seeds (min / median / max) |
+|---|---|---|
+| Highest era index | 5 / 7 / 7 | 5 / 5 / 7 |
+| Year farming appears | 145 / 176 / 204 | 144 / 167 / 189 |
+| Nations alive | 5 / 8 / 11 | 5 / 7 / 10 |
+| Nations fallen | 1 / 3 / 8 | 0 / 2 / 7 |
+| Wars | 60 / 81 / 104 | 37 / 75 / 121 |
+| Annexations | 2 / 6 / 16 | 0 / 4 / 14 |
+| Religions | 12 / 19 / 29 | 6 / 16 / 30 |
+| Population | 0.72M / 1.17M / 1.86M | 0.61M / 0.99M / 1.83M |
+| ms per simulated year | 25.9 / 29.2 / 34.5 | 20.3 / 24.9 / 43 |
+| Invariants (ledger, finite and non-negative, GDP identity) | not measured | **20/20 seeds pass all three** |
+
+Highest era reached by year 600: era 5 in 15 seeds, era 7 in 5 seeds. Median annexations are well below median wars, so most wars end without total conquest (the plan's `notAlwaysTotalConquest` criterion).
+
+A run before the public-debt fix had 12 of 20 seeds passing. All 8 failures came from debt compounding to Infinity; see STATUS bug #4.
 
 ## 7. Performance
 

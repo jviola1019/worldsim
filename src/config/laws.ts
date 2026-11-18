@@ -82,6 +82,24 @@ export interface Preset {
 
 export const PRESETS: Preset[] = [
   {
+    key: 'realistic',
+    name: 'Realistic (observer)',
+    description: 'Earth-like world left entirely to itself: grounded technology, no fantasy, natural disasters and diseases on, and no god powers. Watch history happen.',
+    apply: (c) => {
+      c.settings.startEra = 1;
+      c.settings.startCivs = 5;
+      c.settings.realism = 'grounded';
+      c.settings.fantasy = false;
+      c.settings.alien = false;
+      c.settings.disasterFrequency = 1;
+      c.settings.observer = true;
+      c.laws.fantasyCreatures = false;
+      c.laws.speculativeTech = false;
+      c.laws.disasters = true;
+      c.laws.diseases = true;
+    },
+  },
+  {
     key: 'primitive',
     name: 'Primitive Earth',
     description: 'Earth-like continents. A handful of hunter-gatherer bands begin the long road to civilization.',

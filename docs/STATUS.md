@@ -29,7 +29,7 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 | R4–R6 | Civilizations, religion, government | Complete | Counterfactual tests #6 and #9; flags; secession; alliance obligations. |
 | R7 | Technology | Complete | #10: prerequisites hold across seeds, speculative technology is gated, diffusion needs contact. #3: education raises research capability, with no measurable effect on tech score within 30 years. |
 | R8.1–8.2 | Cities, transport | Complete | housingDrivesConstruction, roads (#2), buildingTierFollowsEra. |
-| R8.3 | Economy, accounting identities | Complete | GDP identity held in all 20 holdout seeds (pre-debt-fix run); the 20-seed rerun is pending in VALIDATION §6. ΔInventories counts quantity changes only, with no holding gains and no spoilage. Public debt can no longer reach Infinity. Unemployment follows service demand rather than a fixed rule. |
+| R8.3 | Economy, accounting identities | Complete | GDP identity, ledger and finiteness hold in 20/20 holdout seeds (VALIDATION §6). ΔInventories counts quantity changes only, with no holding gains and no spoilage. Public debt can no longer reach Infinity. Unemployment follows service demand rather than a fixed rule. |
 | R8.4 | Trade, embargoes, crises | Complete | Integration #8: an embargo hurts the dependent importer and trade recovers once it is lifted. tradeBalanceSumsToZero passes. |
 | R9 | War and diplomacy | Complete | War counterfactual (#4), recorded causes, alliance obligations. |
 | R10 | Disease, ecology, powers | Complete | Sanitation lowers deaths and predators reduce prey (both counterfactual). All 97 powers apply without error, and the ledger fuzzer applied random powers with no failures. |

@@ -218,6 +218,9 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
           {ticker.headline}
         </button>
       )}
+      {sim.w.meta.settings.observer ? (
+        <div class="observer-badge" role="status">Observer mode: history unfolds on its own (no god powers)</div>
+      ) : (
       <Dock
         tool={tool}
         setTool={pickTool}
@@ -231,6 +234,7 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
           }
         }}
       />
+      )}
       <div class="toast-stack" aria-live="polite">
         {toasts.map((t) => (
           <div key={t.id} class={'toast' + (t.warn ? ' warn' : '')}>

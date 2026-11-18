@@ -55,6 +55,8 @@ export interface WorldSettings {
   realism: RealismMode;
   alien: boolean;
   empty: boolean;
+  /** Observer mode: god powers are unavailable; history runs only on its own (Realistic preset). */
+  observer?: boolean;
 }
 
 export interface WorldMeta {
