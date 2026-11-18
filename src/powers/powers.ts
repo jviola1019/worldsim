@@ -5,6 +5,7 @@
  * Brush powers apply to a radius around the touched tile; tap powers act on
  * the settlement/civilization under the finger.
  */
+import { removeBuilding } from '../civilizations/urban';
 import { record, residents } from '../population/ledger';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement, SpeciesKey } from '../sim/types';
@@ -32,7 +33,7 @@ import { nuclearStrike } from '../military/war';
 import { infect } from '../population/disease';
 import { HAZARD } from '../world/tilemap';
 import { Good } from '../world/resources';
-import { UndoStack } from './undo';
+import { UndoStack, afterTerrainEdit } from './undo';
 
 export type PowerCategory = 'terrain' | 'nature' | 'civ' | 'religion' | 'tech' | 'diplomacy' | 'war' | 'disaster' | 'future' | 'laws';
 
@@ -84,7 +85,7 @@ function reclassify(sim: Sim, i: number): void {
   const m = sim.w.map;
   const e = m.elev[i];
   if (e <= 0) {
-    if (m.bld[i]) m.bld[i] = 0;
+    if (m.bld[i]) removeBuilding(sim, i, false); // keeps the town's district counts consistent
     m.terrain[i] = e < -0.42 ? T.DEEP : e < -0.1 ? T.OCEAN : T.SHALLOW;
     m.veg[i] = 0;
     return;
@@ -263,7 +264,7 @@ export const POWERS: PowerDef[] = [
         m.elev[i] = Math.max(m.elev[i], 0.64 + 0.3 * f);
         m.terrain[i] = T.MOUNTAIN;
         reclassify(sim, i);
-        if (m.bld[i]) m.bld[i] = 0;
+        if (m.bld[i]) removeBuilding(sim, i, false); // keeps the town's district counts consistent
       });
       return null;
     },
@@ -811,11 +812,7 @@ export function applyPower(sim: Sim, id: string, x: number, y: number, r: number
 export function endStroke(sim: Sim, id: string): void {
   const p = POWER_BY_ID[id];
   if (!p || p.cat !== 'terrain') return;
-  computeHydrology(sim.w.map, sim.w.meta.gen.rivers);
-  sim.terrainVersion++;
-  for (const s of sim.w.settlements.values()) {
-    s.sites = undefined;
-    s.routes = undefined; // planned paths may now cross new water or mountains
-  }
-  for (let k = 0; k < sim.chunkDirty.length; k++) sim.chunkDirty[k] = 1;
+  // rivers/lakes follow the new land; what they change (e.g. a valley flooded behind a new ridge)
+  // belongs to this stroke, so undo can give the valley back
+  undo.captureDerived(sim, () => afterTerrainEdit(sim));
 }

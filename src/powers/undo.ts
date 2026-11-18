@@ -1,6 +1,7 @@
 /** Undo for terrain-editing strokes: snapshots of each touched tile before the first change. */
 import type { Sim } from '../sim/context';
 import { markTile, markOverlay } from '../sim/context';
+import { computeHydrology } from '../world/worldgen';
 
 interface TileSnap {
   i: number;
@@ -37,6 +38,19 @@ export class UndoStack {
     this.current = null;
   }
 
+  /** Run a whole-map derived update and record, into the last stroke, the prior state of tiles it changed. */
+  captureDerived(sim: Sim, fn: () => void): void {
+    const m = sim.w.map;
+    const before = m.terrain.slice();
+    fn();
+    const last = this.strokes[this.strokes.length - 1];
+    if (!last) return;
+    for (let i = 0; i < m.n; i++) {
+      if (m.terrain[i] === before[i] || last.has(i)) continue;
+      last.set(i, { i, elev: m.elev[i], terrain: before[i], moist: m.moist[i], fert: m.fert[i], veg: m.veg[i], dep: m.dep[i], depAmt: m.depAmt[i], temp: m.temp[i] });
+    }
+  }
+
   get canUndo(): boolean {
     return this.strokes.length > 0;
   }
@@ -57,6 +71,21 @@ export class UndoStack {
       markTile(sim, t.i);
       markOverlay(sim, t.i);
     }
+    afterTerrainEdit(sim); // rivers/lakes and terrain-derived plans must follow the restored land
     return true;
   }
+}
+
+/**
+ * Shared follow-up after any terrain edit (a finished stroke or an undo): recompute rivers and lakes,
+ * drop terrain-derived plans (site surveys, routes) and redraw everything.
+ */
+export function afterTerrainEdit(sim: Sim): void {
+  computeHydrology(sim.w.map, sim.w.meta.gen.rivers);
+  sim.terrainVersion++;
+  for (const s of sim.w.settlements.values()) {
+    s.sites = undefined;
+    s.routes = undefined;
+  }
+  for (let k = 0; k < sim.chunkDirty.length; k++) sim.chunkDirty[k] = 1;
 }

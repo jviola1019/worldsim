@@ -116,8 +116,8 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
       },
       onStrokeEnd: (cancelled) => {
         undo.end();
-        if (cancelled) undo.undo(sim);
-        endStroke(sim, stateRef.current.tool);
+        if (cancelled) undo.undo(sim); // undo re-derives rivers itself
+        else endStroke(sim, stateRef.current.tool);
       },
       onHover: (sx, sy, visible) => {
         const p = POWER_BY_ID[stateRef.current.tool];
@@ -217,7 +217,6 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
         canUndo={undo.canUndo}
         onUndo={() => {
           if (undo.undo(sim)) {
-            endStroke(sim, 'raise');
             toast('Undid the last terrain edit');
           }
         }}
