@@ -23,7 +23,7 @@ There are no other runtime dependencies.
 | `history/` | Event log with causes, newspaper text, sampled statistics, **historical territory snapshots**. |
 | `persistence/` | Binary save format, IndexedDB slots, autosave rotation, export and import, migrations. |
 | `powers/` | God-power definitions (97 tools in 10 categories), undo stack. |
-| `rendering/` | Procedural pixel-art atlas (595 sprites), camera, chunked terrain layer, overlays (16), renderer, **procedural flags**. |
+| `rendering/` | Procedural pixel-art atlas (708 sprites; selection rules in `art/select.ts`), camera, chunked terrain layer, overlays (16), renderer, **procedural flags**. |
 | `ui/` | Screens, HUD, tool dock, inspectors, panels, charts, input classification, audio, preferences. |
 | `workers/` | World generation in a Web Worker, so the UI never freezes during creation. |
 

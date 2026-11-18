@@ -19,7 +19,8 @@
     "bench": "tsx benchmarks/sim-bench.ts",
     "bench:browser": "node benchmarks/browser-bench.mjs",
     "e2e": "node tests/e2e/run-e2e.mjs",
-    "sprites": "tsx tools/render-sprites.ts"
+    "sprites": "tsx tools/render-sprites.ts",
+    "sprites:sheet": "tsx tools/contact-sheet.ts"
   },
   "dependencies": {
     "preact": "10.29.8"

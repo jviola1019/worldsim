@@ -5,7 +5,9 @@
  */
 import { ALL_SPRITES } from './art/index';
 import type { SpriteDef } from './art/types';
-import { PALETTE, hexToRgb, teamShades } from './art/palette';
+import { teamShades } from './art/palette';
+import { rasterizeSprite } from './art/raster';
+import { BuildingSpriteIndex, type HousingStyle } from './art/select';
 
 export interface SpriteImg {
   canvas: HTMLCanvasElement;
@@ -20,46 +22,23 @@ export interface SpriteImg {
   team: boolean;
 }
 
-const rgbCache = new Map<string, [number, number, number]>();
-function rgbOf(key: string, team?: Record<string, string>): [number, number, number] {
-  if (team && (key === 'T' || key === 'U' || key === 'V')) return hexToRgb(team[key]);
-  let c = rgbCache.get(key);
-  if (!c) rgbCache.set(key, (c = hexToRgb(PALETTE[key] ?? '#ff00ff')));
-  return c;
-}
-
 function rasterize(def: SpriteDef, team?: Record<string, string>): HTMLCanvasElement {
-  const n = def.frames.length;
+  const img = rasterizeSprite(def, team);
   const c = document.createElement('canvas');
-  c.width = def.w * n;
-  c.height = def.h;
+  c.width = img.width;
+  c.height = img.height;
   const ctx = c.getContext('2d')!;
-  const img = ctx.createImageData(c.width, c.height);
-  for (let f = 0; f < n; f++) {
-    const rows = def.frames[f];
-    for (let y = 0; y < def.h; y++) {
-      const row = rows[y] ?? '';
-      for (let x = 0; x < def.w; x++) {
-        const ch = row[x];
-        if (!ch || ch === '.') continue;
-        const [r, g, b] = rgbOf(ch, team);
-        const o = (y * c.width + f * def.w + x) * 4;
-        img.data[o] = r;
-        img.data[o + 1] = g;
-        img.data[o + 2] = b;
-        img.data[o + 3] = 255;
-      }
-    }
-  }
-  ctx.putImageData(img, 0, 0);
+  const data = ctx.createImageData(img.width, img.height);
+  data.data.set(img.data);
+  ctx.putImageData(data, 0, 0);
   return c;
 }
 
 export class Atlas {
   private base = new Map<string, SpriteImg>();
   private tinted = new Map<string, SpriteImg>();
-  /** For building keys: available tiers (sorted) and variant suffixes. */
-  private bldTiers = new Map<string, number[]>();
+  /** District sprites by key, tier, variant letter and ethos style. */
+  readonly buildings = new BuildingSpriteIndex(Object.keys(ALL_SPRITES));
 
   constructor() {
     for (const [id, def] of Object.entries(ALL_SPRITES)) {
@@ -76,13 +55,6 @@ export class Atlas {
         fh: def.fh ?? 1,
         team,
       });
-      const m = /^bld\.([A-Z_]+)\.(\d)$/.exec(id);
-      if (m) {
-        const arr = this.bldTiers.get(m[1]) ?? [];
-        arr.push(Number(m[2]));
-        arr.sort((a, b) => a - b);
-        this.bldTiers.set(m[1], arr);
-      }
     }
   }
 
@@ -102,16 +74,13 @@ export class Atlas {
     return t;
   }
 
-  /** Building sprite id for a key and tier, falling back to the nearest available tier. */
-  buildingId(key: string, tier: number, variantHash = 0): string | undefined {
-    const tiers = this.bldTiers.get(key);
-    if (!tiers || !tiers.length) return undefined;
-    let best = tiers[0];
-    for (const t of tiers) if (t <= tier) best = t;
-    if (best > tier) best = tiers[0];
-    const variant = `bld.${key}.${best}b`;
-    if (variantHash % 2 === 1 && this.base.has(variant)) return variant;
-    return `bld.${key}.${best}`;
+  /**
+   * Building sprite id for a key and tier, falling back to the nearest available tier. `variantHash`
+   * (the tile hash) picks among the tier's looks (bld.KEY.N, bld.KEY.Nb, .Nc, ...); `style` swaps in an
+   * ethos style set (bld.KEY.atomic.n / bld.KEY.eco.n) from the modern tier on. See art/select.ts.
+   */
+  buildingId(key: string, tier: number, variantHash = 0, style?: HousingStyle): string | undefined {
+    return this.buildings.resolve(key, tier, variantHash, style);
   }
 
   /** Draw a sprite frame with its anchor at (x, y) in the current transform. */

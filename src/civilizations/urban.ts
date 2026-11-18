@@ -375,7 +375,9 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   add(B.HOSPITAL, 1 + civ.budget.health * 8 + pop / 40000 - s.bld[B.HOSPITAL] * 0.8);
   add(B.LAB, 1 + civ.budget.research * 8 + pop / 80000 - s.bld[B.LAB] * 0.9);
   add(B.AQUEDUCT, 1.4);
-  add(B.ARENA, 0.8);
+  // a city whose team plays in a league wants a proper venue
+  const hasTeam = [...sim.w.leagues.values()].some((l) => l.active && l.teams.some((t) => t.settlementId === s.id));
+  add(B.ARENA, 0.8 + (hasTeam ? 2.5 : 0));
   add(B.MONUMENT, 0.6);
   add(B.PARK, 0.7);
   add(B.BANK, 1 + caps.finance);

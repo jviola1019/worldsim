@@ -10,6 +10,7 @@
  * (population, roads, rails, trade routes, airports) — they are not
  * simulated individuals and are documented as such.
  */
+import { vehicleSprite, housingStyleForEthos, characterSprite, soldierSprite } from './art/select';
 import { flagCanvas } from './flag';
 import type { Sim } from '../sim/context';
 import { CHUNK } from '../sim/context';
@@ -222,7 +223,7 @@ export class Renderer {
         const wx = (s.x + 0.5 + Math.cos(ang) * rad) * TILE;
         const wy = (s.y + 0.5 + Math.sin(ang) * rad * 0.8) * TILE;
         const flip = Math.sin(ang) > 0;
-        const job = tier <= 1 && k % 3 === 0 ? 'unit.farmer' : `unit.citizen.${Math.min(7, tier)}`;
+        const job = townsperson(s.employment, tier, civ?.caps.landTier ?? 0, h);
         atlas.draw(ctx, atlas.has(job) ? job : 'unit.citizen.0', wx, wy, this.frameIdx(4, k), civ?.color, flip);
       }
     }
@@ -355,27 +356,31 @@ export class Renderer {
       const civ = w.civs.get(s.civId);
       if (!civ) continue;
       if (civ.caps.railTier >= 1 && s.bld[B.STATION]) {
-        const train = civ.caps.railTier >= 4 ? 'veh.maglev' : civ.caps.railTier >= 3 ? 'veh.train_hsr' : civ.caps.railTier >= 2 ? 'veh.train_electric' : 'veh.train_steam';
+        const train = vehicleSprite('rail', civ.caps, eraToTier(civ.era), s.id) ?? 'veh.train_steam';
         const t = this.time * 0.8 + s.id;
         const dx = Math.cos(t * 0.3) * s.radius;
         const ri = m.idx(Math.max(0, Math.min(m.w - 1, Math.round(s.x + dx))), s.y);
         if (m.railTier(ri)) atlas.draw(ctx, train, (s.x + dx) * TILE, s.y * TILE + 5, this.frameIdx(4), civ.color, Math.sin(t * 0.3) > 0);
       }
-      if (civ.caps.roadTier >= 4 && s.pop > 20000) {
+      // street traffic of the era: porters and carts, horses and buggies, trams, cars and buses, hovercars
+      if (civ.caps.roadTier >= 1 && s.pop > 2000) {
         const cars = Math.min(6, Math.floor(Math.log10(s.pop)));
+        const tier = eraToTier(civ.era);
+        const style = housingStyleForEthos(civ.ethos?.key);
         for (let k = 0; k < cars; k++) {
           const t = this.time * 0.5 + k * 1.7 + s.id;
           const x = s.x + Math.cos(t) * (1 + (k % 3));
           const y = s.y + Math.sin(t * 0.7) * (1 + (k % 2));
           const i = m.idx(Math.max(0, Math.min(m.w - 1, Math.round(x))), Math.max(0, Math.min(m.h - 1, Math.round(y))));
-          if (m.roadTier(i) || m.bld[i]) atlas.draw(ctx, k % 3 === 0 ? 'veh.truck' : civ.caps.ai > 0.5 ? 'veh.hovercar' : 'veh.car', x * TILE, y * TILE, 0, civ.color, Math.sin(t) > 0);
+          const veh = vehicleSprite('road', civ.caps, tier, s.id * 7 + k, style);
+          if (veh && (m.roadTier(i) || m.bld[i])) atlas.draw(ctx, veh, x * TILE, y * TILE, this.frameIdx(4, k), civ.color, Math.sin(t) > 0);
         }
       }
       if (civ.caps.airTier >= 2 && s.bld[B.AIRPORT]) {
         const t = (this.time * 0.05 + s.id * 0.37) % 1;
         const x = s.x + (t - 0.5) * 40;
         const y = s.y - 6 + Math.sin(t * 6) * 2;
-        atlas.draw(ctx, civ.caps.airTier >= 3 ? 'veh.airliner' : 'veh.biplane', x * TILE, y * TILE, this.frameIdx(6), civ.color);
+        atlas.draw(ctx, vehicleSprite('air', civ.caps, eraToTier(civ.era), s.id) ?? 'veh.biplane', x * TILE, y * TILE, this.frameIdx(6), civ.color);
       }
       if (civ.caps.spaceTier >= 1 && s.bld[B.SPACEPORT]) {
         const cycle = (this.time * 0.1 + s.id) % 6;
@@ -566,3 +571,25 @@ export class Renderer {
 }
 
 export { OV_SCALE };
+
+/**
+ * A walker drawn from the town's real employment mix: farmers, miners, smiths, merchants and scholars,
+ * soldiers of the nation's land-warfare tier, builders, and the unemployed out walking.
+ */
+function townsperson(emp: number[], tier: number, landTier: number, h: number): string {
+  let total = 0;
+  for (const v of emp) total += Math.max(0, v);
+  if (total <= 0 || h % 4 === 0) return `unit.citizen.${Math.min(7, tier)}`; // plain townsfolk too
+  let r = ((h >>> 3) % 1000) / 1000 * total;
+  let sector = 0;
+  for (; sector < emp.length - 1; sector++) { r -= Math.max(0, emp[sector]); if (r <= 0) break; }
+  switch (sector) {
+    case 0: return characterSprite('farmer', tier, h);
+    case 1: return characterSprite('miner', tier, h);
+    case 2: return characterSprite('smith', tier, h);
+    case 3: return `unit.citizen.${Math.min(7, tier)}`;
+    case 4: return characterSprite(h % 3 === 0 ? 'scholar' : h % 5 === 0 ? 'priest' : 'merchant', tier, h);
+    case 5: return soldierSprite(landTier);
+    default: return characterSprite('walker', tier, h);
+  }
+}

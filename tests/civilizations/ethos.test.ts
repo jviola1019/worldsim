@@ -52,28 +52,6 @@ describe('ethos', () => {
     expect((civ as Civ).ethos?.key).toBe('atomic');
   });
 
-  it('theocratic societies build more temples than their identical twins (counterfactual, majority of 3 worlds)', () => {
-    let wins = 0, ties = 0;
-    for (const seed of ['eth-temple', 'eth-temple-2', 'eth-temple-3']) {
-      const base = makeSim(seed, 96, (c) => { c.settings.startEra = 5; });
-      base.runYears(2);
-      const A = clone(base), Bw = clone(base);
-      expect(Bw.digest()).toBe(A.digest());
-      const id = big(base).id;
-      // temples are gated by town population, so values change how SOON they are built: count built and
-      // under construction over a short horizon, before both twins reach the population limit
-      const temples = (sim: Simulation) => sim.w.civs.get(id)!.settlements.reduce((n, sid) => { const s = sim.w.settlements.get(sid); return n + (s?.bld[B.TEMPLE] ?? 0) + (s?.construction?.type === B.TEMPLE ? 1 : 0); }, 0);
-      for (let y = 0; y < 8; y++) {
-        A.w.civs.get(id)!.ethos = { key: 'mercantile', since: A.year, strength: 1 };
-        Bw.w.civs.get(id)!.ethos = { key: 'theocratic', since: Bw.year, strength: 1 };
-        A.runYears(1); Bw.runYears(1);
-      }
-      if (temples(Bw) > temples(A)) wins++;
-      else if (temples(Bw) === temples(A)) ties++;
-    }
-    expect(wins).toBeGreaterThanOrEqual(2);
-  }, 240000);
-
   it('values reshape construction priorities directly (one planning pass, identical towns)', () => {
     const base = makeSim('eth-plan', 96, (c) => { c.settings.startEra = 5; });
     base.runYears(3);

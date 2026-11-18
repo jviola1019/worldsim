@@ -76,37 +76,35 @@ describe('integration: causal chains', () => {
     expect(after).toBeLessThan(before * 0.7);
   });
 
-  it('#4 war costs lives compared to peace (counterfactual, majority of 3 worlds)', () => {
-    // In each world: the closest pair of kingdoms that know each other; in B they are forced into war.
-    // Either may still fight (each other or third parties) in A by its own choice, so a single chaotic
-    // world can go either way; the claim is that forcing the war costs lives in most worlds.
-    let more = 0;
-    for (const seed of ['int-war', 'int-war-2', 'int-war-3']) {
-      const kbase = makeSim(seed, 96, (c) => { c.settings.startEra = 4; });
-      kbase.runYears(30);
-      const civs = alive(kbase);
-      let x = civs[0], y = civs[1], bd = Infinity;
-      for (const a of civs) for (const b of civs) {
-        if (a.id >= b.id || !a.knownCivs.includes(b.id)) continue;
-        const ca = kbase.w.settlements.get(a.capital), cb = kbase.w.settlements.get(b.capital);
-        if (!ca || !cb) continue;
-        const d = (ca.x - cb.x) ** 2 + (ca.y - cb.y) ** 2;
-        if (d < bd) { bd = d; x = a; y = b; }
-      }
-      expect(bd).toBeLessThan(Infinity);
-      const A = clone(kbase), B = clone(kbase);
-      expect(B.digest()).toBe(A.digest());
-      declareWar(B, B.w.civs.get(x.id)!, B.w.civs.get(y.id)!, 'conquest', [{ label: 'Test intervention', weight: 1 }]);
-      A.runYears(8);
-      B.runYears(8);
-      const pairCasualties = (s: Simulation) => [...s.w.wars.values()]
-        .filter((w) => (w.attackers.includes(x.id) && w.defenders.includes(y.id)) || (w.attackers.includes(y.id) && w.defenders.includes(x.id)))
-        .reduce((a, w) => a + Object.values(w.casualties).reduce((p, q) => p + q, 0), 0);
-      const battles = [...B.w.wars.values()].filter((w) => w.attackers.includes(x.id) && w.defenders.includes(y.id)).reduce((a, w) => a + w.battles, 0);
-      expect(battles + pairCasualties(B)).toBeGreaterThan(0); // the forced war was really fought
-      if (pairCasualties(B) > pairCasualties(A)) more++;
+  it('#4 war costs lives compared to peace (counterfactual)', () => {
+    // A pair of kingdoms that know each other and, left alone, stay at peace for the next 8 years (checked
+    // in an untouched copy of the future); in B they are forced into war. Casualties of wars between them
+    // are then caused by the intervention alone.
+    const kbase = makeSim('int-war', 96, (c) => { c.settings.startEra = 4; });
+    kbase.runYears(30);
+    const probe = clone(kbase);
+    probe.runYears(8);
+    const fought = (s: Simulation, a: number, b: number) => [...s.w.wars.values()].some((w) => (w.attackers.includes(a) && w.defenders.includes(b)) || (w.attackers.includes(b) && w.defenders.includes(a)));
+    const civs = alive(kbase);
+    let x: Civ | undefined, y: Civ | undefined, bd = Infinity;
+    for (const a of civs) for (const b of civs) {
+      if (a.id >= b.id || !a.knownCivs.includes(b.id) || fought(probe, a.id, b.id) || fought(kbase, a.id, b.id)) continue;
+      const ca = kbase.w.settlements.get(a.capital), cb = kbase.w.settlements.get(b.capital);
+      if (!ca || !cb) continue;
+      const d = (ca.x - cb.x) ** 2 + (ca.y - cb.y) ** 2;
+      if (d < bd) { bd = d; x = a; y = b; }
     }
-    expect(more).toBeGreaterThanOrEqual(2);
+    expect(x && y, 'precondition: a pair that would stay at peace').toBeTruthy();
+    const A = clone(kbase), B = clone(kbase);
+    expect(B.digest()).toBe(A.digest());
+    declareWar(B, B.w.civs.get(x!.id)!, B.w.civs.get(y!.id)!, 'conquest', [{ label: 'Test intervention', weight: 1 }]);
+    A.runYears(8);
+    B.runYears(8);
+    const pairCasualties = (s: Simulation) => [...s.w.wars.values()]
+      .filter((w) => (w.attackers.includes(x!.id) && w.defenders.includes(y!.id)) || (w.attackers.includes(y!.id) && w.defenders.includes(x!.id)))
+      .reduce((a, w) => a + Object.values(w.casualties).reduce((p, q) => p + q, 0), 0);
+    expect(pairCasualties(A)).toBe(0);
+    expect(pairCasualties(B)).toBeGreaterThan(0);
   }, 240000);
 
   it('#6 a collapse of legitimacy leads to political change', () => {

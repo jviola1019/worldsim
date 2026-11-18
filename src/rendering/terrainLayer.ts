@@ -15,6 +15,14 @@ import { BLDF, HAZARD } from '../world/tilemap';
 import { BUILDING_KEY_BY_ID, B } from '../civilizations/buildingTypes';
 import { hexToRgb } from './art/palette';
 import { DX8, DY8 } from '../core/math';
+import { sportsVenueSprite, eraVenueSprite, airportSprite, portSprite, housingStyleForEthos, type Sport } from './art/select';
+import type { SportKey } from '../culture/sports';
+
+/** Which venue sprite each simulated sport plays in. */
+const SPORT_VENUE: Record<SportKey, Sport> = {
+  wrestling: 'arena', ballgame: 'ballgame', chariot: 'chariot', football: 'football', baseball: 'baseball', basketball: 'basketball',
+  gridiron: 'football', hockey: 'hockey', esports: 'basketball', drone: 'athletics', gravball: 'grav',
+};
 
 export const PAD = 24; // overhang padding above each chunk (px)
 
@@ -247,7 +255,7 @@ export class TerrainLayer {
           if (m.bldFlags[i] & BLDF.PART) continue;
           const key = BUILDING_KEY_BY_ID[b];
           const tier = m.bldFlags[i] & BLDF.TIER_MASK;
-          const id = this.atlas.buildingId(key, tier, hash3(x, y, 3));
+          const id = this.spriteFor(i, x, y, b, key, tier);
           if (id) {
             const spr = this.atlas.get(id, this.ownerColor(i));
             if (spr) {
@@ -289,6 +297,28 @@ export class TerrainLayer {
           this.atlas.draw(ctx, 'veg.flowers.0', bx, by);
         }
       }
+  }
+
+  /**
+   * The sprite for a building: arenas show the venue of the sport the city's team plays (or the
+   * era's venue), airports and harbours follow the era (a big port spreads over open water, else a
+   * jetty), homes take the owner's ethos style (atomic-age or ecological) from the modern tier on.
+   */
+  private spriteFor(i: number, x: number, y: number, b: number, key: string, tier: number): string | undefined {
+    const m = this.sim.w.map;
+    const civ = m.owner[i] ? this.sim.w.civs.get(m.owner[i]) : undefined;
+    const h = hash3(x, y, 3);
+    if (b === B.ARENA) {
+      const sid = m.settle[i];
+      for (const lg of this.sim.w.leagues.values()) if (lg.active && lg.teams.some((t) => t.settlementId === sid)) return sportsVenueSprite(SPORT_VENUE[lg.sport]);
+      return eraVenueSprite(tier, h);
+    }
+    if (b === B.AIRPORT && civ) return airportSprite(Math.max(1, civ.caps.airTier), tier, civ.caps.spaceTier, h) ?? this.atlas.buildingId(key, tier, h);
+    if (b === B.HARBOR && civ && tier >= 3) {
+      const water = (xx: number, yy: number) => m.inBounds(xx, yy) && m.isWater(m.idx(xx, yy)) && !m.bld[m.idx(xx, yy)];
+      return water(x + 1, y) && water(x, y + 1) && water(x + 1, y + 1) ? portSprite(tier, civ.caps.spaceTier) : 'bld.port.jetty';
+    }
+    return this.atlas.buildingId(key, tier, h, housingStyleForEthos(civ?.ethos?.key));
   }
 
   private ownerColor(i: number): string | undefined {
