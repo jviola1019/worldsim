@@ -16,7 +16,7 @@ Last verified 2026-11-18 (round 5, final gate):
 | Build | `vite build` 8.3.8: exit 0 |
 | E2E | **28/28**, phone and desktop Chromium, production build. Includes the CSP, injected-script and framing checks. |
 | Dependencies | `npm audit`: 0 vulnerabilities; `npm outdated`: none |
-| GitHub Actions | CI run #26 green on Node 26 with the pinned actions (see VALIDATION §R5) |
+| GitHub Actions | CI runs #26 and #27 green on Node 26 with the pinned actions. The Pages deploy waits for the owner to enable Pages (VALIDATION §R5). |
 | Multi-seed invariants | 20 seeds × 600 years: ledger, finite values and GDP identity hold in **20/20** |
 
 Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is in [PERFORMANCE.md](PERFORMANCE.md) and security in [SECURITY.md](SECURITY.md).

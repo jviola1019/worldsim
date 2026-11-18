@@ -28,7 +28,8 @@ The last 10 runs of `ci.yml` before this round's final push were checked through
 
 - **Failure:** run #23 failed. It was the merge commit of P5, in which three trajectory-dependent tests broke. They were rebuilt as probe-selected counterfactuals in the next commits, and runs #24–#26 are green.
 - **Stale steps:** the workflows used `@v4`/`@v3` action tags, Node 22 and Playwright 1.63. All actions are now pinned to commit SHAs at their latest releases, with Node 26 LTS and Playwright 1.65.1. Run #26 passed with exactly this configuration, including the browser e2e.
-- **Skipped jobs:** none skipped. `long-run.yml` runs on its schedule and on manual dispatch. It has not yet been triggered on this branch; its commands were run locally (below). `pages.yml` runs only on `main`, and `main` is created at the end of this round.
+- **Skipped jobs:** none skipped. `long-run.yml` runs on its schedule and on manual dispatch. It has not yet been triggered; its commands were run locally (below).
+- **`main` and Pages:** `main` was created at `14ce30d`, the commit whose CI run #27 passed. The first `pages.yml` run on `main` (#1) passed `npm ci`, `npm test` and the build, then **stopped at `configure-pages`** with "Get Pages site failed… verify that the repository has Pages enabled". GitHub Pages is not yet enabled on the repository. **Owner action:** Settings → Pages → Source: **GitHub Actions**, then re-run "Deploy to GitHub Pages" (Actions tab → Run workflow). Optionally make `main` the default branch (Settings → General).
 - **Flaky e2e:** none observed. The e2e passed in every CI run of this round and in every local run.
 
 ### Natural history, 1,000 years, no god powers (128²)
