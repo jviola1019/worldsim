@@ -126,7 +126,7 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
               ))}
             </div>
           </div>
-          <Slider label="Ocean coverage" value={cfg.gen.oceanCoverage} min={0.25} max={0.85} step={0.01} onInput={(v) => set((c) => (c.gen.oceanCoverage = v))} show={(v) => `${Math.round(v * 100)}%`} />
+          <Slider label="Ocean coverage" value={cfg.gen.oceanCoverage} min={0.1} max={0.9} step={0.01} onInput={(v) => set((c) => (c.gen.oceanCoverage = v))} show={(v) => `${Math.round(v * 100)}%`} />
           <Slider label="Continental fragmentation" value={cfg.gen.fragmentation} min={0} max={1} step={0.01} onInput={(v) => set((c) => (c.gen.fragmentation = v))} show={lvl} />
           <Slider label="Mountains" value={cfg.gen.mountains} min={0} max={1} step={0.01} onInput={(v) => set((c) => (c.gen.mountains = v))} show={lvl} />
           <Slider label="Rivers" value={cfg.gen.rivers} min={0} max={1} step={0.01} onInput={(v) => set((c) => (c.gen.rivers = v))} show={lvl} />

@@ -43,7 +43,7 @@ export interface WorldGenParams {
   width: number;
   height: number;
   landmass: LandmassType;
-  /** Fraction of the map covered by water, 0.2..0.9. */
+  /** Fraction of the map covered by water, 0.1..0.9. */
   oceanCoverage: number;
   /** 0 = few large plates/smooth coasts, 1 = many plates/fragmented coasts. */
   fragmentation: number;
