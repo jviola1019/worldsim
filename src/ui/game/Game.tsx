@@ -16,6 +16,8 @@ import { LawsPanel } from '../panels/LawsPanel';
 import { MenuPanel } from '../panels/MenuPanel';
 import { OverlayPanel } from '../panels/OverlayPanel';
 import { CivListPanel } from '../panels/CivListPanel';
+import { FeedPanel, PostCard } from '../panels/FeedPanel';
+import { postFor, isPostable, type FeedPost } from '../../history/feed';
 import type { HistoryEvent } from '../../sim/types';
 import { TILE } from '../../rendering/camera';
 import { sound } from '../audio';
@@ -23,7 +25,7 @@ import { Tutorial } from './Tutorial';
 import { scenarioObjectives } from '../../scenarios/scenarios';
 import { savePrefs } from '../screens/SettingsScreen';
 
-export type Sheet = 'none' | 'inspect' | 'history' | 'stats' | 'laws' | 'menu' | 'overlays' | 'civs';
+export type Sheet = 'none' | 'inspect' | 'history' | 'stats' | 'laws' | 'menu' | 'overlays' | 'civs' | 'feed';
 
 interface Toast {
   id: number;
@@ -41,7 +43,7 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
   const [selection, setSelection] = useState<Selection | null>(null);
   const [, setUi] = useState(0);
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [ticker, setTicker] = useState<HistoryEvent | null>(null);
+  const [ticker, setTicker] = useState<FeedPost | null>(null);
   const [tutorial, setTutorial] = useState(!prefs.tutorialSeen);
   const [objectivesDone, setObjectivesDone] = useState<string[]>([]);
   const stateRef = useRef({ speed, tool, brushSize, selection, lastPaint: -1, sheet });
@@ -127,7 +129,8 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
       onCamera: () => {},
     });
     const unsub = sim.onEvent((e) => {
-      if (e.headline && e.importance >= 3) setTicker(e);
+      // the newest world-level story appears as a post in its own medium (replaces the old headline ticker)
+      if (isPostable(e, 0)) setTicker(postFor(sim, e));
       if (e.importance >= 4) sound.play('event');
     });
     let last = performance.now();
@@ -180,7 +183,7 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
   // ticker auto-hide
   useEffect(() => {
     if (!ticker) return;
-    const t = setTimeout(() => setTicker(null), 5000);
+    const t = setTimeout(() => setTicker(null), 7000);
     return () => clearTimeout(t);
   }, [ticker]);
 
@@ -213,10 +216,10 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
     <div>
       <canvas ref={canvasRef} class="canvas" aria-label="World map" />
       <TopBar sim={sim} speed={speed} setSpeed={setSpeed} openSheet={(s) => setSheet(sheet === s ? 'none' : s)} sheet={sheet} objectives={objectives} done={objectivesDone} />
-      {ticker && prefs.newspaper && (
-        <button class="ticker" onClick={() => focusOn(ticker.x, ticker.y)}>
-          {ticker.headline}
-        </button>
+      {ticker && prefs.newspaper && sheet !== 'feed' && (
+        <div class="ticker feed-strip" role="status" onClick={() => { focusOn(ticker.x, ticker.y, false); setSheet('feed'); }}>
+          <PostCard post={{ ...ticker, replies: ticker.replies.slice(0, 1) }} sim={sim} focus={(x, y) => focusOn(x, y)} />
+        </div>
       )}
       {sim.w.meta.settings.observer ? (
         <div class="observer-badge" role="status">Observer mode: history unfolds on its own (no god powers)</div>
@@ -245,6 +248,7 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
       {sheet === 'inspect' && selection && <Inspector sim={sim} sel={selection} setSel={(s) => { setSelection(s); if (r) { r.selection = s && s.kind !== 'tile' && s.kind !== 'civ' ? { kind: s.kind, id: s.id } : null; if (s?.kind === 'civ') r.overlay.focusCiv = s.id; } }} close={() => { setSheet('none'); if (r) r.selection = null; }} focus={focusOn} />}
       {sheet === 'history' && <HistoryPanel sim={sim} close={() => setSheet('none')} focus={focusOn} selectedCiv={selection?.kind === 'civ' ? selection.id : 0} openCiv={(id) => { setSelection({ kind: 'civ', id }); setSheet('inspect'); }} />}
       {sheet === 'stats' && <StatsPanel sim={sim} close={() => setSheet('none')} />}
+      {sheet === 'feed' && <FeedPanel sim={sim} close={() => setSheet('none')} focus={focusOn} selectedCiv={selection?.kind === 'civ' ? selection.id : 0} />}
       {sheet === 'laws' && <LawsPanel sim={sim} close={() => setSheet('none')} />}
       {sheet === 'overlays' && r && <OverlayPanel renderer={r} close={() => setSheet('none')} />}
       {sheet === 'civs' && <CivListPanel sim={sim} close={() => setSheet('none')} open={(id) => { setSelection({ kind: 'civ', id }); setSheet('inspect'); const civ = sim.w.civs.get(id); const cap = civ ? sim.w.settlements.get(civ.capital) : undefined; if (cap) focusOn(cap.x, cap.y, false); }} />}

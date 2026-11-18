@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import type { Simulation } from '../../sim/simulation';
 import type { Civ, HistoryEvent, Person, Settlement } from '../../sim/types';
 import { Icon, Kv, Bar, fmt, pct, Sprite, Flag } from '../shared';
+import { PostList } from './FeedPanel';
 import { BUILDINGS, SECTOR_NAMES } from '../../civilizations/buildings';
 import { TERRAIN } from '../../world/terrain';
 import { DEPOSITS, GOODS } from '../../world/resources';
@@ -412,7 +413,7 @@ function ReligionView({ sim, sel, close }: P) {
   );
 }
 
-const TABS = ['Overview', 'History', 'Technology', 'Military', 'Economy', 'Culture', 'Diplomacy', 'Statistics'] as const;
+const TABS = ['Overview', 'Feed', 'History', 'Technology', 'Military', 'Economy', 'Culture', 'Diplomacy', 'Statistics'] as const;
 
 function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>('Overview');
@@ -465,6 +466,7 @@ function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
             </div>
           </>
         )}
+        {tab === 'Feed' && <PostList sim={sim} civId={civ.id} focus={focus} />}
         {tab === 'History' && <EventList sim={sim} ids={civ.events} focus={focus} limit={40} />}
         {tab === 'Technology' && <TechTab civ={civ} />}
         {tab === 'Military' && (

@@ -132,6 +132,11 @@ export function sampleStats(sim: Sim): void {
       unemployment: c.econ.unemployment,
       inflation: c.inflation,
       debt: c.debt,
+      warExhaustion: c.warExhaustion,
+      unrest: c.unrest,
+      polarization: c.media?.polarization ?? 0,
+      misinformation: c.media?.misinformation ?? 0,
+      online: c.media?.online ?? 0,
       ...f,
     });
     if (cs.years.length > MAX_SAMPLES) decimate(cs);

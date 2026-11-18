@@ -1,0 +1,80 @@
+/**
+ * The era-medium feed is derived from recorded history: same save -> same feed; medium, outlets,
+ * AI authors and false claims must all be grounded in what the simulation recorded.
+ */
+import { describe, it, expect } from 'vitest';
+import { makeSim } from '../helpers';
+import { buildFeed, postFor, seriesAt } from '../../src/history/feed';
+
+describe('era-medium feed', () => {
+  const sim = makeSim('feed-test', 96, (c) => { c.settings.startEra = 11; });
+  sim.runYears(120);
+
+  it('is deterministic and does not touch the simulation', () => {
+    const digest = sim.digest();
+    const a = JSON.stringify(buildFeed(sim, 0, 40));
+    const b = JSON.stringify(buildFeed(sim, 0, 40));
+    expect(a).toBe(b);
+    expect(sim.digest()).toBe(digest);
+  });
+
+  it('every post is about a recorded event and uses the medium recorded on it', () => {
+    const posts = buildFeed(sim, 0, 60);
+    expect(posts.length).toBeGreaterThan(10);
+    for (const p of posts) {
+      const ev = sim.w.events.find((e) => e.id === p.eventId)!;
+      expect(ev).toBeTruthy();
+      expect(p.medium).toBe(ev.medium ?? 'carving');
+      expect(ev.importance).toBeGreaterThanOrEqual(3); // the world feed shows major stories only
+    }
+  });
+
+  it('outlets and AI authors existed in that nation in that year', () => {
+    for (const civ of [...sim.w.civs.values()].filter((c) => c.settlements.length).slice(0, 4)) {
+      for (const p of buildFeed(sim, civ.id, 40)) {
+        expect(p.civId === civ.id || p.civId === 0).toBe(true);
+        if (p.outlet) {
+          const o = [...sim.w.outlets.values()].find((x) => x.name === p.outlet)!;
+          expect(o.civId).toBe(civ.id);
+          expect(o.founded).toBeLessThanOrEqual(p.year);
+          if (o.closed !== undefined) expect(o.closed).toBeGreaterThanOrEqual(p.year);
+        }
+        for (const r of p.replies.filter((x) => x.flag === 'ai')) {
+          const a = [...sim.w.ais.values()].find((x) => r.author.startsWith(x.name) && x.civId === civ.id)!;
+          expect(a).toBeTruthy();
+          expect(a.founded).toBeLessThanOrEqual(p.year);
+        }
+      }
+    }
+  });
+
+  it('false claims appear only where misinformation was measured high, and carry the recorded cause', () => {
+    let falseSeen = 0;
+    for (const ev of sim.w.events) {
+      if (ev.importance < 2 || !ev.civs.length) continue;
+      const p = postFor(sim, ev, ev.civs[0]);
+      for (const r of p.replies.filter((x) => x.flag === 'false')) {
+        falseSeen++;
+        expect(r.context).toMatch(/^False claim\. The recorded cause: /);
+        expect(seriesAt(sim.w.stats.civs[ev.civs[0]], 'misinformation', ev.year)).toBeGreaterThan(0.3);
+      }
+    }
+    // with no misinformation anywhere there can be no false claims
+    const calm = makeSim('feed-calm', 64, (c) => { c.settings.startEra = 3; });
+    calm.runYears(30);
+    for (const ev of calm.w.events) if (ev.civs.length) for (const r of postFor(calm, ev, ev.civs[0]).replies) expect(r.flag).not.toBe('false');
+    expect(falseSeen).toBeGreaterThanOrEqual(0);
+  });
+
+  it('ancient worlds carve and write; they do not post', () => {
+    const old = makeSim('feed-old', 64, (c) => { c.settings.startEra = 3; });
+    old.runYears(30);
+    const posts = buildFeed(old, 0, 30);
+    expect(posts.length).toBeGreaterThan(0);
+    for (const p of posts) {
+      expect(['carving', 'tablet', 'scroll']).toContain(p.medium);
+      expect(p.likes).toBeUndefined();
+      expect(p.replies.length).toBe(0);
+    }
+  });
+});

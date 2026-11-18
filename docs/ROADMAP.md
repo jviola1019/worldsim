@@ -19,13 +19,13 @@ This document records the requested scope and the decisions the owner made. Phas
 
 | # | Phase | Contents | Status |
 |---|---|---|---|
-| P1 | Era-medium feed | Posts derived from recorded events and state, authored by generated people, outlets, platforms and AIs. Rendered as carvings, tablets, scrolls, broadsheets, newspapers, broadcasts, social posts or holograms. World feed panel plus a Feed tab per nation. Replaces the ticker. | In progress |
+| P1 | Era-medium feed | Posts derived from recorded events and state, authored by generated people, outlets, platforms and AIs. Rendered as carvings, tablets, scrolls, broadsheets, newspapers, broadcasts, social posts or holograms. World feed panel plus a Feed tab per nation. Replaces the ticker. | **Done**: world panel, nation Feed tab, feed strip replacing the ticker; 5 tests and 1 e2e check |
 | P2 | Civilization depth | Ethos archetypes, including retro-futurist lock-in, technocracy, theocracy, militarism, mercantile, ecological and isolationist societies. Emergent and assignable missions. Realistic pacing and divergence across seeds. Water-first settlement. | Planned |
 | P3 | Map presets | Circle, square, donut and crescent. Highlands, arid, waterworld and frozen. Shards, spiral, mirrored and checkerboard. Pangaea, twin continents, many continents and rift. Each has tests for land fraction, shape and playability. | Planned |
 | P4 | World life | Sports leagues, cups and Olympics. Harbours and airports with trade and visitor (tourism) agreements. Transport by era: horses and buggies, trains, cars and buses, aircraft, hovercars and hoverboards. | Planned |
 | P5 | War and endings | Era weapons, including differing concepts (chemical, drones, cyber, orbital, EMP). Nuclear arsenals, doctrine, deterrence, launches, fallout and nuclear winter. Technological overtaking (leapfrogging). Every realistic ending, with calibrated rarity and recorded causes. God-mode-only threats. | Planned |
 | P6 | Visuals | Sprites for stadiums, ports, airports, housing variety, jobs and characters, and era vehicles. City photos (aerial and postcard) in the nation overview, with the flag, statistics and drill-downs. The 50-year album. | Planned |
-| P7 | Professional docs and release | Architecture with an ERD and data dictionary, security review, README with new screenshots, package upgrades, CI green, a `main` branch and the Pages deployment. Then the standing to-dos in CLAUDE.md: audit the GitHub tests and the newest packages. | Planned |
+| P7 | Professional docs and release (**always last, after every addition**) | Architecture with an ERD and data dictionary, security review, README with new screenshots, package upgrades, CI green, a `main` branch and the Pages deployment. Then the standing to-dos in CLAUDE.md: audit the GitHub tests and the newest packages. Includes the full verification and README update (formerly R4-5). | Planned |
 
 ## Verification standard (every phase)
 

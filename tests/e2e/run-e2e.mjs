@@ -2,7 +2,7 @@
 // Requires a build served at URL (default: npm run build && npm run preview -- --port 4173).
 //   node tests/e2e/run-e2e.mjs
 // Checks: no console errors; world creation; time advances; tool selection; tap-to-inspect;
-// layers sheet incl. past-borders slider; nations list with flags; manual save to IndexedDB.
+// layers sheet incl. past-borders slider; nations list with flags; news feed; manual save to IndexedDB.
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 let pw;
@@ -46,6 +46,13 @@ async function run(label, ctxOpts) {
   await page.getByLabel('Nations').click();
   const flags = await page.locator('img.flag').count();
   check(`${label}: nations list renders flags`, flags > 0, `${flags} flags`);
+  await page.getByLabel('Close').first().click();
+  // news feed: posts in the medium of their time
+  await page.getByLabel('News feed').click();
+  await page.waitForTimeout(300);
+  const posts = await page.locator('article.post').count();
+  const medium = posts ? await page.locator('article.post').first().getAttribute('class') : '';
+  check(`${label}: news feed shows posts`, posts > 0, `${posts} posts (${medium})`);
   await page.getByLabel('Close').first().click();
   // save
   await page.getByLabel('Menu').click();
