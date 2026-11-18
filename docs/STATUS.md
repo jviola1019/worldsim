@@ -40,7 +40,7 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 | R14 | Art and asset manifest | Complete | [ASSETS.md](ASSETS.md) |
 | R15 | Architecture, determinism, performance | Partial | Determinism is complete. On identical state the median is about 9% faster. Late game on 256² costs about 0.4–0.5 s per simulated year. **Physical iPhone performance is unverified.** |
 | R16 | Persistence | **Complete** | Validating decoder; gzip-bomb cap; atomic saves; quota failure leaves the old save intact; V0 migration and unavailable storage are tested (29 security tests). |
-| R17 | Tests, benchmarks, docs, CI | Partial | 125 tests, plus a CI workflow (quality gate on every push, weekly long-run job). Missing: WebKit/Firefox and physical-device runs. |
+| R17 | Tests, benchmarks, docs, CI | Partial | 128 tests, plus a CI workflow (quality gate on every push, weekly long-run job). Missing: WebKit/Firefox and physical-device runs. |
 
 ## Bug ledger, round 2
 
