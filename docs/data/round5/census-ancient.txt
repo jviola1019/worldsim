@@ -1,0 +1,5 @@
+10 worlds x 600 years (96², start era 1) in 199 s
+nations founded 77, fallen 13
+endings: {"conquest":5,"civil_war":5,"famine":2,"dispersal":1}
+catastrophes: {"vei7":8,"airburst":8,"geomagnetic_storm":32,"infertility_pathogen":2}
+nuclear-use events 0, AI incidents 0

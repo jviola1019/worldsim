@@ -1,0 +1,14 @@
+
+> epoch-civilizations-unbound@0.1.0 bench
+> tsx benchmarks/sim-bench.ts 128 900
+
+map 128x128: worldgen+bootstrap 196 ms
+years    0-100: 20.8 ms/year (0.17 ms/tick) · pop 1236 · era 1 · settlements 18 · heap 23 MB
+years  100-200: 29.3 ms/year (0.24 ms/tick) · pop 10073 · era 2 · settlements 28 · heap 34 MB
+years  200-300: 36.4 ms/year (0.30 ms/tick) · pop 99484 · era 3 · settlements 45 · heap 51 MB
+years  300-400: 44.9 ms/year (0.37 ms/tick) · pop 592107 · era 4 · settlements 59 · heap 66 MB
+years  400-500: 70.1 ms/year (0.58 ms/tick) · pop 1913664 · era 6 · settlements 81 · heap 40 MB
+years  500-600: 104.1 ms/year (0.87 ms/tick) · pop 2828428 · era 7 · settlements 94 · heap 39 MB
+years  600-700: 113.9 ms/year (0.95 ms/tick) · pop 3920918 · era 9 · settlements 97 · heap 40 MB
+years  700-800: 126.3 ms/year (1.05 ms/tick) · pop 5613804 · era 10 · settlements 97 · heap 51 MB
+years  800-900: 150.6 ms/year (1.25 ms/tick) · pop 5975636 · era 11 · settlements 97 · heap 55 MB

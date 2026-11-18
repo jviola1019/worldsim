@@ -1,18 +1,23 @@
 # Status report
 
-This report tracks completion against the requirements (R-IDs from [REQUIREMENTS.md](REQUIREMENTS.md)) and the phases of the implementation plan. Labels:
+This report tracks completion against the requirements (R-IDs from [REQUIREMENTS.md](REQUIREMENTS.md)) and the round-5 phases ([ROADMAP.md](ROADMAP.md)). Labels:
 
 - **Complete:** implemented, used by the simulation and covered by tests or verified in the browser.
 - **Partial:** works, with the stated gaps.
 - **Experimental:** works, but balance or behavior is not yet validated.
 - **Missing:** not implemented.
 
-Last verified 2026-11-18 (round 2):
-- `tsc`: exit 0.
-- `npm test`: **128/128** (15 files, 0 skipped).
-- `vite build`: exit 0.
-- E2E: 12/12 (phone and desktop, Chromium).
-- Viewport check: 6/6 device profiles.
+Last verified 2026-11-18 (round 5, final gate):
+
+| Check | Result |
+|---|---|
+| Typecheck | `tsc` 7.0.2: exit 0 |
+| Unit tests | `npm test` (Vitest 5.1.1): **506/506** (27 files, 0 skipped) |
+| Build | `vite build` 8.3.8: exit 0 |
+| E2E | **28/28**, phone and desktop Chromium, production build. Includes the CSP, injected-script and framing checks. |
+| Dependencies | `npm audit`: 0 vulnerabilities; `npm outdated`: none |
+| GitHub Actions | CI run #26 green on Node 26 with the pinned actions (see VALIDATION §R5) |
+| Multi-seed invariants | 20 seeds × 600 years: ledger, finite values and GDP identity hold in **20/20** |
 
 Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is in [PERFORMANCE.md](PERFORMANCE.md) and security in [SECURITY.md](SECURITY.md).
 
@@ -20,29 +25,55 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 
 | ID | Area | Status | Evidence / gaps |
 |---|---|---|---|
-| R0 | Principles: autonomy, emergence, original IP, truthful docs | Complete | 20-seed holdout runs diverge (VALIDATION §6). |
-| R1 | World creation, presets, no forced quests | Complete | The presets test covers every preset. Developed (era) starts are now sized to their land and laid out with farmland. |
-| R2.1–2.4 | Terrain, generation, dynamics with causal effects | Complete | Drought counterfactual. Undo now restores land exactly, including valleys flooded by a stroke. |
-| R2.5 | Resources, depletion, extraction | Partial | Deposits deplete. Pre-stocked developed starts mask scarcity for decades: "rich" and "poor" scenarios differ little over 25 years, although metal access does differ. |
-| R3.1–3.2, R3.4–3.5 | Individuals, character development, notables, multi-resolution | Complete | 10 development tests. Cohort↔individual conversions now conserve population, with rounding recorded explicitly. |
-| R3.3 | Demographic response and transition | Partial | Works, but organic late-era worlds reach a **Malthusian ceiling**: food at 41% of need, 26 births and 17 famine deaths per 1,000 per year. The fertility transition needs recalibration (VALIDATION §3). |
-| R4–R6 | Civilizations, religion, government | Complete | Counterfactual tests #6 and #9; flags; secession; alliance obligations. |
-| R7 | Technology | Complete | #10: prerequisites hold across seeds, speculative technology is gated, diffusion needs contact. #3: education raises research capability, with no measurable effect on tech score within 30 years. |
-| R8.1–8.2 | Cities, transport | Complete | housingDrivesConstruction, roads (#2), buildingTierFollowsEra. |
-| R8.3 | Economy, accounting identities | Complete | GDP identity, ledger and finiteness hold in 20/20 holdout seeds (VALIDATION §6). ΔInventories counts quantity changes only, with no holding gains and no spoilage. Public debt can no longer reach Infinity. Unemployment follows service demand rather than a fixed rule. |
-| R8.4 | Trade, embargoes, crises | Complete | Integration #8: an embargo hurts the dependent importer and trade recovers once it is lifted. tradeBalanceSumsToZero passes. |
-| R9 | War and diplomacy | Complete | War counterfactual (#4), recorded causes, alliance obligations. |
-| R10 | Disease, ecology, powers | Complete | Sanitation lowers deaths and predators reduce prey (both counterfactual). All 97 powers apply without error, and the ledger fuzzer applied random powers with no failures. |
-| R11 | Modern and future systems | Experimental | Natural worlds now modernize on their own: 4 of 4 reach Atomic & Space or later within 1,000 years (VALIDATION §6b). But modern economies are weak: food shortfall 58–69%, metal access lost to deposit depletion, unemployment 46–66%. Colonies require space tier and automation displaces labor (tests). |
-| R12.1–12.3 | Event log, causes, snapshots, branching | Complete | Saves resume identically for 20–40 years in eras 1/4/9/10/12. |
-| R12.4 | Statistics and change decomposition | **Complete** | The population ledger reconciles exactly at every tick, for the world and for every civ. Residual: baseline mean 0–11% (worst 40%), now 0%. |
-| R13 | UI, touch, inspectors, 16 overlays | Complete | Tested in Chromium emulation of iPhone SE, iPhone 13 portrait and landscape, iPhone 15 Pro Max, iPad and Galaxy S9+. Map labels no longer overlap. **No WebKit or physical-device testing.** |
-| R14 | Art and asset manifest | Complete | [ASSETS.md](ASSETS.md) |
-| R15 | Architecture, determinism, performance | Partial | Determinism is complete. On identical state the median is about 9% faster. Late game on 256² costs about 0.4–0.5 s per simulated year. **Physical iPhone performance is unverified.** |
-| R16 | Persistence | **Complete** | Validating decoder; gzip-bomb cap; atomic saves; quota failure leaves the old save intact; V0 migration and unavailable storage are tested (29 security tests). |
-| R17 | Tests, benchmarks, docs, CI | Partial | 128 tests, plus a CI workflow (quality gate on every push, weekly long-run job). Missing: WebKit/Firefox and physical-device runs. |
+| R0 | Principles: autonomy, emergence, original IP, truthful docs | Complete | 20-seed runs diverge. Every name is generated, and a list of real brands is blocked (`culture/naming.ts`). |
+| R1 | World creation, presets, no forced quests | Complete | 9 presets plus **17 map shapes** (264 preset tests with measured land fraction, shape and playability). |
+| R2.1–2.4 | Terrain, generation, dynamics with causal effects | Complete | Drought counterfactual; undo restores land exactly; natural catastrophes at real-order base rates. |
+| R2.5 | Resources, depletion, extraction | Complete | Industrial extraction scales both the rate and the recoverable reserves. Modern worlds keep their metal access: 0–7% food short in the final 1,000-year runs. |
+| R3.1–3.5 | Individuals, development, notables, demography, transition | Complete | The fertility transition is driven by development and access, and starvation adds mortality. The Malthusian ceiling of round 2 is gone (VALIDATION §R5). |
+| R4–R6 | Civilizations, religion, government | Complete | 11 ethos archetypes scored relative to other nations; contested ideals stop all governments converging (measured: 7 ethos types and 4–5 government forms over 6 seeds). Emergent missions. |
+| R7 | Technology | Complete | Leapfrogging and sclerosis (counterfactual test); tech-lead history; geography dead ends removed (rare metals, oil or coal). |
+| R8.1–8.4 | Cities, transport, economy, trade | Complete | Redevelopment of obsolete districts; transport by era; ports and airports; visitor accords; GDP identity 20/20. |
+| R9 | War and diplomacy | Complete | Era weapons and doctrines, nuclear deterrence and arms control (`war-nuclear.test.ts`); war counterfactual #4. |
+| R10 | Disease, ecology, powers | Complete | God-mode horrors are refused in observer worlds (test). |
+| R11 | Modern and future systems | **Complete** (was Experimental) | 4 of 4 natural worlds reach Atomic & Space; 2 become Spacefaring; media and AI simulation; space programs; typed endings, including AI takeover. Unemployment of 15–36% and warming of 3–10 °C remain (below). |
+| R12 | History, statistics, feed, album | Complete | Era-medium feed derived from recorded events (8 tests); 50-year album (5 tests); population ledger exact. |
+| R13 | UI, touch, inspectors, overlays | Complete | Era interface frames, nation overview with city pictures, album tab. Chromium emulation only: **no WebKit or physical-device testing.** |
+| R14 | Art and asset manifest | Complete | Sprite pack (venues, ports, airports, ethos housing, era vehicles, job characters); [contact sheet](images/sprites/contact-sheet.png). |
+| R15 | Architecture, determinism, performance | Partial | Determinism complete (the round-trip and digest tests include every round-5 entity). Multi-seed cost: median 32 ms per simulated year on 96². **Physical iPhone performance is unverified.** |
+| R16 | Persistence and security | Complete | Validating decoder, now including the round-5 fields. 92-threat audit with CSP, frame check, validated preferences and pinned CI (SECURITY.md). |
+| R17 | Tests, benchmarks, docs, CI | Partial | 506 tests and 28 e2e checks; CI on every push; weekly long run; ERD and data dictionary. Missing: WebKit, Firefox and physical-device runs. |
 
-## Bug ledger, round 2
+## Bug ledger, rounds 4 and 5
+
+Each fix has a regression test. "Mutation" means the test was confirmed to fail with the fix reverted.
+
+| # | Severity | Root cause | Fix | Regression evidence |
+|---|---|---|---|---|
+| 22 | High | Malthusian ceiling in modern worlds: fertility ignored development, and starvation only scaled existing mortality. | Development-driven fertility transition; additive starvation mortality | `modern.test.ts` (mutation); 1,000-year runs |
+| 23 | High | Metal collapse: deposits ran dry and modern extraction did not scale. | The industrial extraction factor raises both the rate and the recoverable reserves; concrete substitution capped per job | `modern.test.ts` (mutation, including the per-step cap bug) |
+| 24 | High | Spaceports were never built: capital-only placement, a 2×2 footprint, circular priority, and an electronics deadlock in which households ate the reserve. | Largest city; priority by scarcity; construction reserve | `modern-civ.test.ts` |
+| 25 | High | All modern nations converged to the same government (single-faction ideals ratcheted). Developed starts were all democracies. | Contested hereditary rule and military influence; randomized institutions | Diversity test |
+| 26 | Medium | Ethos collapsed onto one archetype. | Relative scoring with hysteresis | `ethos.test.ts` |
+| 27 | Medium | Traditionalist caution 0.8 hit the autarky threshold, so trade closed by accident. | 0.7 | Covered by the trade tests |
+| 28 | Medium | Feed scroll text lower-cased proper adjectives. | Colon format | `feed.test.ts` |
+| 29 | Low | The world app frame said "0% of people online" because it read no nation. | Population-weighted world share | `feed.test.ts` (mutation) |
+| 30–36 | Low | Security R5-1…R5-6: no CSP, no frame protection, a third-party font, unvalidated preferences, loose round-5 save fields, mutable CI action tags. | See SECURITY.md §2 | `tests/security/hardening.test.ts` (9 mutations caught) + 5 e2e checks |
+| — | Doc | The water-first claim (90.5% vs 83.6%) came from a 2-seed sample. | Corrected: over 8 seeds, 82.4% vs 81.6% (within noise); the test checks the outcome only | ROADMAP, VALIDATION |
+
+## Known issues and next steps (ranked)
+
+1. **Modern unemployment stays high:** 15–36% in the most advanced nation of the final 1,000-year runs. Automation displaces labor faster than services absorb it.
+2. **Warming can be strong:** 3.4–10.3 °C by year 1,000 (modern-2 is 10.27 °C). Emissions are normalized by map area, but mitigation (renewables adoption, policy) is weak.
+3. **No WebKit or physical-device verification (R13, R15).** Run the protocol in VALIDATION §8 on an iPhone; Safari's CSP behavior is untested.
+4. **Nuclear use was never observed** in the 20-world endings census (by design it is rare, and deterrence and the taboo work). This means the launch path is exercised only by tests, not by organic history.
+5. **GitHub Pages header limits:** HSTS, frame-ancestors and similar headers need another host or a CDN (SECURITY.md §5).
+6. **Favorites and follow camera:** not implemented (deferred, as agreed).
+
+## History
+
+The round-2 ledger is kept below for reference.
+
+### Bug ledger, round 2
 
 Each fix has a regression test, and "mutation" means the test was confirmed to fail without the fix.
 
@@ -61,17 +92,7 @@ Each fix has a regression test, and "mutation" means the test was confirmed to f
 | 21 | Medium | New World screen applied the first preset in the list (now Realistic/observer) while highlighting Primitive Earth. | Apply the highlighted preset | E2E |
 | 18 | Low | `foundSettlement`'s profile also inflated the starting population of developed civs by 0.7%. | Normalized | Ledger tests |
 
-## Known issues and next steps (ranked)
-
-1. **Modern economies (R3.3, R2.5, R11): Malthusian ceiling plus metal depletion.** Measured in VALIDATION §6b. This has the highest model impact. Next step: recalibrate the fertility transition so that food security, child survival and urbanization lower TFR. Yields alone were tested and rejected.
-2. **No WebKit or physical-device verification (R13, R15).** Run the protocol in VALIDATION §8 on an iPhone.
-3. **Late-game performance on 256²:** about 0.45 s per simulated year. The next targets are migration, settlement monthly bookkeeping and herd updates (PERFORMANCE §1).
-4. **Resource scarcity is masked by pre-stocked developed starts (R2.5).**
-5. **Dev-dependency advisories:** vitest 5 upgrade (SECURITY.md).
-6. **Favorites and follow camera:** not implemented (deferred, as agreed).
-7. **Self-host the Pixelify Sans font:** privacy improvement.
-
-## Plan verification
+### Plan verification (round 2)
 
 Tests the plan named, and where they stand:
 

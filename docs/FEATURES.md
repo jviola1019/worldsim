@@ -12,7 +12,7 @@ Legend: **✓** comparable capability, of original design · **◐** partial · 
 |---|---|---|---|
 | 1 | Terrain painting, height tools, brushes (F01–F04) | ✓ | 37 terrain and biome tools, brush sizes with preview, raise and lower, undo. Hydrology is recomputed after each stroke. |
 | 1 | Walls, stamps, cellular automata (F03, F05, F10) | ✕ | Not planned. They are decorative in the reference and have no simulation meaning here. |
-| 2 | Procedural generation, map sizes (F11–F17) | ✓ | Plates, rain shadow, rivers to the sea or lakes, 24 terrains, 8 presets (incl. Realistic observer), 4 sizes (128²–320²), plus a "complete randomization" option. Generation runs in a Web Worker. |
+| 2 | Procedural generation, map sizes (F11–F17) | ✓ | Plates, rain shadow, rivers to the sea or lakes, 24 terrains, 9 presets (incl. Realistic observer), **17 map shapes** (circle, square, donut, crescent, spiral, shards, checkerboard, mirrored, highlands, arid, waterworld, frozen, pangaea, twin, many continents, rift, natural), 4 sizes (128²–320²), plus a "complete randomization" option. Generation runs in a Web Worker. |
 | 3 | Biomes and environmental change (F18–F25) | ✓ | Seasons, droughts (AR(1)), fire spread, floods, storms, quakes, volcanoes, desertification, pollution, CO₂-driven warming and sea level. |
 | 4 | Animals, plants, ecosystems (F26–F33) | ✓ | Herds, predation, grazing, domestication, migration, extinction. Plants are vegetation density on tiles, not individuals. |
 | 5 | Civilizations, cities, borders (F34–F42) | ✓ | Emergent from bands, era-specific districts, territory growth, capitals, secession and merger. Original **procedural flags** from emblems. |
@@ -35,8 +35,8 @@ Legend: **✓** comparable capability, of original design · **◐** partial · 
 | 15 | Map layers (F116) | ✓ | 16 overlays, including **past borders** with a year slider. |
 | 15 | Time controls (F118) | ✓ | Pause and five speeds. Simulation speed is independent of frame rate. |
 | 16 | World ages and eras (F119–F123) | ⇄ | No global "ages". Each civilization advances through its own eras; climate change is modeled. |
-| 17 | Disasters and destructive powers (F124–F131) | ✓ | 11 disaster tools plus natural disasters with causal effects (damage, deaths, refugees, legitimacy). Nuclear strikes are abstract. |
-| 18 | Fantasy creatures (F132–F138) | ◐ | 7 optional creature types behind the fantasy toggle. Human-only worlds are the default. |
+| 17 | Disasters and destructive powers (F124–F131) | ✓ | 11 disaster tools, natural disasters with causal effects, and catastrophes at real-order base rates (airbursts, impacts, VEI-7/8 eruptions, geomagnetic storms, superflares, gamma-ray bursts). Nuclear arsenals with doctrine, deterrence, fallout and nuclear winter. |
+| 18 | Fantasy creatures (F132–F138) | ◐ | 7 optional creature types behind the fantasy toggle, plus god-mode-only horrors (zombies, ghouls, blight) that can never appear in Realistic worlds. Human-only worlds are the default. |
 | 19 | Statistics, history, favorites (F139–F145) | ✓ / ✕ | Global and per-civ charts with event markers, filterable history, causes, newspaper. **Favorites are not implemented.** |
 | 20 | World laws (F146–F152) | ✓ | 15 laws plus live tuning of the balance constants in the World laws panel. |
 | 21 | Saving, loading, sharing (F153–F158) | ✓ | IndexedDB slots, autosave, thumbnails, export and import files, timeline branching. Saves are exactly deterministic. No online sharing. |
@@ -50,4 +50,9 @@ The reference has none of these:
 - Factions that drive institution vectors, with derived government labels.
 - Counterfactual-tested causal chains (drought → prices, instability → regime change).
 - Modern and future systems: automation, space programs, colonies, fusion.
+- An era-medium news feed (cave wall → tablets → scriptorium → press → newspaper → broadcast → social app → holonet), derived from recorded events, with generated outlets, platforms and AI systems.
+- Live city photos (aerial from the real tiles, street-level postcard) and a 50-year album per nation.
+- National values (11 ethos archetypes) and emergent missions that change how each nation works.
+- Sports leagues, cups and world games; ports, airports and visitor accords; transport by era.
+- Typed endings with recorded causes, including AI takeover, engineered pandemics, nuclear winter and grey goo; technological leapfrogging.
 - Characters' life logs with recorded causes.

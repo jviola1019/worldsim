@@ -1,0 +1,5 @@
+10 worlds x 300 years (96², start era 9) in 129 s
+nations founded 54, fallen 4
+endings: {"conquest":4}
+catastrophes: {"geomagnetic_storm":17,"airburst":5,"vei7":2,"supervolcano":1}
+nuclear-use events 0, AI incidents 31

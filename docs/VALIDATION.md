@@ -1,10 +1,73 @@
-# Validation record (round 2)
+# Validation record
 
 | | |
 |---|---|
 | Baseline | `5571bc8`, branch `claude/epoch-civilizations-unbound-dap8pc`, clean worktree. The baseline numbers below were measured from a separate git worktree pinned at this commit. |
 | Environment | Cloud container: 4 vCPU Intel Xeon @ 2.10 GHz, 15 GB RAM, Node 22.23.4, Playwright 1.63 with Chromium only (no WebKit or Firefox installed), Linux. **Not** a phone. |
 | Commands | `npm ci`, `npm run typecheck`, `npm test`, `npm run build`, `npm run e2e`, `node tools/viewports.mjs`, `npm run bench -- <size> <years>`, `npm run stats -- <seeds> <years> <size>`. Probe scripts are listed under each section. |
+
+## R5. Round 5 final verification (2026-11-18)
+
+Environment: the same cloud container (4 vCPU, Linux, **not** a phone), Node 22.23.4 locally and Node 26 LTS in CI, Chromium only. Every figure below comes from a recorded run, and raw outputs are in [`docs/data/round5/`](data/round5/).
+
+### Gate
+
+| Check | Result |
+|---|---|
+| `npm run typecheck` (TypeScript 7.0.2) | exit 0 |
+| `npm test` (Vitest 5.1.1) | **506 passed, 0 failed, 0 skipped** (27 files). Each fix of rounds 4–5 was mutation-checked: the test fails with the fix reverted. |
+| `npm run build` (Vite 8.3.8) | exit 0. The CSP meta tag is injected, and `_headers` and the font files are in `dist/`. |
+| `npm run e2e` (production build) | **28/28**: world creation, time, tools, layers, nations and flags, nation overview with city pictures, album, news feed, IndexedDB save, CSP present, no CSP violations, injected script blocked, cross-origin frame refused, font loaded, no console errors; phone and desktop |
+| `node tools/viewports.mjs` | **6/6** device profiles: nothing off-screen, no touch targets under 32 px, no console errors |
+| `npm audit` / `npm outdated` | 0 vulnerabilities / nothing outdated (preact 11.2.0, vite 8.3.8, vitest 5.1.1, TypeScript 7.0.2, @types/node 26.6.6, @fontsource/pixelify-sans 5.3.0) |
+| Security | 92-threat matrix, 4 confirmed weaknesses fixed, 32 security regression tests in `tests/security/` (9 mutations caught) plus 29 round-2 persistence tests ([SECURITY.md](SECURITY.md)) |
+
+### GitHub Actions audit (standing to-do)
+
+The last 10 runs of `ci.yml` before this round's final push were checked through the GitHub API.
+
+- **Failure:** run #23 failed. It was the merge commit of P5, in which three trajectory-dependent tests broke. They were rebuilt as probe-selected counterfactuals in the next commits, and runs #24–#26 are green.
+- **Stale steps:** the workflows used `@v4`/`@v3` action tags, Node 22 and Playwright 1.63. All actions are now pinned to commit SHAs at their latest releases, with Node 26 LTS and Playwright 1.65.1. Run #26 passed with exactly this configuration, including the browser e2e.
+- **Skipped jobs:** none skipped. `long-run.yml` runs on its schedule and on manual dispatch. It has not yet been triggered on this branch; its commands were run locally (below). `pages.yml` runs only on `main`, and `main` is created at the end of this round.
+- **Flaky e2e:** none observed. The e2e passed in every CI run of this round and in every local run.
+
+### Natural history, 1,000 years, no god powers (128²)
+
+| World | Furthest era (year) | Agricultural | Early Industrial | Atomic & Space | Food short (y1000) | Unemployed (y1000) | Warming |
+|---|---|---|---|---|---|---|---|
+| modern-1 | Spacefaring (973) | 182 | 538 | 727 | 0% | 31% | 7.18 °C |
+| modern-2 | Spacefaring (988) | 165 | 552 | 714 | 0% | 15% | 10.27 °C |
+| modern-3 | Atomic & Space (892) | 172 | 599 | 892 | 7% | 36% | 3.42 °C |
+| realistic-1 | Near Future (831) | 160 | 538 | 703 | 0% | 24% | 7.22 °C |
+
+Round 2 measured a food shortfall of 58–69% in modern worlds; the round-4 economy fixes removed it (STATUS.md, R11). Unemployment and warming remain the open items.
+
+### Endings census (`scripts/endings-census.ts`)
+
+| Sample | Nations founded / fallen | Endings | Catastrophes | Nuclear use | AI incidents |
+|---|---|---|---|---|---|
+| 10 worlds × 600 years, from prehistory (96²) | 77 / 13 | conquest 5, civil war 5, famine 2, dispersal 1 | geomagnetic storms 32, VEI-7 eruptions 8, airbursts 8, infertility pathogen 2 | 0 | 0 |
+| 10 worlds × 300 years, from era 9 (96²) | 54 / 4 | conquest 4 | geomagnetic storms 17, airbursts 5, VEI-7 2, supervolcano 1 | 0 | 31 |
+
+Rare endings (nuclear war, AI takeover, impacts, grey goo) did not occur organically in these 9,000 world-years. Their mechanics are covered by forced-scenario tests (`endings.test.ts`, `war-nuclear.test.ts`).
+
+### Multi-seed invariants (`npm run stats -- 20 600 96`)
+
+| Metric | Min | Median | Max |
+|---|---|---|---|
+| Highest era at year 600 | 6 (Renaissance) | 7 (Early Industrial) | 8 (Late Industrial) |
+| First farming (year) | 153 | 175 | 195 |
+| Nations alive / fallen | 5 / 0 | 7 / 2 | 10 / 9 |
+| Wars | 47 | 72 | 95 |
+| Religions | 11 | 16 | 28 |
+| Population | 708,851 | 1,419,191 | 1,900,171 |
+| ms per simulated year | 27 | 32 | 41.8 |
+| Ledger / finite / GDP identity | 20/20 | 20/20 | 20/20 |
+
+### Divergence and settling
+
+- Over 6 seeds, developed starts produced 7 ethos types and 4–5 government forms.
+- Water-first settling, over 8 seeds: 82.4% of settlements by water with the change, 81.6% without. The difference is within noise. The 2-seed claim of 90.5% vs 83.6% made earlier was withdrawn, and the test checks the outcome (> 72% over 4 seeds).
 
 ## 1. Test health
 
@@ -183,10 +246,12 @@ See [PERFORMANCE.md](PERFORMANCE.md).
 | WebKit / Safari, Firefox | **Not tested.** These engines are not installed in this environment, and installing browsers was out of scope. |
 | Physical iPhone Safari | **Not tested.** Protocol: build, run `npm run preview:lan`, open the LAN URL on the iPhone, create a Primitive Earth world, run at max speed for 5 minutes, then check pan, pinch, tap-to-inspect, brush painting, the trait editor, the past-borders slider, save and reload, and backgrounding and return. Use Safari Web Inspector for FPS and memory. |
 
-## 9. Unresolved risks
+## 9. Unresolved risks (updated round 5)
 
-1. Late eras sit at a Malthusian ceiling (§3), which needs the fertility-transition recalibration.
+1. Modern unemployment of 15–36% and warming of 3–10 °C (§R5).
 2. No WebKit testing and no physical-device testing.
-3. Late-game cost on 256² maps is about 0.4–0.5 s per simulated year.
-4. Dev-dependency advisories (see [SECURITY.md](SECURITY.md)).
+3. Late-game cost on 256² maps is about 0.4–0.5 s per simulated year (round-2 measurement; see PERFORMANCE.md for the round-5 rerun).
+4. GitHub Pages cannot send security headers (SECURITY.md §5).
 5. Favorites and the follow camera are not implemented.
+
+The Malthusian ceiling and the dev-dependency advisories of round 2 are resolved.

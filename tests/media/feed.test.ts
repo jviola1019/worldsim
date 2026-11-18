@@ -79,7 +79,7 @@ describe('era-medium feed', () => {
   });
 });
 
-import { feedFrame, worldMedium } from '../../src/history/feedFrame';
+import { feedFrame, worldMedium, onlineShare } from '../../src/history/feedFrame';
 import { mediumOf } from '../../src/media/medium';
 
 describe('era interface frames', () => {
@@ -93,6 +93,19 @@ describe('era interface frames', () => {
       for (const p of f.people) { const person = sim.w.persons.get(p.id)!; expect(person.civId).toBe(civ.id); expect(person.died).toBeUndefined(); }
     }
     expect(feedFrame(sim, undefined).medium).toBe(worldMedium(sim));
+  });
+
+  it('the world app frame reports the population-weighted online share, not zero (regression: it read no nation)', () => {
+    const sim = makeSim('frame-online', 64, (c) => { c.settings.startEra = 12; });
+    sim.runYears(3);
+    const civs = [...sim.w.civs.values()].filter((c) => c.alive && c.population > 0);
+    const pop = civs.reduce((a, c) => a + c.population, 0);
+    const expected = civs.reduce((a, c) => a + c.population * (c.media?.online ?? 0), 0) / pop;
+    expect(expected).toBeGreaterThan(0.01); // a modern world is online
+    expect(onlineShare(sim, undefined)).toBeCloseTo(expected, 12);
+    const f = feedFrame(sim, undefined);
+    if (f.medium === 'social') expect(f.subtitle).toContain(`${Math.round(expected * 100)}% of the world online`);
+    for (const c of civs) expect(onlineShare(sim, c)).toBe(c.media?.online ?? 0);
   });
 
   it('a prehistoric world gets the cave wall, not an app', () => {

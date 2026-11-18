@@ -42,6 +42,21 @@ Worldgen plus bootstrap took 159–165 ms on 128² and 362–414 ms on 256². Th
 
 **Regression noted:** early 256² years (300–500) are 8–11% slower in the current run. This is the population ledger bookkeeping plus a different world trajectory. It is small in absolute terms (under 20 ms per year).
 
+## 2b. Round 5 rerun (128², 900 years)
+
+`npm run bench -- 128 900`, seed `bench`, after the round 4–5 systems: media and AI, ethos, missions, sports, visitors, album, catastrophes, risks, nuclear, overtaking. Raw output: [`data/round5/bench-128x900.txt`](data/round5/bench-128x900.txt). This is **not an equivalent workload**: the world takes a different trajectory and grows a smaller population.
+
+| Years | Round 2 (current column above) | Round 5 |
+|---|---|---|
+| 0–100 | 16.6 (1k) | 20.8 (1k) |
+| 300–400 | 38.9 (534k) | 44.9 (592k) |
+| 500–600 | 81.0 (5.0M) | 104.1 (2.8M) |
+| 600–700 | 103.0 (10.0M) | 113.9 (3.9M) |
+| 700–800 | 118.3 (13.0M) | 126.3 (5.6M) |
+| 800–900 | 124.8 (11.8M) | 150.6 (6.0M) |
+
+Worldgen plus bootstrap took 196 ms, and the heap stayed between 23 and 66 MB. **The cost per simulated year rose by roughly 10–30%** in every window, at lower populations. The new yearly systems add work in every window, the most in the modern and future eras. At 150 ms per year the simulation can run at most about 6–7 simulated years per second in the late game on this machine. It has not been measured on a phone. The 20-seed run measured a median of 32 ms per year on 96² (VALIDATION §R5).
+
 ## 3. Browser
 
 `npm run bench:browser -- phone|desktop` measured `requestAnimationFrame` over 10 s on a fresh 128² world.

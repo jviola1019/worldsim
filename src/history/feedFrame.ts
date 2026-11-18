@@ -43,6 +43,18 @@ export function worldMedium(sim: Sim): Medium {
   return order[best];
 }
 
+/** Share of people online: the nation's own, or for the world view the population-weighted share of all living nations. */
+export function onlineShare(sim: Sim, civ: Civ | undefined): number {
+  if (civ) return civ.media?.online ?? 0;
+  let pop = 0, online = 0;
+  for (const c of sim.w.civs.values()) {
+    if (!c.alive || !c.population) continue;
+    pop += c.population;
+    online += c.population * (c.media?.online ?? 0);
+  }
+  return pop > 0 ? online / pop : 0;
+}
+
 export function feedFrame(sim: Sim, civ: Civ | undefined): FeedFrame {
   const medium = civ ? mediumOf(civ) : worldMedium(sim);
   const capital = civ ? sim.w.settlements.get(civ.capital)?.name ?? civ.baseName : 'the world';
@@ -84,7 +96,7 @@ export function feedFrame(sim: Sim, civ: Civ | undefined): FeedFrame {
     broadsheet: [lead ?? `Printers of ${capital}`, 'Freshly pulled from the press'],
     newspaper: [lead ?? `The ${capital} Gazette`, 'Morning edition'],
     broadcast: [lead ?? `${civ?.adjective ?? 'World'} Broadcasting`, 'Live'],
-    social: [lead ?? 'Feed', `${outlets.length} platform${outlets.length === 1 ? '' : 's'} · ${Math.round((civ?.media?.online ?? 0) * 100)}% of people online`],
+    social: [lead ?? 'Feed', `${outlets.length} platform${outlets.length === 1 ? '' : 's'} · ${Math.round(onlineShare(sim, civ) * 100)}% of ${civ ? 'people' : 'the world'} online`],
     holo: [lead ?? 'Holonet', 'Neural sync active'],
   };
   return { medium, title: titles[medium][0], subtitle: titles[medium][1], outlets: outlets.slice(0, 5), trending, people };
