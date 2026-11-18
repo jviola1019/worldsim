@@ -10,6 +10,8 @@
  */
 import { eachOwnTile, forgetOwnTiles } from './territory';
 import { BALANCE } from '../config/balance';
+import { ethosBuildMult } from './ethos';
+import { missionBuildMult } from './missions';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement } from '../sim/types';
 import { markTile } from '../sim/context';
@@ -277,7 +279,8 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
     if (type !== B.CAMP && !hasUnlocked(civ, type)) return;
     if (pop < def.minPop) return;
     if (def.max && s.bld[type] >= def.max && upgrade === undefined) return;
-    cands.push({ type, score, upgrade });
+    // the nation's values and current mission reshape its priorities
+    cands.push({ type, score: score * ethosBuildMult(civ, type) * missionBuildMult(civ, type), upgrade });
   };
   // housing pressure
   const pressure = pop / Math.max(1, s.housing);

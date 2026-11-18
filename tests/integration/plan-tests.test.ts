@@ -71,7 +71,8 @@ describe('world & simulation', () => {
     const m = A.w.map;
     let land = -1;
     // on a river, so the stroke re-routes water and undo must route it back
-    for (let i = 0; i < m.n; i++) if (m.isLand(i) && !m.settle[i] && m.river[i] > 0) { land = i; break; }
+    // (towns now claim river land first, so accept a river tile inside a territory as long as nothing is built on it)
+    for (let i = 0; i < m.n; i++) if (m.isLand(i) && !m.bld[i] && m.river[i] > 0) { land = i; break; }
     expect(land).toBeGreaterThanOrEqual(0);
     // rivers are re-derived from the current land on every edit; normalize first so the comparison is
     // "the world as it would be without the stroke"
@@ -107,7 +108,7 @@ describe('economy & government', () => {
 
   it('tradeBalanceSumsToZero: world exports equal world imports (in a world that trades)', () => {
     let traded = false;
-    for (const seed of ['int-trade', 'plan-trade', 'plan-trade-2']) {
+    for (const seed of ['int-trade', 'plan-trade', 'plan-trade-2', 'tr-4', 'tr-5']) { // whether nations meet and sign trade treaties depends on the seed
       const sim = makeSim(seed, 96, (c) => { c.settings.startEra = 4; });
       sim.runYears(40);
       let exp = 0, imp = 0;

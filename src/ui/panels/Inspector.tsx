@@ -3,6 +3,8 @@ import type { Simulation } from '../../sim/simulation';
 import type { Civ, HistoryEvent, Person, Settlement } from '../../sim/types';
 import { Icon, Kv, Bar, fmt, pct, Sprite, Flag } from '../shared';
 import { PostList } from './FeedPanel';
+import { ETHOS } from '../../civilizations/ethos';
+import { MISSIONS, missionMetric, assignMission, type MissionKind } from '../../civilizations/missions';
 import { BUILDINGS, SECTOR_NAMES } from '../../civilizations/buildings';
 import { TERRAIN } from '../../world/terrain';
 import { DEPOSITS, GOODS } from '../../world/resources';
@@ -445,6 +447,13 @@ function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
               ['Living standard', civ.econ.livingStandard.toFixed(2)],
               ['Research per year', fmt(civ.researchRate)],
             ]} />
+            {civ.ethos && (
+              <div class="section">
+                <h3>Values: {ETHOS[civ.ethos.key].name}</h3>
+                <p class="muted">{ETHOS[civ.ethos.key].blurb} <span>(since {civ.ethos.since})</span></p>
+              </div>
+            )}
+            <MissionBox sim={sim} civ={civ} />
             <div class="section">
               <h3>Leadership</h3>
               {ruler ? (
@@ -586,5 +595,39 @@ function CivStats({ sim, civ }: { sim: Simulation; civ: Civ }) {
       <div class="section"><h3>Stability</h3><LineChart series={[mk('stability', 'Stability')]} format={(v) => `${Math.round(v * 100)}%`} /></div>
       <p class="muted">Cohort size note: {fmt(sim.w.settlements.size ? [...sim.w.settlements.values()].filter((s) => s.civId === civ.id).reduce((a, s) => a + (s.mode === 'cohort' ? cohortTotal(s.cohorts) : 0), 0) : 0)} people are modelled as age cohorts; smaller groups as individuals.</p>
     </>
+  );
+}
+
+/** The nation's current mission with measured progress; god mode may assign a new one. */
+function MissionBox({ sim, civ }: { sim: P['sim']; civ: Civ }) {
+  const [, force] = useState(0);
+  const m = civ.mission;
+  const god = !sim.w.meta.settings.observer && civ.alive;
+  let progress = 0;
+  if (m) {
+    const now = missionMetric(sim, civ, m.kind);
+    progress = m.kind === 'environment' ? (m.start - now) / Math.max(1e-9, m.start - m.target) : (now - m.start) / Math.max(1e-9, m.target - m.start);
+  }
+  const done = civ.missionLog ?? [];
+  return (
+    <div class="section">
+      <h3>Mission{m ? `: ${MISSIONS[m.kind].name}` : ''}</h3>
+      {m ? (
+        <>
+          <p class="muted">{MISSIONS[m.kind].goal}. Because: {m.reason}. Deadline: year {m.until}.</p>
+          <Bar value={Math.max(0, Math.min(1, progress))} />
+        </>
+      ) : <p class="muted">No national mission right now.</p>}
+      {done.length > 0 && <p class="muted small">Past missions: {done.filter((d) => d.ok).length} achieved, {done.filter((d) => !d.ok).length} failed.</p>}
+      {god && (
+        <label class="row small">
+          <span>Decree a mission</span>
+          <select aria-label="Decree a mission" value="" onChange={(e) => { const k = (e.target as HTMLSelectElement).value as MissionKind; if (k) { assignMission(sim, civ, k); force((x) => x + 1); } }}>
+            <option value="">Choose…</option>
+            {(Object.keys(MISSIONS) as MissionKind[]).map((k) => <option key={k} value={k}>{MISSIONS[k].name}</option>)}
+          </select>
+        </label>
+      )}
+    </div>
   );
 }

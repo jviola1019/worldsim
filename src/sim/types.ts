@@ -489,6 +489,10 @@ export interface Civ {
   space: SpaceProgram;
   // --- media & AI (absent in saves from before round 4; created on first use)
   media?: CivMedia;
+  // --- values and goals (round 5; absent in older saves)
+  ethos?: import('../civilizations/ethos').CivEthos;
+  mission?: import('../civilizations/missions').Mission;
+  missionLog?: { kind: import('../civilizations/missions').MissionKind; start: number; end: number; ok: boolean }[];
   // --- bookkeeping
   events: number[];
   lastYearly: number;

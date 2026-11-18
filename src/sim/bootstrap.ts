@@ -172,6 +172,12 @@ export function developedCiv(sim: Sim, x: number, y: number, species: SpeciesKey
   i.liberties = rng.range(0.2, 0.7);
   i.ruleOfLaw = clamp(0.2 + era * 0.04, 0, 0.8);
   i.welfare = era >= 9 ? rng.range(0.1, 0.6) : 0.05;
+  // every institution varies, so developed worlds start with genuinely different states
+  i.religiousAuthority = rng.range(0.05, era >= 9 ? 0.6 : 0.85);
+  i.militaryInfluence = rng.range(0.1, 0.75);
+  i.stateEconomy = era >= 8 ? rng.range(0.05, 0.8) : rng.range(0.05, 0.3);
+  i.federalism = rng.range(0.1, 0.8);
+  i.techGovernance = era >= 11 ? rng.range(0, 0.7) : 0;
   // population scaled by era
   const capPop = Math.round([0, 200, 1500, 5000, 12000, 20000, 40000, 80000, 200000, 400000, 800000, 1500000, 2000000][Math.min(12, era)] * rng.range(0.6, 1.3));
   const cap = foundSettlement(sim, civ, x, y, { pop: capPop, quiet: true });

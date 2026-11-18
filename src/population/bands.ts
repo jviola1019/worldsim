@@ -168,8 +168,10 @@ function bandYearly(sim: Sim, b: Band, civ: Civ, cap: number, size: number): voi
   revealAround(sim, civ, b.x, b.y, 7);
   const i = m.idx(Math.floor(b.x), Math.floor(b.y));
   const richness = clamp01(cap / Math.max(1, size * 1.4) / 3) + (m.hasFreshWater(i) ? 0.15 : 0) + (m.isCoastal(i) ? 0.1 : 0);
-  // settle
-  const pSettle = 0.03 + 0.15 * richness + (civ.caps.farming > 0 ? 0.5 : 0);
+  // settle: farmers put down roots where there is water to drink and irrigate (a river or lake, or a
+  // coast to fish); dry spots are passed over while the band keeps moving toward water
+  const water = m.hasFreshWater(i) ? 1 : m.isCoastal(i) ? 0.7 : 0.15;
+  const pSettle = (0.03 + 0.15 * richness) * (0.5 + 0.5 * water) + (civ.caps.farming > 0 ? 0.5 * water : 0);
   if (size >= 12 && !m.settle[i] && !isWaterTerrain(m.terrain[i]) && TERRAIN[m.terrain[i]].buildable && rng.float() < pSettle) {
     const s = foundSettlement(sim, civ, Math.floor(b.x), Math.floor(b.y), { members: b.members, species: b.species, cultureId: b.cultureId, religionId: b.religionId, cause: civ.caps.farming > 0 ? 'Agriculture made permanent settlement possible' : 'Rich foraging grounds encouraged a permanent camp' });
     s.food = b.food;

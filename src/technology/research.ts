@@ -12,6 +12,8 @@
  * literacy and institutions can make a civilization FORGET techs.
  */
 import { mediaResearchMult } from '../media/media';
+import { ethosResearchMult, ethosAdoptionMult } from '../civilizations/ethos';
+import { missionResearchMult } from '../civilizations/missions';
 import type { Sim } from '../sim/context';
 import type { Civ, TechState } from '../sim/types';
 import { CAP_KEYS, emptyCaps, isTierCap, type GeoFeature, type TechDef } from './types';
@@ -260,6 +262,8 @@ export function chooseResearch(sim: Sim, civ: Civ): string {
         u *= 1.1;
         break;
     }
+    // what the society values and what it is striving for
+    u *= ethosResearchMult(civ, t.category) * missionResearchMult(civ, t.category);
     // prefer techs we already have resources for
     if (!resourcesMet(civ, t)) u *= 0.4;
     return u;
@@ -409,7 +413,7 @@ export function researchYearly(sim: Sim, civ: Civ): void {
     if (!def) continue;
     const before = st.adoption;
     if (resourcesMet(civ, def)) {
-      if (st.adoption < 1) st.adoption = Math.min(1, st.adoption + (investment * (1 + civ.caps.communication * 0.03)) / def.adoptionYears);
+      if (st.adoption < 1) st.adoption = Math.min(1, st.adoption + (investment * (1 + civ.caps.communication * 0.03) * ethosAdoptionMult(civ, id)) / def.adoptionYears);
     } else if (st.adoption > 0) {
       st.adoption = Math.max(0, st.adoption - 0.06); // lost access to required materials
     }

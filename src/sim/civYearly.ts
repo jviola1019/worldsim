@@ -13,6 +13,8 @@ import { militaryYearly } from '../military/war';
 import { infrastructureYearly } from '../economy/trade';
 import { spaceYearly } from '../future/space';
 import { mediaYearly } from '../media/media';
+import { ethosYearly } from '../civilizations/ethos';
+import { missionsYearly } from '../civilizations/missions';
 import { killCiv } from '../civilizations/civ';
 import { spawnAgent } from '../population/agents';
 import { isKnown } from '../civilizations/knowledge';
@@ -51,6 +53,8 @@ export function civYearly(sim: Sim, civ: Civ): void {
     const c = w.settlements.get(civ.capital);
     if (c) c.capital = true;
   }
+  ethosYearly(sim, civ);
+  missionsYearly(sim, civ);
   researchYearly(sim, civ);
   civEconomyYearly(sim, civ, civ.tradeExp ?? 0, civ.tradeImp ?? 0);
   politicsYearly(sim, civ);
@@ -96,8 +100,9 @@ function siteScore(sim: Sim, civ: Civ, i: number): number {
   const y = m.yOf(i);
   for (const s of sim.w.settlements.values()) if ((s.x - x) ** 2 + (s.y - y) ** 2 < 30) return -1;
   let score = def.habitability + m.fert[i] / 255;
-  if (m.hasFreshWater(i)) score += 0.5;
-  if (m.isCoastal(i)) score += 0.25 * (1 + civ.personality.trade);
+  // most towns in history grew on rivers, lakes and coasts
+  if (m.hasFreshWater(i)) score += 1.2;
+  if (m.isCoastal(i)) score += 0.5 * (0.6 + civ.personality.trade);
   let deposits = 0;
   m.forRadius(x, y, 3, (j) => {
     if (m.dep[j]) deposits++;

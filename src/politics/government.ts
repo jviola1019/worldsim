@@ -16,6 +16,7 @@
  * outcomes depend on who holds power.
  */
 import { mediaUnrest, mediaCorruptionRelief } from '../media/media';
+import { ethosBudget, ethosPolicies, ethosIdeal } from '../civilizations/ethos';
 import { removePeople } from '../population/demography';
 import { flow } from '../population/ledger';
 import type { Sim } from '../sim/context';
@@ -178,6 +179,7 @@ export function politicsYearly(sim: Sim, civ: Civ): void {
   // --- institutional drift toward power-weighted ideals (bounded by ideas & technology)
   const maxParticipation = clamp01(0.3 + c.participation * 0.45 + c.communication * 0.02);
   const reform = 0.03 * (1 + rulerLead(sim, civ, 'reform')) * (0.5 + civ.stability);
+  const ethosVoice = ethosIdeal(civ);
   for (const k of Object.keys(i) as (keyof Institutions)[]) {
     if (k === 'capacity') continue;
     let tw = 0;
@@ -188,6 +190,9 @@ export function politicsYearly(sim: Sim, civ: Civ): void {
       tw += f.power;
       tv += f.power * v;
     }
+    // the society's values pull too (a theocratic people wants clerics in power, a technocratic one experts)
+    const ev = ethosVoice?.ideal[k];
+    if (ev !== undefined) { tw += ethosVoice!.power; tv += ethosVoice!.power * ev; }
     if (tw <= 0) continue;
     let goal = tv / tw;
     if (k === 'participation') goal = Math.min(goal, maxParticipation);
@@ -412,6 +417,7 @@ function policyDecisions(sim: Sim, civ: Civ): void {
     welfare: c.welfare > 0 ? civ.inst.welfare * 0.3 : 0.01,
     religion: 0.02 + civ.inst.religiousAuthority * 0.2,
   };
+  ethosBudget(civ, t);
   let sum = 0;
   for (const k of Object.keys(t) as (keyof typeof t)[]) sum += t[k];
   for (const k of Object.keys(t) as (keyof typeof t)[]) b[k] += (t[k] / sum - b[k]) * 0.25;
@@ -439,6 +445,7 @@ function policyDecisions(sim: Sim, civ: Civ): void {
   civ.policies.ubi = c.welfare > 0 && c.automation > 0.4 && civ.econ.unemployment > 0.15 && civ.inst.participation > 0.4;
   if (c.ai > 0.5) civ.policies.aiRegulation = civ.inst.liberties > 0.6 ? 'strict' : civ.inst.techGovernance > 0.4 ? 'light' : 'none';
   if (civ.policies.ubi) civ.inst.welfare = clamp01(civ.inst.welfare + 0.02);
+  ethosPolicies(civ);
 }
 
 export type { GovFormKey };
