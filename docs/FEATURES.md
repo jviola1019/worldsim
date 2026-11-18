@@ -12,7 +12,7 @@ Legend: **✓** comparable capability, of original design · **◐** partial · 
 |---|---|---|---|
 | 1 | Terrain painting, height tools, brushes (F01–F04) | ✓ | 37 terrain and biome tools, brush sizes with preview, raise and lower, undo. Hydrology is recomputed after each stroke. |
 | 1 | Walls, stamps, cellular automata (F03, F05, F10) | ✕ | Not planned. They are decorative in the reference and have no simulation meaning here. |
-| 2 | Procedural generation, map sizes (F11–F17) | ✓ | Plates, rain shadow, rivers to the sea or lakes, 24 terrains, 7 presets, 4 sizes (128²–320²), plus a "complete randomization" option. Generation runs in a Web Worker. |
+| 2 | Procedural generation, map sizes (F11–F17) | ✓ | Plates, rain shadow, rivers to the sea or lakes, 24 terrains, 8 presets (incl. Realistic observer), 4 sizes (128²–320²), plus a "complete randomization" option. Generation runs in a Web Worker. |
 | 3 | Biomes and environmental change (F18–F25) | ✓ | Seasons, droughts (AR(1)), fire spread, floods, storms, quakes, volcanoes, desertification, pollution, CO₂-driven warming and sea level. |
 | 4 | Animals, plants, ecosystems (F26–F33) | ✓ | Herds, predation, grazing, domestication, migration, extinction. Plants are vegetation density on tiles, not individuals. |
 | 5 | Civilizations, cities, borders (F34–F42) | ✓ | Emergent from bands, era-specific districts, territory growth, capitals, secession and merger. Original **procedural flags** from emblems. |
