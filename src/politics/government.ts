@@ -15,6 +15,7 @@
  * (e.g. mass participation needs communication & suffrage ideas) but
  * outcomes depend on who holds power.
  */
+import { mediaUnrest, mediaCorruptionRelief } from '../media/media';
 import { removePeople } from '../population/demography';
 import { flow } from '../population/ledger';
 import type { Sim } from '../sim/context';
@@ -165,12 +166,12 @@ export function politicsYearly(sim: Sim, civ: Civ): void {
   }
   local = pop > 0 ? local / pop : 0;
   const repression = i.centralization * i.militaryInfluence * 0.3;
-  const unrestTarget = clamp01(grievance * 1.2 + local * 0.5 + shortage * 2 + civ.econ.inequality * 0.2 + civ.warExhaustion * 0.3 - repression - civ.legitimacy * 0.25);
+  const unrestTarget = clamp01(grievance * 1.2 + local * 0.5 + shortage * 2 + civ.econ.inequality * 0.2 + civ.warExhaustion * 0.3 + mediaUnrest(civ) - repression - civ.legitimacy * 0.25);
   civ.unrest += (unrestTarget - civ.unrest) * 0.3;
   civ.stability += (clamp01(civ.legitimacy * 0.6 + (1 - civ.unrest) * 0.4 - (civ.crisis > 0 ? 0.1 : 0)) - civ.stability) * 0.25;
   // --- corruption & capacity
   const rents = civ.econ.gdp > 0 ? clamp01((civ.econ.sectors[1] ?? 0) / civ.econ.gdp) : 0;
-  const corrTarget = clamp01(0.35 - i.ruleOfLaw * 0.3 - i.liberties * 0.1 - c.ruleOfLaw * 0.2 + saturate(civ.regimeAge, 60) * 0.15 + rents * 0.25 + rulerLead(sim, civ, 'corruption'));
+  const corrTarget = clamp01(0.35 - i.ruleOfLaw * 0.3 - i.liberties * 0.1 - c.ruleOfLaw * 0.2 + saturate(civ.regimeAge, 60) * 0.15 + rents * 0.25 + rulerLead(sim, civ, 'corruption') - mediaCorruptionRelief(civ));
   civ.corruption += (corrTarget - civ.corruption) * 0.1;
   const capTarget = clamp01((0.05 + c.adminCapacity * 0.12) * (0.6 + 0.8 * civ.budget.admin) * (1 - civ.corruption * 0.5));
   i.capacity += (capTarget - i.capacity) * 0.08;

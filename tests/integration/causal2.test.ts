@@ -18,20 +18,27 @@ import { BUILDINGS } from '../../src/civilizations/buildings';
 const clone = (s: Simulation) => { s.syncRng(); return new Simulation(decodeWorld(encodeWorld(s.w))); };
 
 describe('#8 trade interruption hurts a dependent importer, and trade recovers', () => {
-  const base = makeSim('int-trade', 96, (c) => { c.settings.startEra = 4; });
-  base.runYears(40);
+  // a world that trades: whether nations meet and open routes depends on the seed, so take the first
+  // of a few seeds with an established route (the precondition below still demands real dependence)
+  let base!: Simulation;
   // the most import-dependent (route, good): share of the importer's supply that arrives by this route
   let pick: { route: number; good: number; importer: number; exporter: number; dep: number } | null = null;
-  for (const r of base.w.routes.values()) {
-    if (!r.active || r.volume <= 0) continue;
-    r.flows.forEach((f, g) => {
-      if (!f) return;
-      const importer = f > 0 ? r.civB : r.civA;
-      const exporter = f > 0 ? r.civA : r.civB;
-      const imp = base.w.civs.get(importer)!;
-      const dep = Math.abs(f) / (Math.abs(f) + imp.acc.prod[g] + 1e-9);
-      if (!pick || dep > pick.dep) pick = { route: r.id, good: g, importer, exporter, dep };
-    });
+  for (const seed of ['int-trade', 'int-trade-2', 'int-trade-3', 'int-trade-4', 'int-trade-5']) {
+    base = makeSim(seed, 96, (c) => { c.settings.startEra = 4; });
+    base.runYears(40);
+    for (const r of base.w.routes.values()) {
+      if (!r.active || r.volume <= 0) continue;
+      r.flows.forEach((f, g) => {
+        if (!f) return;
+        const importer = f > 0 ? r.civB : r.civA;
+        const exporter = f > 0 ? r.civA : r.civB;
+        const imp = base.w.civs.get(importer)!;
+        const dep = Math.abs(f) / (Math.abs(f) + imp.acc.prod[g] + 1e-9);
+        if (!pick || dep > pick.dep) pick = { route: r.id, good: g, importer, exporter, dep };
+      });
+    }
+    if (pick && (pick as { dep: number }).dep > 0.5) break;
+    pick = null;
   }
 
   it('precondition: an established route the importer depends on', () => {

@@ -63,7 +63,7 @@ export function crc32(buf: Uint8Array): number {
   return (c ^ 0xffffffff) >>> 0;
 }
 
-const MAPS = ['civs', 'settlements', 'persons', 'dynasties', 'bands', 'herds', 'subspecies', 'monsters', 'agents', 'armies', 'religions', 'cultures', 'languages', 'diseases', 'wars', 'treaties', 'orgs', 'routes', 'colonies'] as const;
+const MAPS = ['civs', 'settlements', 'persons', 'dynasties', 'bands', 'herds', 'subspecies', 'monsters', 'agents', 'armies', 'religions', 'cultures', 'languages', 'diseases', 'wars', 'treaties', 'orgs', 'routes', 'colonies', 'outlets', 'ais'] as const;
 
 export class SaveError extends Error {}
 
@@ -209,6 +209,10 @@ function decodeChecked(bytes: Uint8Array): WorldState {
     knowledge,
   };
   for (const k of MAPS) w[k] = new Map((st[k] ?? []).map((e: any) => [e.id, e]));
+  // id counters added after the first release (older saves start them at the highest id in use)
+  for (const [k, list] of [['outlet', 'outlets'], ['ai', 'ais']] as const) {
+    if (!isInt(w.ids[k])) w.ids[k] = Math.max(0, ...[...w[list].keys()].filter((id: unknown) => isInt(id)));
+  }
   return w as WorldState;
 }
 

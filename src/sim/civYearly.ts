@@ -12,6 +12,7 @@ import { diplomacyYearly } from '../politics/diplomacy';
 import { militaryYearly } from '../military/war';
 import { infrastructureYearly } from '../economy/trade';
 import { spaceYearly } from '../future/space';
+import { mediaYearly } from '../media/media';
 import { killCiv } from '../civilizations/civ';
 import { spawnAgent } from '../population/agents';
 import { isKnown } from '../civilizations/knowledge';
@@ -58,6 +59,7 @@ export function civYearly(sim: Sim, civ: Civ): void {
   militaryYearly(sim, civ);
   infrastructureYearly(sim, civ);
   spaceYearly(sim, civ);
+  mediaYearly(sim, civ);
   domestication(sim, civ);
   expansion(sim, civ);
   computeCaps(civ);

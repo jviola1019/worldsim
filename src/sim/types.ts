@@ -487,6 +487,8 @@ export interface Civ {
   personality: Personality;
   // --- future
   space: SpaceProgram;
+  // --- media & AI (absent in saves from before round 4; created on first use)
+  media?: CivMedia;
   // --- bookkeeping
   events: number[];
   lastYearly: number;
@@ -496,6 +498,80 @@ export interface Civ {
   prev: { pop: number; gdp: number; territory: number };
   population: number;
   territory: number;
+}
+
+// ---------------------------------------------------------------- media & AI
+
+/** The medium a civilization's news travels through, by era and technology. */
+export type Medium = 'carving' | 'tablet' | 'scroll' | 'broadsheet' | 'newspaper' | 'broadcast' | 'social' | 'holo';
+
+export type OutletKind = 'chronicle' | 'press' | 'newspaper' | 'broadcaster' | 'platform' | 'holonet';
+
+/** A named outlet: chronicle house, printing press, newspaper, broadcaster, social platform or holonet. */
+export interface MediaOutlet {
+  id: number;
+  civId: number;
+  kind: OutletKind;
+  name: string;
+  founded: number;
+  closed?: number;
+  closedCause?: string;
+  /** Settlement it was founded in. */
+  settlementId: number;
+  /** Share of the nation's people it reaches (0..1). */
+  reach: number;
+  /** Public trust in it (0..1). */
+  trust: number;
+  /** State control: state outlets repeat the government line. */
+  stateRun: boolean;
+  /** Platforms: strength of content moderation (0..1). */
+  moderation: number;
+  /** Platforms: years since launch drive a rise-and-fade life cycle. */
+  peak: number;
+}
+
+export type AIRole = 'research' | 'assistant' | 'governance' | 'defense' | 'general';
+
+/** A named artificial-intelligence system built by a lab in a nation. */
+export interface AISystem {
+  id: number;
+  civId: number;
+  name: string;
+  lab: string;
+  version: number;
+  role: AIRole;
+  founded: number;
+  retired?: number;
+  status: 'active' | 'retired' | 'shutdown';
+  /** Grows with the nation's computing and AI capability. */
+  capability: number;
+  /** How reliably it does what its operators intend (0..1); regulation raises it. */
+  alignment: number;
+  /** How much it acts without human sign-off (0..1). */
+  autonomy: number;
+  incidents: number;
+}
+
+/** A civilization's information environment (yearly; serialized). */
+export interface CivMedia {
+  /** Political polarization (0..1): raises unrest, weakens legitimacy, sharpens elections. */
+  polarization: number;
+  /** Prevalence of false claims (0..1): undermines public-health compliance and trust. */
+  misinformation: number;
+  /** Trust in news and institutions (0..1). */
+  trust: number;
+  /** Press freedom (0..1): exposes corruption; censorship lowers it. */
+  freedom: number;
+  /** Share of people on social or neural platforms (0..1). */
+  online: number;
+  /** Combined capability of active AI systems by role. */
+  aiResearch: number;
+  aiGovernance: number;
+  aiDefense: number;
+  /** Year of the last AI incident (or -1). */
+  lastIncident: number;
+  /** Year of the last online protest movement (or -1). */
+  lastProtest?: number;
 }
 
 export interface EconAcc {
@@ -800,6 +876,8 @@ export interface HistoryEvent {
   importance: number; // 1 minor .. 5 world-shaking
   causes?: Cause[];
   headline?: string;
+  /** How the news travelled when it happened (fixed then; later technology does not rewrite it). */
+  medium?: Medium;
 }
 
 export interface SeriesStore {
@@ -881,6 +959,8 @@ export interface WorldState {
   orgs: Map<number, IntlOrg>;
   routes: Map<number, TradeRoute>;
   colonies: Map<number, Colony>;
+  outlets: Map<number, MediaOutlet>;
+  ais: Map<number, AISystem>;
   relations: Map<string, Relation>;
   events: HistoryEvent[];
   stats: StatsStore;

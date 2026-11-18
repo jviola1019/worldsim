@@ -18,6 +18,7 @@ import type { Sim } from '../sim/context';
 import type { Civ, Religion, Settlement } from '../sim/types';
 import { clamp01 } from '../core/math';
 import { makeName, religionName } from './language';
+import { uniqueName, namesInUse } from './naming';
 import { phonOfCulture, createPerson } from '../population/persons';
 import { logEvent } from '../history/events';
 import { CIV_COLORS } from '../civilizations/civ';
@@ -100,8 +101,11 @@ export function foundReligion(sim: Sim, s: Settlement, civ: Civ, founderId = 0, 
     headId: founder,
     adherents: 0,
   };
-  r.name = parent ? `Reformed ${parent.name.replace(/^Reformed /, '')}` : religionName(rng, phon, deity);
-  if (parent && rng.chance(0.5)) r.name = `${makeName(rng, phon, 'word')} ${parent.name.replace(/^(The |Reformed )/, '')}`;
+  const taken = namesInUse(sim);
+  r.name = uniqueName(sim, () => {
+    if (parent && rng.chance(0.5)) return `${makeName(rng, phon, 'word')} ${parent.name.replace(/^(The |Reformed )/, '')}`;
+    return parent ? `Reformed ${parent.name.replace(/^Reformed /, '')}` : religionName(rng, phon, deity);
+  }, taken);
   w.religions.set(r.id, r);
   w.map.hazard[r.holySite] |= HAZARD.SACRED;
   const fp = w.persons.get(founder);

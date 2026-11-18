@@ -20,6 +20,7 @@
  * they deter war, and in extreme losing situations may be used with
  * catastrophic humanitarian, environmental and diplomatic consequences.
  */
+import { mediaMilitaryMult } from '../media/media';
 import { flow } from '../population/ledger';
 import { onBattle } from '../population/development';
 import type { Sim } from '../sim/context';
@@ -46,7 +47,7 @@ export function armyStrength(sim: Sim, a: Army, civ: Civ | undefined): number {
   const tierMult = 1 + a.tier * 0.55;
   const gen = sim.w.persons.get(a.generalId);
   const generalship = gen ? 1 + gen.skills.military * 0.03 : 1;
-  const air = 1 + c.airPower * 0.4 + c.autonomousWeapons * 0.3;
+  const air = (1 + c.airPower * 0.4 + c.autonomousWeapons * 0.3) * mediaMilitaryMult(civ);
   return a.manpower * tierMult * (0.4 + 0.6 * a.equipment) * (0.5 + 0.5 * a.training) * (0.3 + 0.7 * a.morale) * (0.4 + 0.6 * a.supply) * (1 + c.militaryAttack) * generalship * air;
 }
 

@@ -9,6 +9,7 @@
  * policy. Recovered people are immune for a while. No real pathogen biology is
  * modelled — parameters are abstract (r0, lethality, duration, immunity).
  */
+import { mediaHealthPenalty } from '../media/media';
 import { flow } from './ledger';
 import { onEpidemicSurvived } from './development';
 import type { Sim } from '../sim/context';
@@ -78,10 +79,12 @@ export function diseaseMonthly(sim: Sim, s: Settlement, civ: Civ): void {
     if (!d) continue;
     const gamma = 1 / Math.max(0.3, d.duration); // recoveries per month
     const crowd = clamp(0.55 + density * 0.18, 0.5, 1.5);
-    const beta = d.r0 * gamma * crowd * (1 - sanitation * 0.45) * (1 - control * 0.6) * (1 - quarantine);
+    // false claims undermine distancing, treatment and vaccination
+    const misinfo = mediaHealthPenalty(civ);
+    const beta = d.r0 * gamma * crowd * (1 - sanitation * 0.45) * (1 - control * 0.6 * (1 - misinfo * 0.5)) * (1 - quarantine * (1 - misinfo));
     const newInf = Math.min(e.s, beta * e.s * e.i);
     const rec = gamma * e.i;
-    const lethal = d.lethality * (1 - control * 0.85) * (1 - clamp01(caps.healthcare) * 0.4);
+    const lethal = d.lethality * (1 - control * 0.85 * (1 - misinfo * 0.4)) * (1 - clamp01(caps.healthcare) * 0.4);
     const dead = rec * lethal;
     e.s -= newInf;
     e.i += newInf - rec;

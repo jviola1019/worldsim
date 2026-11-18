@@ -163,6 +163,9 @@ export class Simulation implements Sim {
     for (const c of w.civs.values()) d.num(c.id).num(c.population).num(c.techScore).num(c.treasury).str(c.govForm).num(c.alive ? 1 : 0);
     for (const s of w.settlements.values()) d.num(s.id).num(s.pop).num(s.food).arr(s.bld);
     for (const h of w.herds.values()) d.num(h.id).num(h.count).num(h.x).num(h.y);
+    for (const o of w.outlets.values()) d.num(o.id).num(o.reach).num(o.closed ?? -1);
+    for (const a of w.ais.values()) d.num(a.id).num(a.capability).num(a.alignment).str(a.status);
+    for (const c of w.civs.values()) if (c.media) d.num(c.media.polarization).num(c.media.misinformation).num(c.media.trust);
     d.num(w.persons.size).num(w.events.length);
     return d.hex();
   }

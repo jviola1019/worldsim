@@ -8,6 +8,7 @@
  *
  * Model classification: [S] stylized abstraction (magnitudes in config/balance.ts).
  */
+import { mediaServiceMult } from '../media/media';
 import { bldTiles } from '../civilizations/territory';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement } from '../sim/types';
@@ -486,7 +487,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
       emp[SECTOR.UNEMPLOYED] = free;
     }
   }
-  const servProd = 0.9 * (1 + caps.markets + caps.finance * 0.6 + caps.computing * 0.4 + caps.ai * 0.6) * (0.55 + s.education);
+  const servProd = 0.9 * (1 + caps.markets + caps.finance * 0.6 + caps.computing * 0.4 + caps.ai * 0.6) * (0.55 + s.education) * mediaServiceMult(civ);
   civ.acc.services += (serviceWorkers * servProd) / 12;
   civ.acc.workers += totalWorkers;
   civ.acc.unemployed += emp[SECTOR.UNEMPLOYED];

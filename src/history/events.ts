@@ -8,6 +8,7 @@
 import type { Sim } from '../sim/context';
 import type { Cause, EventCategory, HistoryEvent } from '../sim/types';
 import { headlineFor } from './newspaper';
+import { mediumOf } from '../media/medium';
 
 export interface EventInput {
   type: string;
@@ -44,6 +45,10 @@ export function logEvent(sim: Sim, e: EventInput): HistoryEvent {
     importance: e.importance ?? 2,
     causes: e.causes && e.causes.length ? normalizeCauses(e.causes) : undefined,
   };
+  // the medium is fixed when the news happens: later technology does not rewrite how it was told
+  let teller = ev.civs.length ? w.civs.get(ev.civs[0]) : undefined;
+  for (const cid of ev.civs) { const c = w.civs.get(cid); if (c && teller && c.era > teller.era) teller = c; }
+  if (teller) ev.medium = mediumOf(teller);
   ev.headline = headlineFor(sim, ev);
   w.events.push(ev);
   if (w.events.length > MAX_EVENTS) pruneEvents(sim);

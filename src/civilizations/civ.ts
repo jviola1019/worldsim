@@ -6,6 +6,7 @@
 import type { Sim } from '../sim/context';
 import type { Civ, Culture, CultureValues, Institutions, Language, Personality, SpeciesKey } from '../sim/types';
 import { generatePhonology, mutatePhonology, makeName, adjectiveOf } from '../culture/language';
+import { uniqueName } from '../culture/naming';
 import { clamp, clamp01 } from '../core/math';
 import { emptyCaps } from '../technology/types';
 import { initTechs, computeCaps } from '../technology/research';
@@ -128,7 +129,7 @@ export function createCiv(sim: Sim, o: NewCiv): Civ {
   let culture = o.cultureId ? w.cultures.get(o.cultureId) : undefined;
   if (!culture) culture = createCulture(sim, { originCiv: id, languageId: o.languageId });
   const lang = w.languages.get(culture.languageId)!;
-  const base = o.name ?? makeName(sim.rng, lang.phon, 'civ');
+  const base = o.name ?? uniqueName(sim, () => makeName(sim.rng, lang.phon, 'civ')); // no two nations share a name
   const g = new Array(GOOD_COUNT).fill(0);
   const civ: Civ = {
     id,

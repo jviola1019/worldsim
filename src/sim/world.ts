@@ -9,7 +9,7 @@ import { emptySeries } from '../history/stats';
 
 export const ID_KINDS = [
   'civ', 'settlement', 'person', 'dynasty', 'band', 'herd', 'subspecies', 'monster', 'agent', 'army', 'religion',
-  'culture', 'language', 'disease', 'war', 'treaty', 'org', 'route', 'colony', 'event',
+  'culture', 'language', 'disease', 'war', 'treaty', 'org', 'route', 'colony', 'event', 'outlet', 'ai',
 ] as const;
 
 export function createWorldState(cfg: WorldConfig, gen?: WorldGenResult): WorldState {
@@ -53,6 +53,8 @@ export function createWorldState(cfg: WorldConfig, gen?: WorldGenResult): WorldS
     orgs: new Map(),
     routes: new Map(),
     colonies: new Map(),
+    outlets: new Map(),
+    ais: new Map(),
     relations: new Map(),
     events: [],
     stats: { global: emptySeries(), civs: {}, interval: 1, lastSample: -1e9 },
