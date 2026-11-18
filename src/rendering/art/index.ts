@@ -12,15 +12,26 @@ import { EFFECT_SPRITES } from './effects';
 import { BUILDING_SPRITES } from './buildings';
 import { CIVIC_BUILDING_SPRITES } from './buildings_civic';
 import { ICON_SPRITES } from './icons';
+import { BUILDING_VENUE_SPRITES } from './buildings_venues';
+import { HOUSING_VARIANT_SPRITES } from './buildings_housing';
+import { ERA_VEHICLE_SPRITES } from './vehicles_era';
+import { CHARACTER_SPRITES } from './characters';
 
-export const ALL_SPRITES: SpriteSheet = {
-  ...TERRAIN_SPRITES,
-  ...VEGETATION_SPRITES,
-  ...UNIT_SPRITES,
-  ...ANIMAL_SPRITES,
-  ...VEHICLE_SPRITES,
-  ...EFFECT_SPRITES,
-  ...BUILDING_SPRITES,
-  ...CIVIC_BUILDING_SPRITES,
-  ...ICON_SPRITES,
+/** Every sheet, in registration order (also used by tests to detect duplicate ids). */
+export const SPRITE_SHEETS: Readonly<Record<string, SpriteSheet>> = {
+  terrain: TERRAIN_SPRITES,
+  vegetation: VEGETATION_SPRITES,
+  units: UNIT_SPRITES,
+  characters: CHARACTER_SPRITES,
+  animals: ANIMAL_SPRITES,
+  vehicles: VEHICLE_SPRITES,
+  vehiclesEra: ERA_VEHICLE_SPRITES,
+  effects: EFFECT_SPRITES,
+  buildings: BUILDING_SPRITES,
+  housing: HOUSING_VARIANT_SPRITES,
+  civic: CIVIC_BUILDING_SPRITES,
+  venues: BUILDING_VENUE_SPRITES,
+  icons: ICON_SPRITES,
 };
+
+export const ALL_SPRITES: SpriteSheet = Object.assign({}, ...Object.values(SPRITE_SHEETS)) as SpriteSheet;

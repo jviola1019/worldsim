@@ -37,7 +37,7 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 | R12.1–12.3 | Event log, causes, snapshots, branching | Complete | Saves resume identically for 20–40 years in eras 1/4/9/10/12. |
 | R12.4 | Statistics and change decomposition | **Complete** | The population ledger reconciles exactly at every tick, for the world and for every civ. Residual: baseline mean 0–11% (worst 40%), now 0%. |
 | R13 | UI, touch, inspectors, 16 overlays | Complete | Tested in Chromium emulation of iPhone SE, iPhone 13 portrait and landscape, iPhone 15 Pro Max, iPad and Galaxy S9+. Map labels no longer overlap. **No WebKit or physical-device testing.** |
-| R14 | Art and asset manifest | Complete | [ASSETS.md](ASSETS.md) |
+| R14 | Art and asset manifest | Complete | [ASSETS.md](ASSETS.md). 708 static sprites, including the round-5 pack (sports venues, ports and airports by era, housing variants and atomic/eco style sets, era vehicles, characters); `tests/rendering/sprites.test.ts`; contact sheet in `docs/images/sprites/`. Only the housing variants are wired into the renderer so far. |
 | R15 | Architecture, determinism, performance | Partial | Determinism is complete. On identical state the median is about 9% faster. Late game on 256² costs about 0.4–0.5 s per simulated year. **Physical iPhone performance is unverified.** |
 | R16 | Persistence | **Complete** | Validating decoder; gzip-bomb cap; atomic saves; quota failure leaves the old save intact; V0 migration and unavailable storage are tested (29 security tests). |
 | R17 | Tests, benchmarks, docs, CI | Partial | 128 tests, plus a CI workflow (quality gate on every push, weekly long-run job). Missing: WebKit/Firefox and physical-device runs. |
