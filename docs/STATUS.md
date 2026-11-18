@@ -9,7 +9,7 @@ This report tracks completion against the requirements (R-IDs from [REQUIREMENTS
 
 Last verified 2026-11-18 (round 2):
 - `tsc`: exit 0.
-- `npm test`: **125/125** (14 files, 0 skipped).
+- `npm test`: **128/128** (15 files, 0 skipped).
 - `vite build`: exit 0.
 - E2E: 12/12 (phone and desktop, Chromium).
 - Viewport check: 6/6 device profiles.
@@ -33,7 +33,7 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 | R8.4 | Trade, embargoes, crises | Complete | Integration #8: an embargo hurts the dependent importer and trade recovers once it is lifted. tradeBalanceSumsToZero passes. |
 | R9 | War and diplomacy | Complete | War counterfactual (#4), recorded causes, alliance obligations. |
 | R10 | Disease, ecology, powers | Complete | Sanitation lowers deaths and predators reduce prey (both counterfactual). All 97 powers apply without error, and the ledger fuzzer applied random powers with no failures. |
-| R11 | Modern and future systems | Experimental | Colonies require space tier and automation displaces labor (tests). Late-era balance is limited by R3.3. |
+| R11 | Modern and future systems | Experimental | Natural worlds now modernize on their own: 4 of 4 reach Atomic & Space or later within 1,000 years (VALIDATION §6b). But modern economies are weak: food shortfall 58–69%, metal access lost to deposit depletion, unemployment 46–66%. Colonies require space tier and automation displaces labor (tests). |
 | R12.1–12.3 | Event log, causes, snapshots, branching | Complete | Saves resume identically for 20–40 years in eras 1/4/9/10/12. |
 | R12.4 | Statistics and change decomposition | **Complete** | The population ledger reconciles exactly at every tick, for the world and for every civ. Residual: baseline mean 0–11% (worst 40%), now 0%. |
 | R13 | UI, touch, inspectors, 16 overlays | Complete | Tested in Chromium emulation of iPhone SE, iPhone 13 portrait and landscape, iPhone 15 Pro Max, iPad and Galaxy S9+. Map labels no longer overlap. **No WebKit or physical-device testing.** |
@@ -56,11 +56,14 @@ Each fix has a regression test, and "mutation" means the test was confirmed to f
 | 6 | Medium | Undo left the land flooded behind a ridge as grass, and left pit-filled elevation in place. | Undo re-derives hydrology; derived changes are captured in the stroke | Test (mutation, both halves) |
 | 7 | Medium | Terrain powers cleared buildings without updating settlement counts. | `removeBuilding` | Covered by the powers test |
 | 8–17 | Medium/Low | Security audit V1–V9 and S1 (gzip bomb, unvalidated decode, non-atomic save, hangs, URL beacon). | See SECURITY.md | 29 tests; 23 of 28 fail against the pre-fix decoder |
+| 19 | High | Medieval stall in 2 of 4 natural worlds: foragers drove every domesticable species extinct, so domestication (and 146 techs behind it) became impossible. | Type-III hunting response (refuge populations) | `refugia.test.ts` (mutation) |
+| 20 | High | Tech-tree dead end: 146 of 207 techs behind one geography-dependent tech. | Two historically wrong prerequisite edges removed | Structural test; `modern-3` now reaches Atomic & Space |
+| 21 | Medium | New World screen applied the first preset in the list (now Realistic/observer) while highlighting Primitive Earth. | Apply the highlighted preset | E2E |
 | 18 | Low | `foundSettlement`'s profile also inflated the starting population of developed civs by 0.7%. | Normalized | Ledger tests |
 
 ## Known issues and next steps (ranked)
 
-1. **Malthusian ceiling in late eras (R3.3).** This has the highest model impact. Next step: recalibrate the fertility transition so that food security, child survival and urbanization lower TFR. Yields alone were tested and rejected.
+1. **Modern economies (R3.3, R2.5, R11): Malthusian ceiling plus metal depletion.** Measured in VALIDATION §6b. This has the highest model impact. Next step: recalibrate the fertility transition so that food security, child survival and urbanization lower TFR. Yields alone were tested and rejected.
 2. **No WebKit or physical-device verification (R13, R15).** Run the protocol in VALIDATION §8 on an iPhone.
 3. **Late-game performance on 256²:** about 0.45 s per simulated year. The next targets are migration, settlement monthly bookkeeping and herd updates (PERFORMANCE §1).
 4. **Resource scarcity is masked by pre-stocked developed starts (R2.5).**

@@ -130,6 +130,47 @@ Highest era reached by year 600: era 5 in 15 seeds, era 7 in 5 seeds. Median ann
 
 A run before the public-debt fix had 12 of 20 seeds passing. All 8 failures came from debt compounding to Infinity; see STATUS bug #4.
 
+## 6b. Modernization: natural history with no god powers
+
+**Method.** `npx tsx scripts/modernization.ts <seed> 1000 128 [realistic]` runs 1,000 years on a 128² map with **0 interventions**. It records the year the leading nation first reached each era, its modernization indicators every 100 years, and every natural hazard.
+
+**First verification run (before the fixes).** Two of four worlds (`modern-1`, `modern-3`) **stayed in the Medieval era for about 600 years**: literacy plateaued at 0.26 and industry at 3%. Two root causes were diagnosed:
+
+1. **Ecological collapse.** Foragers took 12% of a herd every month however scarce it was. Every domesticable species was extinct by about year 300, so `domestication` (which needs nearby domesticable herds) became impossible. Fix: a type-III hunting response, where scarce prey is hard to find. Regression test: `tests/ecology/refugia.test.ts`, which fails without the fix (0 animals left).
+2. **A hard dead end in the tech tree.** 146 of 207 technologies depended on `domestication` through `heavy_plow`. Two historically wrong edges were removed:
+   - watermills no longer require the heavy plow;
+   - chemical fertilizer now requires scientific method plus electric power, not the seed drill.
+
+   Without domesticable animals, only 9 animal-based technologies stay locked. Structural regression test in `tests/technology/techData.test.ts`.
+
+**Final runs (current code, 0 interventions).** Each cell is the first year the leading nation reached that era.
+
+| World | Agricultural | Medieval | Early Industrial | Early Modern | Atomic & Space | Further |
+|---|---|---|---|---|---|---|
+| `modern-1` | 180 | 420 | 549 | 669 | 792 | — |
+| `modern-2` | 186 | 413 | 517 | 701 | 859 | — |
+| `modern-3` (previously stuck) | 151 | 405 | 529 | 761 | 886 | — |
+| `realistic-1` (Realistic preset) | 173 | 394 | 507 | 613 | 650 | Digital 720, Near Future 849 |
+
+**Modernization indicators of the leading nation.** These move in the expected direction:
+- urban share: 0% → 99–100%;
+- literacy: 0 → 0.81–0.91;
+- life-expectancy index: 0.33 → 0.74–0.85;
+- agricultural employment: about 50% → 0–2%.
+
+**Natural hazards over 1,000 years, with no intervention:**
+- 30–41 logged disasters (earthquakes, storms, one volcanic eruption), causing 168k–358k deaths;
+- 128–260 deadly epidemics;
+- 2.9k–5.5k drought cell-years;
+- emergent warming of 5.2–7.1 °C, with up to 65 sea-level events.
+
+**Verified limitation (open).** Modern nations are dysfunctional economically:
+- **Food:** a chronic shortfall of 58–69% from the Industrial era on (the Malthusian ceiling, §3).
+- **Metals:** iron and copper access falls to 0 as deposits deplete. Electric power then decays by design ("lost access to required materials"), and almost no factories or power plants are ever built.
+- **Result:** in the Atomic era and later, industry is at 0–2% of jobs, unemployment 46–66%, and GDP per person about 0.5–0.65, against about 1.5 in the Renaissance.
+
+Next steps (STATUS): recalibrate the fertility transition and the metal economy (recycling and substitution, deep deposits, imports).
+
 ## 7. Performance
 
 See [PERFORMANCE.md](PERFORMANCE.md).
