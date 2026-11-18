@@ -78,3 +78,26 @@ describe('era-medium feed', () => {
     }
   });
 });
+
+import { feedFrame, worldMedium } from '../../src/history/feedFrame';
+import { mediumOf } from '../../src/media/medium';
+
+describe('era interface frames', () => {
+  it('each nation sees its own era frame, listing only its real outlets and its notable living people', () => {
+    const sim = makeSim('frame-test', 96, (c) => { c.settings.startEra = 8; });
+    sim.runYears(40);
+    for (const civ of [...sim.w.civs.values()].filter((c) => c.alive && c.settlements.length)) {
+      const f = feedFrame(sim, civ);
+      expect(f.medium).toBe(mediumOf(civ));
+      for (const o of f.outlets) expect([...sim.w.outlets.values()].some((x) => x.name === o.name && x.civId === civ.id && x.closed === undefined)).toBe(true);
+      for (const p of f.people) { const person = sim.w.persons.get(p.id)!; expect(person.civId).toBe(civ.id); expect(person.died).toBeUndefined(); }
+    }
+    expect(feedFrame(sim, undefined).medium).toBe(worldMedium(sim));
+  });
+
+  it('a prehistoric world gets the cave wall, not an app', () => {
+    const sim = makeSim('frame-old', 64);
+    sim.runYears(60);
+    expect(['carving', 'tablet']).toContain(worldMedium(sim));
+  });
+});

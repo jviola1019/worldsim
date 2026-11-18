@@ -126,7 +126,7 @@ function mainPost(sim: Sim, ev: HistoryEvent, civ: Civ | undefined, rng: Rng): F
     case 'scroll':
       base.author = person(rng, p);
       base.role = o ? `chronicler, ${o.name}` : 'chronicler';
-      base.text = `Let it be recorded that in the year ${ev.year} ${lcFirst(title)}.${cause ? ` It came to pass through ${lcFirst(cause)}.` : ''}`;
+      base.text = `Let it be recorded that in the year ${ev.year}: ${title}.${cause ? ` It came to pass through ${lcFirst(cause)}.` : ''}`;
       break;
     case 'broadsheet':
       base.author = o?.name ?? `Printers of ${place ?? 'the city'}`;

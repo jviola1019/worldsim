@@ -13,6 +13,9 @@ This document records the requested scope and the decisions the owner made. Phas
 | Endings in Realistic mode | Every ending that is humanly possible: nuclear war and nuclear winter, AI takeover, pandemics (natural and engineered), climate runaway, asteroid, supervolcano, demographic collapse and others. The rarest are genuinely rare. God mode adds fictional threats such as a zombie apocalypse and ghouls. |
 | Sports | Simulated, with effects: era-appropriate sports, generated leagues and teams, seasons, cups, Olympics with host bids, and stadium, arena and ballpark sprites. Prestige, tourism and relations are affected, and boycotts follow wars. |
 | Map presets | All four families: shapes, extreme terrain, structured chaos and Earth-like variety. |
+| Social tab | Full era interface frames around the feed: cave wall, scribe's desk, scriptorium with quill and a town crier, printing press, newspaper front page, radio or TV with a ticker, social app with profiles, trending and a platform switcher, hologram. Each nation shows its own era. |
+| Security | Audit all 92 listed threats against the real (static, client-only) architecture with evidence, fixes and regression tests, plus a written threat model with required controls for any future backend (accounts, cloud saves, shared worlds, leaderboards). |
+| Hosting headers | A strict meta CSP and frame-busting fallback, plus a `_headers` file (HSTS, frame-ancestors, nosniff) for hosts that apply it. GitHub Pages limits are documented for manual verification. |
 | Missions | Emergent from conditions and leaders, also assignable in god mode, plus a nation **ethos**. A society's values change how it works, for example a 1940s-style atomic-age retro-futurism versus a present-day society. |
 
 ## Phases
