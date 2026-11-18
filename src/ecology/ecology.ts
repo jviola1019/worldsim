@@ -292,7 +292,11 @@ export function huntHerds(sim: Sim, x: number, y: number, r: number, demand: num
     const sp = SPECIES_BY_KEY[h.species];
     if (!sp || sp.aquatic || sp.flying || h.owner) continue;
     const want = (demand - got) / sp.meat;
-    const take = Math.min(want, h.count * 0.12 * skill);
+    // type-III functional response: scarce prey is hard to find, so hunting pressure collapses as a herd
+    // dwindles (refuge populations survive and can recover). Without it, foragers wiped out every
+    // domesticable species before domestication was discovered, locking 146 of 207 technologies.
+    const findable = (h.count * h.count) / (h.count * h.count + 225);
+    const take = Math.min(want, h.count * 0.12 * skill * findable);
     if (take <= 0) continue;
     const before = h.count;
     h.count -= take;

@@ -21,7 +21,7 @@ const mult = (v: number) => `${v.toFixed(1)}×`;
 export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean; back: () => void; start: (c: WorldConfig) => void }) {
   const [cfg, setCfg] = useState<WorldConfig>(() => {
     const c = defaultConfig();
-    PRESETS[0].apply(c);
+    PRESETS.find((p) => p.key === 'primitive')!.apply(c); // the highlighted default (not the list's first entry)
     return c;
   });
   const [preset, setPreset] = useState(scenarios ? SCENARIOS[0].key : 'primitive');
