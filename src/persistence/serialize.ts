@@ -63,7 +63,7 @@ export function crc32(buf: Uint8Array): number {
   return (c ^ 0xffffffff) >>> 0;
 }
 
-const MAPS = ['civs', 'settlements', 'persons', 'dynasties', 'bands', 'herds', 'subspecies', 'monsters', 'agents', 'armies', 'religions', 'cultures', 'languages', 'diseases', 'wars', 'treaties', 'orgs', 'routes', 'colonies', 'outlets', 'ais'] as const;
+const MAPS = ['civs', 'settlements', 'persons', 'dynasties', 'bands', 'herds', 'subspecies', 'monsters', 'agents', 'armies', 'religions', 'cultures', 'languages', 'diseases', 'wars', 'treaties', 'orgs', 'routes', 'colonies', 'outlets', 'ais', 'leagues'] as const;
 
 export class SaveError extends Error {}
 
@@ -93,6 +93,7 @@ export function encodeWorld(w: WorldState): Uint8Array {
     interventions: w.interventions,
     popLedger: w.popLedger,
     speciesStatus: w.speciesStatus,
+    sports: w.sports,
   };
   for (const k of MAPS) state[k] = [...(w[k] as Map<number, unknown>).values()];
   const header = JSON.stringify({ format: 'epoch-world', saveVersion: SAVE_VERSION, engineVersion: w.meta.engineVersion, state, table });
@@ -206,11 +207,12 @@ function decodeChecked(bytes: Uint8Array): WorldState {
     interventions: st.interventions ?? [],
     popLedger: st.popLedger,
     speciesStatus: st.speciesStatus ?? {},
+    sports: isObj(st.sports) && Array.isArray(st.sports.held) && Array.isArray(st.sports.cups) && Number.isFinite(st.sports.next) ? st.sports : undefined,
     knowledge,
   };
   for (const k of MAPS) w[k] = new Map((st[k] ?? []).map((e: any) => [e.id, e]));
   // id counters added after the first release (older saves start them at the highest id in use)
-  for (const [k, list] of [['outlet', 'outlets'], ['ai', 'ais']] as const) {
+  for (const [k, list] of [['outlet', 'outlets'], ['ai', 'ais'], ['league', 'leagues']] as const) {
     if (!isInt(w.ids[k])) w.ids[k] = Math.max(0, ...[...w[list].keys()].filter((id: unknown) => isInt(id)));
   }
   return w as WorldState;

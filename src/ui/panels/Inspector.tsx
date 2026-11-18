@@ -454,6 +454,7 @@ function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
               </div>
             )}
             <MissionBox sim={sim} civ={civ} />
+            <SportsBox sim={sim} civ={civ} />
             <div class="section">
               <h3>Leadership</h3>
               {ruler ? (
@@ -628,6 +629,24 @@ function MissionBox({ sim, civ }: { sim: P['sim']; civ: Civ }) {
           </select>
         </label>
       )}
+    </div>
+  );
+}
+
+/** Leagues, champions, games and prestige of a nation. */
+function SportsBox({ sim, civ }: { sim: P['sim']; civ: Civ }) {
+  const leagues = [...sim.w.leagues.values()].filter((l) => l.civId === civ.id && l.active);
+  const games = sim.w.sports?.held ?? [];
+  const hosted = games.filter((g) => g.hostCiv === civ.id).length;
+  const medals = games.reduce((a, g) => a + (g.medals[civ.id] ?? 0), 0);
+  if (!leagues.length && !hosted && !medals) return null;
+  return (
+    <div class="section">
+      <h3>Sports and games</h3>
+      <ul class="list">
+        {leagues.map((l) => <li key={l.id}><strong>{l.name}</strong> <span class="muted">· {l.teams.length} teams{l.champions.length ? ` · champions: ${l.champions[l.champions.length - 1].team}` : ''}</span></li>)}
+      </ul>
+      <p class="muted small">World games hosted: {hosted} · medals won: {medals} · prestige {Math.round((civ.prestige ?? 0) * 100)}</p>
     </div>
   );
 }

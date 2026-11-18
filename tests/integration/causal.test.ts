@@ -103,10 +103,13 @@ describe('integration: causal chains', () => {
     const battles = [...B.w.wars.values()].filter((w) => w.attackers.includes(x.id) && w.defenders.includes(y.id)).reduce((a, w) => a + w.battles, 0);
     void ax; void ay;
     expect(battles + warDeaths(B)).toBeGreaterThan(0);
-    // lives: deaths the ledger attributes to war in the two nations, war world vs. peace world
-    // (total population after 8 years of a chaotic system is too noisy to isolate one intervention)
-    const ledgerWar = (s: Simulation) => (s.w.civs.get(x.id)?.ledger?.war ?? 0) + (s.w.civs.get(y.id)?.ledger?.war ?? 0);
-    expect(ledgerWar(B)).toBeGreaterThan(ledgerWar(A));
+    // lives: casualties in wars BETWEEN the two nations, war world vs. the world where they keep the
+    // peace (either may still fight third parties in both worlds, and total population after 8 years
+    // of a chaotic system is too noisy to isolate one intervention)
+    const pairCasualties = (s: Simulation) => [...s.w.wars.values()]
+      .filter((w) => (w.attackers.includes(x.id) && w.defenders.includes(y.id)) || (w.attackers.includes(y.id) && w.defenders.includes(x.id)))
+      .reduce((a, w) => a + Object.values(w.casualties).reduce((p, q) => p + q, 0), 0);
+    expect(pairCasualties(B)).toBeGreaterThan(pairCasualties(A));
     void popA; void popB;
   }, 120000);
 

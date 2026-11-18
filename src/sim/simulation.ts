@@ -7,6 +7,8 @@
  * The renderer never drives simulation logic; `advance()` converts real time
  * to a budgeted number of ticks for the chosen speed.
  */
+import { sportsYearly } from '../culture/sports';
+import { visitorsYearly } from '../economy/visitors';
 import type { Sim, VisualFx } from './context';
 import { CHUNK } from './context';
 import type { HistoryEvent, WorldState } from './types';
@@ -112,6 +114,8 @@ export class Simulation implements Sim {
     evolutionYearly(this);
     religionYearly(this);
     cultureYearly(this);
+    sportsYearly(this);
+    visitorsYearly(this);
     climateYearly(this);
     notablesYearly(this);
     if (this.year % 10 === 0) pruneArchive(this);
@@ -165,6 +169,8 @@ export class Simulation implements Sim {
     for (const h of w.herds.values()) d.num(h.id).num(h.count).num(h.x).num(h.y);
     for (const o of w.outlets.values()) d.num(o.id).num(o.reach).num(o.closed ?? -1);
     for (const a of w.ais.values()) d.num(a.id).num(a.capability).num(a.alignment).str(a.status);
+    for (const l of w.leagues.values()) d.num(l.id).num(l.champions.length).num(l.active ? 1 : 0);
+    d.num(w.sports?.held.length ?? 0).num(w.sports?.cups.length ?? 0);
     for (const c of w.civs.values()) if (c.media) d.num(c.media.polarization).num(c.media.misinformation).num(c.media.trust);
     d.num(w.persons.size).num(w.events.length);
     return d.hex();

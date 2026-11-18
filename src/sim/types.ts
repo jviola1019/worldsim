@@ -493,6 +493,8 @@ export interface Civ {
   ethos?: import('../civilizations/ethos').CivEthos;
   mission?: import('../civilizations/missions').Mission;
   missionLog?: { kind: import('../civilizations/missions').MissionKind; start: number; end: number; ok: boolean }[];
+  /** Standing from sport, games and spectacle (decays; adds a little legitimacy). */
+  prestige?: number;
   // --- bookkeeping
   events: number[];
   lastYearly: number;
@@ -730,7 +732,7 @@ export interface Disease {
 
 // ---------------------------------------------------------------- relations
 
-export type TreatyKind = 'trade' | 'nonaggression' | 'defensive' | 'alliance' | 'vassal' | 'ceasefire' | 'peace' | 'federation' | 'embargo' | 'research';
+export type TreatyKind = 'trade' | 'nonaggression' | 'defensive' | 'alliance' | 'vassal' | 'ceasefire' | 'peace' | 'federation' | 'embargo' | 'research' | 'visitors';
 
 export interface Treaty {
   id: number;
@@ -965,6 +967,9 @@ export interface WorldState {
   colonies: Map<number, Colony>;
   outlets: Map<number, MediaOutlet>;
   ais: Map<number, AISystem>;
+  leagues: Map<number, import('../culture/sports').League>;
+  /** World games and cups (absent before round 5). */
+  sports?: import('../culture/sports').SportsState;
   relations: Map<string, Relation>;
   events: HistoryEvent[];
   stats: StatsStore;

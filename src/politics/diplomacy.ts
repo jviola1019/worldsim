@@ -55,7 +55,7 @@ export function makeTreaty(sim: Sim, a: Civ, b: Civ, kind: TreatyKind, years = 3
   const rel = ensureRelation(sim, a.id, b.id);
   rel.treaties.push(t.id);
   if (rel.treaties.length > 12) rel.treaties = rel.treaties.filter((id) => w.treaties.get(id)?.active);
-  const label: Record<string, string> = { trade: 'a trade agreement', nonaggression: 'a non-aggression pact', defensive: 'a defensive alliance', alliance: 'an alliance', vassal: 'vassalage terms', ceasefire: 'a ceasefire', peace: 'a peace treaty', federation: 'a federation', embargo: 'an embargo', research: 'a research partnership' };
+  const label: Record<string, string> = { trade: 'a trade agreement', nonaggression: 'a non-aggression pact', defensive: 'a defensive alliance', alliance: 'an alliance', vassal: 'vassalage terms', ceasefire: 'a ceasefire', peace: 'a peace treaty', federation: 'a federation', embargo: 'an embargo', research: 'a research partnership', visitors: 'a visitor accord, opening ports and airports to each other\'s travellers' };
   if (!quiet)
     logEvent(sim, {
       type: 'treaty_' + kind,
