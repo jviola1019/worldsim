@@ -100,7 +100,7 @@ export function infrastructureYearly(sim: Sim, civ: Civ): void {
       // re-plan a route the land has cut (a coast flooded, a lake filled a valley)
       if (path && path.some((i) => m.isWater(i))) path = undefined;
       if (!path) {
-        path = findPath(m, m.idx(s.x, s.y), m.idx(o.x, o.y), { mode: 'land', maxNodes: 8000, planRoad: true }) ?? [];
+        path = findPath(m, m.idx(s.x, s.y), m.idx(o.x, o.y), { mode: 'land', maxNodes: 8000, planRoad: civ.id }) ?? [];
         routes[o.id] = path;
       }
       left -= improvePath(sim, civ, path, Math.min(left, 12));

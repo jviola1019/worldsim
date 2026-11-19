@@ -69,6 +69,13 @@ describe('jobs change as technology turns', () => {
     expect(count(after, 'automation_engineers')).toBeGreaterThan(0);
   });
 
+  it('power plants employ power plant workers (review finding: they were listed as artisans); resource work always has a name', () => {
+    const jobs = occupations(...Object.values(town({ industry: 1 }, [[B.POWER_FOSSIL, 2], [B.SOLAR, 1]])) as [Settlement, Civ]);
+    expect(count(jobs, 'power_workers')).toBe(600);
+    expect(count(jobs, 'artisans')).toBe(0);
+    expect(jobs.filter((j) => j.sector === 1).reduce((a, j) => a + j.count, 0)).toBe(300); // no extraction districts: laborers
+  });
+
   it('computing creates programmers, and AI creates supervisors while clerk work shrinks', () => {
     const offices: [number, number][] = [[B.OFFICE, 4], [B.BANK, 1], [B.DATA_CENTER, 2]];
     const pre = occupations(...Object.values(town({ industry: 1 }, offices)) as [Settlement, Civ]);

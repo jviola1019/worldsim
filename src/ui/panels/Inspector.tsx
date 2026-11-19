@@ -656,10 +656,13 @@ function JobsOverTime({ st }: { st: SeriesStore }) {
   if (!groups.length) return null;
   const peak = (g: JobGroup) => Math.max(...(st.data['job_' + g] ?? [0]));
   const top = [...groups].sort((a, b) => peak(b) - peak(a)).slice(0, 6);
+  // saves from before job history padded the earlier years with zeros: start where the record starts
+  let from = 0;
+  while (from < st.years.length - 1 && !JOB_GROUPS.some((g) => (st.data['job_' + g]?.[from] ?? 0) > 0)) from++;
   return (
     <div class="section" data-testid="jobs-over-time">
       <h3>Jobs over time</h3>
-      <LineChart series={top.map((g) => ({ label: GROUP_LABEL[g], color: JOB_COLORS[g], years: st.years, values: st.data['job_' + g] ?? [] }))} format={(v) => `${Math.round(v * 100)}%`} />
+      <LineChart series={top.map((g) => ({ label: GROUP_LABEL[g], color: JOB_COLORS[g], years: st.years.slice(from), values: (st.data['job_' + g] ?? []).slice(from) }))} format={(v) => `${Math.round(v * 100)}%`} />
       <p class="muted">Share of workers in the largest kinds of work. Names change as the nation's technology changes what people do.</p>
     </div>
   );

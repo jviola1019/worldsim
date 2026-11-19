@@ -29,6 +29,7 @@ export const JOBS: readonly JobDef[] = [
   J('miners', 'Miners', S.RESOURCES, 'extraction'), J('oil_workers', 'Oil and gas workers', S.RESOURCES, 'extraction'),
   J('artisans', 'Artisans', S.INDUSTRY, 'crafts'), J('smiths', 'Smiths', S.INDUSTRY, 'crafts'), J('millers', 'Millers', S.INDUSTRY, 'crafts'),
   J('factory_workers', 'Factory workers', S.INDUSTRY, 'factory'), J('steelworkers', 'Steelworkers', S.INDUSTRY, 'factory'), J('refinery_workers', 'Refinery workers', S.INDUSTRY, 'factory'),
+  J('power_workers', 'Power plant workers', S.INDUSTRY, 'factory'), J('laborers', 'Laborers', S.RESOURCES, 'extraction'),
   J('chip_technicians', 'Chip technicians', S.INDUSTRY, 'hightech'), J('robot_technicians', 'Robot technicians', S.INDUSTRY, 'hightech'), J('automation_engineers', 'Automation engineers', S.INDUSTRY, 'hightech'),
   J('builders', 'Builders', S.CONSTRUCTION, 'building'),
   J('traders', 'Traders and shopkeepers', S.SERVICES, 'commerce'), J('porters', 'Porters and servants', S.SERVICES, 'commerce'),
@@ -86,10 +87,13 @@ function weights(s: Settlement, civ: Civ | undefined): Record<string, number> {
   w.factory_workers = b(B.FACTORY) * 3 * (1 - auto * 0.7);
   w.steelworkers = b(B.STEEL_MILL) * 3 * (1 - auto * 0.5);
   w.refinery_workers = b(B.REFINERY) * 2;
+  // power plants staff the industry sector too
+  w.power_workers = (b(B.POWER_FOSSIL) + b(B.POWER_NUCLEAR) + b(B.HYDRO) + b(B.FUSION)) * 2 + (b(B.SOLAR) + b(B.WIND)) * 0.5;
   w.chip_technicians = b(B.CHIP_FAB) * 3;
   w.robot_technicians = b(B.ROBOT_FACTORY) * 3;
   w.automation_engineers = (b(B.FACTORY) + b(B.STEEL_MILL) + b(B.ROBOT_FACTORY)) * auto * 2;
   if (!Object.entries(w).some(([k, v]) => JOB_BY_KEY[k].sector === S.INDUSTRY && v > 0)) w.artisans = 0.01;
+  if (!Object.entries(w).some(([k, v]) => JOB_BY_KEY[k].sector === S.RESOURCES && v > 0)) w.laborers = 1;
   w.builders = 1;
   // services
   w.traders = 0.6 + b(B.MARKET) * 2 + b(B.HARBOR) + b(B.WAREHOUSE) * 0.5;

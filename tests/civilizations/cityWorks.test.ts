@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { makeSim } from '../helpers';
 import { foundSettlement } from '../../src/civilizations/settlement';
-import { renovationTier, worksOf } from '../../src/civilizations/urban';
+import { worksOf } from '../../src/civilizations/urban';
 import { B } from '../../src/civilizations/buildingTypes';
 import { BLDF, TileMap } from '../../src/world/tilemap';
 import { BUILDINGS } from '../../src/civilizations/buildings';
@@ -31,13 +31,6 @@ describe('new towns start in the homes of their era', () => {
 });
 
 describe('renovation', () => {
-  it('a district is rebuilt in the newest style its type has in this era', () => {
-    expect(renovationTier(B.HOUSE, 6)).toBe(4); // houses top out in the early-modern style
-    expect(renovationTier(B.HUT, 6)).toBe(1);
-    expect(renovationTier(B.TOWER, 6)).toBe(6);
-    expect(renovationTier(B.APARTMENT, 3)).toBe(-1); // not buildable yet
-  });
-
   it('modern cities renovate, build up and redevelop, and keep count; renovated homes are up to date', () => {
     const sim = makeSim('works-run', 96, (c) => { c.settings.startEra = 4; });
     sim.runYears(80);
@@ -45,7 +38,7 @@ describe('renovation', () => {
     for (const s of sim.w.settlements.values()) for (const k of Object.keys(sum) as (keyof typeof sum)[]) sum[k] += worksOf(s)[k];
     expect(sum.built).toBeGreaterThan(10);
     expect(sum.builtUp + sum.renovated + sum.redeveloped).toBeGreaterThan(0);
-    // no home of a living nation stays three or more style tiers behind what its type can be now, in a city that is not crowded
+    // renovation keeps most homes within two era styles of their nation (crowded cities build up instead)
     const m = sim.w.map;
     let behind = 0, homes = 0;
     for (let i = 0; i < m.n; i++) {
@@ -54,7 +47,7 @@ describe('renovation', () => {
       const civ = sim.w.civs.get(m.owner[i]);
       if (!civ) continue;
       homes++;
-      if ((m.bldFlags[i] & BLDF.TIER_MASK) <= renovationTier(b, eraToTier(civ.era)) - 3) behind++;
+      if ((m.bldFlags[i] & BLDF.TIER_MASK) <= eraToTier(civ.era) - 3) behind++;
     }
     expect(homes).toBeGreaterThan(10);
     expect(behind / homes).toBeLessThan(0.5);
@@ -85,5 +78,9 @@ describe('road networks share trunk lines', () => {
     const fresh = (p: number[]) => p.filter((i) => m.roadTier(i) === 0).length;
     expect(shared(planned)).toBeGreaterThan(shared(plain));
     expect(fresh(planned)).toBeLessThan(fresh(plain)); // fewer new road tiles to build
+    // review finding: a nation never builds on foreign land, so it does not plan along a foreign road
+    for (const i of ab) m.owner[i] = 2;
+    const foreign = findPath(m, A, C, { mode: 'land', planRoad: 1 })!;
+    expect(shared(foreign)).toBeLessThan(shared(planned));
   });
 });

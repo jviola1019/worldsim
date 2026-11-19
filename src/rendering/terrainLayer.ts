@@ -259,7 +259,7 @@ export class TerrainLayer {
           const px = (x - x0) * TILE, py = (y - y0) * TILE + PAD;
           ctx.fillStyle = col;
           if (x + 1 < m.w && isDetailTile(m, i + 1)) ctx.fillRect(px + 7, py, 1, 8);
-          if (y + 1 < m.h && isDetailTile(m, i + m.w)) ctx.fillRect(px, py + 7, 8, 1);
+          if (y + 1 < m.h && tier > 2 && isDetailTile(m, i + m.w)) ctx.fillRect(px, py + 7, 8, 1); // early towns have one lane per block (cityBlocks streetFor)
         }
       }
     // pass 3: standing things (trees, peaks, buildings) in row order for overlap

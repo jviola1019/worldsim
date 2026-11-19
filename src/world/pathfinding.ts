@@ -22,7 +22,7 @@ export interface PathOpts {
    * Round 7, planning a road: reusing an existing road is nearly free and a new road costs its
    * construction, so networks share trunk lines instead of laying parallel roads.
    */
-  planRoad?: boolean;
+  planRoad?: boolean | number;
 }
 
 let gScore = new Float32Array(0);
@@ -37,7 +37,8 @@ export function tileCost(map: TileMap, i: number, o: PathOpts): number {
   if (o.mode === 'land') {
     if (water) return Infinity;
     let c = map.landMoveCost(i);
-    if (o.planRoad) return map.roadTier(i) > 0 ? 0.15 : c + 0.6;
+    // a number is the planning nation: only its own (or unowned) roads are reused, since it never builds on foreign land
+    if (o.planRoad) return map.roadTier(i) > 0 && (o.planRoad === true || !map.owner[i] || map.owner[i] === o.planRoad) ? 0.15 : c + 0.6;
     const rail = map.railTier(i);
     if (rail > 0 && (o.railTier ?? 0) > 0) c = Math.min(c, 0.12);
     return c;

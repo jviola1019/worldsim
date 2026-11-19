@@ -49,6 +49,13 @@ export class Renderer {
   /** Reduce motion (player setting or OS): no walkers or street traffic; weather, ships, trains and sprites step at most once a second. */
   reduceMotion = false;
   private flashT = 0;
+  private dataShown: Record<string, string> = {};
+  /** Test hooks on the canvas, written only when they change (no DOM churn each frame). */
+  private setData(key: string, value: string): void {
+    if (this.dataShown[key] === value) return;
+    this.dataShown[key] = value;
+    this.canvas.dataset[key] = value;
+  }
   private flashColor = '';
   private lastFlash = -99;
   /** Units, settlers, herds and monsters shrink in the close-up so they do not dwarf city blocks. */
@@ -127,9 +134,9 @@ export class Renderer {
     } else this.drawChunks(close >= 1 ? (k) => (this.city.readyForMapChunk(k) ? this.base : this.layer) : () => this.layer);
     if (close > 0) this.drawCity(close);
     else this.cityChunksDrawn = 0;
-    this.canvas.dataset.cityChunks = String(this.cityChunksDrawn);
-    this.canvas.dataset.overviewRepaints = String(this.layer.overviewRepaints);
-    this.canvas.dataset.overlayRepaints = String(this.overlay.repaints);
+    this.setData('cityChunks', String(this.cityChunksDrawn));
+    this.setData('overviewRepaints', String(this.layer.overviewRepaints));
+    this.setData('overlayRepaints', String(this.overlay.repaints));
     // overlay
     this.overlayTimer -= dt;
     if (this.overlay.mode !== 'terrain' && this.overlayTimer <= 0) {
@@ -167,7 +174,7 @@ export class Renderer {
       ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
       this.flashT = Math.max(0, this.flashT - dt);
     }
-    this.canvas.dataset.flash = this.flashT > 0 ? this.flashColor : '';
+    this.setData('flash', this.flashT > 0 ? this.flashColor : '');
     this.frameMs = performance.now() - t0;
   }
 
@@ -202,8 +209,8 @@ export class Renderer {
     }
     ctx.restore();
     this.cityChunksDrawn = drawn;
-    this.canvas.dataset.cityPending = String(pending);
-    this.canvas.dataset.cityRedraws = String(this.city.redraws);
+    this.setData('cityPending', String(pending));
+    this.setData('cityRedraws', String(this.city.redraws));
   }
 
   /** `layerFor(k)`: which map layer draws map chunk k (the base without city buildings only where the close-up is ready). */
@@ -605,7 +612,7 @@ export class Renderer {
       atlas.draw(ctx, f.kind, f.x * TILE + 4, f.y * TILE + 6, frame);
       kinds.add(f.kind);
     }
-    this.canvas.dataset.fx = [...kinds].sort().join(' ');
+    this.setData('fx', [...kinds].sort().join(' '));
     if (this.highlight) {
       this.highlight.t -= dt;
       if (this.highlight.t <= 0) this.highlight = null;
