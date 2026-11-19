@@ -192,11 +192,22 @@ describe('CI/CD hardening (threats 72–75)', () => {
     for (const [f, y] of flows) {
       expect(y, f).toMatch(/^permissions:\n\s+contents: read\s*$/m);
       expect(y, f).not.toContain('pull_request_target');
-      expect(y, f).not.toMatch(/\$\{\{\s*github\.(event|head_ref)/); // no attacker-controlled text in run steps (script injection)
+      // no attacker-controlled text in workflows (script injection); the one exception is the commit SHA that CI
+      // tested, which the Pages deploy checks out (a 40-hex id, not free text)
+      const y2 = y.replace('${{ github.event.workflow_run.head_sha || github.sha }}', '');
+      expect(y2, f).not.toMatch(/\$\{\{\s*github\.(event|head_ref)/);
     }
   });
   it('checkout does not leave the token in the workspace', () => {
     for (const [f, y] of flows) if (y.includes('actions/checkout')) expect(y, f).toContain('persist-credentials: false');
+  });
+  it('Pages deploys only after a green CI run of a push in this repository (round 7)', () => {
+    const y = read('.github/workflows/pages.yml');
+    expect(y).toMatch(/workflow_run:\n\s+workflows: \[CI\]\n\s+types: \[completed\]/);
+    expect(y).not.toMatch(/^\s+push:/m);
+    expect(y).toContain("github.event.workflow_run.conclusion == 'success'");
+    expect(y).toContain("github.event.workflow_run.event == 'push'");
+    expect(y).toContain('github.event.workflow_run.head_repository.full_name == github.repository');
   });
   it('only the Pages deploy job can write, and only to Pages', () => {
     for (const [f, y] of flows) {

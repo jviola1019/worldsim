@@ -108,7 +108,9 @@ CPU time of the pixel work per refresh pass, in Node (not browser frame time):
   - **No skipped jobs.** Actions are pinned at their latest releases, there are no Node warnings, and `npm audit` is clean in CI. One warning is upstream: `punycode` is deprecated inside `actions/deploy-pages`. Another needs an owner choice: npm notes `esbuild` has an install script not covered by `allowScripts`.
   - **`long-run.yml` has never run.** It is scheduled for Mondays 05:17 UTC, and its commands were run locally above.
   - **Live site.** `https://jviola1019.github.io/worldsim/` serves `fbda5e9`, and its bundle is byte-identical to a local build of that commit. The meta CSP is present and HSTS is sent by GitHub. The e2e suite against the live site: **61/61**.
-  - **Deploys are not gated on CI.** `pages.yml` runs `npm test` and the build, but not typecheck or e2e. Whether to gate deploys on green CI is an owner decision.
+  - **Deploys are now gated on CI (owner's decision).** Before this, `pages.yml` ran `npm test` and the build on every push, but not typecheck or e2e. It now runs on `workflow_run` and deploys only when CI succeeded on a push in this repository, checking out the commit CI tested. `hardening.test.ts` checks the gate.
+  - **esbuild install script (owner's decision).** It is approved in `package.json` `allowScripts`, pinned to `esbuild@0.28.2`, with `npm approve-scripts` from npm 11. A future esbuild version will be listed again for review.
+  - **`long-run.yml`** was triggered manually for the first time (owner's decision); see STATUS for its result.
 
 ## R6. Round 6: close-up cities, planning rule, design review (2026-11-19)
 
