@@ -192,7 +192,7 @@ export class CityLayer {
         const i = y * m.w + x;
         if (m.bldFlags[i] & BLDF.PART || !isDetailTile(m, i) || BUILDINGS[m.bld[i]].footprint !== 2) continue;
         const id = this.spriteIdFor(i);
-        const spr = id ? this.atlas.get(id, this.ownerColor(i)) : undefined;
+        const spr = id ? this.atlas.get(id, this.ownerColor(i), true) : undefined;
         if (!spr) continue;
         // anchor at the bottom-centre of the 2×2 footprint, scaled ×DETAIL
         const bx = (x - x0) * BLOCK + BLOCK, by = (y - y0) * BLOCK + 2 * BLOCK + DPAD;
@@ -300,14 +300,14 @@ export class CityLayer {
       }
       if (l.mapSprite && mapSpriteId) {
         // the district's own map sprite at double size, standing on its grounds
-        const spr = this.atlas.get(mapSpriteId, color);
+        const spr = this.atlas.get(mapSpriteId, color, true);
         if (spr) {
           const k = Math.max(1, Math.min(2, Math.floor((l.w + 4) / spr.w)));
           ctx.drawImage(spr.canvas, 0, 0, spr.w, spr.h, ox + l.x + (l.w >> 1) - spr.ax * k, oy + l.y + l.h - (spr.ay + 1) * k, spr.w * k, spr.h * k);
           continue;
         }
       }
-      this.atlas.draw(ctx, l.sprite, ox + l.x + (l.w >> 1), oy + l.y + l.h - 1, 0, color);
+      this.atlas.draw(ctx, l.sprite, ox + l.x + (l.w >> 1), oy + l.y + l.h - 1, 0, color, false, true);
       // a pool in some modern back yards, a parked car by modern homes
       const h = hash3(x * 32 + l.x, y * 32 + l.y, 7);
       if (l.kind === 'house' && tier >= 6 && h % 4 === 0 && l.w >= 9) this.atlas.draw(ctx, 'lot.pool.0', ox + l.x + 2, oy + l.y + 3);

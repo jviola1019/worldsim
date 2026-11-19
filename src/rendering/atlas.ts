@@ -5,7 +5,7 @@
  */
 import { ALL_SPRITES } from './art/index';
 import type { SpriteDef } from './art/types';
-import { teamShades } from './art/palette';
+import { teamShades, mutedTeamShades } from './art/palette';
 import { rasterizeSprite } from './art/raster';
 import { BuildingSpriteIndex, type HousingStyle } from './art/select';
 
@@ -62,13 +62,14 @@ export class Atlas {
     return this.base.has(id);
   }
 
-  get(id: string, teamColor?: string): SpriteImg | undefined {
+  /** A sprite, tinted with a nation's colour; `muted` blends that colour into a neutral material (buildings). */
+  get(id: string, teamColor?: string, muted = false): SpriteImg | undefined {
     const b = this.base.get(id);
     if (!b || !teamColor || !b.team) return b;
-    const key = id + '|' + teamColor;
+    const key = id + '|' + teamColor + (muted ? '|m' : '');
     let t = this.tinted.get(key);
     if (!t) {
-      t = { ...b, canvas: rasterize(ALL_SPRITES[id], teamShades(teamColor)) };
+      t = { ...b, canvas: rasterize(ALL_SPRITES[id], muted ? mutedTeamShades(teamColor) : teamShades(teamColor)) };
       this.tinted.set(key, t);
     }
     return t;
@@ -84,8 +85,8 @@ export class Atlas {
   }
 
   /** Draw a sprite frame with its anchor at (x, y) in the current transform. */
-  draw(ctx: CanvasRenderingContext2D, id: string, x: number, y: number, frame = 0, teamColor?: string, flip = false): void {
-    const s = this.get(id, teamColor);
+  draw(ctx: CanvasRenderingContext2D, id: string, x: number, y: number, frame = 0, teamColor?: string, flip = false, muted = false): void {
+    const s = this.get(id, teamColor, muted);
     if (!s) return;
     const f = frame % s.frames;
     if (flip) {

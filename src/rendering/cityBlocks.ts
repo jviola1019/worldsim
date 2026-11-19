@@ -302,3 +302,20 @@ function groundsBlock(c: BlockContext, plan: BlockPlan, L: Layout, ux0: number, 
 function pick(st: { surface: StreetSeg['surface']; sidewalk: boolean }): Pick<StreetSeg, 'surface' | 'sidewalk'> {
   return { surface: st.surface, sidewalk: st.sidewalk };
 }
+
+/**
+ * A point on one of the block's streets for walkers (sidewalk edge) and vehicles (inside the lane),
+ * chosen by hash `h` and moved along the street by `t` in [0, 1). Null when the block has no street.
+ */
+export function streetPoint(plan: BlockPlan, h: number, t: number, lane: boolean): { x: number; y: number; horiz: boolean; seg: number } | null {
+  if (!plan.streets.length) return null;
+  const seg = h % plan.streets.length;
+  const s = plan.streets[seg];
+  const horiz = s.w > s.h;
+  const len = horiz ? s.w : s.h, width = horiz ? s.h : s.w;
+  const along = Math.min(len - 1, Math.floor((((t % 1) + 1) % 1) * len));
+  let across: number;
+  if (lane) across = width <= 2 ? Math.min(1, width - 1) : 1 + ((h >> 3) % (width - 2));
+  else across = (h >> 5) & 1 ? width - 1 : 0;
+  return horiz ? { x: s.x + along, y: s.y + across, horiz, seg } : { x: s.x + across, y: s.y + along, horiz, seg };
+}

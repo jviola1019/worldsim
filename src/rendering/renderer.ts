@@ -18,6 +18,7 @@ import { Atlas } from './atlas';
 import { Camera, TILE } from './camera';
 import { TerrainLayer, PAD } from './terrainLayer';
 import { CityLayer, DCHUNK, DETAIL, DPAD, detailAlpha } from './cityLayer';
+import { blockContext, blockSignature, composeBlock, streetPoint, type BlockPlan } from './cityBlocks';
 import { OverlayLayer, SCALE as OV_SCALE } from './overlays';
 import { HAZARD } from '../world/tilemap';
 import { B, eraToTier } from '../civilizations/buildingTypes';
@@ -256,16 +257,19 @@ export class Renderer {
   }
 
   /** Ambient citizens near settlements: visual representation of population (not simulated individuals). */
+  /** Below the close-up, people are drawn at half size; in the close-up, at street scale on sidewalks. */
   private drawAmbient(vis: [number, number, number, number], tilePx: number): void {
     if (tilePx < 9) return;
-    const { ctx, atlas } = this;
+    const { atlas } = this;
     const w = this.sim.w;
+    const m = w.map;
+    const close = tilePx >= 20;
     const [x0, y0, x1, y1] = vis;
     for (const s of w.settlements.values()) {
       if (s.x < x0 - 3 || s.x > x1 + 3 || s.y < y0 - 3 || s.y > y1 + 3) continue;
       const civ = w.civs.get(s.civId);
       const tier = civ ? eraToTier(civ.era) : 0;
-      const n = Math.min(10, Math.round(Math.log2(s.pop + 2)));
+      const n = Math.min(10, Math.round(Math.log2(s.pop + 2))) * (close ? 4 : 1);
       for (let k = 0; k < n; k++) {
         const h = hash3(s.id, k, 9);
         const ang = (h % 628) / 100 + this.time * 0.15 * ((h >> 10) % 2 ? 1 : -1);
@@ -274,10 +278,45 @@ export class Renderer {
         const wy = (s.y + 0.5 + Math.sin(ang) * rad * 0.8) * TILE;
         const flip = Math.sin(ang) > 0;
         const job = townsperson(s.employment, tier, civ?.caps.landTier ?? 0, h);
-        atlas.draw(ctx, atlas.has(job) ? job : 'unit.citizen.0', wx, wy, this.frameIdx(4, k), civ?.color, flip);
+        const id = atlas.has(job) ? job : 'unit.citizen.0';
+        if (!close) {
+          this.drawScaled(id, wx, wy, this.frameIdx(4, k), civ?.color, flip, 0.5);
+          continue;
+        }
+        const tx = Math.floor(wx / TILE), ty = Math.floor(wy / TILE);
+        if (!m.inBounds(tx, ty)) continue;
+        const plan = this.planAt(m.idx(tx, ty));
+        const p = plan && streetPoint(plan, h, this.time * 0.03 * (1 + (h % 3)) + (h % 97) / 97, false);
+        if (!p) continue;
+        this.drawScaled(id, tx * TILE + p.x / DETAIL, ty * TILE + (p.y + 1) / DETAIL, this.frameIdx(4, k), civ?.color, flip, 1 / 8);
       }
     }
   }
+
+  private plans = new Map<number, { sig: number; plan: BlockPlan }>();
+  /** The composed block on tile i (cached by signature), or null when it is not a city block. */
+  private planAt(i: number): BlockPlan | null {
+    const c = blockContext(this.sim, i);
+    if (!c) return null;
+    const sig = blockSignature(c);
+    const hit = this.plans.get(i);
+    if (hit && hit.sig === sig) return hit.plan;
+    if (this.plans.size > 4000) this.plans.clear();
+    const plan = composeBlock(c);
+    this.plans.set(i, { sig, plan });
+    return plan;
+  }
+
+  /** Draw a sprite scaled about its anchor point. */
+  private drawScaled(id: string, x: number, y: number, frame: number, color: string | undefined, flip: boolean, k: number): void {
+    const { ctx } = this;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(k, k);
+    this.atlas.draw(ctx, id, 0, 0, frame, color, flip);
+    ctx.restore();
+  }
+
 
   private drawHerds(vis: [number, number, number, number]): void {
     const { ctx, atlas } = this;
@@ -423,7 +462,20 @@ export class Renderer {
           const y = s.y + Math.sin(t * 0.7) * (1 + (k % 2));
           const i = m.idx(Math.max(0, Math.min(m.w - 1, Math.round(x))), Math.max(0, Math.min(m.h - 1, Math.round(y))));
           const veh = vehicleSprite('road', civ.caps, tier, s.id * 7 + k, style);
-          if (veh && (m.roadTier(i) || m.bld[i])) atlas.draw(ctx, veh, x * TILE, y * TILE, this.frameIdx(4, k), civ.color, Math.sin(t) > 0);
+          if (!veh || !(m.roadTier(i) || m.bld[i])) continue;
+          if (tilePx < 20) {
+            this.drawScaled(veh, x * TILE, y * TILE, this.frameIdx(4, k), civ.color, Math.sin(t) > 0, 0.5);
+            continue;
+          }
+          // close-up: in the lanes of the city's streets, at street scale
+          for (let q = 0; q < 3; q++) {
+            const hh = hash3(s.id, k * 3 + q, 31);
+            const plan = this.planAt(i);
+            const p = plan && streetPoint(plan, hh, this.time * 0.05 * (1 + (hh % 2)) + (hh % 89) / 89, true);
+            if (!p) continue;
+            const tx = m.xOf(i), ty = m.yOf(i);
+            this.drawScaled(veh, tx * TILE + p.x / DETAIL, ty * TILE + (p.y + 1) / DETAIL, this.frameIdx(4, k), civ.color, p.horiz ? (hh & 1) === 1 : false, 1 / 8);
+          }
         }
       }
       if (civ.caps.airTier >= 2 && s.bld[B.AIRPORT]) {

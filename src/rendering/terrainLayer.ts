@@ -254,6 +254,15 @@ export class TerrainLayer {
             ctx.fillRect(cx - 1, cy - 1, 2, 2);
           }
         }
+        // a street between neighbouring city blocks (east and south edges, so each is drawn once)
+        if (isDetailTile(m, i)) {
+          const tier = m.bldFlags[i] & BLDF.TIER_MASK;
+          const col = ROAD_COLORS[Math.max(1, Math.min(4, m.roadTier(i) || (tier >= 5 ? 3 : tier >= 3 ? 2 : 1)))];
+          const px = (x - x0) * TILE, py = (y - y0) * TILE + PAD;
+          ctx.fillStyle = col;
+          if (x + 1 < m.w && isDetailTile(m, i + 1)) ctx.fillRect(px + 7, py, 1, 8);
+          if (y + 1 < m.h && isDetailTile(m, i + m.w)) ctx.fillRect(px, py + 7, 8, 1);
+        }
       }
     // pass 3: standing things (trees, peaks, buildings) in row order for overlap
     for (let y = y0; y < y1; y++)
@@ -269,7 +278,7 @@ export class TerrainLayer {
           const tier = m.bldFlags[i] & BLDF.TIER_MASK;
           const id = this.spriteFor(i, x, y, b, key, tier);
           if (id) {
-            const spr = this.atlas.get(id, this.ownerColor(i));
+            const spr = this.atlas.get(id, this.ownerColor(i), true);
             if (spr) {
               // multi-tile buildings: anchor at the bottom-center of the footprint
               const ox = spr.fw > 1 ? bx + 4 : bx;

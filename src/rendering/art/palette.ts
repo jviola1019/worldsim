@@ -108,3 +108,10 @@ export function teamShades(mainHex: string): { T: string; U: string; V: string }
     V: rgbToHex(r + (255 - r) * 0.45, g + (255 - g) * 0.45, b + (255 - b) * 0.45),
   };
 }
+
+/** Nation colour as an accent on buildings: 35% nation colour, 65% neutral roof material (#9a8f86). */
+export function mutedTeamShades(mainHex: string): { T: string; U: string; V: string } {
+  const [r, g, b] = hexToRgb(mainHex);
+  const [nr, ng, nb] = [0x9a, 0x8f, 0x86];
+  return teamShades(rgbToHex(r * 0.35 + nr * 0.65, g * 0.35 + ng * 0.65, b * 0.35 + nb * 0.65));
+}
