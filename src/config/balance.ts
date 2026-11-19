@@ -84,6 +84,10 @@ export const BALANCE = {
   enclosedPenalty: 2.0,
   /** Housing pressure (people / homes) above which homes may fill the gaps between blocks. */
   infillPressure: 1.5,
+  /** Round 7: priority of renovating a home district two or more era styles out of date (below most needs). */
+  renovateScore: 1.1,
+  /** Round 7: materials a renovation needs, as a share of building new (labour is 40%, as for farm upgrades). */
+  renovateCost: 0.4,
   /** [S] Per-capita stock of construction materials industry leaves for builders (industrial eras). */
   constructionReserve: 0.002,
   /** [S] Maximum market-service jobs per capita at high goods income. */

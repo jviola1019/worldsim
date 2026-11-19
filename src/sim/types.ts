@@ -246,6 +246,20 @@ export interface Construction {
   upgrade: boolean;
   /** Remaining amount of each good that concrete may still stand in for (fixed when work starts). */
   subLeft?: number[];
+  /** Round 7: an out-of-date district rebuilt as the same type in the current style (cheaper). */
+  renovate?: boolean;
+}
+
+/** Round 7: what a settlement has built, counted since its founding (absent in older saves). */
+export interface SettlementWorks {
+  /** New districts on open land. */
+  built: number;
+  /** Homes rebuilt denser (huts to houses, houses to apartments...). */
+  builtUp: number;
+  /** Districts rebuilt as the same type in the current era's style. */
+  renovated: number;
+  /** Districts replaced by a different use (the old use is rebuilt elsewhere when still needed). */
+  redeveloped: number;
 }
 
 export interface Epidemic {
@@ -282,6 +296,8 @@ export interface Settlement {
   /** Count of each building type controlled by this settlement. */
   bld: number[];
   construction: Construction | null;
+  /** Round 7: construction history counters (absent in older saves; created on first use). */
+  works?: SettlementWorks;
   radius: number;
   /** Tiles currently controlled. */
   territory: number;

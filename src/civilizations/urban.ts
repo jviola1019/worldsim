@@ -457,6 +457,12 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   if (caps.spaceTier >= 1 && !civHasBuilding(sim, civ, B.SPACEPORT) && isLargestCity(sim, civ, s)) add(B.SPACEPORT, 2 + caps.spaceTier * 1.2 + civ.personality.science * 2);
   if (caps.spaceTier >= 7) add(B.MEGASTRUCTURE, 1);
   if (caps.biotech > 0 && pop > 20000) add(B.GREENHOUSE, 1 + (civ.econ.livingStandard < 2 ? 1 : 0));
+  // renovate homes two or more eras out of date, as the same type in the current style (only when not crowded:
+  // crowded cities build up instead)
+  if (pressure < 0.9) {
+    const old = outdatedHome(sim, s, tier);
+    if (old !== null) cands.push({ type: sim.w.map.bld[old], score: BALANCE.renovateScore, upgrade: old });
+  }
   // replace aging farms with modern ones (cheap tier upgrade)
   const farmUpgrade = oldFarm(sim, s, tier);
   if (farmUpgrade !== null) cands.push({ type: B.FARM, score: 1.3, upgrade: farmUpgrade });
@@ -630,6 +636,37 @@ function oldFarm(sim: Sim, s: Settlement, tier: number): number | null {
   return found;
 }
 
+/** The style tier a residential type can be rebuilt in during this era (its newest style up to now). */
+export function renovationTier(type: number, eraTier: number): number {
+  const tiers = BUILDINGS[type]?.tiers ?? [];
+  let best = -1;
+  for (const t of tiers) if (t <= eraTier && t > best) best = t;
+  return best;
+}
+
+/** A home district at least two era tiers behind the style its type can have now (nearest the centre first). */
+function outdatedHome(sim: Sim, s: Settlement, eraTier: number): number | null {
+  const m = sim.w.map;
+  let found: number | null = null;
+  let bestD = Infinity;
+  eachOwnTile(sim, s, s.radius + 1, (i, _x, _y, d2) => {
+    if (m.settle[i] !== s.id || m.bldFlags[i] & (BLDF.HISTORIC | BLDF.PART)) return;
+    const b = m.bld[i];
+    if (!b || BUILDINGS[b].category !== 'residential' || b === B.CAMP) return;
+    const target = renovationTier(b, eraTier);
+    if (target >= 0 && (m.bldFlags[i] & BLDF.TIER_MASK) <= target - 2 && d2 < bestD) {
+      bestD = d2;
+      found = i;
+    }
+  });
+  return found;
+}
+
+/** Construction history counters of a settlement (created on first use; older saves have none). */
+export function worksOf(s: Settlement): NonNullable<Settlement['works']> {
+  return (s.works ??= { built: 0, builtUp: 0, renovated: 0, redeveloped: 0 });
+}
+
 function palaceTier(sim: Sim, s: Settlement): { tile: number; tier: number } | null {
   const m = sim.w.map;
   let res: { tile: number; tier: number } | null = null;
@@ -649,9 +686,11 @@ function startProject(sim: Sim, s: Settlement, civ: Civ, type: number, tile: num
   const def = BUILDINGS[type];
   const need = new Array(GOOD_COUNT).fill(0);
   for (const [g, amt] of Object.entries(def.cost)) need[Good[g as GoodKey]] = amt as number;
-  // later tiers of farms & upgrades are cheaper (improving existing land)
-  const laborMult = type === B.FARM && upgrade ? 0.4 : 1;
-  s.construction = { type, tile, progress: 0, need, labor: def.labor * laborMult, upgrade };
+  // later tiers of farms & upgrades are cheaper (improving existing land); so is renovating a district as the same type
+  const renovate = upgrade && type !== B.FARM && sim.w.map.bld[tile] === type;
+  const laborMult = (type === B.FARM && upgrade) || renovate ? 0.4 : 1;
+  if (renovate) for (let g = 0; g < need.length; g++) need[g] *= BALANCE.renovateCost;
+  s.construction = { type, tile, progress: 0, need, labor: def.labor * laborMult, upgrade, ...(renovate ? { renovate } : {}) };
   if (!upgrade) {
     // scaffolding is visible while the district is built
     const m = sim.w.map;
@@ -732,13 +771,16 @@ export function cancelProject(sim: Sim, s: Settlement): void {
 function completeProject(sim: Sim, s: Settlement, civ: Civ): void {
   const job = s.construction!;
   const m = sim.w.map;
-  const tier = eraToTier(civ.era);
+  const eraTier = eraToTier(civ.era);
+  // a renovated district takes the newest style its type has (houses top out in the early-modern style)
+  const tier = job.renovate ? Math.max(0, renovationTier(job.type, eraTier)) : eraTier;
+  const prevType = m.bld[job.tile];
   if (job.upgrade) {
     const oldType = m.bld[job.tile];
     const oldTier = m.bldFlags[job.tile] & BLDF.TIER_MASK;
     const def = BUILDINGS[oldType];
     // landmarks of a much older era are preserved instead of demolished
-    if (def?.landmark && oldTier <= tier - 2 && oldType !== B.PALACE) {
+    if (def?.landmark && oldTier <= eraTier - 2 && oldType !== B.PALACE) {
       m.bldFlags[job.tile] |= BLDF.HISTORIC;
       s.construction = null;
       return;
@@ -759,10 +801,15 @@ function completeProject(sim: Sim, s: Settlement, civ: Civ): void {
       if (m.bld[j] && m.bld[j] !== job.type) removeBuilding(sim, j, false);
     }
   }
+  const works = worksOf(s);
+  if (!job.upgrade) works.built++;
+  else if (job.renovate) works.renovated++;
+  else if (prevType && BUILDINGS[prevType].category === 'residential' && BUILDINGS[job.type].category === 'residential') works.builtUp++;
+  else if (prevType && prevType !== job.type) works.redeveloped++;
   placeBuilding(sim, s, job.type, job.tile, tier);
   s.construction = null;
   // historic status for old landmarks elsewhere in the city
-  markHistoric(sim, s, tier);
+  markHistoric(sim, s, eraTier);
   const firstKey = `bld:${def.key}`;
   const significant = [B.PALACE, B.TEMPLE, B.UNIVERSITY, B.ARENA, B.AQUEDUCT, B.STATION, B.AIRPORT, B.SPACEPORT, B.POWER_NUCLEAR, B.FUSION, B.MEGASTRUCTURE, B.FORT, B.LIBRARY] as number[];
   if (significant.includes(job.type)) {

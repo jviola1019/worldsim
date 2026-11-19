@@ -96,9 +96,11 @@ export function infrastructureYearly(sim: Sim, civ: Civ): void {
       if (!o.links.includes(s.id)) o.links.push(s.id);
       if (left <= 0 || civ.caps.roadTier < 1 || s.id > o.id) continue;
       const routes = (s.routes ??= {});
-      let path = routes[o.id];
+      let path: number[] | undefined = routes[o.id];
+      // re-plan a route the land has cut (a coast flooded, a lake filled a valley)
+      if (path && path.some((i) => m.isWater(i))) path = undefined;
       if (!path) {
-        path = findPath(m, m.idx(s.x, s.y), m.idx(o.x, o.y), { mode: 'land', maxNodes: 8000 }) ?? [];
+        path = findPath(m, m.idx(s.x, s.y), m.idx(o.x, o.y), { mode: 'land', maxNodes: 8000, planRoad: true }) ?? [];
         routes[o.id] = path;
       }
       left -= improvePath(sim, civ, path, Math.min(left, 12));

@@ -126,7 +126,8 @@ export function foundSettlement(sim: Sim, civ: Civ, x: number, y: number, o: New
   }
   setTileSettlement(sim, center, s.id);
   const tier = eraToTier(civ.era);
-  const first = civ.caps.housingTier >= 1 && civ.unlocked.includes(B.HUT) ? B.HUT : B.CAMP;
+  // round 7: the best early dwelling the era allows (round 6 always began with huts, even in the modern age)
+  const first = tier >= 2 && civ.caps.housingTier >= 2 && civ.unlocked.includes(B.HOUSE) ? B.HOUSE : civ.caps.housingTier >= 1 && civ.unlocked.includes(B.HUT) ? B.HUT : B.CAMP;
   if (m.bld[center]) removeBuilding(sim, center);
   placeBuilding(sim, s, first, center, tier);
   recomputeTerritory(sim, s);
