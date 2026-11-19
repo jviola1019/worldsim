@@ -18,7 +18,7 @@ import { CHUNK } from '../sim/context';
 import { Atlas } from './atlas';
 import { Camera, TILE } from './camera';
 import { TerrainLayer, PAD } from './terrainLayer';
-import { CityLayer, DCHUNK, DETAIL, DPAD, detailAlpha, selectDetailChunks, motionTime } from './cityLayer';
+import { CityLayer, DCHUNK, DETAIL, DPAD, detailAlpha, selectDetailChunks, motionTime, drawOrder } from './cityLayer';
 import { blockContext, blockSignature, composeBlock, streetPoint, type BlockPlan } from './cityBlocks';
 import { OverlayLayer, SCALE as OV_SCALE } from './overlays';
 import { HAZARD } from '../world/tilemap';
@@ -199,7 +199,8 @@ export class Renderer {
     ctx.globalAlpha = alpha;
     const pad = DPAD / DETAIL;
     let drawn = 0, pending = 0;
-    for (const k of shown) {
+    // top to bottom: a lower chunk's overhang (tall landmarks) must land on top of the chunk above it
+    for (const k of drawOrder(shown)) {
       const c = this.city.get(k);
       if (!c) { pending++; continue; } // not drawn yet: the map with its buildings shows (drawChunks)
       drawn++;
@@ -791,3 +792,4 @@ function collapseSequence(f: VisualFx): void {
   f.ring = ring || undefined;
   f.then = undefined;
 }
+

@@ -1,0 +1,1508 @@
+{
+ "generated": "2026-11-19",
+ "totals": {
+  "srcFiles": 139,
+  "srcLines": 41759,
+  "testFiles": 40,
+  "testCases": 315
+ },
+ "folders": [
+  {
+   "name": "rendering",
+   "files": 29,
+   "lines": 18332,
+   "deps": {
+    "sim": 12,
+    "world": 10,
+    "civilizations": 9,
+    "core": 7,
+    "history": 2,
+    "politics": 1,
+    "ecology": 2,
+    "economy": 1,
+    "culture": 1
+   }
+  },
+  {
+   "name": "ui",
+   "files": 23,
+   "lines": 2907,
+   "deps": {
+    "sim": 25,
+    "persistence": 5,
+    "config": 5,
+    "core": 3,
+    "powers": 2,
+    "rendering": 11,
+    "history": 7,
+    "scenarios": 3,
+    "technology": 5,
+    "civilizations": 5,
+    "world": 7,
+    "politics": 2,
+    "ecology": 1,
+    "population": 3,
+    "culture": 1,
+    "economy": 2
+   }
+  },
+  {
+   "name": "civilizations",
+   "files": 10,
+   "lines": 2801,
+   "deps": {
+    "world": 7,
+    "sim": 19,
+    "culture": 4,
+    "core": 8,
+    "technology": 5,
+    "history": 6,
+    "politics": 2,
+    "population": 6,
+    "config": 2,
+    "economy": 4,
+    "powers": 1
+   }
+  },
+  {
+   "name": "world",
+   "files": 8,
+   "lines": 2468,
+   "deps": {
+    "sim": 7,
+    "core": 12,
+    "population": 5,
+    "history": 2,
+    "civilizations": 4,
+    "config": 1
+   }
+  },
+  {
+   "name": "sim",
+   "files": 8,
+   "lines": 2319,
+   "deps": {
+    "civilizations": 18,
+    "economy": 7,
+    "technology": 9,
+    "population": 8,
+    "config": 4,
+    "ecology": 4,
+    "world": 11,
+    "history": 5,
+    "politics": 6,
+    "culture": 4,
+    "core": 8,
+    "military": 2,
+    "future": 3,
+    "media": 1,
+    "powers": 1
+   }
+  },
+  {
+   "name": "population",
+   "files": 9,
+   "lines": 1617,
+   "deps": {
+    "sim": 16,
+    "world": 3,
+    "config": 5,
+    "civilizations": 11,
+    "history": 3,
+    "culture": 3,
+    "core": 7,
+    "economy": 1,
+    "ecology": 1,
+    "politics": 2,
+    "media": 1
+   }
+  },
+  {
+   "name": "economy",
+   "files": 6,
+   "lines": 1513,
+   "deps": {
+    "sim": 12,
+    "world": 7,
+    "config": 2,
+    "core": 4,
+    "history": 3,
+    "civilizations": 11,
+    "media": 1,
+    "ecology": 1,
+    "population": 1,
+    "politics": 2
+   }
+  },
+  {
+   "name": "politics",
+   "files": 4,
+   "lines": 1398,
+   "deps": {
+    "population": 8,
+    "sim": 7,
+    "core": 3,
+    "civilizations": 8,
+    "history": 3,
+    "culture": 2,
+    "world": 1,
+    "config": 2,
+    "military": 1,
+    "media": 1
+   }
+  },
+  {
+   "name": "military",
+   "files": 3,
+   "lines": 1180,
+   "deps": {
+    "sim": 12,
+    "core": 3,
+    "world": 8,
+    "civilizations": 12,
+    "population": 10,
+    "history": 3,
+    "media": 1,
+    "config": 1,
+    "politics": 1,
+    "culture": 1
+   }
+  },
+  {
+   "name": "powers",
+   "files": 3,
+   "lines": 1171,
+   "deps": {
+    "sim": 10,
+    "core": 2,
+    "population": 6,
+    "history": 2,
+    "civilizations": 6,
+    "world": 10,
+    "ecology": 2,
+    "culture": 1,
+    "technology": 2,
+    "politics": 3,
+    "military": 2,
+    "future": 1
+   }
+  },
+  {
+   "name": "technology",
+   "files": 4,
+   "lines": 1053,
+   "deps": {
+    "sim": 4,
+    "core": 2,
+    "civilizations": 6,
+    "history": 2,
+    "media": 1,
+    "world": 3,
+    "config": 1,
+    "population": 1
+   }
+  },
+  {
+   "name": "culture",
+   "files": 5,
+   "lines": 997,
+   "deps": {
+    "sim": 10,
+    "civilizations": 6,
+    "history": 3,
+    "core": 4,
+    "population": 2,
+    "world": 1
+   }
+  },
+  {
+   "name": "history",
+   "files": 6,
+   "lines": 896,
+   "deps": {
+    "sim": 13,
+    "civilizations": 1,
+    "world": 1,
+    "media": 2,
+    "core": 1,
+    "culture": 3,
+    "population": 2,
+    "economy": 1
+   }
+  },
+  {
+   "name": "ecology",
+   "files": 2,
+   "lines": 578,
+   "deps": {
+    "population": 2,
+    "sim": 4,
+    "world": 3,
+    "config": 1,
+    "core": 2,
+    "history": 1,
+    "civilizations": 2
+   }
+  },
+  {
+   "name": "core",
+   "files": 5,
+   "lines": 570,
+   "deps": {}
+  },
+  {
+   "name": "persistence",
+   "files": 3,
+   "lines": 523,
+   "deps": {
+    "config": 3,
+    "sim": 2,
+    "world": 2
+   }
+  },
+  {
+   "name": "config",
+   "files": 2,
+   "lines": 434,
+   "deps": {
+    "sim": 1,
+    "world": 3
+   }
+  },
+  {
+   "name": "media",
+   "files": 2,
+   "lines": 406,
+   "deps": {
+    "sim": 3,
+    "core": 2,
+    "history": 1,
+    "population": 3,
+    "culture": 2,
+    "civilizations": 1
+   }
+  },
+  {
+   "name": "future",
+   "files": 2,
+   "lines": 373,
+   "deps": {
+    "sim": 6,
+    "core": 2,
+    "population": 6,
+    "history": 2,
+    "civilizations": 6,
+    "military": 1,
+    "politics": 1,
+    "world": 3,
+    "culture": 1
+   }
+  },
+  {
+   "name": "scenarios",
+   "files": 1,
+   "lines": 111,
+   "deps": {
+    "config": 1,
+    "sim": 1
+   }
+  },
+  {
+   "name": "security",
+   "files": 2,
+   "lines": 71,
+   "deps": {}
+  },
+  {
+   "name": "(root)",
+   "files": 1,
+   "lines": 24,
+   "deps": {
+    "ui": 1,
+    "security": 1
+   }
+  },
+  {
+   "name": "workers",
+   "files": 1,
+   "lines": 17,
+   "deps": {
+    "world": 2
+   }
+  }
+ ],
+ "files": [
+  {
+   "path": "src/civilizations/buildings.ts",
+   "folder": "civilizations",
+   "lines": 192,
+   "about": "Functional building definitions."
+  },
+  {
+   "path": "src/civilizations/buildingTypes.ts",
+   "folder": "civilizations",
+   "lines": 113,
+   "about": "Numeric building type ids (stored per tile in TileMap.bld) and their keys."
+  },
+  {
+   "path": "src/civilizations/civ.ts",
+   "folder": "civilizations",
+   "lines": 287,
+   "about": "Civilizations: creation (from bands, splits, secessions or presets), cultures and languages, identity (name, color, emblem), personality, and extinction (kept in history)."
+  },
+  {
+   "path": "src/civilizations/endings.ts",
+   "folder": "civilizations",
+   "lines": 214,
+   "about": "How civilizations end."
+  },
+  {
+   "path": "src/civilizations/ethos.ts",
+   "folder": "civilizations",
+   "lines": 264,
+   "about": "ETHOS: what a society values, and therefore how it works."
+  },
+  {
+   "path": "src/civilizations/knowledge.ts",
+   "folder": "civilizations",
+   "lines": 81,
+   "about": "Civ knowledge of the map (non-omniscient AI)."
+  },
+  {
+   "path": "src/civilizations/missions.ts",
+   "folder": "civilizations",
+   "lines": 200,
+   "about": "NATIONAL MISSIONS: the goal a nation is pursuing right now."
+  },
+  {
+   "path": "src/civilizations/settlement.ts",
+   "folder": "civilizations",
+   "lines": 370,
+   "about": "Settlements: founding, the monthly cycle (economy -> demography -> construction -> health/migration), yearly upkeep (territory, education, access), transfer between civilizations and destruction."
+  },
+  {
+   "path": "src/civilizations/territory.ts",
+   "folder": "civilizations",
+   "lines": 182,
+   "about": "Territory: each settlement projects influence over nearby tiles (stronger with population, culture, administration and transport)."
+  },
+  {
+   "path": "src/civilizations/urban.ts",
+   "folder": "civilizations",
+   "lines": 898,
+   "about": "Urban development. Each settlement runs at most one construction project at a time, chosen by utility from its measured needs (housing pressure, food deficit, material shortages, unworked deposits, energy deficit, services per capita, threats, transport links)"
+  },
+  {
+   "path": "src/config/balance.ts",
+   "folder": "config",
+   "lines": 212,
+   "about": "Balance parameters. Every gameplay coefficient lives here (not scattered as magic numbers) so it can be tuned, tested for sensitivity and adjusted at runtime from the developer panel."
+  },
+  {
+   "path": "src/config/laws.ts",
+   "folder": "config",
+   "lines": 222,
+   "about": ""
+  },
+  {
+   "path": "src/core/heap.ts",
+   "folder": "core",
+   "lines": 94,
+   "about": "Binary min-heap keyed by float priority, storing integer payloads."
+  },
+  {
+   "path": "src/core/math.ts",
+   "folder": "core",
+   "lines": 88,
+   "about": "Small numeric helpers shared by all systems."
+  },
+  {
+   "path": "src/core/noise.ts",
+   "folder": "core",
+   "lines": 110,
+   "about": "Seeded 2D simplex noise (after Stefan Gustavson's public-domain reference implementation of Ken Perlin's simplex noise), plus fractal helpers."
+  },
+  {
+   "path": "src/core/rng.ts",
+   "folder": "core",
+   "lines": 230,
+   "about": "Deterministic, seedable pseudo-random number generation."
+  },
+  {
+   "path": "src/core/time.ts",
+   "folder": "core",
+   "lines": 48,
+   "about": "Simulation time scales."
+  },
+  {
+   "path": "src/culture/culture.ts",
+   "folder": "culture",
+   "lines": 100,
+   "about": "Cultural change (yearly)."
+  },
+  {
+   "path": "src/culture/language.ts",
+   "folder": "culture",
+   "lines": 179,
+   "about": "Procedural languages and name generation."
+  },
+  {
+   "path": "src/culture/naming.ts",
+   "folder": "culture",
+   "lines": 145,
+   "about": "Procedural names for everything a civilization creates beyond its places and people: chronicles, printing houses, newspapers, broadcasters, social platforms, holographic networks, AI systems and the labs that build them."
+  },
+  {
+   "path": "src/culture/religion.ts",
+   "folder": "culture",
+   "lines": 285,
+   "about": "Religion as a dynamic social institution."
+  },
+  {
+   "path": "src/culture/sports.ts",
+   "folder": "culture",
+   "lines": 288,
+   "about": "SPORTS, LEAGUES AND WORLD GAMES (yearly)."
+  },
+  {
+   "path": "src/ecology/ecology.ts",
+   "folder": "ecology",
+   "lines": 490,
+   "about": "Ecosystems: vegetation regrowth, animal herds (movement, grazing, logistic growth limited by local vegetation, predation, starvation, climate stress), human hunting, extinction, slow evolution into subspecies, and optional fantasy monsters."
+  },
+  {
+   "path": "src/ecology/species.ts",
+   "folder": "ecology",
+   "lines": 88,
+   "about": "Animal species. Habitat suitability, diet and growth parameters are stylized; predator–prey coupling follows Lotka–Volterra-style dynamics (prey growth limited by vegetation, predators by prey encounters)."
+  },
+  {
+   "path": "src/economy/market.ts",
+   "folder": "economy",
+   "lines": 203,
+   "about": "National market & public finance (yearly)."
+  },
+  {
+   "path": "src/economy/occupations.ts",
+   "folder": "economy",
+   "lines": 153,
+   "about": "Round 7: what people do for a living."
+  },
+  {
+   "path": "src/economy/production.ts",
+   "folder": "economy",
+   "lines": 788,
+   "about": "Settlement economy (monthly): labour allocation, food, materials, industry, energy, services and household consumption — all in physical units that flow through the settlement's food store and the civilization's national market stock."
+  },
+  {
+   "path": "src/economy/trade.ts",
+   "folder": "economy",
+   "lines": 236,
+   "about": "Transport networks & trade (yearly)."
+  },
+  {
+   "path": "src/economy/traffic.ts",
+   "folder": "economy",
+   "lines": 78,
+   "about": "Round 7: street traffic at real-world rates, derived (never saved, never changes history)."
+  },
+  {
+   "path": "src/economy/visitors.ts",
+   "folder": "economy",
+   "lines": 55,
+   "about": "VISITOR ACCORDS (yearly): friendly nations at peace that both have a harbour (and later an airport) open their borders to each other's travellers: pilgrims and merchants by sea in the age of sail, tourists by air in the jet age."
+  },
+  {
+   "path": "src/future/risks.ts",
+   "folder": "future",
+   "lines": 236,
+   "about": "Anthropogenic existential risks (speculative or plausible; magnitudes stylized)."
+  },
+  {
+   "path": "src/future/space.ts",
+   "folder": "future",
+   "lines": 137,
+   "about": "Space programs & off-world settlement (yearly)."
+  },
+  {
+   "path": "src/history/album.ts",
+   "folder": "history",
+   "lines": 113,
+   "about": "The PHOTO ALBUM: every 50 years each nation's capital and its largest other city are recorded as compact LAYOUT RECORDS (a few hundred bytes): for every column of the city from west to east, the tallest building and the nearest building with their types and ti"
+  },
+  {
+   "path": "src/history/events.ts",
+   "folder": "history",
+   "lines": 115,
+   "about": "World history: every meaningful development is recorded as a HistoryEvent with the entities involved, a map location, an importance level and — for decisions such as wars, revolutions or collapses — the CAUSES that were actually measured when the decision was "
+  },
+  {
+   "path": "src/history/feed.ts",
+   "folder": "history",
+   "lines": 264,
+   "about": "The civilization feed: what people of the time read, heard or scrolled."
+  },
+  {
+   "path": "src/history/feedFrame.ts",
+   "folder": "history",
+   "lines": 104,
+   "about": "The interface AROUND the feed, in the medium of the nation's era: a cave wall, a scribe's tablet house, a scriptorium with a town crier, a printing house, a newspaper front page, a broadcast set, a social app or a holographic interface."
+  },
+  {
+   "path": "src/history/newspaper.ts",
+   "folder": "history",
+   "lines": 39,
+   "about": "Era-appropriate headlines generated by deterministic templates from actual recorded events (no free-form narrative): ancient chronicles, broadsheets, modern news and futuristic feeds."
+  },
+  {
+   "path": "src/history/stats.ts",
+   "folder": "history",
+   "lines": 261,
+   "about": "Time-series statistics sampled from live simulation state (yearly, with adaptive decimation so long histories stay bounded), plus change decomposition built from recorded demographic flows."
+  },
+  {
+   "path": "src/main.tsx",
+   "folder": "(root)",
+   "lines": 24,
+   "about": ""
+  },
+  {
+   "path": "src/media/media.ts",
+   "folder": "media",
+   "lines": 389,
+   "about": "Media and artificial intelligence (yearly, per civilization)."
+  },
+  {
+   "path": "src/media/medium.ts",
+   "folder": "media",
+   "lines": 17,
+   "about": "How a civilization's news travels, from its adopted technology (no other dependencies)."
+  },
+  {
+   "path": "src/military/nuclear.ts",
+   "folder": "military",
+   "lines": 320,
+   "about": "Nuclear weapons: programmes, doctrine, deterrence, escalation, strikes, fallout, nuclear winter and arms control."
+  },
+  {
+   "path": "src/military/war.ts",
+   "folder": "military",
+   "lines": 546,
+   "about": "Warfare. ARMIES are raised from settlements' working-age people (reducing labour), equipped from the national ARMS stock and paid from the military budget."
+  },
+  {
+   "path": "src/military/weapons.ts",
+   "folder": "military",
+   "lines": 314,
+   "about": "Weapons by era, land doctrine, arms races and special operations."
+  },
+  {
+   "path": "src/persistence/migrations.ts",
+   "folder": "persistence",
+   "lines": 33,
+   "about": "Save-format migrations."
+  },
+  {
+   "path": "src/persistence/saves.ts",
+   "folder": "persistence",
+   "lines": 156,
+   "about": "Local-first save storage in IndexedDB."
+  },
+  {
+   "path": "src/persistence/serialize.ts",
+   "folder": "persistence",
+   "lines": 334,
+   "about": "World serialization (save format v1)."
+  },
+  {
+   "path": "src/politics/diplomacy.ts",
+   "folder": "politics",
+   "lines": 465,
+   "about": "Diplomacy (yearly). Relations between civs that have met are persistent state: opinion, trust, trade, shared border, disputed tiles, grievances (memory of wars and lost land), rivalry and treaties."
+  },
+  {
+   "path": "src/politics/government.ts",
+   "folder": "politics",
+   "lines": 484,
+   "about": "Government & internal politics (yearly)."
+  },
+  {
+   "path": "src/politics/govforms.ts",
+   "folder": "politics",
+   "lines": 103,
+   "about": "Government forms are LABELS derived from a continuous institution vector (see Institutions in sim/types.ts) plus scale and era."
+  },
+  {
+   "path": "src/politics/succession.ts",
+   "folder": "politics",
+   "lines": 346,
+   "about": "Leadership & succession."
+  },
+  {
+   "path": "src/population/agents.ts",
+   "folder": "population",
+   "lines": 153,
+   "about": "Mobile groups: settlers (found new settlements), explorers (reveal the map), migrants & refugees (move people between settlements), missionaries (carry religion), colonists (overseas settlement)."
+  },
+  {
+   "path": "src/population/bands.ts",
+   "folder": "population",
+   "lines": 240,
+   "about": "Nomadic bands (individual-level hunter-gatherer groups)."
+  },
+  {
+   "path": "src/population/demography.ts",
+   "folder": "population",
+   "lines": 411,
+   "about": "Demography at two resolutions."
+  },
+  {
+   "path": "src/population/development.ts",
+   "folder": "population",
+   "lines": 228,
+   "about": "Character development over a lifetime (notable persons only)."
+  },
+  {
+   "path": "src/population/disease.ts",
+   "folder": "population",
+   "lines": 142,
+   "about": "Abstract public-health model."
+  },
+  {
+   "path": "src/population/ledger.ts",
+   "folder": "population",
+   "lines": 101,
+   "about": "Population accounting ledger."
+  },
+  {
+   "path": "src/population/migration.ts",
+   "folder": "population",
+   "lines": 82,
+   "about": "Migration: people leave settlements suffering hunger, unrest or overcrowding and move toward known settlements that are more prosperous, better fed and have room — preferring their own civilization; foreign destinations depend on migration policies."
+  },
+  {
+   "path": "src/population/persons.ts",
+   "folder": "population",
+   "lines": 183,
+   "about": "Individual persons: creation, inheritance (genes + traits), naming, death."
+  },
+  {
+   "path": "src/population/traits.ts",
+   "folder": "population",
+   "lines": 77,
+   "about": "Personality traits of individuals."
+  },
+  {
+   "path": "src/powers/horrors.ts",
+   "folder": "powers",
+   "lines": 164,
+   "about": "Fictional horrors: GOD MODE ONLY."
+  },
+  {
+   "path": "src/powers/powers.ts",
+   "folder": "powers",
+   "lines": 913,
+   "about": "God powers. Every power mutates simulation state (terrain, climate, people, institutions, technology, relations...) — never just a label — and is recorded in WorldState.interventions so a timeline can be reproduced."
+  },
+  {
+   "path": "src/powers/undo.ts",
+   "folder": "powers",
+   "lines": 94,
+   "about": "Undo for terrain-editing strokes: snapshots of each touched tile before the first change."
+  },
+  {
+   "path": "src/rendering/art/animals.ts",
+   "folder": "rendering",
+   "lines": 479,
+   "about": "Wild/domestic animals and fantasy monsters (ani.*, mon.*) Side view facing RIGHT (the renderer mirrors for leftward motion); flying creatures likewise."
+  },
+  {
+   "path": "src/rendering/art/buildings_civic.ts",
+   "folder": "rendering",
+   "lines": 1291,
+   "about": "Civic, military, transport and special buildings (bld.*)"
+  },
+  {
+   "path": "src/rendering/art/buildings_housing.ts",
+   "folder": "rendering",
+   "lines": 939,
+   "about": "Housing variety (bld.<KEY>.<tier><variant>) and ethos style sets (bld.<KEY>.atomic.<n>, bld.<KEY>.eco.<n>)."
+  },
+  {
+   "path": "src/rendering/art/buildings_venues.ts",
+   "folder": "rendering",
+   "lines": 623,
+   "about": "Sports venues, ports and airports by era (bld.sport.*, bld.port.*, bld.air.*)."
+  },
+  {
+   "path": "src/rendering/art/buildings.ts",
+   "folder": "rendering",
+   "lines": 1329,
+   "about": "Economic buildings: residential, food, extraction, industry, energy, commerce (bld.*)"
+  },
+  {
+   "path": "src/rendering/art/characters.ts",
+   "folder": "rendering",
+   "lines": 1273,
+   "about": "Characters and jobs (char.*): small people with a 4-frame walk cycle."
+  },
+  {
+   "path": "src/rendering/art/city_lots.ts",
+   "folder": "rendering",
+   "lines": 275,
+   "about": "Close-up city lot sprites (round 6): lot.<kind>.<band>.<variant> and street props (lot.tree.n, lot.fence.h/v, lot.hedge.h/v, lot.pool.0, lot.car.h/v.n, lot.bench.0, lot.lamp.0, lot.fountain.0)."
+  },
+  {
+   "path": "src/rendering/art/effects.ts",
+   "folder": "rendering",
+   "lines": 786,
+   "about": "Fire, smoke, explosions, weather, divine/disaster effects (fx.*)"
+  },
+  {
+   "path": "src/rendering/art/icons.ts",
+   "folder": "rendering",
+   "lines": 3802,
+   "about": "16x16 UI icons (ico.*)."
+  },
+  {
+   "path": "src/rendering/art/index.ts",
+   "folder": "rendering",
+   "lines": 40,
+   "about": "Sprite registry: merges every sheet into one id -> SpriteDef map."
+  },
+  {
+   "path": "src/rendering/art/palette.ts",
+   "folder": "rendering",
+   "lines": 118,
+   "about": "EPOCH master palette."
+  },
+  {
+   "path": "src/rendering/art/raster.ts",
+   "folder": "rendering",
+   "lines": 58,
+   "about": "DOM-free sprite rasterizer."
+  },
+  {
+   "path": "src/rendering/art/select.ts",
+   "folder": "rendering",
+   "lines": 336,
+   "about": "Sprite selection rules: which sprite key the renderer should draw for a building, venue, port, airport, vehicle or person, given its era, tier, ethos style and a deterministic per-tile/per-agent hash."
+  },
+  {
+   "path": "src/rendering/art/terrain.ts",
+   "folder": "rendering",
+   "lines": 964,
+   "about": "Terrain ground tiles (ter.*), mountains/hills (mtn.*), water details and shore pieces (shore.*)"
+  },
+  {
+   "path": "src/rendering/art/types.ts",
+   "folder": "rendering",
+   "lines": 68,
+   "about": "Pixel-art sprite definition format."
+  },
+  {
+   "path": "src/rendering/art/units.ts",
+   "folder": "rendering",
+   "lines": 1206,
+   "about": "People, workers, soldiers per era and fantasy races (unit.*) Conventions (all sprites face RIGHT; the renderer mirrors for leftward motion): - Standard figure: 7 px wide canvas, body on columns 1..5 (center column 3), 3 px head with hair at the back (left) and"
+  },
+  {
+   "path": "src/rendering/art/vegetation.ts",
+   "folder": "rendering",
+   "lines": 351,
+   "about": "Trees, bushes, cacti and crops (veg.*)"
+  },
+  {
+   "path": "src/rendering/art/vehicles_era.ts",
+   "folder": "rendering",
+   "lines": 710,
+   "about": "Era transport (veh.*): riders, carriages, bicycles, trams, cars, buses, lorries, aircraft, personal flyers and ships, each with 2-4 animation frames (wheels, legs, rotors, paddles, wakes, thrusters)."
+  },
+  {
+   "path": "src/rendering/art/vehicles.ts",
+   "folder": "rendering",
+   "lines": 568,
+   "about": "Boats, ships, carts, trains, cars, aircraft, rockets (veh.*) Water and land vehicles: side view facing RIGHT (the renderer mirrors for leftward motion)."
+  },
+  {
+   "path": "src/rendering/atlas.ts",
+   "folder": "rendering",
+   "lines": 131,
+   "about": "Sprite atlas: rasterizes every palette-keyed sprite into canvases once at startup, with lazily created team-colored variants (T/U/V keys replaced by a civilization's colors)."
+  },
+  {
+   "path": "src/rendering/camera.ts",
+   "folder": "rendering",
+   "lines": 70,
+   "about": "2D camera: world units are art pixels (1 tile = 8 px); zoom = CSS px per art px."
+  },
+  {
+   "path": "src/rendering/cityBlocks.ts",
+   "folder": "rendering",
+   "lines": 482,
+   "about": "Close-up city blocks (round 6)."
+  },
+  {
+   "path": "src/rendering/cityLayer.ts",
+   "folder": "rendering",
+   "lines": 423,
+   "about": "Close-up city layer (round 6)."
+  },
+  {
+   "path": "src/rendering/flag.ts",
+   "folder": "rendering",
+   "lines": 122,
+   "about": "Procedural pixel flags from a civilization's emblem (field division + charge) and its two colors."
+  },
+  {
+   "path": "src/rendering/overlays.ts",
+   "folder": "rendering",
+   "lines": 239,
+   "about": "Map overlay modes. Every color is computed from live simulation state."
+  },
+  {
+   "path": "src/rendering/photos.ts",
+   "folder": "rendering",
+   "lines": 350,
+   "about": "City pictures. POSTCARD: a street-level skyline drawn ONLY from a layout record (history/album.ts): every column of the city from west to east, its tallest building behind and its nearest building in front, in the style of the era the building was built in (th"
+  },
+  {
+   "path": "src/rendering/pixelCache.ts",
+   "folder": "rendering",
+   "lines": 136,
+   "about": "Round 7: WorldBox-style pixel caching."
+  },
+  {
+   "path": "src/rendering/renderer.ts",
+   "folder": "rendering",
+   "lines": 796,
+   "about": "Frame renderer. Draws (back to front): cached world chunks (or the far-zoom overview), the overlay, animated tiles (volcanoes, fires, smoke, windmills), living things and agents, traffic derived from real infrastructure and trade, effects, labels, selection an"
+  },
+  {
+   "path": "src/rendering/terrainLayer.ts",
+   "folder": "rendering",
+   "lines": 367,
+   "about": "Static world layer, cached per 16x16-tile chunk."
+  },
+  {
+   "path": "src/scenarios/scenarios.ts",
+   "folder": "scenarios",
+   "lines": 111,
+   "about": "Scenario worlds: preset configurations with OPTIONAL objectives."
+  },
+  {
+   "path": "src/security/framing.ts",
+   "folder": "security",
+   "lines": 20,
+   "about": "Clickjacking fallback."
+  },
+  {
+   "path": "src/security/policy.ts",
+   "folder": "security",
+   "lines": 51,
+   "about": "Browser security policy for the static build (round 5, P7 security audit)."
+  },
+  {
+   "path": "src/sim/bootstrap.ts",
+   "folder": "sim",
+   "lines": 335,
+   "about": "Seeding a new world: wildlife, optional fantasy monsters, and starting peoples."
+  },
+  {
+   "path": "src/sim/civYearly.ts",
+   "folder": "sim",
+   "lines": 220,
+   "about": "The yearly cycle of a civilization: census, research & adoption, national economy, politics, diplomacy, military, infrastructure, space, expansion and domestication."
+  },
+  {
+   "path": "src/sim/conceptFx.ts",
+   "folder": "sim",
+   "lines": 228,
+   "about": "Round 7: the one place that decides what every concept shows on the map."
+  },
+  {
+   "path": "src/sim/context.ts",
+   "folder": "sim",
+   "lines": 121,
+   "about": "Sim: the runtime context passed to every system function."
+  },
+  {
+   "path": "src/sim/maintenance.ts",
+   "folder": "sim",
+   "lines": 36,
+   "about": "Archive maintenance: keeps long-running worlds bounded in memory and save size."
+  },
+  {
+   "path": "src/sim/simulation.ts",
+   "folder": "sim",
+   "lines": 189,
+   "about": "Simulation: fixed-tick, deterministic orchestration of all systems."
+  },
+  {
+   "path": "src/sim/types.ts",
+   "folder": "sim",
+   "lines": 1121,
+   "about": "EPOCH world state model."
+  },
+  {
+   "path": "src/sim/world.ts",
+   "folder": "sim",
+   "lines": 69,
+   "about": "World state creation."
+  },
+  {
+   "path": "src/technology/overtaking.ts",
+   "folder": "technology",
+   "lines": 60,
+   "about": "Technological overtaking."
+  },
+  {
+   "path": "src/technology/research.ts",
+   "folder": "technology",
+   "lines": 513,
+   "about": "Technology runtime: research, discovery, adoption, diffusion, loss."
+  },
+  {
+   "path": "src/technology/techData.ts",
+   "folder": "technology",
+   "lines": 293,
+   "about": "EPOCH technology dependency graph (data)."
+  },
+  {
+   "path": "src/technology/types.ts",
+   "folder": "technology",
+   "lines": 187,
+   "about": "Technology system contracts."
+  },
+  {
+   "path": "src/ui/App.tsx",
+   "folder": "ui",
+   "lines": 71,
+   "about": ""
+  },
+  {
+   "path": "src/ui/audio.ts",
+   "folder": "ui",
+   "lines": 54,
+   "about": "Tiny synthesized sound effects (WebAudio oscillators and noise) — no audio assets needed."
+  },
+  {
+   "path": "src/ui/charts/LineChart.tsx",
+   "folder": "ui",
+   "lines": 180,
+   "about": "Canvas line chart for simulation time series."
+  },
+  {
+   "path": "src/ui/game/Dock.tsx",
+   "folder": "ui",
+   "lines": 69,
+   "about": ""
+  },
+  {
+   "path": "src/ui/game/Game.tsx",
+   "folder": "ui",
+   "lines": 298,
+   "about": ""
+  },
+  {
+   "path": "src/ui/game/TopBar.tsx",
+   "folder": "ui",
+   "lines": 69,
+   "about": ""
+  },
+  {
+   "path": "src/ui/game/Tutorial.tsx",
+   "folder": "ui",
+   "lines": 28,
+   "about": ""
+  },
+  {
+   "path": "src/ui/input.ts",
+   "folder": "ui",
+   "lines": 200,
+   "about": "Pointer input for touch and mouse."
+  },
+  {
+   "path": "src/ui/panels/CivListPanel.tsx",
+   "folder": "ui",
+   "lines": 40,
+   "about": ""
+  },
+  {
+   "path": "src/ui/panels/CivPhotos.tsx",
+   "folder": "ui",
+   "lines": 85,
+   "about": ""
+  },
+  {
+   "path": "src/ui/panels/FeedPanel.tsx",
+   "folder": "ui",
+   "lines": 142,
+   "about": ""
+  },
+  {
+   "path": "src/ui/panels/HistoryPanel.tsx",
+   "folder": "ui",
+   "lines": 81,
+   "about": ""
+  },
+  {
+   "path": "src/ui/panels/Inspector.tsx",
+   "folder": "ui",
+   "lines": 749,
+   "about": ""
+  },
+  {
+   "path": "src/ui/panels/LawsPanel.tsx",
+   "folder": "ui",
+   "lines": 65,
+   "about": ""
+  },
+  {
+   "path": "src/ui/panels/MenuPanel.tsx",
+   "folder": "ui",
+   "lines": 79,
+   "about": ""
+  },
+  {
+   "path": "src/ui/panels/OverlayPanel.tsx",
+   "folder": "ui",
+   "lines": 72,
+   "about": ""
+  },
+  {
+   "path": "src/ui/panels/StatsPanel.tsx",
+   "folder": "ui",
+   "lines": 96,
+   "about": ""
+  },
+  {
+   "path": "src/ui/screens/LoadScreen.tsx",
+   "folder": "ui",
+   "lines": 77,
+   "about": ""
+  },
+  {
+   "path": "src/ui/screens/NewWorldScreen.tsx",
+   "folder": "ui",
+   "lines": 173,
+   "about": ""
+  },
+  {
+   "path": "src/ui/screens/SettingsScreen.tsx",
+   "folder": "ui",
+   "lines": 97,
+   "about": ""
+  },
+  {
+   "path": "src/ui/screens/TitleScreen.tsx",
+   "folder": "ui",
+   "lines": 72,
+   "about": ""
+  },
+  {
+   "path": "src/ui/shared.tsx",
+   "folder": "ui",
+   "lines": 54,
+   "about": ""
+  },
+  {
+   "path": "src/ui/worldFactory.ts",
+   "folder": "ui",
+   "lines": 56,
+   "about": "Create a simulation, generating geography in a Web Worker when available."
+  },
+  {
+   "path": "src/workers/worldgen.worker.ts",
+   "folder": "workers",
+   "lines": 17,
+   "about": "/ <reference lib=\"webworker\" />"
+  },
+  {
+   "path": "src/world/catastrophes.ts",
+   "folder": "world",
+   "lines": 199,
+   "about": "Rare natural catastrophes (yearly, world level), with base rates of the real order of magnitude so that rare things stay rare (rates are per world-year, scaled by the disaster-frequency setting): regional airburst (~50-100 m impactor) 1 / 800 (Tunguska-class) "
+  },
+  {
+   "path": "src/world/environment.ts",
+   "folder": "world",
+   "lines": 367,
+   "about": "Environment & climate."
+  },
+  {
+   "path": "src/world/mapShapes.ts",
+   "folder": "world",
+   "lines": 415,
+   "about": "Map shapes: world-generation presets that steer where land forms."
+  },
+  {
+   "path": "src/world/pathfinding.ts",
+   "folder": "world",
+   "lines": 114,
+   "about": "A* pathfinding on the tile grid."
+  },
+  {
+   "path": "src/world/resources.ts",
+   "folder": "world",
+   "lines": 132,
+   "about": "Natural resource deposits (per tile) and economic goods (stockpiled and traded)."
+  },
+  {
+   "path": "src/world/terrain.ts",
+   "folder": "world",
+   "lines": 113,
+   "about": "Terrain (biome) definitions."
+  },
+  {
+   "path": "src/world/tilemap.ts",
+   "folder": "world",
+   "lines": 210,
+   "about": "TileMap: the geographic state of the world in data-oriented typed arrays (one array per attribute, index = y * w + x)."
+  },
+  {
+   "path": "src/world/worldgen.ts",
+   "folder": "world",
+   "lines": 918,
+   "about": "Procedural world generation."
+  }
+ ],
+ "tests": [
+  {
+   "path": "tests/civilizations/cityWorks.test.ts",
+   "cases": 4,
+   "about": "Round 7: buildings are built up, renovated and redeveloped; new towns start in their era's homes; road networks share trunk lines."
+  },
+  {
+   "path": "tests/civilizations/construction.test.ts",
+   "cases": 0,
+   "about": ""
+  },
+  {
+   "path": "tests/civilizations/ethos.test.ts",
+   "cases": 9,
+   "about": "Round 5, P2: what societies value (ethos), the missions they pursue, how much they differ, and where they settle."
+  },
+  {
+   "path": "tests/civilizations/modern-civ.test.ts",
+   "cases": 5,
+   "about": "Round-4 fixes that let modern civilizations keep building, go to space and govern themselves plausibly."
+  },
+  {
+   "path": "tests/civilizations/planning.test.ts",
+   "cases": 9,
+   "about": "Round 6: a light planning rule."
+  },
+  {
+   "path": "tests/civilizations/round8.test.ts",
+   "cases": 12,
+   "about": "Round 8: city composition, public-service jobs, climate mitigation, and the round-6 leftovers."
+  },
+  {
+   "path": "tests/culture/sports.test.ts",
+   "cases": 8,
+   "about": "Sports, world games and visitor accords (round 5, P4)."
+  },
+  {
+   "path": "tests/ecology/refugia.test.ts",
+   "cases": 1,
+   "about": ""
+  },
+  {
+   "path": "tests/economy/employment.test.ts",
+   "cases": 4,
+   "about": ""
+  },
+  {
+   "path": "tests/economy/modern.test.ts",
+   "cases": 6,
+   "about": "Round-4 modern-economy fixes."
+  },
+  {
+   "path": "tests/economy/occupations.test.ts",
+   "cases": 7,
+   "about": "Round 7: jobs are tracked and shown."
+  },
+  {
+   "path": "tests/history/album.test.ts",
+   "cases": 5,
+   "about": "Photo album layout records: exact, per-save, bounded, saved, and validated on load."
+  },
+  {
+   "path": "tests/integration/causal.test.ts",
+   "cases": 6,
+   "about": "Integration tests as counterfactual experiments: run a world, clone it exactly (save/load is deterministic), intervene in ONE copy, and compare."
+  },
+  {
+   "path": "tests/integration/causal2.test.ts",
+   "cases": 7,
+   "about": "Integration scenarios #3, #5, #8 and #10 from the original specification (\"Integration tests\": 3 education → technology, 5 electricity → dependent industries, 8 trade interruption → dependent cities, 10 advanced technology gated by prerequisites / credible tra"
+  },
+  {
+   "path": "tests/integration/endings.test.ts",
+   "cases": 10,
+   "about": "Round 5, P5: endings, catastrophes, horrors and technological overtaking."
+  },
+  {
+   "path": "tests/integration/plan-tests.test.ts",
+   "cases": 14,
+   "about": "Named tests from the implementation plan (docs/superpowers/plans/2026-11-14-epoch-implementation.md) that were not yet covered elsewhere."
+  },
+  {
+   "path": "tests/integration/war-nuclear.test.ts",
+   "cases": 4,
+   "about": "Phase P5: war, nuclear weapons and technological overtaking."
+  },
+  {
+   "path": "tests/media/feed.test.ts",
+   "cases": 8,
+   "about": "The era-medium feed is derived from recorded history: same save -> same feed; medium, outlets, AI authors and false claims must all be grounded in what the simulation recorded."
+  },
+  {
+   "path": "tests/media/media.test.ts",
+   "cases": 13,
+   "about": "Media & AI (round 4): era-appropriate outlets, platform life cycles, named AI systems, and their causal effects, tested as counterfactuals on identical clones (one intervention, compare)."
+  },
+  {
+   "path": "tests/persistence/roundtrip.test.ts",
+   "cases": 3,
+   "about": ""
+  },
+  {
+   "path": "tests/persistence/security.test.ts",
+   "cases": 7,
+   "about": "Hostile and broken save files (security audit V1–V5, S1) and storage failures (V6, plan: unavailableStorage, migrationFromV0, quota exhaustion / interrupted writes)."
+  },
+  {
+   "path": "tests/population/development.test.ts",
+   "cases": 10,
+   "about": ""
+  },
+  {
+   "path": "tests/population/ledger.test.ts",
+   "cases": 9,
+   "about": "Population accounting (R12.4): for the world and for every civilization, Δ boundary population == Σ signed ledger components exactly (up to float rounding), across every way people are created, moved, transferred or removed."
+  },
+  {
+   "path": "tests/rendering/cacheFreshness.test.ts",
+   "cases": 2,
+   "about": "Round 7 (\"recall cache for concepts\"): every concept that changes something the cached map draws must mark that place for redraw."
+  },
+  {
+   "path": "tests/rendering/cityBlocks.test.ts",
+   "cases": 17,
+   "about": "Round 6: close-up city blocks."
+  },
+  {
+   "path": "tests/rendering/cityLayer.test.ts",
+   "cases": 10,
+   "about": "Round 6: close-up city layer, the parts that need no DOM (fade curve, chunk mapping, cache)."
+  },
+  {
+   "path": "tests/rendering/cityLife.test.ts",
+   "cases": 10,
+   "about": "Round 7: streets and parks at real-world rates, homes in many forms past huts and caves, traffic from demand over street capacity, and highways on simulated roads."
+  },
+  {
+   "path": "tests/rendering/palette.test.ts",
+   "cases": 4,
+   "about": "Round 6: nation colour on buildings becomes an accent (muted), so cities are not one flat hue."
+  },
+  {
+   "path": "tests/rendering/pixelCache.test.ts",
+   "cases": 4,
+   "about": "Round 7: WorldBox-style pixel caching."
+  },
+  {
+   "path": "tests/rendering/sprites.test.ts",
+   "cases": 18,
+   "about": ""
+  },
+  {
+   "path": "tests/security/hardening.test.ts",
+   "cases": 24,
+   "about": "Round 5 security audit (docs/SECURITY.md, threat matrix)."
+  },
+  {
+   "path": "tests/sim/conceptFx.test.ts",
+   "cases": 12,
+   "about": "Round 7: every concept shows on the map."
+  },
+  {
+   "path": "tests/sim/determinism.test.ts",
+   "cases": 3,
+   "about": ""
+  },
+  {
+   "path": "tests/sim/systems.test.ts",
+   "cases": 7,
+   "about": ""
+  },
+  {
+   "path": "tests/technology/techData.test.ts",
+   "cases": 8,
+   "about": ""
+  },
+  {
+   "path": "tests/ui/flag-input.test.ts",
+   "cases": 7,
+   "about": ""
+  },
+  {
+   "path": "tests/ui/guide.test.ts",
+   "cases": 3,
+   "about": "Round 8: the interactive code guide (public/guide/, served at /guide/) keeps the game's security policy and its facts stay in step with the code (regenerate with `node tools/guide-facts.mjs`)."
+  },
+  {
+   "path": "tests/world/fire-determinism.test.ts",
+   "cases": 2,
+   "about": "Regression (round 6): fires set outside ignite() were missing from the cached fire set, so a save made while they burned resumed differently (the reloaded world burned them, the running one did not)."
+  },
+  {
+   "path": "tests/world/presets.test.ts",
+   "cases": 18,
+   "about": "Map shape presets (src/world/mapShapes.ts): every shape at two sizes and two seeds must generate, hit its land range, show its signature geometry and let civilizations start."
+  },
+  {
+   "path": "tests/world/worldgen.test.ts",
+   "cases": 5,
+   "about": ""
+  }
+ ],
+ "scripts": [
+  {
+   "path": "scripts/endings-census.ts",
+   "lines": 27,
+   "about": "How often each ending and catastrophe actually happens in natural worlds (no god powers)."
+  },
+  {
+   "path": "scripts/modernization.ts",
+   "lines": 60,
+   "about": "Natural-history run with NO god powers: does civilization modernize on its own, and do natural hazards happen during ordinary ticks?"
+  },
+  {
+   "path": "scripts/multi-seed.ts",
+   "lines": 65,
+   "about": "Statistical multi-seed run: same config, N seeds, Y years."
+  },
+  {
+   "path": "scripts/run-sim.ts",
+   "lines": 39,
+   "about": "Headless simulation runner: prints a world summary every N years."
+  },
+  {
+   "path": "tools/balance-compare.mjs",
+   "lines": 56,
+   "about": "Compare two sets of 1,000-year modernization runs (scripts/modernization.ts output)."
+  },
+  {
+   "path": "tools/contact-sheet.ts",
+   "lines": 208,
+   "about": "Labelled contact sheet of EVERY registered sprite (all frames), grouped by family, for visual review of the pixel art."
+  },
+  {
+   "path": "tools/design-capture.mjs",
+   "lines": 98,
+   "about": "Design review capture (round 6): every screen at five device sizes, plus measured design metrics."
+  },
+  {
+   "path": "tools/design-metrics.mjs",
+   "lines": 58,
+   "about": "Design floors measured inside the page (round 6 design review), shared by tools/design-capture.mjs and tools/viewports.mjs."
+  },
+  {
+   "path": "tools/gallery-r5.mjs",
+   "lines": 73,
+   "about": "Captures the round-5 README screenshots from the real built game (Chromium; iPhone 13 emulation + desktop)."
+  },
+  {
+   "path": "tools/gallery.mjs",
+   "lines": 95,
+   "about": "Captures the README screenshot gallery from the real built game (Chromium; desktop + iPhone 13 emulation)."
+  },
+  {
+   "path": "tools/guide-facts.mjs",
+   "lines": 70,
+   "about": "Round 8: facts for the code guide, read from the code itself so the guide cannot drift silently."
+  },
+  {
+   "path": "tools/guide.mjs",
+   "lines": 61,
+   "about": "Annotated \"what's on the screen\" guide images: numbered callouts drawn over the live game at the real positions of each control (Chromium; desktop + iPhone 13 emulation)."
+  },
+  {
+   "path": "tools/make-icons.ts",
+   "lines": 34,
+   "about": "App icons for \"Add to Home Screen\" (iPhone) and installable web app (PC), drawn from the game's own pixel art: a globe-and-crown sprite centered on the midnight-ink background, nearest-neighbor scaled."
+  },
+  {
+   "path": "tools/perf-closeup.mjs",
+   "lines": 50,
+   "about": "Frame-time check for the close-up city layer (round 6): a modern capital at maximum zoom (close-up on) and just below the close-up threshold (normal map), Chromium with CPU throttled ×4."
+  },
+  {
+   "path": "tools/pixel-font.ts",
+   "lines": 129,
+   "about": "Tiny original bitmap font for tooling (contact sheets)."
+  },
+  {
+   "path": "tools/png.ts",
+   "lines": 42,
+   "about": "Minimal RGBA PNG encoder for tooling (node only)."
+  },
+  {
+   "path": "tools/render-map.ts",
+   "lines": 47,
+   "about": "Render a generated world overview to PNG (terrain colors + hillshade + rivers + deposits)."
+  },
+  {
+   "path": "tools/render-shapes.ts",
+   "lines": 50,
+   "about": "Render one small preview PNG per map shape (terrain colour per tile, rivers in blue)."
+  },
+  {
+   "path": "tools/render-sprites.ts",
+   "lines": 149,
+   "about": "Renders every registered sprite sheet into a PNG contact sheet so that pixel art can be reviewed visually (open the PNG with any image viewer)."
+  },
+  {
+   "path": "tools/screenshot.mjs",
+   "lines": 39,
+   "about": "Usage: node tools/screenshot.mjs [mode] ; serves dist via vite preview externally"
+  },
+  {
+   "path": "tools/viewports.mjs",
+   "lines": 78,
+   "about": "Layout check across device profiles (Chromium emulation, not Safari/physical devices)."
+  },
+  {
+   "path": "benchmarks/browser-bench.mjs",
+   "lines": 31,
+   "about": "Browser frame-rate benchmark: creates a world, runs at max speed and measures requestAnimationFrame rate and simulated years per real second."
+  },
+  {
+   "path": "benchmarks/pixel-cache.ts",
+   "lines": 59,
+   "about": "Round 7: what WorldBox-style zone caching saves."
+  },
+  {
+   "path": "benchmarks/sim-bench.ts",
+   "lines": 28,
+   "about": "Headless simulation throughput: ms per simulated year at checkpoints."
+  }
+ ],
+ "workflows": [
+  {
+   "path": ".github/workflows/ci.yml",
+   "about": ""
+  },
+  {
+   "path": ".github/workflows/long-run.yml",
+   "about": ""
+  },
+  {
+   "path": ".github/workflows/pages.yml",
+   "about": ""
+  }
+ ]
+}

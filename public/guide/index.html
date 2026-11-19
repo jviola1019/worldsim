@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self' data:; img-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; manifest-src 'self'; media-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'none'" />
+<title>EPOCH code guide</title>
+<meta name="description" content="An interactive map of how EPOCH: Civilizations Unbound works: its code, its simulation timeline and its measured balance." />
+<link rel="stylesheet" href="guide.css" />
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">EPOCH: Civilizations Unbound</p>
+    <h1>How the code works</h1>
+    <p class="lede">An interactive companion to <a href="https://github.com/jviola1019/worldsim/blob/claude/epoch-civilizations-unbound-dap8pc/docs/GUIDE.md">docs/GUIDE.md</a>. Every number here is read from the code by <code>tools/guide-facts.mjs</code> or from measured balance runs.</p>
+    <div class="stats" id="stats" aria-live="polite"></div>
+    <p class="nav"><a href="../">Play the game</a> · <a href="#map">Code map</a> · <a href="#time">Timeline</a> · <a href="#balance">Balance</a> · <a href="#files">Every file</a></p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="map" aria-labelledby="map-h">
+    <h2 id="map-h">The code map</h2>
+    <p>Each circle is a folder of <code>src/</code>; its size is its number of lines. Lines show which folders use which. Select a folder to see its files and what each does. The simulation sits in the middle; <strong>rendering</strong> and <strong>ui</strong> only read it.</p>
+    <div class="mapgrid">
+      <div><svg id="mapsvg" viewBox="0 0 720 600" role="img" aria-label="Folders of the code and their dependencies"></svg></div>
+      <aside id="detail" class="card" aria-live="polite"><p class="muted">Select a folder.</p></aside>
+    </div>
+  </section>
+
+  <section id="time" aria-labelledby="time-h">
+    <h2 id="time-h">The heartbeat: one simulated year</h2>
+    <p>A year is 120 ticks (about 3 days each). Drag the slider or press play to watch what runs on each tick. Settlements take turns each month (by id), nations take turns each year, world-wide systems run on day 0.</p>
+    <div class="timeline card">
+      <div class="tlrow">
+        <button id="play" class="btn" type="button" aria-pressed="false">Play</button>
+        <input id="tick" type="range" min="0" max="119" value="0" aria-label="Tick of the year" />
+        <output id="tickout" for="tick">Day 0</output>
+      </div>
+      <svg id="wheel" viewBox="0 0 720 120" role="img" aria-label="The 120 ticks of a year"></svg>
+      <ul id="runs" class="runs"></ul>
+    </div>
+  </section>
+
+  <section id="balance" aria-labelledby="bal-h">
+    <h2 id="bal-h">Measured balance: round 7 against round 8</h2>
+    <p>Four natural histories of 1,000 years each (128² map, no god powers; <code>scripts/modernization.ts</code>). Round 8 added public-service jobs, capped craft workshops in industrial cities, made climate policy respond to warming and made the climate's own feedback a finite store.</p>
+    <div class="charts">
+      <figure class="card"><figcaption>Unemployment, mean of years 700–1,000</figcaption><svg id="chart-unemp" viewBox="0 0 340 220" role="img" aria-label="Unemployment by world"></svg></figure>
+      <figure class="card"><figcaption>Warming at year 1,000 (°C)</figcaption><svg id="chart-warm" viewBox="0 0 340 220" role="img" aria-label="Warming by world"></svg></figure>
+    </div>
+    <p class="muted" id="balnote"></p>
+  </section>
+
+  <section id="files" aria-labelledby="files-h">
+    <h2 id="files-h">Every file</h2>
+    <label class="search">Search <input id="q" type="search" placeholder="e.g. cache, ledger, war" /></label>
+    <p id="count" class="muted" aria-live="polite"></p>
+    <div id="filelist" class="filelist"></div>
+  </section>
+</main>
+<footer class="wrap muted"><p id="gen"></p></footer>
+<script src="guide.js"></script>
+</body>
+</html>

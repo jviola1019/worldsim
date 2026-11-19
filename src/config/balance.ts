@@ -92,6 +92,20 @@ export const BALANCE = {
   constructionReserve: 0.002,
   /** [S] Maximum market-service jobs per capita at high goods income. */
   serviceDemandMax: 0.42,
+  /** [E] Round 8: public-service jobs per person in industrial eras: base, per unit of welfare, per budget share on schooling and health, cap. */
+  publicJobsBase: 0.02,
+  publicJobsWelfare: 0.05,
+  publicJobsBudget: 0.25,
+  publicJobsMax: 0.12,
+  /** [E] Round 8: global warming (°C) at which nations that can act adopt basic, then strict, environment policy. */
+  climateBasicAt: 1.5,
+  climateStrictAt: 2.5,
+  /** [E] Round 8: priority of rebuilding a fossil plant as a solar or wind farm under a strict climate policy. */
+  cleanPowerScore: 2.2,
+  /** [E] Round 8: share of steel made with electricity, by environment policy (renewables add 0.1). */
+  steelGreenNone: 0.1,
+  steelGreenBasic: 0.35,
+  steelGreenStrict: 0.65,
   /** [E] Reduction of full-time-equivalent labor supply per unit of automation (working-time decline). */
   hoursPerAutomation: 0.35,
   /** [E] Scrap share of factory metal input per unit of industry capability (capped at 45%; real steel is ~30-40% scrap). */
@@ -182,6 +196,8 @@ export const BALANCE = {
   climateSensitivity: 0.8,
   /** [S] Emission units -> ppm conversion for the 128x128 reference world (scaled by map area). Recalibrated when industrial extraction made fossil supply ~10x larger. */
   emissionToPpm: 6e-11,
+  /** [E] Round 8: CO2 (ppm) the climate's own feedbacks (permafrost, forests, ice) can release in total. */
+  feedbackPoolPpm: 300,
 
   // ---------------- disease
   /** [S] Base annual chance of a new pathogen per settlement at reference density. */

@@ -21,7 +21,8 @@ export const DETAIL = 4;
 /** Tiles per detail chunk side. */
 export const DCHUNK = 8;
 /** Overhang padding above each detail chunk, in detail px (tall towers). */
-export const DPAD = 32;
+/** Overhang above each close-up chunk: arcologies rise 64 detail px above their 2×2 footprint (round 8, was 32). */
+export const DPAD = 64;
 
 export function detailAlpha(tilePx: number): number {
   if (tilePx <= 20) return 0;
@@ -413,4 +414,9 @@ export class CityLayer {
       this.atlas.draw(ctx, 'lot.lamp.0', ox + s.x + (horiz ? 12 : 0), oy + s.y + (horiz ? 0 : 14) + 3);
     }
   }
+}
+
+/** Close-up chunks in row order (chunk keys grow left to right, then top to bottom), so overhangs stack correctly. */
+export function drawOrder(keys: readonly number[]): number[] {
+  return [...keys].sort((a, b) => a - b);
 }

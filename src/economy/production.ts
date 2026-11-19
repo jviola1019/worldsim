@@ -406,8 +406,14 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   if (steelStaff > 0) {
     const cap = (s.bld[B.STEEL_MILL] * 32000 * steelStaff * (1 + Math.max(0, caps.industry - 1))) / 12;
     const iron = take(civ, Good.IRON, cap * 1.3, access);
-    const coal = take(civ, Good.COAL, cap * 0.6, access);
-    const made = Math.min(iron / 1.3, coal / 0.6);
+    // Round 8: electric steelmaking (arc furnaces, hydrogen) replaces part of the coal in electrified nations,
+    // more under climate policy. Steel was ~73% of a modern world's emissions; the electricity is drawn from the
+    // grid, and any shortfall falls back to coal.
+    const green = steelGreenShare(civ);
+    const energyNeed = cap * 0.6 * green / BALANCE.fossilFuelPerEnergy;
+    const greenCoal = energyNeed > 0 ? take(civ, Good.ENERGY, energyNeed, access) * BALANCE.fossilFuelPerEnergy : 0;
+    const coal = take(civ, Good.COAL, Math.max(0, cap * 0.6 - greenCoal), access);
+    const made = Math.min(iron / 1.3, (coal + greenCoal) / 0.6);
     give(civ, Good.METAL, made);
     out[Good.METAL] += made * 12 * 0.1;
     civ.acc.emissions += coal * 1.0;
@@ -477,6 +483,13 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
       // Market services are demand-driven (structural change): households buy more services as their
       // GOODS income rises (lagged one month; goods only, so service jobs cannot inflate their own demand).
       // Automation cuts the labor each unit of service needs. Building-based service staff count first.
+      // Public services (round 8): modern states employ teachers, nurses, doctors and administrators in
+      // proportion to what they spend on welfare, schooling and health (about 15-20% of workers in modern
+      // economies; a rough target, not measured data). These jobs do not depend on household goods income.
+      const publicRate = Math.min(BALANCE.publicJobsMax, BALANCE.publicJobsBase + BALANCE.publicJobsWelfare * clamp01(caps.welfare) + BALANCE.publicJobsBudget * (civ.budget.education + civ.budget.health));
+      const publicJobs = Math.min(free, pop * publicRate);
+      emp[SECTOR.SERVICES] += publicJobs;
+      free -= publicJobs;
       const goodsIncome = Math.log2(1 + (s.goodsPerCap ?? 0) / 0.9);
       const perCapita = 0.04 + BALANCE.serviceDemandMax * clamp((goodsIncome - 0.6) / 2, 0, 1);
       const demandJobs = pop * perCapita * (1 - automation * 0.2);
@@ -485,6 +498,7 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
       serviceWorkers += market;
       free -= market;
       // what remains: informal work, else unemployment (a safety net lets people search instead)
+      serviceWorkers += publicJobs;
       const informal = free * clamp(0.75 - caps.welfare * 0.2 - caps.automation * 0.15, 0.3, 0.75);
       emp[SECTOR.SERVICES] += informal;
       serviceWorkers += informal * 0.4;
@@ -638,6 +652,17 @@ function manufacture(sim: Sim, civ: Civ, s: Settlement, cap: number, armsWanted:
   addPollution(sim, s, B.FACTORY, (1 - civ.caps.pollutionControl) * policyFactor(civ));
 }
 
+/**
+ * Share of steel made with electricity instead of coal (round 8): none before electrification; then a little
+ * (scrap arc furnaces), more under basic and most under strict climate policy, more again with renewables.
+ */
+export function steelGreenShare(civ: Civ): number {
+  const c = civ.caps;
+  if (c.electrification < 0.5) return 0;
+  const base = civ.policies.environment === 'strict' ? BALANCE.steelGreenStrict : civ.policies.environment === 'basic' ? BALANCE.steelGreenBasic : BALANCE.steelGreenNone;
+  return Math.min(0.9, base + (c.renewables > 0 ? 0.1 : 0));
+}
+
 function policyFactor(civ: Civ): number {
   return civ.policies.environment === 'strict' ? 0.35 : civ.policies.environment === 'basic' ? 0.7 : 1;
 }
@@ -660,7 +685,7 @@ function produceEnergy(sim: Sim, s: Settlement, civ: Civ, staff: (t: number, l: 
   let energy = 0;
   const fossil = staff(B.POWER_FOSSIL, 1 - automation * 0.5);
   if (fossil > 0) {
-    const cap = (s.bld[B.POWER_FOSSIL] * BALANCE.powerFossilOutput * fossil * (1 + c.energyEfficiency * 0.3)) / 12;
+    const cap = (s.bld[B.POWER_FOSSIL] * BALANCE.powerFossilOutput * fossil * (1 + c.energyEfficiency * 0.3) * (civ.fossilDispatch ?? 1)) / 12;
     const per = BALANCE.fossilFuelPerEnergy;
     let need = cap * per;
     const gas = take(civ, Good.GAS, need * 0.8, access);
@@ -670,6 +695,7 @@ function produceEnergy(sim: Sim, s: Settlement, civ: Civ, staff: (t: number, l: 
     const oil = need > 0 ? take(civ, Good.OIL, need * 0.75, access) : 0;
     const produced = gas / 0.8 / per + coal / per + oil / 0.75 / per;
     energy += produced;
+    civ.acc.energyFossil = (civ.acc.energyFossil ?? 0) + produced;
     civ.acc.emissions += coal * 1 + oil * 0.8 + gas * 0.55;
     addPollution(sim, s, B.POWER_FOSSIL, (1 - c.pollutionControl) * policyFactor(civ) * (coal > 0 ? 1 : 0.4));
   }

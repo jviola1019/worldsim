@@ -317,9 +317,12 @@ export function climateYearly(sim: Sim): void {
     const forcing = BALANCE.co2Forcing * Math.log(c.co2 / c.baseCo2);
     const equilibrium = BALANCE.climateSensitivity * forcing;
     c.anomaly += (equilibrium - c.anomaly) * 0.03;
-    // tipping point: past 3 °C, thawing permafrost, burning forests and darkening ice add CO2 on their own
+    // tipping point: past 3 °C, thawing permafrost, burning forests and darkening ice add CO2 on their own.
+    // Round 8: that carbon is a finite store, released ever more slowly as it runs out (it was unlimited, so
+    // warming ran away whatever nations did).
     if (c.anomaly > 3) {
-      const fb = (c.anomaly - 3) * 2;
+      const left = Math.max(0, 1 - (c.feedback ?? 0) / BALANCE.feedbackPoolPpm);
+      const fb = (c.anomaly - 3) * 2 * left;
       c.feedback = (c.feedback ?? 0) + fb;
       c.co2 += fb;
       if (w.milestones['climate_tipping'] === undefined) {

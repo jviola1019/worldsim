@@ -483,6 +483,11 @@ export interface Civ {
   econ: EconStats;
   /** Running accumulators for the current year (serialized so mid-year saves are exact). */
   acc: EconAcc;
+  /**
+   * Round 8, merit-order dispatch: the share of their capacity fossil plants run at. Under a climate policy, clean
+   * power is used first and fossil plants only cover the rest (absent: full output).
+   */
+  fossilDispatch?: number;
   /** Last year's market stock value and money supply (for ΔInventory and inflation). */
   prevStockValue?: number; // legacy (pre-0.1 saves); superseded by prevStock
   /** Market stock quantities at the last yearly accounting (for ΔInventories). */
@@ -708,6 +713,8 @@ export interface EconAcc {
   foodShort: number;
   energyUse: number;
   emissions: number;
+  /** Round 8: electricity made by fossil plants this year (for merit-order dispatch; absent in older saves). */
+  energyFossil?: number;
 }
 
 export interface EconStats {

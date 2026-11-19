@@ -228,7 +228,7 @@ function placementScore(sim: Sim, s: Settlement, def: BuildingDef, i: number, x:
 export function isOpenTile(m: TileMap, j: number): boolean {
   if (m.isWater(j)) return true;
   const b = m.bld[j];
-  return !b || b === B.PARK || BUILDINGS[b].category === 'food';
+  return !b || b === B.PARK || b === B.RUINS || BUILDINGS[b].category === 'food'; // ruins are rubble, not walls (as drawn)
 }
 
 /**
@@ -377,7 +377,7 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   // industry & crafts
   const unemployed = s.employment[6] / Math.max(1, pop);
   // crafts scale with population up to a target count (factories take over in industrial eras)
-  const workshopTarget = pop / (caps.industry > 0 ? 15000 : 5000);
+  const workshopTarget = workshopGoal(caps, pop);
   if (pop > 150) add(B.WORKSHOP, 1 + (workshopTarget - s.bld[B.WORKSHOP]) * 1.2);
   const smithyTarget = pop / (caps.industry > 0 ? 60000 : 8000); // steel mills and factories replace the village smithy
   if (pop > 150 && caps.metalTier >= 1) add(B.SMITHY, 1 + (smithyTarget - s.bld[B.SMITHY]) * 1.5);
@@ -416,7 +416,8 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   if (pop > 120 * (temples + 1) * (temples + 1)) add(B.TEMPLE, 1.6 + civ.personality.piety);
   if (caps.currency > 0) add(B.MARKET, 1.5 - s.bld[B.MARKET] * 0.6);
   add(B.LIBRARY, 1.2 - s.bld[B.LIBRARY] * 0.8);
-  add(B.SCHOOL, 1 + civ.budget.education * 8 + pop / 10000 - s.bld[B.SCHOOL] * 0.7);
+  // schools grow with the city, but a metropolis does not want a school district per 10,000 people (round 8)
+  add(B.SCHOOL, 1 + civ.budget.education * 8 + Math.min(pop / 10000, 4 + pop / 60000) - s.bld[B.SCHOOL] * 0.7);
   add(B.UNIVERSITY, 1.2 + civ.personality.science - s.bld[B.UNIVERSITY] * 0.9);
   add(B.HOSPITAL, 1 + civ.budget.health * 8 + pop / 40000 - s.bld[B.HOSPITAL] * 0.8);
   add(B.LAB, 1 + civ.budget.research * 8 + pop / 80000 - s.bld[B.LAB] * 0.9);
@@ -474,6 +475,12 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   if (pressure < 0.9) {
     const old = outdatedHome(sim, s, tier);
     if (old !== null) cands.push({ type: sim.w.map.bld[old], score: BALANCE.renovateScore, upgrade: old });
+  }
+  // round 8: under a strict climate policy, a coal or gas plant is rebuilt as a solar or wind farm while power is not short
+  if (civ.policies.environment === 'strict' && caps.renewables > 0 && s.bld[B.POWER_FOSSIL] > 0 && !energyShort(civ)) {
+    const plant = siteOf(sim, s, B.POWER_FOSSIL);
+    const clean = hasUnlocked(civ, B.SOLAR) ? B.SOLAR : hasUnlocked(civ, B.WIND) ? B.WIND : 0;
+    if (plant !== null && clean) cands.push({ type: clean, score: BALANCE.cleanPowerScore, upgrade: plant });
   }
   // replace aging farms with modern ones (cheap tier upgrade)
   const farmUpgrade = oldFarm(sim, s, tier);
@@ -591,6 +598,35 @@ function redevelopBlock(sim: Sim, s: Settlement, civ: Civ, targetRank: number): 
 }
 
 /** Buildings a civilization has outgrown (never landmarks, which are preserved as historic). */
+/**
+ * Craft workshops a settlement aims for. Before industry: one per 5,000 people. In industrial eras factories,
+ * offices and services take over: one per 15,000 people, but at most 3 + 3 x (1 - automation) (round 8: a
+ * 480k capital had about 32 workshop districts).
+ */
+export function workshopGoal(c: Civ['caps'], pop: number): number {
+  if (c.industry <= 0) return pop / 5000;
+  return Math.min(pop / 15000, 3 + 3 * (1 - Math.min(1, c.automation)));
+}
+
+/** A tile of this settlement holding the given single-tile building (nearest the centre), or null. */
+function siteOf(sim: Sim, s: Settlement, type: number): number | null {
+  const m = sim.w.map;
+  let best: number | null = null;
+  let bestD = Infinity;
+  eachOwnTile(sim, s, s.radius + 1, (i, _x, _y, d2) => {
+    if (m.settle[i] !== s.id || m.bld[i] !== type || m.bldFlags[i] & BLDF.PART) return;
+    if (d2 < bestD) { bestD = d2; best = i; }
+  });
+  return best;
+}
+
+/** The nation's power is short: it uses most of what it makes, or its reserve is low. */
+function energyShort(civ: Civ): boolean {
+  const produced = civ.acc.prod[Good.ENERGY];
+  const used = civ.acc.use[Good.ENERGY] + civ.acc.energyUse;
+  return used >= produced * 0.9 || civ.stock[Good.ENERGY] < civ.population * 0.05;
+}
+
 function isObsolete(civ: Civ, s: Settlement, b: number): boolean {
   const c = civ.caps;
   switch (b) {
@@ -600,7 +636,7 @@ function isObsolete(civ: Civ, s: Settlement, b: number): boolean {
     case B.SMITHY:
       return c.industry > 0 && s.bld[B.SMITHY] > Math.max(1, s.pop / 60000);
     case B.WORKSHOP:
-      return c.industry > 0 && s.bld[B.WORKSHOP] > Math.max(1, s.pop / 15000);
+      return c.industry > 0 && s.bld[B.WORKSHOP] > Math.max(1, workshopGoal(c, s.pop));
     case B.MILL:
       return c.electrification >= 0.5;
     case B.GRANARY:

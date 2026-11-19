@@ -177,13 +177,20 @@ export function blockContext(sim: Sim, i: number): BlockContext | null {
   };
 }
 
+/** A small string hash (FNV-1a). */
+function strHash(t: string): number {
+  let h = 2166136261;
+  for (let k = 0; k < t.length; k++) h = Math.imul(h ^ t.charCodeAt(k), 16777619);
+  return h | 0;
+}
+
 const BANDS: SizeBand[] = ['village', 'town', 'city', 'metropolis'];
 const KINDS: NeighbourKind[] = ['built', 'water', 'open', 'farm'];
 /** Cheap signature of everything that shapes a block except its tile hash. */
 export function blockSignature(c: BlockContext): number {
   let s = c.b * 31 + c.tier;
   s = s * 7 + BANDS.indexOf(c.band);
-  s = (s * 13 + (c.ethos ? c.ethos.length * 31 + c.ethos.charCodeAt(0) : 0)) | 0;
+  s = (s * 13 + (c.ethos ? strHash(c.ethos) : 0)) | 0; // the whole key: militarist and mercantile share a length and first letter
   for (const k of c.nb) s = (s * 5 + KINDS.indexOf(k)) | 0;
   s = (s * 7 + c.road) | 0;
   s = (s * 17 + (c.wealth ?? 0) * 5 + (c.ineq ?? 0)) | 0;

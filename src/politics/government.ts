@@ -455,6 +455,9 @@ function policyDecisions(sim: Sim, civ: Civ): void {
   // environment: polluted democracies (or strict-minded rulers) regulate
   const pollution = civ.econ.emissions / Math.max(1, civ.population) * 1000;
   if (c.pollutionControl > 0 && pollution > 0.5 && civ.inst.participation > 0.45) civ.policies.environment = pollution > 2 ? 'strict' : 'basic';
+  // round 8: warming the world can feel changes policy too, in any nation that knows cleaner ways (it never relaxes it)
+  const env = climatePolicy(sim.w.climate.anomaly, c.renewables > 0 || c.pollutionControl > 0);
+  if (ENV_RANK[env] > ENV_RANK[civ.policies.environment]) civ.policies.environment = env;
   // migration: closed when crowded/hungry, open otherwise
   civ.policies.migration = civ.econ.livingStandard < 1 || civ.unrest > 0.5 ? 'restricted' : civ.personality.caution > 0.8 ? 'restricted' : 'open';
   // trade policy
@@ -468,3 +471,13 @@ function policyDecisions(sim: Sim, civ: Civ): void {
 }
 
 export type { GovFormKey };
+
+const ENV_RANK = { none: 0, basic: 1, strict: 2 } as const;
+/**
+ * Environment policy that global warming alone calls for (round 8): basic above 1.5 °C, strict above 2.5 °C,
+ * for nations that know renewables or pollution control. (Polluted participatory nations act sooner.)
+ */
+export function climatePolicy(anomaly: number, canAct: boolean): 'none' | 'basic' | 'strict' {
+  if (!canAct) return 'none';
+  return anomaly > BALANCE.climateStrictAt ? 'strict' : anomaly > BALANCE.climateBasicAt ? 'basic' : 'none';
+}

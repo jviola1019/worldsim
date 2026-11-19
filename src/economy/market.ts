@@ -167,7 +167,9 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   }
   e.livingStandard = civ.population > 0 ? ls / civ.population : 1;
   e.inequality = clamp(0.3 + 0.25 * (1 - civ.inst.participation) * (civ.caps.currency > 0 ? 1 : 0.3) + 0.1 * civ.caps.finance - 0.25 * civ.inst.welfare + gini(pros) * 0.5, 0.15, 0.75);
+  civ.fossilDispatch = fossilDispatch(civ);
   // reset accumulators
+  acc.energyFossil = 0;
   acc.prod.fill(0);
   acc.use.fill(0);
   acc.want.fill(0);
@@ -181,4 +183,20 @@ export function civEconomyYearly(sim: Sim, civ: Civ, exportsValue: number, impor
   acc.foodShort = 0;
   acc.energyUse = 0;
   acc.emissions = 0;
+}
+
+/**
+ * Merit-order dispatch (round 8). Without a climate policy fossil plants run flat out. With one, clean power is
+ * used first and fossil plants run only for what is left of last year's demand (plus a 10% margin), never below 10%.
+ */
+export function fossilDispatch(civ: Civ): number {
+  if (civ.policies.environment === 'none') return 1;
+  const acc = civ.acc;
+  const fossil = acc.energyFossil ?? 0;
+  const prev = civ.fossilDispatch ?? 1;
+  if (fossil <= 0 || prev <= 0) return 1;
+  const used = acc.energyUse + acc.use[Good.ENERGY];
+  const clean = Math.max(0, acc.prod[Good.ENERGY] - fossil);
+  const fullFossil = fossil / prev;
+  return clamp(((used - clean) * 1.1) / fullFossil, 0.1, 1);
 }
