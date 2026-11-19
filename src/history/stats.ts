@@ -5,6 +5,7 @@
  */
 import type { Sim } from '../sim/context';
 import type { Civ, SeriesStore, TerritorySnapshot } from '../sim/types';
+import { jobGroupShares, JOB_GROUPS } from '../economy/occupations';
 import { boundaryPopulation, emptyLedger, LEDGER_KEYS, LEDGER_SIGN, type LedgerKey, type PopLedger } from '../population/ledger';
 
 const MAX_SAMPLES = 400;
@@ -41,6 +42,13 @@ export function civFlowsTotal(sim: Sim, civ: Civ) {
     for (const k of Object.keys(f) as (keyof typeof f)[]) f[k] += s.flows[k];
   }
   return f;
+}
+
+/** Share of the nation's workers in each job group, as `job_<group>` series (round 7). */
+function jobSeries(sim: Sim, c: Civ): Record<string, number> {
+  const list = c.settlements.map((id) => sim.w.settlements.get(id)).filter((s): s is NonNullable<typeof s> => !!s);
+  const shares = jobGroupShares(list, c);
+  return Object.fromEntries(JOB_GROUPS.map((g) => ['job_' + g, shares[g]]));
 }
 
 /** Yearly sampling. Called at year start, after civ yearly updates have run at least once. */
@@ -137,6 +145,7 @@ export function sampleStats(sim: Sim): void {
       polarization: c.media?.polarization ?? 0,
       misinformation: c.media?.misinformation ?? 0,
       online: c.media?.online ?? 0,
+      ...jobSeries(sim, c),
       ...f,
     });
     if (cs.years.length > MAX_SAMPLES) decimate(cs);

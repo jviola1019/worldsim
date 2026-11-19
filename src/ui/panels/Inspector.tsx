@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import type { Simulation } from '../../sim/simulation';
-import type { Civ, HistoryEvent, Person, Settlement } from '../../sim/types';
+import type { Civ, HistoryEvent, Person, Settlement, SeriesStore } from '../../sim/types';
 import { Icon, Kv, Bar, fmt, pct, Sprite, Flag } from '../shared';
 import { PostList } from './FeedPanel';
 import { CityPictures, Album } from './CivPhotos';
@@ -22,6 +22,7 @@ import { effCost } from '../../technology/research';
 import { TRAIT_BY_KEY, TRAITS } from '../../population/traits';
 import { divineTrait } from '../../population/development';
 import { DOCTRINES } from '../../culture/religion';
+import { occupations, JOB_GROUPS, GROUP_LABEL, type JobGroup } from '../../economy/occupations';
 
 export type Selection = { kind: 'settlement' | 'civ' | 'person' | 'army' | 'herd' | 'band' | 'tile' | 'religion'; id: number };
 
@@ -243,6 +244,7 @@ function SettlementView({ sim, s, setSel, close, focus }: P & { s: Settlement })
           <h3>Work</h3>
           {emp.map((n, k) => (n > 0.5 ? <div key={k} class="row"><span style={{ width: '110px' }}>{SECTOR_NAMES[k]}</span><div style={{ flex: 1 }}><Bar value={n / empTotal} color={k === 6 ? '#e2654e' : undefined} /></div><span class="muted">{fmt(n)}</span></div> : null))}
         </div>
+        <JobsList s={s} civ={civ} />
         <div class="section">
           <h3>Districts</h3>
           <div class="row">{counts.map(([id, n]) => <span key={id} class="chip">{BUILDINGS[id].name} ×{n}</span>)}</div>
@@ -584,6 +586,44 @@ function TechTab({ civ }: { civ: Civ }) {
   );
 }
 
+/** What people here do for a living (named occupations within each sector). */
+function JobsList({ s, civ }: { s: Settlement; civ: Civ | undefined }) {
+  const jobs = occupations(s, civ);
+  const total = jobs.reduce((a, j) => a + j.count, 0);
+  if (!total) return null;
+  return (
+    <div class="section" data-testid="jobs">
+      <h3>Jobs</h3>
+      {jobs.slice(0, 10).map((j) => (
+        <div key={j.key} class="row"><span style={{ width: '170px' }}>{j.label}</span><div style={{ flex: 1 }}><Bar value={j.count / total} color={j.key === 'job_seekers' ? '#e2654e' : undefined} /></div><span class="muted">{fmt(j.count)}</span></div>
+      ))}
+      {jobs.length > 10 && <p class="muted">{jobs.length - 10} more kinds of work, {fmt(jobs.slice(10).reduce((a, j) => a + j.count, 0))} people.</p>}
+    </div>
+  );
+}
+
+/** Colour per job group for the "Jobs over time" chart (distinct hues, readable on the dark sheet). */
+const JOB_COLORS: Record<JobGroup, string> = {
+  foraging: '#a3d977', farming: '#e8c034', fishing: '#4fa3dc', agritech: '#9be3c0', extraction: '#b08060', crafts: '#e8762b',
+  factory: '#c9463d', hightech: '#3fd6e0', building: '#d7bd78', commerce: '#f8e889', care: '#ef8a72', knowledge: '#a77fcf',
+  digital: '#7da7ff', culture: '#f2a7d0', military: '#9d96a3', unemployed: '#e2654e',
+};
+
+/** How the nation's work changed: the share of workers in its six largest job groups, year by year. */
+function JobsOverTime({ st }: { st: SeriesStore }) {
+  const groups = JOB_GROUPS.filter((g) => (st.data['job_' + g] ?? []).some((v) => v > 0.01));
+  if (!groups.length) return null;
+  const peak = (g: JobGroup) => Math.max(...(st.data['job_' + g] ?? [0]));
+  const top = [...groups].sort((a, b) => peak(b) - peak(a)).slice(0, 6);
+  return (
+    <div class="section" data-testid="jobs-over-time">
+      <h3>Jobs over time</h3>
+      <LineChart series={top.map((g) => ({ label: GROUP_LABEL[g], color: JOB_COLORS[g], years: st.years, values: st.data['job_' + g] ?? [] }))} format={(v) => `${Math.round(v * 100)}%`} />
+      <p class="muted">Share of workers in the largest kinds of work. Names change as the nation's technology changes what people do.</p>
+    </div>
+  );
+}
+
 function CivStats({ sim, civ }: { sim: Simulation; civ: Civ }) {
   const st = sim.w.stats.civs[civ.id];
   if (!st || st.years.length < 2) return <p class="muted">Statistics appear after a few years of history.</p>;
@@ -605,6 +645,7 @@ function CivStats({ sim, civ }: { sim: Simulation; civ: Civ }) {
       <div class="section"><h3>Technology score</h3><LineChart series={[mk('techScore', 'Technology')]} markers={markers} /></div>
       <div class="section"><h3>Military power</h3><LineChart series={[mk('military', 'Military')]} /></div>
       <div class="section"><h3>Stability</h3><LineChart series={[mk('stability', 'Stability')]} format={(v) => `${Math.round(v * 100)}%`} /></div>
+      <JobsOverTime st={st} />
       <p class="muted">Cohort size note: {fmt(sim.w.settlements.size ? [...sim.w.settlements.values()].filter((s) => s.civId === civ.id).reduce((a, s) => a + (s.mode === 'cohort' ? cohortTotal(s.cohorts) : 0), 0) : 0)} people are modelled as age cohorts; smaller groups as individuals.</p>
     </>
   );
