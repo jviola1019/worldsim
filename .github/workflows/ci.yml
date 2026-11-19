@@ -31,3 +31,8 @@ jobs:
           npx vite preview --port 4173 &
           for i in $(seq 1 30); do curl -sf http://localhost:4173/ >/dev/null && break; sleep 1; done
           npm run e2e
+      # round 9: the same checks on WebKit (Safari's engine; emulation, not a physical iPhone)
+      - name: Browser smoke test (WebKit, iPhone 13 emulation + desktop)
+        run: |
+          npx playwright install --with-deps webkit
+          BROWSER=webkit npm run e2e

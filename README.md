@@ -44,6 +44,14 @@ Zoom in and each district of a city opens into a proper block, drawn from what i
 - shops, cafés, gyms, clinics, schools with sports fields, car parks, parks and factory yards;
 - people walking the sidewalks and traffic of the era in the lanes.
 
+Zoom in further and the map shows its inhabitants the way WorldBox does: people, animals and vehicles keep a small, readable size while the city grows around them.
+- In small towns you see the **real residents**: rulers, generals, priests, children and workers, each drawn by role, age and job. Tap one to open their life story.
+- Big cities show their famous people (marked with a star) and a crowd drawn from the jobs the city really has.
+- Herds spread out, wandering bands show their members, chimneys smoke and flags fly over palaces, temples and universities.
+- Press **Follow** in a panel to keep the camera on a person, army, herd, town or nation, and **★** to add it to your favourites in the game menu.
+
+<img src="docs/images/r9-close-zoom-modern.png" alt="Close zoom on a modern capital" width="720" />
+
 Older towns grow organically, and industrial cities follow a grid. Cities also keep their breathing room: new homes, shops and civic buildings must stay next to open land, and large cities plant parks.
 
 Cities follow real-world rates:
@@ -129,6 +137,8 @@ Prefer to just watch? Choose the **Realistic (observer)** preset. God powers are
 ### Save, load, branch and share
 
 Your worlds are saved in your browser, with autosave. You can export a world as a `.epoch` file to back it up or share it, and **branch** a world to explore an alternative timeline. A loaded save continues *exactly* the same history.
+
+Every save remembers **which device made it** (for example "iPhone · Safari"; rename yours in Settings). The Load screen lists worlds started on this device first, then those that came from your other devices, and says where each world has been saved. A device here means a browser: nothing is uploaded, and the label is just a random id kept in that browser.
 
 ---
 
@@ -218,7 +228,7 @@ This repository includes an automatic publishing workflow (`.github/workflows/pa
 | | Touch (iPhone/iPad) | Mouse and keyboard (PC) |
 |---|---|---|
 | Move the map | Drag with one finger | Drag; or right or middle button; or hold **Space** and drag |
-| Zoom | Pinch with two fingers | Mouse wheel |
+| Zoom | Pinch with two fingers | Mouse wheel, or the **+** and **−** keys |
 | Inspect a town, nation, army or animal | Tap it (press and hold for details) | Click it |
 | Use a god power | Pick it in the bottom dock, then tap or paint | Same, with the mouse |
 | Move the map while painting | Use **two fingers** (they always move the map, never paint) | Right or middle button |
@@ -259,8 +269,8 @@ TypeScript 7, Vite 8, Preact 11, Canvas2D, Vitest 5. Runtime dependencies: Preac
 | `npm run dev` / `npm run dev:lan` | Dev server on localhost / also on your LAN (for phones) |
 | `npm run build` | Type-check and build the static site into `dist/` |
 | `npm run preview` / `npm run preview:lan` | Serve the built site on port 4173 |
-| `npm test` | 552 unit, integration, counterfactual, round-trip, map-preset and security tests (about 2 minutes) |
-| `npm run e2e` | Browser test on the production build (iPhone 13 emulation and desktop), 62 checks on phone, desktop and Reduce motion, including the close-up city, jobs, map effects, the code guide, feed, city pictures, album, CSP and framing; needs `npm run preview` running |
+| `npm test` | 623 unit, integration, counterfactual, round-trip, map-preset and security tests (about 2 minutes) |
+| `npm run e2e` | Browser test on the production build (iPhone 13 emulation and desktop), 74 checks; `BROWSER=webkit npm run e2e` runs them on WebKit (Safari's engine) on phone, desktop and Reduce motion, including the close-up city, people up close, follow and favourites, saves by device, jobs, map effects, the code guide, feed, city pictures, album, CSP and framing; needs `npm run preview` running |
 | `node tools/viewports.mjs` | Layout check on 6 device sizes, failing on text under 12 px, touch targets under 44 px or contrast below WCAG AA |
 | `node tools/design-capture.mjs` | Design-review captures of every screen on 5 devices, with measurements |
 | `node tools/perf-closeup.mjs` | Close-up frame times (CPU throttled ×4) |
@@ -271,7 +281,7 @@ TypeScript 7, Vite 8, Preact 11, Canvas2D, Vitest 5. Runtime dependencies: Preac
 | `node tools/gallery.mjs`, `node tools/gallery-r5.mjs`, `node tools/guide.mjs` | Regenerate the README screenshots |
 | `npm run sprites:sheet` | Regenerate the sprite contact sheet |
 
-**Continuous integration:** `.github/workflows/ci.yml` runs typecheck, tests, build and the browser test on every push. `long-run.yml` runs weekly long simulations, and `pages.yml` publishes the game.
+**Continuous integration:** `.github/workflows/ci.yml` runs typecheck, tests, build and the browser test (Chromium, then WebKit) on every push. `long-run.yml` runs weekly long simulations, and `pages.yml` publishes the game.
 
 ### Documentation
 

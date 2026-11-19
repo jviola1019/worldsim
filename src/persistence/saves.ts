@@ -22,7 +22,7 @@ export interface SlotMeta {
   /** The device the world started on (the oldest in its device history) and every device that saved it. */
   originId?: string;
   originName?: string;
-  devicesSeen?: string[];
+  devicesSeen?: { id: string; name: string }[];
   name: string;
   year: number;
   seed: string;
@@ -104,9 +104,9 @@ export class SaveStore {
       branchOf: w.meta.branchOf?.name,
       deviceId: device.id,
       deviceName: device.name,
-      originId: w.meta.devices?.[w.meta.devices.length - 1]?.id,
-      originName: w.meta.devices?.[w.meta.devices.length - 1]?.name,
-      devicesSeen: w.meta.devices?.map((d) => d.name),
+      originId: w.meta.origin?.id,
+      originName: w.meta.origin?.name,
+      devicesSeen: w.meta.devices?.map((d) => ({ id: d.id, name: d.name })),
       ...extra,
     };
     const tx = this.db.transaction(['meta', 'data'], 'readwrite');

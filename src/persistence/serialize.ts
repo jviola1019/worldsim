@@ -181,6 +181,7 @@ function decodeChecked(bytes: Uint8Array): WorldState {
   if (!isObj(st.meta) || !isObj(st.laws) || !isObj(st.ids) || !isObj(st.climate) || !isObj(st.milestones) || !isObj(st.stats)) throw new SaveError('Save state is incomplete');
   if (!Array.isArray(st.relations) || !Array.isArray(st.events)) throw new SaveError('Save state is incomplete');
   if (!validDevices(st.meta.devices)) throw new SaveError('Save device history is invalid');
+  if (st.meta.origin !== undefined && !validDevices([st.meta.origin])) throw new SaveError('Save origin device is invalid');
   if (!validFavorites(st.meta.favorites)) throw new SaveError('Save favourites are invalid');
   if (typeof st.meta.name !== 'string' || st.meta.name.length > 200 || (st.meta.seed !== undefined && (typeof st.meta.seed !== 'string' || st.meta.seed.length > 200))) throw new SaveError('Save world name is invalid');
   for (const k of MAPS) {

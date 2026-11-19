@@ -574,7 +574,7 @@ function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
               const tr = treatiesBetween(sim, civ.id, oid).map((t) => t.kind);
               return (
                 <li key={oid}>
-                  {civLink(sim, oid, setSel)} {atWarWith(sim, civ.id, oid) ? <strong style={{ color: '#e2654e' }}>at war</strong> : <span>opinion {Math.round(rel.opinion)}, trust {pct(rel.trust)}</span>}
+                  {civLink(sim, oid, setSel)} {atWarWith(sim, civ.id, oid) ? <strong style={{ color: '#ef7d66' }}>at war</strong> : <span>opinion {Math.round(rel.opinion)}, trust {pct(rel.trust)}</span>}
                   {tr.length > 0 && <div class="muted">{tr.join(', ')}</div>}
                 </li>
               );

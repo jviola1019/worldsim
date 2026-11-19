@@ -23,12 +23,14 @@ export function deviceNameFromUA(ua: string): string {
 const ID_RE = /^[0-9a-f-]{8,40}$/i;
 const clean = (s: string) => s.replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, DEVICE_NAME_MAX);
 
+let sessionId: string | undefined;
+
 function newId(): string {
   const c = (globalThis as { crypto?: Crypto }).crypto;
   if (c?.randomUUID) return c.randomUUID();
   const b = new Uint8Array(16);
   if (c?.getRandomValues) c.getRandomValues(b);
-  else for (let k = 0; k < 16; k++) b[k] = Math.floor(Math.random() * 256); // display-only fallback, never simulation state
+  else { const t = Date.now(); for (let k = 0; k < 16; k++) b[k] = (t / 256 ** (k % 6) + k * 37) & 255; } // no Web Crypto: a time-based id (only a label, never a secret)
   return [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
 }
 
@@ -36,9 +38,13 @@ function newId(): string {
 export function currentDevice(storage: Pick<Storage, 'getItem' | 'setItem'> | undefined = safeStorage(), ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''): DeviceInfo {
   let stored: Partial<DeviceInfo> = {};
   try { stored = JSON.parse(storage?.getItem(KEY) ?? '{}') ?? {}; } catch { stored = {}; }
-  const id = typeof stored.id === 'string' && ID_RE.test(stored.id) ? stored.id : newId();
+  const known = typeof stored.id === 'string' && ID_RE.test(stored.id);
+  let id = known ? (stored.id as string) : newId();
   const name = typeof stored.name === 'string' && clean(stored.name) ? clean(stored.name) : deviceNameFromUA(ua);
-  try { storage?.setItem(KEY, JSON.stringify({ id, name })); } catch { /* private mode: session-only id */ }
+  let kept = false;
+  try { if (storage) { storage.setItem(KEY, JSON.stringify({ id, name })); kept = true; } } catch { /* private mode */ }
+  // storage unavailable: one id for the whole session, not a new one per call
+  if (!known && !kept) id = sessionId ??= id;
   return { id, name };
 }
 
@@ -56,7 +62,10 @@ function safeStorage(): Storage | undefined {
 
 /** Record that this device saved the world now (newest first, at most DEVICE_HISTORY devices, one entry each). */
 export function stampDevice(w: WorldState, d: DeviceInfo, at = Date.now()): void {
-  const list = (w.meta.devices ?? []).filter((x) => x.id !== d.id);
+  // the origin is fixed at the first stamp (older round-9 saves: the oldest device in the history)
+  const old = w.meta.devices ?? [];
+  if (!w.meta.origin) w.meta.origin = old.length ? { ...old[old.length - 1] } : { id: d.id, name: d.name, at };
+  const list = old.filter((x) => x.id !== d.id);
   list.unshift({ id: d.id, name: d.name, at } as DeviceStamp);
   w.meta.devices = list.slice(0, DEVICE_HISTORY);
 }

@@ -62,6 +62,8 @@ export class Renderer {
   private lastFlash = -99;
   /** Units, settlers, herds and monsters shrink in the close-up so they do not dwarf city blocks. */
   private unitScale = 1;
+  /** Round 9: past 20 px per tile actors keep a readable size and real people are drawn. */
+  private closeUp = false;
   overlay: OverlayLayer;
   ctx: CanvasRenderingContext2D;
   dpr = 1;
@@ -129,7 +131,9 @@ export class Renderer {
     const tilePx = cam.zoom * TILE;
     const far = tilePx < 2.6;
     const close = far ? 0 : detailAlpha(tilePx);
-    this.unitScale = tilePx >= 20 ? readableScale(cam.zoom) : 1; // round 9: readable, WorldBox-style actors up close
+    this.closeUp = tilePx >= 20;
+    this.unitScale = this.closeUp ? readableScale(cam.zoom) : 1; // round 9: readable, WorldBox-style actors up close
+    this.peopleHits = []; // only what this frame draws can be tapped
     if (far) {
       this.layer.updateOverview();
       ctx.drawImage(this.layer.overview, 0, 0, m.w * TILE, m.h * TILE);
@@ -282,7 +286,7 @@ export class Renderer {
         const b = m.bld[i];
         if (!b) continue;
         if (b === B.FACTORY || b === B.POWER_FOSSIL || b === B.STEEL_MILL || b === B.REFINERY || b === B.SMITHY) {
-          if (this.unitScale < 1 && isDetailTile(m, i)) continue; // up close, city blocks have their own chimney wisps (drawCityDetails)
+          if (this.closeUp && isDetailTile(m, i)) continue; // up close, city blocks have their own chimney wisps (drawCityDetails)
           const f = this.frameIdx(3, hash3(x, y, 5) % 4);
           atlas.draw(ctx, b === B.SMITHY ? 'fx.smoke' : 'fx.smoke_dark', x * TILE + 5, y * TILE - 4 - (f % 4), f);
         } else if (b === B.MILL || b === B.WIND || b === B.OIL_WELL || b === B.CAMP || b === B.CONSTRUCTION || b === B.DATA_CENTER) {
@@ -374,7 +378,6 @@ export class Renderer {
     const [x0, y0, x1, y1] = vis;
     const k = this.unitScale;
     const t = this.reduceMotion ? 0 : this.time;
-    this.peopleHits = [];
     let drawn = 0;
     for (const s of w.settlements.values()) {
       if (s.x < x0 - 3 || s.x > x1 + 3 || s.y < y0 - 3 || s.y > y1 + 3) continue;
@@ -473,7 +476,7 @@ export class Renderer {
       const sp = SPECIES_BY_KEY[h.species];
       if (!sp) continue;
       // round 9: up close, up to 6 animals grazing over a wider patch
-      const close = this.unitScale < 1;
+      const close = this.closeUp;
       const shown = herdShown(h.count, close);
       const spread = close ? 2.2 : 1;
       for (let k = 0; k < shown; k++) {
@@ -493,7 +496,7 @@ export class Renderer {
       const civ = w.civs.get(b.civId);
       const sprite = b.species === 'human' ? 'unit.citizen.0' : `unit.${b.species}`;
       // round 9: up close, the band's real members (up to 12), each drawn by role and age
-      if (this.unitScale < 1 && b.species === 'human') {
+      if (this.closeUp && b.species === 'human') {
         const members = b.members.slice(0, 12).map((id) => w.persons.get(id)).filter((p): p is NonNullable<typeof p> => !!p && p.died === undefined);
         members.forEach((p, k) => {
           const ox = ((hash3(p.id, 1, 1) % 11) - 5) * 1.6, oy = ((hash3(p.id, 2, 2) % 9) - 4) * 1.3;

@@ -7,18 +7,18 @@ This report tracks completion against the requirements (R-IDs from [REQUIREMENTS
 - **Experimental:** works, but balance or behavior is not yet validated.
 - **Missing:** not implemented.
 
-Last verified 2026-11-19 (round 8):
+Last verified 2026-11-19 (round 9):
 
 | Check | Result |
 |---|---|
 | Typecheck | `tsc` 7.0.2: exit 0 |
-| Unit tests | `npm test` (Vitest 5.1.1): **610 tests** (40 files). One test was widened from 3 to 5 worlds after a diagnosed trajectory-noise failure (VALIDATION §R8). |
+| Unit tests | `npm test` (Vitest 5.1.1): **623 tests** (42 files). The round-8 emissions counterfactual was corrected to turn off round 9's clean-power lever too (VALIDATION §R9). |
 | Build | `vite build` 8.3.8: exit 0 |
-| E2E | **62/62** (phone, desktop, Reduce motion; now also the code guide) |
+| E2E | **74/74 on Chromium and 74/74 on WebKit** (Safari's engine), each with iPhone 13 emulation, desktop and Reduce motion. This is emulation, not a physical device. |
 | Design floors | 6/6 device profiles; 121 captures with 0 violations |
 | Dependencies | `npm audit`: 0 vulnerabilities; `npm outdated`: none |
-| GitHub Actions | CI, then Pages after a green CI (`workflow_run`); weekly long run (VALIDATION §R7, §R8) |
-| Multi-seed invariants | 20 seeds × 600 years: **20/20** (round-8 code) |
+| GitHub Actions | CI (now with a WebKit e2e step), then Pages after a green CI (`workflow_run`); weekly long run (VALIDATION §R7–§R9) |
+| Multi-seed invariants | 20 seeds × 600 years: **20/20** (round-9 code) |
 
 Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is in [PERFORMANCE.md](PERFORMANCE.md) and security in [SECURITY.md](SECURITY.md).
 
@@ -55,6 +55,18 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 | Save determinism with fires (nuclear strike, rain) | Fixed (pre-existing bug) | `fire-determinism.test.ts` |
 | Duplicate league names | Fixed (pre-existing bug) | sports uniqueness test |
 | Final whole-branch review | 1 critical and 3 important findings fixed with tests (close-up cache thrash at large screens, reduce-motion weather, 2×2 access, a doc correction) | VALIDATION §R6 |
+
+## Round 9 (device-labelled saves, close zoom, follow camera, warming, unemployment, WebKit)
+
+| Item | Status | Evidence |
+|---|---|---|
+| Saves labelled by device (history, fixed origin, Load screen grouped, device name in Settings) | Complete. A "device" is a browser profile, not hardware. | `device.test.ts` (8); e2e in both browsers |
+| WorldBox-style close zoom (readable sprites, real residents, notables and crowds, herds, bands, smoke and flags, tap a person) | Complete | `closeup.test.ts`; e2e; screenshots `docs/images/r9-close-zoom-*.png` |
+| Follow camera and favourites (+ keyboard zoom) | Complete | e2e (follow, favourite) |
+| Warming: power urgency and clean-power bonus | Complete, **modest**: warming 6.26 → 6.14 °C (4-world mean, mixed across worlds) | VALIDATION §R9 |
+| Unemployment: elder-care jobs | Complete, **modest**: 12.4% → 11.3% (4-world mean, one world rose) | Counterfactual test; VALIDATION §R9 |
+| Safari/WebKit testing | Complete in emulation (74/74 locally, step added to CI). **No physical iPhone or Mac tested.** | VALIDATION §R9 |
+| Code review of the round-9 diff | 9 findings, all fixed | VALIDATION §R9 |
 
 ## Round 8 (city composition, public jobs, climate, leftovers, code guide)
 
@@ -110,13 +122,13 @@ Each fix has a regression test. "Mutation" means the test was confirmed to fail 
 
 ## Known issues and next steps (ranked)
 
-1. **Modern unemployment:** 9–17% in the round-8 runs, from 16–28% after public-service jobs were added. Automation still displaces labour faster than market services absorb it.
+1. **Modern unemployment:** 10–13% in the round-9 runs (9–17% in round 8). Elder care helped two worlds, but modern-3 rose from 9% to 13%. Automation still displaces labour faster than services absorb it.
 2. **City composition:** fixed in round 8 (workshop and school targets capped). Existing districts are retired gradually through redevelopment, so old cities change over decades, not at once.
-3. **Warming is still strong:** 5.8–6.7 °C by year 1,000 in the round-8 runs (6.3–9.2 °C in round 7). The climate levers are measured as small because grids become clean but short of power. More clean capacity and storage would be the next lever.
-4. **No WebKit or physical-device verification (R13, R15).** Run the protocol in VALIDATION §8 on an iPhone; Safari's CSP behavior is untested.
+3. **Warming is still strong:** 5.4–6.8 °C by year 1,000 in the round-9 runs (5.8–6.7 °C in round 8). Power urgency and the clean-power bonus moved the mean only 0.12 °C, and two worlds warmed more. Grid storage is still not modelled; demand reduction (efficiency) and carbon removal are untried levers.
+4. **No physical-device verification (R13, R15).** WebKit now passes the e2e in emulation (round 9), including the CSP checks, but no real iPhone, iPad or Mac has been tested. Run the protocol in VALIDATION §8 on a device.
 5. **Nuclear use was never observed** in the 20-world endings census (by design it is rare, and deterrence and the taboo work). This means the launch path is exercised only by tests, not by organic history.
 6. **GitHub Pages header limits:** HSTS, frame-ancestors and similar headers need another host or a CDN (SECURITY.md §5).
-7. **Favorites and follow camera:** not implemented (deferred, as agreed).
+7. **Device labels are per browser profile:** clearing site data or using a second browser makes a new "device". There is no cross-device sync (by design: no server).
 
 ## History
 

@@ -7,14 +7,26 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 let pw;
 try { pw = require('playwright'); } catch { pw = require('/opt/node-tools/node_modules/playwright'); }
-const { chromium, devices } = pw;
+const { chromium, webkit, devices } = pw;
+// BROWSER=webkit runs the same checks on WebKit (Safari's engine; still emulation, not a real iPhone)
+const engine = process.env.BROWSER === 'webkit' ? webkit : chromium;
+console.log(`engine: ${process.env.BROWSER === 'webkit' ? 'webkit' : 'chromium'}`);
 const url = process.env.URL ?? 'http://localhost:4173/';
 const results = [];
 const check = (name, ok, info = '') => { results.push({ name, ok, info }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${info ? ' — ' + info : ''}`); };
 
 async function run(label, ctxOpts) {
+  // mobile WebKit has no mouse wheel: zoom with the keyboard (+ / -) there
+  const noWheel = process.env.BROWSER === 'webkit' && !!ctxOpts.isMobile;
+  const zoom = async (page, steps, dy) => {
+    for (let k = 0; k < Math.abs(steps); k++) {
+      if (noWheel) await page.keyboard.press(dy < 0 ? '+' : '-');
+      else await page.mouse.wheel(0, dy);
+      await page.waitForTimeout(20);
+    }
+  };
   const reduced = ctxOpts.reducedMotion === 'reduce';
-  const browser = await chromium.launch();
+  const browser = await engine.launch();
   const ctx = await browser.newContext(ctxOpts);
   const page = await ctx.newPage();
   const errors = [];
@@ -79,7 +91,7 @@ async function run(label, ctxOpts) {
   await page.getByLabel('Close').first().click().catch(() => {});
   const vp = page.viewportSize();
   await page.mouse.move(vp.width / 2, vp.height / 2);
-  for (let k = 0; k < 30; k++) { await page.mouse.wheel(0, -300); await page.waitForTimeout(30); }
+  await zoom(page, noWheel ? 16 : 30, -300);
   await page.waitForTimeout(1500);
   const cityChunks = Number(await page.locator('canvas.canvas').getAttribute('data-city-chunks'));
   check(`${label}: close-up city blocks drawn when zoomed in`, cityChunks > 0, `${cityChunks} close-up chunks on screen`);
@@ -164,7 +176,7 @@ async function run(label, ctxOpts) {
     check(`${label}: close-up settles on a 1920x1080 screen (no thrash)`, drawnBig > 0 && drawnBig <= 48 && pendingBig === '0' && r0 !== null && r0 === r1, `${drawnBig} drawn, ${pendingBig} pending, redraws ${r0} -> ${r1}`);
     await page.setViewportSize({ width: 1280, height: 800 });
   }
-  for (let k = 0; k < 30; k++) { await page.mouse.wheel(0, 300); await page.waitForTimeout(20); }
+  await zoom(page, noWheel ? 16 : 30, 300);
   // save
   await page.getByLabel('Menu').click();
   const save = page.getByText(/^Save/).first();

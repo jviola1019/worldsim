@@ -65,7 +65,7 @@ Three ideas run through the whole code:
 
 The project is TypeScript built with **Vite**. The interface uses **Preact** (a small React). The map is drawn with **Canvas 2D**. Tests use **Vitest** (unit) and **Playwright** (browser).
 
-**Size** (from `node tools/guide-facts.mjs`, round 8): 139 source files, about 41,700 lines, and 40 unit-test files plus the browser e2e runner. Nearly half the lines are pixel art defined as code (`src/rendering/art/`).
+**Size** (from `node tools/guide-facts.mjs`, round 9): 142 source files, about 42,300 lines, and 42 unit-test files plus the browser e2e runner. Nearly half the lines are pixel art defined as code (`src/rendering/art/`).
 
 ```mermaid
 flowchart TB
@@ -323,7 +323,7 @@ flowchart LR
 ```
 
 - **Labour:** working-age people are assigned to districts, and each district has jobs. Automation shrinks working hours and staff.
-- **Services:** in industrial eras, market services grow with household goods income. Since round 8 there are also **public-service jobs** (teaching, health care, administration), which grow with welfare and with what the nation spends on schools and health. Whoever is left does informal work or is unemployed.
+- **Services:** in industrial eras, market services grow with household goods income. Since round 8 there are also **public-service jobs** (teaching, health care, administration), which grow with welfare and with what the nation spends on schools and health. Since round 9, **elder care** adds care jobs in proportion to the people aged 65 and over (`careWorkersPerElder`), so ageing modern societies employ carers. Whoever is left does informal work or is unemployed.
 - **Jobs** (`economy/occupations.ts`, round 7): the 7 sectors split into **41 named jobs**, from gatherers and smiths to programmers and AI supervisors. The split depends on what each place has and what each nation knows. Nations record the shares every year.
 - **Roads** (`economy/trade.ts`): nations link their towns and upgrade the tiles along the way. Since round 7, route planning reuses roads they already built, so networks share trunk lines.
 - **Traffic** (`economy/traffic.ts`, derived and never saved): vehicle trips per day are people × vehicles per 1,000 for the era × 2.5, measured against street capacity.
@@ -341,7 +341,7 @@ flowchart LR
 
 **Government** (`politics/government.ts`):
 - **Institutions:** a nation has a continuous vector (participation, liberties, capacity, welfare, religious authority, …). The government *form* (band, chiefdom, monarchy, republic, …) is a **label derived from** that vector (`govforms.ts`), not a switch.
-- **Policies:** taxes, environment, migration, trade, conscription, UBI and AI regulation are set yearly from conditions. Since round 8, the environment policy also responds to global warming, and strict policy shifts steel to electricity and runs fossil plants only for demand clean power can't meet.
+- **Policies:** taxes, environment, migration, trade, conscription, UBI and AI regulation are set yearly from conditions. Since round 8, the environment policy also responds to global warming, and strict policy shifts steel to electricity and runs fossil plants only for demand clean power can't meet. Since round 9, a city short of power builds new plants faster the bigger the shortfall (`powerUrgency`), and a climate policy favours solar, wind, hydro and nuclear for those new plants (`cleanPowerStrictBonus`, half of it under the basic policy).
 
 **Values and goals** (`civilizations/ethos.ts`, `missions.ts`):
 - **Ethos:** derived each year from what a nation actually does, scored against the other nations, for example a militarist, mercantile, theocratic or ecological ethos. It multiplies building and research priorities.
@@ -435,6 +435,8 @@ flowchart LR
   - every failure is a typed `SaveError`.
 - `persistence/saves.ts` keeps slots, thumbnails and branches in IndexedDB. `persistence/migrations.ts` upgrades older save versions.
 - Fields added in later rounds are optional, so older saves still load.
+- **Devices** (round 9, `persistence/device.ts`): each browser gets a private random id (stored in `localStorage`, never sent anywhere) and a name read from the browser's user agent, such as "iPhone · Safari", which you can rename in Settings. Every save and export stamps the device that made it into `meta.devices` (the last 8, newest first). The Load screen groups worlds as "Started on this device" first, then by the device each world began on, and shows "also saved on …". The simulation never reads these fields, so they cannot change history.
+- **Favourites** (`sim/favorites.ts`) are saved in `meta.favorites` the same way: a list of up to 50 places, nations, people, armies, bands and herds.
 
 ---
 
@@ -470,6 +472,18 @@ A test, `cacheFreshness.test.ts`, runs every god power and 30-year histories fro
 - **Roads:** simulated roads become arterials or divided highways.
 
 <img src="images/r6-close-up-modern.png" alt="Close-up of a modern city" width="720" />
+
+**Close zoom, WorldBox-style** (round 9, `rendering/closeup.ts`): past 20 px per tile the map stops scaling its actors up with the camera. People, animals, armies and vehicles keep a readable on-screen size (`readableScale`), so a close view shows many small figures, not a few giant ones.
+- **Real people:** small towns (individual mode) draw their actual living residents, at most 40 of them. The sprite comes from their role (ruler, general, priest…), then their age (children are smaller), then their job.
+- **Big cities** (cohort mode) draw their notables, each marked with a small star, plus a crowd sampled from the city's real employment mix.
+- **Tapping a figure** opens that person in the inspector.
+- **Herds** show more animals, more spread out, up close. Wandering bands draw their real members.
+- **City details:** smoke wisps rise from industry (never from solar or wind plants), and flags fly over palaces, temples and universities.
+- Under **Reduce motion**, people stand still.
+
+<img src="images/r9-close-zoom-modern.png" alt="Close zoom on a modern capital: readable people, cars, a bus, parks and flags" width="720" />
+
+**Follow camera** (round 9, `ui/game/Game.tsx`): the inspector's *Follow* button keeps the camera on a person, army, band, herd, town or nation each frame. Dragging the map stops following; zooming does not. The ★ button adds the selection to Favourites in the game menu. The keys `+` and `-` zoom at the centre of the view.
 
 **Concept effects** (`sim/conceptFx.ts`): one registry decides what every god power and every event type shows on the map (a quake ring, a meteor that falls and explodes, fireworks for world games). Every entry is either an effect or a written reason for having none, and a test checks the registry covers everything. Under **Reduce motion**, effects become still markers and the screen never flashes.
 
@@ -541,7 +555,7 @@ A **counterfactual** test is the main tool for checking cause and effect. It clo
 
 ```mermaid
 flowchart LR
-  Dev[Push to GitHub] --> CI[CI workflow<br/>typecheck · unit tests · build ·<br/>browser e2e (Chromium)]
+  Dev[Push to GitHub] --> CI[CI workflow<br/>typecheck · unit tests · build ·<br/>browser e2e (Chromium + WebKit)]
   CI -- green --> Pages[Pages workflow<br/>runs on CI success only,<br/>builds the exact tested commit]
   CI -- red --> Stop[Nothing deploys]
   Pages --> Live[jviola1019.github.io/worldsim]
@@ -549,6 +563,7 @@ flowchart LR
 ```
 
 - `npm run build` runs `tsc` then `vite build`, producing the static site in `dist/`.
+- **Browser e2e** (`tests/e2e/run-e2e.mjs`): runs on Chromium, and since round 9 also on WebKit, Safari's engine (`BROWSER=webkit`), each with iPhone 13 emulation and a desktop window. This is emulation, not a physical iPhone.
 - **Security on GitHub Actions:**
   - every action is pinned to a full commit hash;
   - jobs read the repository by default, and only the Pages deploy job can write, and only to Pages;

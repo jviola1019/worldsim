@@ -9,7 +9,9 @@
 - Docs must be honest: no invented benchmarks or test runs, and emulation is not physical-device testing.
 
 ## Current plan
-Round 8 is **done** (2026-11-19). It covered:
+Round 9 is **done** (2026-11-19): device-labelled saves (`persistence/device.ts`), WorldBox-style close zoom (`rendering/closeup.ts`), follow camera and favourites, power urgency and clean-power bonus, elder-care jobs, and WebKit e2e (`BROWSER=webkit npm run e2e`; also in CI). Plan: `docs/superpowers/plans/2026-11-19-round9.md`. Results: `docs/VALIDATION.md` §R9; data in `docs/data/round9/`.
+
+Round 8 (also done) covered:
 - public-service jobs;
 - city composition;
 - the climate response and a finite feedback store;

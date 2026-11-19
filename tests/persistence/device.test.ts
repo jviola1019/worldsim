@@ -28,6 +28,12 @@ describe('device identity', () => {
     expect(currentDevice(s).name).toBe('Kitchen iPad');
     expect(currentDevice(mem()).id).not.toBe(a.id); // another browser, another id
   });
+
+  it('without storage (private mode) the id stays the same for the whole session (review fix)', () => {
+    expect(currentDevice(undefined, 'x').id).toBe(currentDevice(undefined, 'x').id);
+    const broken = { getItem: () => null, setItem: () => { throw new Error('quota'); } };
+    expect(currentDevice(broken, 'x').id).toBe(currentDevice(broken, 'x').id);
+  });
 });
 
 describe('saves carry their device history', () => {
@@ -38,6 +44,18 @@ describe('saves carry their device history', () => {
     expect(d.length).toBe(DEVICE_HISTORY);
     expect(d[0].name).toBe('Device 1');
     expect(new Set(d.map((x) => x.id)).size).toBe(d.length);
+  });
+
+  it('the world keeps the device it started on, however many devices save it later (review fix)', () => {
+    const sim = makeSim('dev-origin', 32);
+    stampDevice(sim.w, { id: 'aaaaaaaa-0001', name: 'Phone A' }, 1);
+    stampDevice(sim.w, { id: 'bbbbbbbb-0002', name: 'Laptop B' }, 2);
+    stampDevice(sim.w, { id: 'aaaaaaaa-0001', name: 'Phone A' }, 3); // back on A: A moves to the front of the history
+    for (let k = 0; k < 10; k++) stampDevice(sim.w, { id: `cccccccc-00${10 + k}`, name: `Other ${k}` }, 10 + k); // A drops out
+    expect(sim.w.meta.devices!.some((d) => d.id === 'aaaaaaaa-0001')).toBe(false);
+    expect(sim.w.meta.origin).toEqual({ id: 'aaaaaaaa-0001', name: 'Phone A', at: 1 });
+    sim.syncRng();
+    expect(decodeWorld(encodeWorld(sim.w)).meta.origin).toEqual({ id: 'aaaaaaaa-0001', name: 'Phone A', at: 1 });
   });
 
   it('the device history and favourites survive a save, and malformed ones are refused', () => {

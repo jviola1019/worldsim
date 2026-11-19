@@ -109,17 +109,18 @@ describe('F3 climate mitigation: emissions and the feedback store', () => {
     base.runYears(2);
     base.w.climate.anomaly = 3;
     const on = clone(base), off = clone(base);
-    const keep = { s: BALANCE.steelGreenStrict, b: BALANCE.steelGreenBasic, n: BALANCE.steelGreenNone, p: BALANCE.cleanPowerScore };
+    const keep = { s: BALANCE.steelGreenStrict, b: BALANCE.steelGreenBasic, n: BALANCE.steelGreenNone, p: BALANCE.cleanPowerScore, c: BALANCE.cleanPowerStrictBonus };
     const emitted = (sim: Simulation) => { const c0 = sim.w.climate.cumulativeEmissions; sim.runYears(20); return sim.w.climate.cumulativeEmissions - c0; };
     let a = 0, b = 0;
     try {
       a = emitted(on);
-      Object.assign(BALANCE, { steelGreenStrict: 0, steelGreenBasic: 0, steelGreenNone: 0, cleanPowerScore: 0 });
+      Object.assign(BALANCE, { steelGreenStrict: 0, steelGreenBasic: 0, steelGreenNone: 0, cleanPowerScore: 0, cleanPowerStrictBonus: 0 });
       b = emitted(off);
     } finally {
-      Object.assign(BALANCE, { steelGreenStrict: keep.s, steelGreenBasic: keep.b, steelGreenNone: keep.n, cleanPowerScore: keep.p });
+      Object.assign(BALANCE, { steelGreenStrict: keep.s, steelGreenBasic: keep.b, steelGreenNone: keep.n, cleanPowerScore: keep.p, cleanPowerStrictBonus: keep.c });
     }
-    // measured: about 4% less here. This future world's grid is already clean but short, so electric steel often falls
+    // measured: about 4% less in round 8; 1.2% less since round 9 (all clean levers off in the other arm, but power urgency
+    // now builds more plants of every kind in both arms, so both grids grow). This future world's grid is already clean but short, so electric steel often falls
     // back to coal; the large reduction in warming comes from the finite feedback store (next test)
     expect(a).toBeLessThan(b * 0.99);
   }, 300000);

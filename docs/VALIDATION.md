@@ -3,8 +3,82 @@
 | | |
 |---|---|
 | Baseline | `5571bc8`, branch `claude/epoch-civilizations-unbound-dap8pc`, clean worktree. The baseline numbers below were measured from a separate git worktree pinned at this commit. |
-| Environment | Cloud container: 4 vCPU Intel Xeon @ 2.10 GHz, 15 GB RAM, Node 22.23.4, Playwright 1.63 with Chromium only (no WebKit or Firefox installed), Linux. **Not** a phone. |
+| Environment | Cloud container: 4 vCPU Intel Xeon @ 2.10 GHz, 15 GB RAM, Node 22.23.4, Playwright 1.63 with Chromium (and, since round 9, WebKit; no Firefox), Linux. **Not** a phone. |
 | Commands | `npm ci`, `npm run typecheck`, `npm test`, `npm run build`, `npm run e2e`, `node tools/viewports.mjs`, `npm run bench -- <size> <years>`, `npm run stats -- <seeds> <years> <size>`. Probe scripts are listed under each section. |
+
+## R9. Round 9: device-labelled saves, WorldBox-style close zoom, follow camera, warming, unemployment, WebKit (2026-11-19)
+
+Environment: the same cloud container. Since this round it also has **WebKit** (Playwright's build of Safari's engine), installed for the e2e. This is still emulation, **not** a physical iPhone or Mac. Plan: [`superpowers/plans/2026-11-19-round9.md`](superpowers/plans/2026-11-19-round9.md). Raw outputs are in [`docs/data/round9/`](data/round9/).
+
+### Gate
+
+| Check | Result |
+|---|---|
+| `npm run typecheck` | exit 0 |
+| `npm test` | **623 tests, all passing** (42 files). The first full run had 1 failure, the round-8 emissions counterfactual (below), which was corrected |
+| `npm run build` | exit 0 |
+| `npm run e2e` (Chromium) | **74/74**, up from 62. New checks: people are drawn up close; tapping a person opens that person; Follow and ★ Favourite; the Load screen groups saves by device. |
+| `BROWSER=webkit npm run e2e` | **74/74**, the same checks on WebKit (iPhone 13 emulation + desktop). Mobile WebKit has no mouse wheel in Playwright, so the e2e zooms with the new `+`/`-` keys. CI now runs this step too. |
+| `node tools/viewports.mjs` | 6/6 |
+| `node tools/design-capture.mjs` | 121 captures: 0 text < 12 px, 0 targets < 44 px. The first run found **1 contrast failure** (the red "at war" label in the nation diplomacy tab, 4.48:1). It was lightened and the rerun had **0 violations**. |
+| `npm audit` / `npm outdated` | 0 vulnerabilities / nothing outdated; every GitHub Action and Playwright 1.65.1 are at their latest releases |
+
+### Saves are labelled by device
+
+- Each browser keeps a private random id (Web Crypto) and a name read from its user agent, such as "iPhone · Safari", which the player can rename in Settings.
+- Every save and export stamps the device into the world (`meta.devices`, the last 8), and the first device is kept for good (`meta.origin`).
+- The Load screen groups worlds: "Started on this device" first, then one group per device the worlds began on, with "Saved on … · also saved on …" for each slot.
+- **Tests:** `tests/persistence/device.test.ts` (8 tests) covers the user-agent names, a stable id (also without storage), renaming, the history cap, a fixed origin, the save round trip, refusal of malformed entries, and the grouping. The e2e checks the grouping in both browsers.
+- **Honest limit:** a device is a browser profile, not hardware. Two browsers on one phone are two devices, and clearing site data makes a new one.
+
+### Close zoom, WorldBox-style
+
+- Past 20 px per tile, actors keep a readable on-screen size instead of growing with the camera (`readableScale`).
+- Small towns draw their **real living residents** (at most 40), by role, then age, then job. Big cities draw their notables (marked with a star) and a crowd sampled from the city's employment.
+- Herds show more animals up close, bands draw their real members, and city blocks get smoke wisps and flags.
+- **Checked by eye** in Chromium screenshots of a modern capital (people, cars, buses, flags, parks and smoke: `docs/images/r9-close-zoom-modern.png` and `r9-close-zoom-mid.png`). The e2e checks that people are drawn and that tapping one opens a person.
+
+### Balance against round 8 (`tools/balance-compare.mjs docs/data/round8 final- docs/data/round9 final-`)
+
+| World | Milestones in both | Worst shift | Unemployment, mean of years 700–1,000 | Food short (y1000) | Warming (y1000) |
+|---|---|---|---|---|---|
+| modern-1 | 13 | Spacefaring +3.6% | 10% → 10% | 0% → 0% | 6.67 → 6.75 °C |
+| modern-2 | 12 | Atomic & Space −2.2% | 14% → 10% | 0% → 0% | 6.35 → 6.60 °C |
+| modern-3 | 11 | Digital +8.6% | 9% → 13% | 0% → 0% | 6.27 → 5.87 °C |
+| realistic-1 | 12 | Near Future +13.5% | 17% → 12% | 0% → 0% | 5.76 → 5.35 °C |
+
+**Means over the 4 worlds:** unemployment 12.4% → 11.3%; warming 6.26 → 6.14 °C. Food is never short.
+
+**Both effects are modest, and they are mixed across worlds.** Unemployment fell in two worlds, held in one and rose in one (modern-3, 9% → 13%). Warming fell in two worlds and rose in two. With four worlds, a one-point change in the mean is within the run-to-run variation between worlds.
+
+**20 seeds × 600 years:**
+- ledger, finite values and GDP identity hold in **20/20**;
+- median era 7, population 1.27 M (round 8: 7 and 1.26 M);
+- median 25 ms per year. The round-9 changes act in modern eras, which these 600-year runs barely reach.
+
+### What each change did, measured honestly
+
+- **Elder care** (`careWorkersPerElder` 0.08): in a counterfactual test, an ageing future world (5.5% unemployed, 7.7% aged 65+) has lower unemployment with care jobs than without.
+- **Power urgency** (`powerUrgency` 3): cities short of power build plants faster, in proportion to the shortfall. The first value tried, 6, caused a 12% food shortage at year 1,000 in modern-1 (labour moved into energy), so it was lowered to 3. Food is fine at 3.
+- **Clean-power bonus** (`cleanPowerStrictBonus` 3, half under the basic policy): climate policies favour solar, wind, hydro and nuclear for new plants.
+- **The round-8 emissions counterfactual** (`round8.test.ts`) failed once in the full run: its "levers off" arm still had the new round-9 bonus. With every clean lever off in that arm, the levers cut emissions by **1.2%** over 20 years, down from about 4% in round 8, because power urgency now grows the grid in both arms. The test's threshold is 1%, so it passes, but only by a small margin.
+
+### Code review (whole round-9 diff)
+
+The review found 9 issues: 5 important and 4 minor. All were fixed:
+- the "started on" device was taken from the history list, which reorders, so it is now a fixed `meta.origin`;
+- without storage, every call made a new device id, so there is now one id per session;
+- at zoom 2.5–3 the close-up checks disagreed (doubled smoke, bands not drawn as people), so one `closeUp` flag is used everywhere;
+- after zooming out, a stale tap list could open a person, so it is cleared every frame;
+- jumping elsewhere while following snapped back, so a jump now ends following;
+- opening a favourite did not move the map highlight;
+- following carried over into a newly loaded world;
+- `Ctrl`+`-` also zoomed the map;
+- "also saved on" merged devices with the same name.
+
+### GitHub Actions and the live site (round 9)
+
+Recorded after the push (see the next commit).
 
 ## R8. Round 8: city composition, public jobs, climate response, leftovers, code guide (2026-11-19)
 

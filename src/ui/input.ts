@@ -71,6 +71,14 @@ export class InputHandler {
     on('contextmenu', (e) => e.preventDefault());
     const kd = (e: KeyboardEvent) => {
       if (e.code === 'Space') this.space = true;
+      // round 9: keyboard zoom (+ / = in, - out) at the centre of the view, unless the player is typing
+      const t = e.target as HTMLElement | null;
+      if (e.ctrlKey || e.metaKey || e.altKey) return; // browser zoom and shortcuts stay the browser's
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+      if (e.key === '+' || e.key === '=' || e.key === '-') {
+        this.cam.zoomAt(this.cam.viewW / 2, this.cam.viewH / 2, e.key === '-' ? 1 / 1.25 : 1.25);
+        this.cb.onCamera(false);
+      }
     };
     const ku = (e: KeyboardEvent) => {
       if (e.code === 'Space') this.space = false;

@@ -76,6 +76,8 @@ export interface WorldMeta {
   branchOf?: { name: string; year: number; tick: number };
   /** Round 9: the devices that saved this world, newest first (persistence/device.ts). Never read by the simulation. */
   devices?: DeviceStamp[];
+  /** Round 9: the device the world was first saved on; set once, never changed. Never read by the simulation. */
+  origin?: DeviceStamp;
   /** Round 9: the player's favourite places, people and armies (never read by the simulation). */
   favorites?: Favorite[];
 }

@@ -6,6 +6,9 @@ import { currentDevice } from '../../persistence/device';
 import type { WorldState } from '../../sim/types';
 import { fmt } from '../shared';
 
+/** Other devices that saved this world (by id, so two phones with the same name both count). */
+const alsoOn = (s: SlotMeta) => (s.devicesSeen ?? []).filter((d) => typeof d === 'object' && d.id !== s.deviceId).map((d) => d.name).join(', ');
+
 export function LoadScreen({ back, open, setBusy }: { back: () => void; open: (w: WorldState) => void; setBusy: (s: string) => void }) {
   const [slots, setSlots] = useState<SlotMeta[]>([]);
   const [error, setError] = useState('');
@@ -62,7 +65,7 @@ export function LoadScreen({ back, open, setBusy }: { back: () => void; open: (w
                   <br />
                   Seed {s.seed} · saved {new Date(s.savedAt).toLocaleString()}
                   {s.branchOf ? <><br />Branch of {s.branchOf}</> : null}
-                  {s.deviceName ? <><br />Saved on {s.deviceId === device.id ? 'this device' : s.deviceName}{s.devicesSeen && s.devicesSeen.length > 1 ? ` · also saved on ${s.devicesSeen.filter((n) => n !== s.deviceName).join(', ')}` : ''}</> : null}
+                  {s.deviceName ? <><br />Saved on {s.deviceId === device.id ? 'this device' : s.deviceName}{alsoOn(s) ? ` · also saved on ${alsoOn(s)}` : ''}</> : null}
                 </div>
               </div>
               <div class="actions">

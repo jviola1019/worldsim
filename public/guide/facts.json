@@ -2,15 +2,15 @@
  "generated": "2026-11-19",
  "totals": {
   "srcFiles": 142,
-  "srcLines": 42245,
+  "srcLines": 42282,
   "testFiles": 42,
-  "testCases": 326
+  "testCases": 328
  },
  "folders": [
   {
    "name": "rendering",
    "files": 30,
-   "lines": 18545,
+   "lines": 18548,
    "deps": {
     "sim": 13,
     "world": 10,
@@ -26,7 +26,7 @@
   {
    "name": "ui",
    "files": 23,
-   "lines": 2993,
+   "lines": 3015,
    "deps": {
     "sim": 31,
     "persistence": 7,
@@ -80,7 +80,7 @@
   {
    "name": "sim",
    "files": 9,
-   "lines": 2382,
+   "lines": 2384,
    "deps": {
     "civilizations": 18,
     "economy": 7,
@@ -233,7 +233,7 @@
   {
    "name": "persistence",
    "files": 4,
-   "lines": 626,
+   "lines": 636,
    "deps": {
     "sim": 4,
     "config": 3,
@@ -599,7 +599,7 @@
   {
    "path": "src/persistence/device.ts",
    "folder": "persistence",
-   "lines": 70,
+   "lines": 79,
    "about": "Round 9: which device a save was made on."
   },
   {
@@ -617,7 +617,7 @@
   {
    "path": "src/persistence/serialize.ts",
    "folder": "persistence",
-   "lines": 338,
+   "lines": 339,
    "about": "World serialization (save format v1)."
   },
   {
@@ -887,7 +887,7 @@
   {
    "path": "src/rendering/renderer.ts",
    "folder": "rendering",
-   "lines": 902,
+   "lines": 905,
    "about": "Frame renderer. Draws (back to front): cached world chunks (or the far-zoom overview), the overlay, animated tiles (volcanoes, fires, smoke, windmills), living things and agents, traffic derived from real infrastructure and trade, effects, labels, selection an"
   },
   {
@@ -959,7 +959,7 @@
   {
    "path": "src/sim/types.ts",
    "folder": "sim",
-   "lines": 1130,
+   "lines": 1132,
    "about": "EPOCH world state model."
   },
   {
@@ -1019,7 +1019,7 @@
   {
    "path": "src/ui/game/Game.tsx",
    "folder": "ui",
-   "lines": 316,
+   "lines": 327,
    "about": ""
   },
   {
@@ -1037,7 +1037,7 @@
   {
    "path": "src/ui/input.ts",
    "folder": "ui",
-   "lines": 201,
+   "lines": 209,
    "about": "Pointer input for touch and mouse."
   },
   {
@@ -1097,7 +1097,7 @@
   {
    "path": "src/ui/screens/LoadScreen.tsx",
    "folder": "ui",
-   "lines": 85,
+   "lines": 88,
    "about": ""
   },
   {
@@ -1283,7 +1283,7 @@
   },
   {
    "path": "tests/persistence/device.test.ts",
-   "cases": 5,
+   "cases": 7,
    "about": "Round 9: saves are accounted to the device that made them."
   },
   {
