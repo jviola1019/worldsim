@@ -9,7 +9,7 @@
 - Docs must be honest: no invented benchmarks or test runs, and emulation is not physical-device testing.
 
 ## Current plan
-Round 5 scope, decisions and phase status: `docs/ROADMAP.md` (P1 feed, P2 civ depth/ethos/missions/water, P3 map presets, P4 sports/ports/transport, P5 war/nuclear/endings, P6 sprites/city photos/album, P7 docs/packages/CI/main+Pages). Read it first after any restart; update its status column as phases finish.
+Round 6 (city detail, planning rule, full design review): spec `docs/superpowers/specs/2026-11-18-city-detail-design.md` (approved), plan `docs/superpowers/plans/2026-11-18-city-detail.md`, progress ledger `.superpowers/sdd/2026-11-18-city-detail/progress.md` (git-ignored; if lost, use `git log`). Round 5 history: `docs/ROADMAP.md`. Read the ledger first after any restart.
 
 ## Standing to-dos
 Do these **after all other work is finished**, as the last step of a round:
