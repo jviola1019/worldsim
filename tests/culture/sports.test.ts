@@ -106,3 +106,13 @@ describe('visitor accords', () => {
     expect([...B.w.treaties.values()].some((t) => t.kind === 'visitors' && t.active && [t.a, t.b].includes(a.id) && [t.a, t.b].includes(b.id))).toBe(false);
   });
 });
+
+// ---------------------------------------------------------------- round 7: dynasty headlines
+import { notableStreak, ordinal } from '../../src/culture/sports';
+describe('dynasty headlines (round 7: a long streak was "a third straight title" every year)', () => {
+  it('a streak makes the news at its third, fifth and every fifth title, with the right ordinal', () => {
+    const notable = Array.from({ length: 21 }, (_, k) => k + 1).filter(notableStreak);
+    expect(notable).toEqual([3, 5, 10, 15, 20]);
+    expect([3, 5, 21, 22, 23, 25, 111].map(ordinal)).toEqual(['third', 'fifth', '21st', '22nd', '23rd', '25th', '111th']);
+  });
+});

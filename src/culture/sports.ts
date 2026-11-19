@@ -180,16 +180,32 @@ function season(sim: Sim, lg: League): void {
   champ.titles++;
   lg.champions.push({ year: sim.year, team: champ.name });
   if (lg.champions.length > 60) lg.champions.shift();
-  const last = lg.champions.slice(-3);
-  const dynasty = last.length === 3 && last.every((c) => c.team === champ.name);
+  // the current winning streak (seasons in a row, counting this one)
+  let streak = 0;
+  for (let k = lg.champions.length - 1; k >= 0 && lg.champions[k].team === champ.name; k--) streak++;
   const s = sim.w.settlements.get(champ.settlementId)!;
-  // every season is recorded in the league; only notable ones make history
+  // every season is recorded in the league; only notable ones make history: a first title, and a dynasty at
+  // its third, fifth and every fifth straight title after (round 7: a long streak was reported as "a third
+  // straight title" every year)
+  const dynasty = notableStreak(streak);
   if (!dynasty && champ.titles !== 1) return;
   logEvent(sim, {
     type: 'sports_champion', cat: 'culture',
-    title: dynasty ? `The ${champ.name} won a third straight ${lg.name} title` : champ.titles === 1 ? `The ${champ.name} won their first ${lg.name} title` : `The ${champ.name} won the ${lg.name}`,
+    title: dynasty ? `The ${champ.name} won a ${ordinal(streak)} straight ${lg.name} title` : `The ${champ.name} won their first ${lg.name} title`,
     civs: [civ.id], settlements: [s.id], x: s.x, y: s.y, importance: 2,
   });
+}
+
+const ORDINALS = ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth', 'twentieth'];
+export function ordinal(n: number): string {
+  if (ORDINALS[n]) return ORDINALS[n];
+  const t = n % 100, u = n % 10;
+  return `${n}${t >= 11 && t <= 13 ? 'th' : u === 1 ? 'st' : u === 2 ? 'nd' : u === 3 ? 'rd' : 'th'}`;
+}
+
+/** A winning streak worth a headline: the third title in a row, the fifth, and every fifth after. */
+export function notableStreak(streak: number): boolean {
+  return streak === 3 || (streak >= 5 && streak % 5 === 0);
 }
 
 function atWar(sim: Sim, a: number, b: number): boolean {

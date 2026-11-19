@@ -32,7 +32,7 @@ export const JOBS: readonly JobDef[] = [
   J('chip_technicians', 'Chip technicians', S.INDUSTRY, 'hightech'), J('robot_technicians', 'Robot technicians', S.INDUSTRY, 'hightech'), J('automation_engineers', 'Automation engineers', S.INDUSTRY, 'hightech'),
   J('builders', 'Builders', S.CONSTRUCTION, 'building'),
   J('traders', 'Traders and shopkeepers', S.SERVICES, 'commerce'), J('porters', 'Porters and servants', S.SERVICES, 'commerce'),
-  J('clerks', 'Clerks', S.SERVICES, 'commerce'), J('bankers', 'Bankers', S.SERVICES, 'commerce'), J('drivers', 'Drivers and transport crews', S.SERVICES, 'commerce'),
+  J('clerks', 'Clerks and scribes', S.SERVICES, 'commerce'), J('bankers', 'Bankers', S.SERVICES, 'commerce'), J('drivers', 'Drivers and transport crews', S.SERVICES, 'commerce'),
   J('priests', 'Priests', S.SERVICES, 'care'), J('healers', 'Healers', S.SERVICES, 'care'), J('doctors', 'Doctors and nurses', S.SERVICES, 'care'),
   J('teachers', 'Teachers', S.SERVICES, 'knowledge'), J('scholars', 'Scholars and researchers', S.SERVICES, 'knowledge'),
   J('programmers', 'Programmers', S.SERVICES, 'digital'), J('ai_supervisors', 'AI supervisors', S.SERVICES, 'digital'),

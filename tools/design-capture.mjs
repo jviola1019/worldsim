@@ -65,7 +65,16 @@ for (const [name, ctxOpts] of DEVICES) {
     if (await tryClick(page.locator('.sheet-body ul.list li button'))) {
       await page.waitForTimeout(800);
       await snap('15-nation-overview');
-      for (const t of ['Feed', 'Album', 'History', 'Technology', 'Economy', 'Diplomacy']) if (await tryClick(page.getByRole('tab', { name: t }))) await snap(`16-nation-${t.toLowerCase()}`);
+      for (const t of ['Feed', 'Album', 'History', 'Technology', 'Economy', 'Diplomacy', 'Statistics']) if (await tryClick(page.getByRole('tab', { name: t }))) await snap(`16-nation-${t.toLowerCase()}`);
+      // round 7: the capital's panel (jobs, homes, streets and traffic, building works)
+      if (await tryClick(page.getByRole('tab', { name: 'Overview' }))) {
+        if (await tryClick(page.locator('[data-testid=open-capital]'))) {
+          await page.waitForTimeout(500);
+          await snap('18-settlement');
+          await page.locator('.sheet-body').first().evaluate((el) => el.scrollTo(0, el.scrollHeight)).catch(() => {});
+          await snap('19-settlement-city-life');
+        }
+      }
     }
     await close();
   }
