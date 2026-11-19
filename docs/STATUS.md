@@ -17,7 +17,7 @@ Last verified 2026-11-19 (round 7, audit loop pass 2):
 | E2E | **61/61**: phone, desktop and desktop with Reduce motion (Chromium), on the production build. Includes jobs, map effects, still markers under Reduce motion, the close-up city, CSP, injected-script and framing checks. |
 | Design floors | 6/6 device profiles: text ≥ 12 px, touch targets ≥ 44 px, WCAG AA (`tools/viewports.mjs`); 121 captures with 0 violations |
 | Dependencies | `npm audit`: 0 vulnerabilities; `npm outdated`: none |
-| GitHub Actions | CI and Pages run on every push of this branch (VALIDATION §R7) |
+| GitHub Actions | CI #44 green. Pages #15 deployed after it through the new CI gate (`workflow_run`). Long-run validation #1 green, its first run. A flaky e2e check that failed CI #42 is fixed (VALIDATION §R7). |
 | Multi-seed invariants | 20 seeds × 600 years: ledger, finite values and GDP identity hold in **20/20** (round-7 code) |
 
 Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is in [PERFORMANCE.md](PERFORMANCE.md) and security in [SECURITY.md](SECURITY.md).

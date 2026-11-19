@@ -110,7 +110,8 @@ CPU time of the pixel work per refresh pass, in Node (not browser frame time):
   - **Live site.** `https://jviola1019.github.io/worldsim/` serves `fbda5e9`, and its bundle is byte-identical to a local build of that commit. The meta CSP is present and HSTS is sent by GitHub. The e2e suite against the live site: **61/61**.
   - **Deploys are now gated on CI (owner's decision).** Before this, `pages.yml` ran `npm test` and the build on every push, but not typecheck or e2e. It now runs on `workflow_run` and deploys only when CI succeeded on a push in this repository, checking out the commit CI tested. `hardening.test.ts` checks the gate.
   - **esbuild install script (owner's decision).** It is approved in `package.json` `allowScripts`, pinned to `esbuild@0.28.2`, with `npm approve-scripts` from npm 11. A future esbuild version will be listed again for review.
-  - **`long-run.yml`** was triggered manually for the first time (owner's decision); see STATUS for its result.
+  - **`long-run.yml`** was triggered manually for the first time (owner's decision): Long-run validation #1 on `dc771b2` **succeeded** (16:07–16:12 UTC).
+  - **The gate works.** On `dc771b2`, the push started CI #44 and no Pages run. When CI #44 succeeded, "Deploy to GitHub Pages" #15 started from `workflow_run` on the same commit and **succeeded**. On `d5b8b7f` (the e2e fix): CI #43 success, Pages #14 success.
 
 ## R6. Round 6: close-up cities, planning rule, design review (2026-11-19)
 
