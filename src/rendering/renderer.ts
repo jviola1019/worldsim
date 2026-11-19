@@ -575,6 +575,7 @@ export class Renderer {
     const { ctx, atlas } = this;
     const fx = this.sim.fx;
     const kinds = new Set<string>();
+    let motion = ''; // what each effect looks like this frame (ring size, sprite frame): a test hook for movement
     const reduce = this.reduceMotion;
     for (let k = fx.length - 1; k >= 0; k--) {
       const f = fx[k];
@@ -603,6 +604,7 @@ export class Renderer {
         ctx.beginPath();
         ctx.arc(f.x * TILE + 4, f.y * TILE + 4, f.ring * TILE * grow, 0, Math.PI * 2);
         ctx.stroke();
+        motion += `r${Math.round(f.ring * TILE * grow * 4)}`;
       }
       let frame = 0;
       if (spr && spr.frames > 1) {
@@ -611,8 +613,10 @@ export class Renderer {
       }
       atlas.draw(ctx, f.kind, f.x * TILE + 4, f.y * TILE + 6, frame);
       kinds.add(f.kind);
+      motion += `f${frame};`;
     }
     this.setData('fx', [...kinds].sort().join(' '));
+    this.setData('fxMotion', motion);
     if (this.highlight) {
       this.highlight.t -= dt;
       if (this.highlight.t <= 0) this.highlight = null;

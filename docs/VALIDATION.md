@@ -97,7 +97,18 @@ CPU time of the pixel work per refresh pass, in Node (not browser frame time):
 ### Standing to-dos (CLAUDE.md)
 
 - **Packages:** `npm audit` reports 0 vulnerabilities and `npm outdated` reports nothing. Actions are pinned at the same releases checked in round 6 earlier the same day. No new dependencies.
-- **GitHub Actions:** see the run list in STATUS. CI and Pages run on every push of this branch.
+- **GitHub Actions audit** (a verification subagent read the run list and logs; results checked here):
+
+  | Commit | CI | Pages |
+  |---|---|---|
+  | `e3d8706` | #41 success (e2e 61/61) | #12 success |
+  | `fbda5e9` (docs only) | #42 **failure**: `phone: the effect animates — 0 of 3 frame pairs changed` | #13 success |
+
+  - **The CI #42 failure was a flaky check, now fixed.** It compared a fixed 180×180 screen clip, and in a random world the quake ring can fall outside that clip. The check now reads the renderer's `data-fx-motion` hook (each effect's ring size and sprite frame). Three local runs in a row gave 61/61, with the effect changing in 3 of 3 samples and the Reduce-motion marker in 0 of 3.
+  - **No skipped jobs.** Actions are pinned at their latest releases, there are no Node warnings, and `npm audit` is clean in CI. One warning is upstream: `punycode` is deprecated inside `actions/deploy-pages`. Another needs an owner choice: npm notes `esbuild` has an install script not covered by `allowScripts`.
+  - **`long-run.yml` has never run.** It is scheduled for Mondays 05:17 UTC, and its commands were run locally above.
+  - **Live site.** `https://jviola1019.github.io/worldsim/` serves `fbda5e9`, and its bundle is byte-identical to a local build of that commit. The meta CSP is present and HSTS is sent by GitHub. The e2e suite against the live site: **61/61**.
+  - **Deploys are not gated on CI.** `pages.yml` runs `npm test` and the build, but not typecheck or e2e. Whether to gate deploys on green CI is an owner decision.
 
 ## R6. Round 6: close-up cities, planning rule, design review (2026-11-19)
 
@@ -200,7 +211,7 @@ The last 10 runs of `ci.yml` before this round's final push were checked through
 - **Stale steps:** the workflows used `@v4`/`@v3` action tags, Node 22 and Playwright 1.63. All actions are now pinned to commit SHAs at their latest releases, with Node 26 LTS and Playwright 1.65.1. Run #26 passed with exactly this configuration, including the browser e2e.
 - **Skipped jobs:** none skipped. `long-run.yml` runs on its schedule and on manual dispatch. It has not yet been triggered; its commands were run locally (below).
 - **`main` and Pages:** `main` was created at `14ce30d`, the commit whose CI run #27 passed. The first `pages.yml` run on `main` (#1) passed `npm ci`, `npm test` and the build, then **stopped at `configure-pages`** with "Get Pages site failed… verify that the repository has Pages enabled". GitHub Pages is not yet enabled on the repository. **Owner action:** Settings → Pages → Source: **GitHub Actions**, then re-run "Deploy to GitHub Pages" (Actions tab → Run workflow). Optionally make `main` the default branch (Settings → General).
-- **Flaky e2e:** none observed. The e2e passed in every CI run of this round and in every local run.
+- **Flaky e2e:** none observed. The e2e passed in every CI run of this round and in every local run. *(Round 5. Round 7 saw one flaky check; see §R7.)*
 
 ### Natural history, 1,000 years, no god powers (128²)
 

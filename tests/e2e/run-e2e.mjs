@@ -106,20 +106,22 @@ async function run(label, ctxOpts) {
   // let the map redraw what the quake destroyed (cached chunks repaint over a few frames), then sample the effect
   await page.waitForTimeout(700);
   const fxNow = (await page.locator('canvas.canvas').getAttribute('data-fx')) ?? '';
-  const clip = { x: Math.round(vp.width / 2 - 90), y: Math.round(vp.height / 2 - 50), width: 180, height: 180 };
+  // movement is read from the renderer's hook (ring size and sprite frame of each effect drawn), not from a screen
+  // clip: the world is random, so a fixed clip could miss the ring (CI #42 failed that way on the phone)
+  const motionOf = async () => (await page.locator('canvas.canvas').getAttribute('data-fx-motion')) ?? '';
   let changes = 0;
-  let prev = await page.screenshot({ clip });
+  let prev = await motionOf();
   for (let k = 0; k < 3; k++) {
     await page.waitForTimeout(150);
-    const next = await page.screenshot({ clip });
-    if (!next.equals(prev)) changes++;
+    const next = await motionOf();
+    if (next !== prev) changes++;
     prev = next;
   }
   await page.waitForTimeout(3000);
   const fxLater = (await page.locator('canvas.canvas').getAttribute('data-fx')) ?? '';
   check(`${label}: an earthquake shows its effect and ring, then it ends`, fxNow.includes('fx.quake') && !fxLater.includes('fx.quake'), `now "${fxNow}", later "${fxLater}"`);
-  if (reduced) check(`${label}: under Reduce motion the effect is a still marker`, changes <= 1, `${changes} of 3 frame pairs changed`);
-  else check(`${label}: the effect animates`, changes >= 2, `${changes} of 3 frame pairs changed`);
+  if (reduced) check(`${label}: under Reduce motion the effect is a still marker`, changes <= 1, `${changes} of 3 samples changed`);
+  else check(`${label}: the effect animates`, changes >= 2, `${changes} of 3 samples changed (last: ${prev})`);
   await page.getByLabel('Stop using this power').click().catch(() => {});
   await page.keyboard.press('Escape').catch(() => {});
   if (label === 'desktop') {

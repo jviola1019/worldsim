@@ -135,11 +135,11 @@ Nothing found allowed script execution, data theft, or any effect on another pla
 | 68 | Exposed dev, debug or admin endpoints | Verified Secure | No admin endpoints. The dev and preview servers bind to localhost by default (`dev:lan` is opt-in, round 2). Source maps are published deliberately (open-source project). | Info | `package.json` scripts |
 | 69 | Insecure pre-signed URLs | N/A | No object storage. | None | §1 |
 | 70 | Encryption, TLS and key management | Not Yet Tested (host) | GitHub Pages provides TLS for `*.github.io`. The owner should confirm "Enforce HTTPS" is on (§5). No keys are managed by the app. | Low | Manual |
-| 71 | Missing HSTS and security headers | Partly mitigated; Not Yet Tested on host | GitHub Pages does not allow custom headers. Covered in-app: CSP (meta) and the frame fallback. Header file for other hosts: `public/_headers` (HSTS, CSP + `frame-ancestors`, nosniff, Referrer-Policy, Permissions-Policy, COOP, CORP). `github.io` is expected to be on the browsers' HSTS preload list; verify after deploy (§5). | Low | `hardening.test.ts` › `_headers` matches policy |
+| 71 | Missing HSTS and security headers | Partly mitigated; Not Yet Tested on host | GitHub Pages does not allow custom headers. Covered in-app: CSP (meta) and the frame fallback. Header file for other hosts: `public/_headers` (HSTS, CSP + `frame-ancestors`, nosniff, Referrer-Policy, Permissions-Policy, COOP, CORP). Verified 2026-11-19 on the live site: GitHub sends `strict-transport-security: max-age=31556952` for github.io and redirects `http://` to `https://` (301). The site itself cannot configure this header. | Low | `hardening.test.ts` › `_headers` matches policy |
 | 72 | Vulnerable or malicious dependencies | Verified Secure | `npm audit`: 0 vulnerabilities after the upgrade (R5-7). One runtime dependency (preact), plus the bundled font. Exact versions are pinned in `package.json`, and `package-lock.json` holds integrity hashes. | None | §4 |
 | 73 | Dependency confusion / typosquatting | Verified Secure | All packages are public, well-known npm packages with no private scopes. The names were checked by hand: `preact`, `@fontsource/pixelify-sans`, `vite`, `vitest`, `typescript`, `tsx`, `fake-indexeddb`, `@types/node`. CI uses `npm ci` with the lockfile. | None | Review of `package.json` and `package-lock.json` |
 | 74 | Compromised build pipelines / CI credentials | Vulnerable → fixed (Low) | Mutable action tags, a persisted checkout token and over-broad Pages permissions were fixed (R5-6). No repository secrets are used by any workflow. | Low | 4 static CI tests |
-| 75 | Insecure deployment previews / env config | Verified Secure | No preview deployments. Pages deploys only from `main` through the protected `github-pages` environment. No environment variables carry secrets. | None | `pages.yml` |
+| 75 | Insecure deployment previews / env config | Verified Secure | No preview deployments. Pages deploys through the `github-pages` environment from pushes to `main` **and** to the work branch `claude/epoch-civilizations-unbound-dap8pc` (`pages.yml`; every live deploy so far came from the work branch). No environment variables carry secrets. | None | `pages.yml` |
 | 76 | Subdomain takeover / DNS | Not Yet Tested (owner) | No custom domain is configured; the site uses `<owner>.github.io`. If a custom domain is added, verify the domain in GitHub to prevent takeover (§5). | Info | Manual |
 | 77 | Email-domain spoofing (SPF, DKIM, DMARC) | N/A | The app sends no email and owns no domain. | None | §1 |
 | 78 | Logs, backups and exports | N/A | No server logs or backups. Exported saves are files the player chooses to create. CI artifacts (long-run results) hold only simulation statistics. | None | `long-run.yml` |
@@ -161,13 +161,13 @@ Nothing found allowed script execution, data theft, or any effect on another pla
 | 89 | AI-generated dependency, config or security-design flaws | Applicable to development: reviewed | Every dependency added in this round (`@fontsource/pixelify-sans`) was checked for name, licence and maintainer. Configs (CSP, workflows) are covered by regression tests. This audit is itself the security-design review. | Low | This document; `hardening.test.ts` |
 | 90 | AI endpoint abuse / cost exhaustion | N/A | No AI endpoint. | None | §1 |
 | 91 | Sandboxing of AI-executed code | N/A at runtime | No AI-executed code in the product. The development agent ran in an isolated, ephemeral cloud container. | None | §1 |
-| 92 | AI-generated code deployed without security regression tests | Applicable: controlled | Every push runs typecheck, all unit tests (including 61 security tests: 32 in `tests/security/`, 29 in `tests/persistence/security.test.ts`), the build and the browser e2e suite (including the CSP and framing checks). Pages deploys only from `main` after `npm test` passes. | Low | `ci.yml`, `pages.yml` |
+| 92 | AI-generated code deployed without security regression tests | Applicable: controlled | Every push runs typecheck, all unit tests (including 61 security tests: 32 in `tests/security/`, 29 in `tests/persistence/security.test.ts`), the build and the browser e2e suite (including the CSP and framing checks). Pages deploys from `main` or the work branch after `npm test` and the build pass in `pages.yml`. It is **not** gated on the CI workflow, so typecheck and e2e failures do not block a deploy: a docs-only commit went live while CI run #42 was red on a flaky e2e check, since fixed. | Low | `ci.yml`, `pages.yml` |
 
 **Totals:** 64 not applicable to this architecture, 17 verified secure (two of them with tightened bounds: rows 31 and 49 overlap R5-4 and R5-5), 4 confirmed vulnerabilities fixed with tests (rows 51, 53, 74, plus 31; R5-3 and R5-7 were hardening outside the numbered list), 3 needing owner or host verification (rows 70, 71, 76) and 4 development-process items under control (86, 89, 92; 23 is a game rule). Some rows are counted in two groups.
 
 ## 4. Verification performed (2026-11-18)
 
-All testing was local and non-production: the local build (`vite preview` on localhost) in headless Chromium. Nothing was run against GitHub Pages or any third-party system.
+All testing was local and non-production: the local build (`vite preview` on localhost) in headless Chromium. Nothing was run against GitHub Pages or any third-party system. Round 7 (2026-11-19): the read-only e2e suite was also run against the live site (`URL=https://jviola1019.github.io/worldsim/ node tests/e2e/run-e2e.mjs`), with 61/61 passing, including the CSP, injected-script, framing and IndexedDB checks. The live bundle was byte-identical to a local build of the deployed commit.
 
 | Check | Command or method | Result |
 |---|---|---|
@@ -183,12 +183,12 @@ All testing was local and non-production: the local build (`vite preview` on loc
 
 ## 5. Unresolved risks and settings the owner must verify by hand
 
-1. **GitHub Pages headers.** Pages cannot send CSP `frame-ancestors`, HSTS, nosniff, Referrer-Policy or Permissions-Policy headers. The meta CSP and frame fallback cover the main cases. For full header control, host the `dist/` folder on Cloudflare Pages or Netlify (`_headers` is already in the build), or put a CDN in front of Pages.
+1. **GitHub Pages headers.** Pages cannot send custom headers: CSP `frame-ancestors`, nosniff, Referrer-Policy or Permissions-Policy headers. The meta CSP and frame fallback cover the main cases. For full header control, host the `dist/` folder on Cloudflare Pages or Netlify (`_headers` is already in the build), or put a CDN in front of Pages.
 2. **Enforce HTTPS:** check Settings → Pages → "Enforce HTTPS" after the first deploy.
 3. **HSTS preload:** confirm that `github.io` is on the HSTS preload list for current browsers (hstspreload.org). If a custom domain is added, configure HSTS on the CDN and verify the domain (Settings → Pages → verified domains) to prevent subdomain takeover.
 4. **Repository settings:**
    - Protect `main` (require the CI check, no force-push).
-   - Keep the `github-pages` environment limited to `main`.
+   - Keep the `github-pages` environment limited to `main` once work moves there. Today `pages.yml` also deploys the work branch; that is the owner's choice.
    - Enable Dependabot alerts.
    - Enable secret scanning and push protection (free for public repositories).
    - Optionally add Dependabot version updates for `npm` and `github-actions`. This was not added automatically, because it opens pull requests.
