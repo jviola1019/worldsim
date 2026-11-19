@@ -15,9 +15,9 @@ Environment: the same cloud container (Chromium only, **not** a phone). Raw outp
 | Check | Result |
 |---|---|
 | `npm run typecheck` | exit 0 |
-| `npm test` | **545 passed, 0 failed, 0 skipped** (32 files) |
+| `npm test` | **552 passed, 0 failed, 0 skipped** (32 files) |
 | `npm run build` | exit 0 |
-| `npm run e2e` (production build) | **32/32**. New checks: zooming into the capital draws close-up chunks; the aerial photo draws close-up blocks. |
+| `npm run e2e` (production build) | **33/33**. New checks: zooming into the capital draws close-up chunks; the aerial photo draws close-up blocks; the close-up settles on a 1920×1080 screen. |
 | `node tools/viewports.mjs` | **6/6**, now also enforcing text ≥ 12 px, touch targets ≥ 44 px and WCAG AA on the HUD, power dock, nations sheet, inspector and Settings. Mutation check: putting back the 10.5-px tool labels fails the run. |
 | `node tools/design-capture.mjs` | 106 captures on 5 devices. Text < 12 px: 968 → **0**. Touch targets < 44 px: 1,415 → **0**. Contrast < AA: **0**. See [DESIGN-REVIEW.md](DESIGN-REVIEW.md). |
 | `npm audit` / `npm outdated` | 0 vulnerabilities / nothing outdated |
@@ -35,6 +35,16 @@ Environment: the same cloud container (Chromium only, **not** a phone). Raw outp
 | `tests/security/hardening.test.ts` | +1 | The reduce-motion preference is a boolean, off by default. |
 
 Mutation checks: ethos bias, organic jitter, `streetAccess` off, the online-share fix and the 10.5-px labels were each reverted, and each was caught. Two tests that first passed with the behaviour reverted (organic layout, the floor check) were rewritten until they failed.
+
+**Rebuilt trajectory-sensitive tests (correction).** The Task 5 commit message said these kept "the same assertions, no weakening". That is not accurate for two of them:
+- **The ethos test (a priest-led state turns theocratic)** and **the media churn test** went from one world to a majority of three. They now pass if one of the three worlds misses.
+- **The temple-priority test** now sums three worlds, which is a stronger test.
+- **The education test** chooses the largest literate nation, and **the diffusion test** also counts discovery as diffusion. The assertions themselves are unchanged in both.
+
+**Final-review fixes (whole-branch review on the most capable model, then one fix pass, each with a test that failed first):**
+1. The close-up layer thrashed when more city chunks were wanted than the cache holds, for example 1920×1080 at 26 px per tile. It now draws only the nearest chunks that fit the cache (48), spends no canvas on chunks without a city, reuses evicted canvases, and draws the map with buildings wherever the close-up is not ready yet. Frame simulation: 88 wanted chunks settle with no redraws; without the cap they redraw forever.
+2. Weather, ships, trains and aircraft now step once a second under Reduce motion (rain kept animating before; vehicles were hidden).
+3. 2×2 buildings are checked for street access over the whole footprint (`keepsAccessBlock`).
 
 ### Planning rule: balance against round 5 (128², 1,000 years, no god powers)
 

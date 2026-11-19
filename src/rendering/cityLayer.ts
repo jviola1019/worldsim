@@ -11,7 +11,7 @@ import type { Sim } from '../sim/context';
 import { CHUNK } from '../sim/context';
 import { TILE } from './camera';
 import type { Atlas } from './atlas';
-import { BLDF } from '../world/tilemap';
+import { BLDF, type TileMap } from '../world/tilemap';
 import { BUILDINGS } from '../civilizations/buildings';
 import { blockContext, composeBlock, blockSignature, isDetailTile, streetColor, STREET_COLORS, BLOCK, type BlockPlan, type Feature } from './cityBlocks';
 import { hash3 } from '../core/rng';
@@ -45,6 +45,29 @@ export function detailChunksOf(k: number, mapW: number, mapH = Infinity): number
   return out;
 }
 
+/** The first `cap` chunks of `wanted` (sorted nearest first) that hold any city block. */
+export function selectDetailChunks(wanted: number[], empty: (k: number) => boolean, cap: number): number[] {
+  const out: number[] = [];
+  for (const k of wanted) {
+    if (out.length >= cap) break;
+    if (!empty(k)) out.push(k);
+  }
+  return out;
+}
+
+/** True when detail chunk k (cx detail chunks across) holds at least one close-up city tile. */
+export function chunkHasDetail(m: TileMap, k: number, cx: number): boolean {
+  const x0 = (k % cx) * DCHUNK, y0 = Math.floor(k / cx) * DCHUNK;
+  for (let y = y0; y < Math.min(m.h, y0 + DCHUNK); y++)
+    for (let x = x0; x < Math.min(m.w, x0 + DCHUNK); x++) if (isDetailTile(m, y * m.w + x)) return true;
+  return false;
+}
+
+/** Animation clock: under reduce motion it steps once a second. */
+export function motionTime(time: number, reduce: boolean): number {
+  return reduce ? Math.floor(time) : time;
+}
+
 /** Least-recently-used cache with a hard cap. */
 export class DetailCache<V> {
   private m = new Map<number, V>();
@@ -62,14 +85,18 @@ export class DetailCache<V> {
     this.m.delete(k);
     this.m.set(k, v);
   }
-  put(k: number, v: V): void {
+  /** Insert; returns the values evicted to stay under the cap (canvases to reuse). */
+  put(k: number, v: V): V[] {
     this.m.delete(k);
     this.m.set(k, v);
+    const out: V[] = [];
     while (this.m.size > this.max) {
       const oldest = this.m.keys().next().value as number;
+      out.push(this.m.get(oldest)!);
       this.m.delete(oldest);
       this.evicted.push(oldest);
     }
+    return out;
   }
   /** Take a value for reuse from the evicted pool (canvas recycling). */
   size(): number {
@@ -80,7 +107,11 @@ export class DetailCache<V> {
 const YARD: Record<string, string> = { grass: '#7aa456', dirt: '#957f58', paved: '#9b9892', garden: '#88a05c' };
 
 export class CityLayer {
-  private cache = new DetailCache<HTMLCanvasElement>(48);
+  /** At most this many detail chunks are cached and drawn per frame (nearest first). */
+  static readonly CAP = 48;
+  private cache = new DetailCache<HTMLCanvasElement>(CityLayer.CAP);
+  /** Per detail chunk: -1 unknown, 0 holds city blocks, 1 empty (no canvas spent). */
+  private emptyState: Int8Array;
   private spare: HTMLCanvasElement[] = [];
   dirty: Uint8Array;
   private sig: Uint32Array;
@@ -92,17 +123,36 @@ export class CityLayer {
     this.cx = Math.ceil(m.w / DCHUNK);
     this.cy = Math.ceil(m.h / DCHUNK);
     this.dirty = new Uint8Array(this.cx * this.cy).fill(1);
+    this.emptyState = new Int8Array(this.cx * this.cy).fill(-1);
     this.sig = new Uint32Array(m.n);
+  }
+
+  /** True when detail chunk k holds no city block (cached; recomputed when its map chunk changes). */
+  isEmpty(k: number): boolean {
+    if (this.emptyState[k] < 0) this.emptyState[k] = chunkHasDetail(this.sim.w.map, k, this.cx) ? 0 : 1;
+    return this.emptyState[k] === 1;
+  }
+
+  /** Ready to show: empty, or drawn (a dirty chunk keeps showing its last drawing until redrawn). */
+  ready(k: number): boolean {
+    return this.isEmpty(k) || this.cache.has(k);
+  }
+
+  /** Every detail chunk inside map chunk k is ready, so the map underneath may leave out its city buildings. */
+  readyForMapChunk(k: number): boolean {
+    const m = this.sim.w.map;
+    return detailChunksOf(k, m.w, m.h).every((d) => this.ready(d));
   }
 
   /** A map chunk changed: its detail chunks need redrawing. */
   markMapChunk(k: number): void {
     const m = this.sim.w.map;
-    for (const d of detailChunksOf(k, m.w, m.h)) this.dirty[d] = 1;
+    for (const d of detailChunksOf(k, m.w, m.h)) { this.dirty[d] = 1; this.emptyState[d] = -1; }
   }
 
   invalidateAll(): void {
     this.dirty.fill(1);
+    this.emptyState.fill(-1);
   }
 
   /** Once a simulated year: redraw cached chunks whose block signatures changed (size band, ethos). */
@@ -128,6 +178,7 @@ export class CityLayer {
     let n = 0;
     for (const k of wanted) {
       if (n >= budget) break;
+      if (this.isEmpty(k)) { this.dirty[k] = 0; continue; }
       if (this.dirty[k] || !this.cache.has(k)) {
         this.drawChunk(k);
         this.dirty[k] = 0;
@@ -142,22 +193,23 @@ export class CityLayer {
     return c ?? null;
   }
 
-  /** True when any tile of detail chunk k is a city block (empty chunks are skipped cheaply). */
   private alloc(k: number): HTMLCanvasElement {
     let c = this.cache.get(k);
     if (c) return c;
     c = this.spare.pop() ?? document.createElement('canvas');
     c.width = DCHUNK * TILE * DETAIL;
     c.height = DCHUNK * TILE * DETAIL + DPAD;
-    this.cache.put(k, c);
-    for (const e of this.cache.evicted.splice(0)) {
-      this.dirty[e] = 1;
-      // the evicted canvas object is gone from the map; recycle a fresh one later
-    }
+    // canvases pushed out of the cache are reused, so memory stays bounded at CAP canvases
+    this.spare.push(...this.cache.put(k, c));
+    for (const e of this.cache.evicted.splice(0)) this.dirty[e] = 1;
     return c;
   }
 
+  /** Chunk redraws so far (read by the e2e test: it must stop rising once the view settles). */
+  redraws = 0;
+
   private drawChunk(k: number): void {
+    this.redraws++;
     const m = this.sim.w.map;
     const c = this.alloc(k);
     const ctx = c.getContext('2d')!;

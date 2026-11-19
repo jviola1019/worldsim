@@ -234,15 +234,26 @@ export function isOpenTile(m: TileMap, j: number): boolean {
  * (the map edge counts as open). Keeps streets and breathing room between city blocks.
  */
 export function keepsAccess(sim: Sim, i: number): boolean {
+  return keepsAccessBlock(sim, [i]);
+}
+
+/** keepsAccess for a whole footprint (2×2 buildings): every tile of it and every built neighbour keep open land. */
+export function keepsAccessBlock(sim: Sim, tiles: number[]): boolean {
   const m = sim.w.map;
-  const x = m.xOf(i), y = m.yOf(i);
+  const own = new Set(tiles);
   const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]] as const;
-  const openAt = (xx: number, yy: number) => !m.inBounds(xx, yy) || (m.idx(xx, yy) !== i && isOpenTile(m, m.idx(xx, yy)));
-  if (!N4.some(([dx, dy]) => openAt(x + dx, y + dy))) return false;
-  for (const [dx, dy] of N4) {
-    const nx = x + dx, ny = y + dy;
-    if (!m.inBounds(nx, ny) || isOpenTile(m, m.idx(nx, ny))) continue;
-    if (!N4.some(([ex, ey]) => openAt(nx + ex, ny + ey))) return false;
+  const openAt = (xx: number, yy: number) => !m.inBounds(xx, yy) || (!own.has(m.idx(xx, yy)) && isOpenTile(m, m.idx(xx, yy)));
+  // the footprint as a whole must touch open land
+  if (!tiles.some((t) => N4.some(([dx, dy]) => openAt(m.xOf(t) + dx, m.yOf(t) + dy)))) return false;
+  for (const t of tiles) {
+    const x = m.xOf(t), y = m.yOf(t);
+    for (const [dx, dy] of N4) {
+      const nx = x + dx, ny = y + dy;
+      if (!m.inBounds(nx, ny)) continue;
+      const n = m.idx(nx, ny);
+      if (own.has(n) || isOpenTile(m, n)) continue;
+      if (!N4.some(([ex, ey]) => openAt(nx + ex, ny + ey))) return false;
+    }
   }
   return true;
 }
@@ -278,7 +289,10 @@ export function findSite(sim: Sim, s: Settlement, def: BuildingDef, opts: { acce
       }
     }
     // planning rule: city buildings keep access to open land (streets, breathing room)
-    if (BALANCE.streetAccess && opts.access !== false && ACCESS_CATS.has(def.category) && def.id !== B.PARK && !keepsAccess(sim, i)) return;
+    if (BALANCE.streetAccess && opts.access !== false && ACCESS_CATS.has(def.category) && def.id !== B.PARK) {
+      const tiles = def.footprint === 2 ? [i, i + 1, i + m.w, i + m.w + 1] : [i];
+      if (!keepsAccessBlock(sim, tiles)) return;
+    }
     if (def.category !== 'food' && def.placement !== 'deposit' && def.placement !== 'oil' && m.dep[i] && m.dep[i] !== Deposit.FISH) {
       // do not cover unexploited mineral deposits with houses
       if (DEPOSITS[m.dep[i]].good !== Good.LUXURY || def.category === 'residential') return;

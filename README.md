@@ -247,8 +247,8 @@ TypeScript 7, Vite 8, Preact 11, Canvas2D, Vitest 5. Runtime dependencies: Preac
 | `npm run dev` / `npm run dev:lan` | Dev server on localhost / also on your LAN (for phones) |
 | `npm run build` | Type-check and build the static site into `dist/` |
 | `npm run preview` / `npm run preview:lan` | Serve the built site on port 4173 |
-| `npm test` | 545 unit, integration, counterfactual, round-trip, map-preset and security tests (about 2 minutes) |
-| `npm run e2e` | Browser test on the production build (iPhone 13 emulation and desktop), 32 checks including the close-up city, feed, city pictures, album, CSP and framing; needs `npm run preview` running |
+| `npm test` | 552 unit, integration, counterfactual, round-trip, map-preset and security tests (about 2 minutes) |
+| `npm run e2e` | Browser test on the production build (iPhone 13 emulation and desktop), 33 checks including the close-up city, feed, city pictures, album, CSP and framing; needs `npm run preview` running |
 | `node tools/viewports.mjs` | Layout check on 6 device sizes, failing on text under 12 px, touch targets under 44 px or contrast below WCAG AA |
 | `node tools/design-capture.mjs` | Design-review captures of every screen on 5 devices, with measurements |
 | `node tools/perf-closeup.mjs` | Close-up frame times (CPU throttled ×4) |

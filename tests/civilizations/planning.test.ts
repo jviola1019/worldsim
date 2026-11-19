@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { makeSim } from '../helpers';
-import { isOpenTile, keepsAccess, findSite } from '../../src/civilizations/urban';
+import { isOpenTile, keepsAccess, keepsAccessBlock, findSite } from '../../src/civilizations/urban';
 import { B } from '../../src/civilizations/buildingTypes';
 import { BUILDINGS } from '../../src/civilizations/buildings';
 import { BALANCE } from '../../src/config/balance';
@@ -146,4 +146,21 @@ describe('the planner follows the rule', () => {
     }
     expect(started).toBeGreaterThan(0);
   }, 120000);
+});
+
+describe('2×2 buildings (review finding: only the anchor tile was checked)', () => {
+  it('a 2×2 site that would box in a neighbour of its far tiles is refused', () => {
+    const sim = makeSim('plan-2x2', 32);
+    const m = sim.w.map;
+    for (let y = 4; y <= 12; y++) for (let x = 4; x <= 12; x++) { const j = m.idx(x, y); m.terrain[j] = T.GRASS; m.bld[j] = 0; }
+    // a home at (10,9) whose only open side is (9,9), the far corner of a 2×2 anchored at (8,8)
+    const home = m.idx(10, 9);
+    m.bld[home] = B.HOUSE;
+    for (const [x, y] of [[11, 9], [10, 8], [10, 10]]) m.bld[m.idx(x, y)] = B.HOUSE;
+    // anchored at (8,8) the footprint is (8,8),(9,8),(8,9),(9,9): it covers the home's last open side
+    expect(keepsAccess(sim, m.idx(8, 8))).toBe(true); // the anchor alone looks fine
+    expect(keepsAccessBlock(sim, [m.idx(8, 8), m.idx(9, 8), m.idx(8, 9), m.idx(9, 9)])).toBe(false);
+    // anchored at (6,6) nothing is boxed in
+    expect(keepsAccessBlock(sim, [m.idx(6, 6), m.idx(7, 6), m.idx(6, 7), m.idx(7, 7)])).toBe(true);
+  });
 });

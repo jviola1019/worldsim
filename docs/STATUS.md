@@ -12,9 +12,9 @@ Last verified 2026-11-19 (round 6, final gate):
 | Check | Result |
 |---|---|
 | Typecheck | `tsc` 7.0.2: exit 0 |
-| Unit tests | `npm test` (Vitest 5.1.1): **545/545** (32 files, 0 skipped) |
+| Unit tests | `npm test` (Vitest 5.1.1): **552/552** (32 files, 0 skipped) |
 | Build | `vite build` 8.3.8: exit 0 |
-| E2E | **32/32**, phone and desktop Chromium, production build. Includes the close-up city, aerial blocks, CSP, injected-script and framing checks. |
+| E2E | **33/33**, phone and desktop Chromium, production build. Includes the close-up city, aerial blocks, CSP, injected-script and framing checks. |
 | Design floors | 6/6 device profiles: text ≥ 12 px, touch targets ≥ 44 px, WCAG AA (`tools/viewports.mjs`); 106 captures with 0 violations ([DESIGN-REVIEW.md](DESIGN-REVIEW.md)) |
 | Dependencies | `npm audit`: 0 vulnerabilities; `npm outdated`: none |
 | GitHub Actions | CI runs #26 and #27 green on Node 26 with the pinned actions. The Pages deploy waits for the owner to enable Pages (VALIDATION §R5). |

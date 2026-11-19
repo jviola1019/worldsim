@@ -82,6 +82,27 @@ async function run(label, ctxOpts) {
   await page.waitForTimeout(1500);
   const cityChunks = Number(await page.locator('canvas.canvas').getAttribute('data-city-chunks'));
   check(`${label}: close-up city blocks drawn when zoomed in`, cityChunks > 0, `${cityChunks} close-up chunks on screen`);
+  if (label === 'desktop') {
+    // cache pressure: a big screen just past the close-up threshold wants more chunks than the cache
+    // holds; the layer must settle (nothing pending) with at most 48 chunks drawn
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.mouse.move(960, 540);
+    for (let k = 0; k < 40; k++) {
+      await page.mouse.wheel(0, 120); await page.waitForTimeout(40);
+      if (Number(await page.locator('canvas.canvas').getAttribute('data-city-chunks')) === 0) break;
+    }
+    await page.mouse.wheel(0, -160);
+    await page.waitForTimeout(4000);
+    const attr = async (n) => page.locator('canvas.canvas').getAttribute(n);
+    const r0 = await attr('data-city-redraws');
+    await page.waitForTimeout(2000);
+    const r1 = await attr('data-city-redraws');
+    const drawnBig = Number(await attr('data-city-chunks'));
+    const pendingBig = await attr('data-city-pending');
+    // settled: chunks drawn within the cap, nothing pending, and no chunk redrawn in 2 s of a still view
+    check(`${label}: close-up settles on a 1920x1080 screen (no thrash)`, drawnBig > 0 && drawnBig <= 48 && pendingBig === '0' && r0 !== null && r0 === r1, `${drawnBig} drawn, ${pendingBig} pending, redraws ${r0} -> ${r1}`);
+    await page.setViewportSize({ width: 1280, height: 800 });
+  }
   for (let k = 0; k < 30; k++) { await page.mouse.wheel(0, 300); await page.waitForTimeout(20); }
   // save
   await page.getByLabel('Menu').click();

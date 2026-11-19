@@ -17,7 +17,7 @@ import { CHUNK } from '../sim/context';
 import { Atlas } from './atlas';
 import { Camera, TILE } from './camera';
 import { TerrainLayer, PAD } from './terrainLayer';
-import { CityLayer, DCHUNK, DETAIL, DPAD, detailAlpha } from './cityLayer';
+import { CityLayer, DCHUNK, DETAIL, DPAD, detailAlpha, selectDetailChunks, motionTime } from './cityLayer';
 import { blockContext, blockSignature, composeBlock, streetPoint, type BlockPlan } from './cityBlocks';
 import { OverlayLayer, SCALE as OV_SCALE } from './overlays';
 import { HAZARD } from '../world/tilemap';
@@ -45,7 +45,7 @@ export class Renderer {
   private cityYear = -1;
   /** Close-up chunks drawn in the last frame (0 when the close-up is off); read by the e2e test. */
   cityChunksDrawn = 0;
-  /** Reduce motion (player setting or OS): no walkers or street traffic, sprites animate at most 1 fps. */
+  /** Reduce motion (player setting or OS): no walkers or street traffic; weather, ships, trains and sprites step at most once a second. */
   reduceMotion = false;
   /** Units, settlers, herds and monsters shrink in the close-up so they do not dwarf city blocks. */
   private unitScale = 1;
@@ -119,7 +119,7 @@ export class Renderer {
     if (far) {
       this.layer.updateOverview();
       ctx.drawImage(this.layer.overview, 0, 0, m.w * TILE, m.h * TILE);
-    } else this.drawChunks(close >= 1 ? this.base : this.layer);
+    } else this.drawChunks(close >= 1 ? (k) => (this.city.readyForMapChunk(k) ? this.base : this.layer) : () => this.layer);
     if (close > 0) this.drawCity(close);
     else this.cityChunksDrawn = 0;
     this.canvas.dataset.cityChunks = String(this.cityChunksDrawn);
@@ -139,7 +139,7 @@ export class Renderer {
         this.drawHerds(vis);
         this.drawBands(vis);
       }
-      if (!this.reduceMotion) this.drawTraffic(vis, tilePx);
+      this.drawTraffic(vis, tilePx);
       this.drawAgents(vis);
       this.drawArmies(vis, tilePx);
       this.drawMonsters(vis);
@@ -170,14 +170,16 @@ export class Renderer {
       for (let cx = Math.floor(tx0 / DCHUNK); cx <= Math.min(this.city.cx - 1, Math.floor(tx1 / DCHUNK)); cx++) wanted.push(cy * this.city.cx + cx);
     const ccx = cam.x / (DCHUNK * TILE), ccy = cam.y / (DCHUNK * TILE);
     const d2 = (k: number) => ((k % this.city.cx) - ccx) ** 2 + (Math.floor(k / this.city.cx) - ccy) ** 2;
-    this.city.refresh([...wanted].sort((a, b) => d2(a) - d2(b)), 2);
+    // only the nearest chunks that hold city blocks and fit the cache: no thrash, bounded canvases
+    const shown = selectDetailChunks([...wanted].sort((a, b) => d2(a) - d2(b)), (k) => this.city.isEmpty(k), CityLayer.CAP);
+    this.city.refresh(shown, 2);
     ctx.save();
     ctx.globalAlpha = alpha;
     const pad = DPAD / DETAIL;
-    let drawn = 0;
-    for (const k of wanted) {
+    let drawn = 0, pending = 0;
+    for (const k of shown) {
       const c = this.city.get(k);
-      if (!c) continue; // not drawn yet: the normal map shows through
+      if (!c) { pending++; continue; } // not drawn yet: the map with its buildings shows (drawChunks)
       drawn++;
       const x = (k % this.city.cx) * DCHUNK * TILE;
       const y = Math.floor(k / this.city.cx) * DCHUNK * TILE;
@@ -185,9 +187,12 @@ export class Renderer {
     }
     ctx.restore();
     this.cityChunksDrawn = drawn;
+    this.canvas.dataset.cityPending = String(pending);
+    this.canvas.dataset.cityRedraws = String(this.city.redraws);
   }
 
-  private drawChunks(layer: TerrainLayer = this.layer): void {
+  /** `layerFor(k)`: which map layer draws map chunk k (the base without city buildings only where the close-up is ready). */
+  private drawChunks(layerFor: (k: number) => TerrainLayer = () => this.layer): void {
     const { ctx, cam } = this;
     const m = this.sim.w.map;
     const [tx0, ty0, tx1, ty1] = cam.visibleTiles(m.w, m.h, 1);
@@ -202,8 +207,11 @@ export class Renderer {
     const ccx = cam.x / (CHUNK * TILE);
     const ccy = cam.y / (CHUNK * TILE);
     const sorted = [...wanted].sort((a, b) => ((a % cxN) - ccx) ** 2 + (Math.floor(a / cxN) - ccy) ** 2 - (((b % cxN) - ccx) ** 2 + (Math.floor(b / cxN) - ccy) ** 2));
-    layer.refresh(sorted, 4);
+    const onBase = sorted.filter((k) => layerFor(k) === this.base), onLayer = sorted.filter((k) => layerFor(k) !== this.base);
+    if (onLayer.length) this.layer.refresh(onLayer, 4);
+    if (onBase.length) this.base.refresh(onBase, 4);
     for (const k of wanted) {
+      const layer = layerFor(k);
       const c = layer.get(k);
       const x = (k % cxN) * CHUNK * TILE;
       const y = Math.floor(k / cxN) * CHUNK * TILE;
@@ -427,6 +435,7 @@ export class Renderer {
   /** Vehicles drawn from real infrastructure: trains on built railways, cars on highways, ships on sea routes, aircraft between airports. */
   private drawTraffic(vis: [number, number, number, number], tilePx: number): void {
     if (tilePx < 4) return;
+    const time = motionTime(this.time, this.reduceMotion); // under reduce motion: steps once a second
     const { ctx, atlas } = this;
     const w = this.sim.w;
     const m = w.map;
@@ -436,7 +445,7 @@ export class Renderer {
       const civ = w.civs.get(r.civA);
       const ships = Math.min(3, 1 + Math.floor(Math.log10(r.volume + 1) / 2));
       for (let k = 0; k < ships; k++) {
-        const t = ((this.time * 0.6 + k * 17 + r.id * 3) % r.path.length + r.path.length) % r.path.length;
+        const t = ((time * 0.6 + k * 17 + r.id * 3) % r.path.length + r.path.length) % r.path.length;
         const i = r.path[Math.floor(t)];
         const x = m.xOf(i);
         const y = m.yOf(i);
@@ -454,18 +463,18 @@ export class Renderer {
       if (!civ) continue;
       if (civ.caps.railTier >= 1 && s.bld[B.STATION]) {
         const train = vehicleSprite('rail', civ.caps, eraToTier(civ.era), s.id) ?? 'veh.train_steam';
-        const t = this.time * 0.8 + s.id;
+        const t = time * 0.8 + s.id;
         const dx = Math.cos(t * 0.3) * s.radius;
         const ri = m.idx(Math.max(0, Math.min(m.w - 1, Math.round(s.x + dx))), s.y);
         if (m.railTier(ri)) atlas.draw(ctx, train, (s.x + dx) * TILE, s.y * TILE + 5, this.frameIdx(4), civ.color, Math.sin(t * 0.3) > 0);
       }
       // street traffic of the era: porters and carts, horses and buggies, trams, cars and buses, hovercars
-      if (civ.caps.roadTier >= 1 && s.pop > 2000) {
+      if (civ.caps.roadTier >= 1 && s.pop > 2000 && !this.reduceMotion) {
         const cars = Math.min(6, Math.floor(Math.log10(s.pop)));
         const tier = eraToTier(civ.era);
         const style = housingStyleForEthos(civ.ethos?.key);
         for (let k = 0; k < cars; k++) {
-          const t = this.time * 0.5 + k * 1.7 + s.id;
+          const t = time * 0.5 + k * 1.7 + s.id;
           const x = s.x + Math.cos(t) * (1 + (k % 3));
           const y = s.y + Math.sin(t * 0.7) * (1 + (k % 2));
           const i = m.idx(Math.max(0, Math.min(m.w - 1, Math.round(x))), Math.max(0, Math.min(m.h - 1, Math.round(y))));
@@ -479,7 +488,7 @@ export class Renderer {
           for (let q = 0; q < 3; q++) {
             const hh = hash3(s.id, k * 3 + q, 31);
             const plan = this.planAt(i);
-            const p = plan && streetPoint(plan, hh, this.time * 0.05 * (1 + (hh % 2)) + (hh % 89) / 89, true);
+            const p = plan && streetPoint(plan, hh, time * 0.05 * (1 + (hh % 2)) + (hh % 89) / 89, true);
             if (!p) continue;
             const tx = m.xOf(i), ty = m.yOf(i);
             this.drawScaled(veh, tx * TILE + p.x / DETAIL, ty * TILE + (p.y + 1) / DETAIL, this.frameIdx(4, k), civ.color, p.horiz ? (hh & 1) === 1 : false, 1 / 8);
@@ -487,13 +496,13 @@ export class Renderer {
         }
       }
       if (civ.caps.airTier >= 2 && s.bld[B.AIRPORT]) {
-        const t = (this.time * 0.05 + s.id * 0.37) % 1;
+        const t = (time * 0.05 + s.id * 0.37) % 1;
         const x = s.x + (t - 0.5) * 40;
         const y = s.y - 6 + Math.sin(t * 6) * 2;
         atlas.draw(ctx, vehicleSprite('air', civ.caps, eraToTier(civ.era), s.id) ?? 'veh.biplane', x * TILE, y * TILE, this.frameIdx(6), civ.color);
       }
       if (civ.caps.spaceTier >= 1 && s.bld[B.SPACEPORT]) {
-        const cycle = (this.time * 0.1 + s.id) % 6;
+        const cycle = (time * 0.1 + s.id) % 6;
         if (cycle < 1.5) atlas.draw(ctx, 'veh.rocket', (s.x + 1) * TILE, s.y * TILE - cycle * 60, this.frameIdx(8), civ.color);
       }
     }
@@ -511,7 +520,7 @@ export class Renderer {
       const yBase = y0 + (hash3(k, 2, 7) % Math.max(1, y1 - y0 + 1));
       const cell = ((yBase / c.cellSize) | 0) * c.cellsX + ((x / c.cellSize) | 0);
       if ((c.rain[cell] ?? 0) < 0.45) continue;
-      const fall = ((this.time * 30 + hash3(k, 3, 7)) % 24) - 12;
+      const fall = ((motionTime(this.time, this.reduceMotion) * 30 + hash3(k, 3, 7)) % 24) - 12;
       const i = m.idx(Math.min(m.w - 1, x), Math.min(m.h - 1, yBase));
       atlas.draw(ctx, m.temp[i] < 0 ? 'fx.snow' : 'fx.rain', x * TILE + (k % 8), yBase * TILE + fall);
     }
