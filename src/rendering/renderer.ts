@@ -45,6 +45,10 @@ export class Renderer {
   private cityYear = -1;
   /** Close-up chunks drawn in the last frame (0 when the close-up is off); read by the e2e test. */
   cityChunksDrawn = 0;
+  /** Reduce motion (player setting or OS): no walkers or street traffic, sprites animate at most 1 fps. */
+  reduceMotion = false;
+  /** Units, settlers, herds and monsters shrink in the close-up so they do not dwarf city blocks. */
+  private unitScale = 1;
   overlay: OverlayLayer;
   ctx: CanvasRenderingContext2D;
   dpr = 1;
@@ -111,6 +115,7 @@ export class Renderer {
     const tilePx = cam.zoom * TILE;
     const far = tilePx < 2.6;
     const close = far ? 0 : detailAlpha(tilePx);
+    this.unitScale = tilePx >= 20 ? 0.5 : 1;
     if (far) {
       this.layer.updateOverview();
       ctx.drawImage(this.layer.overview, 0, 0, m.w * TILE, m.h * TILE);
@@ -130,11 +135,11 @@ export class Renderer {
     if (!far) {
       this.drawAnimatedTiles(vis);
       if (tilePx >= 4.5) {
-        this.drawAmbient(vis, tilePx);
+        if (!this.reduceMotion) this.drawAmbient(vis, tilePx);
         this.drawHerds(vis);
         this.drawBands(vis);
       }
-      this.drawTraffic(vis, tilePx);
+      if (!this.reduceMotion) this.drawTraffic(vis, tilePx);
       this.drawAgents(vis);
       this.drawArmies(vis, tilePx);
       this.drawMonsters(vis);
@@ -214,7 +219,8 @@ export class Renderer {
   }
 
   private frameIdx(fps = 4, seed = 0): number {
-    return Math.floor(this.time * fps + seed);
+    // reduced motion: animated sprites change at most once a second
+    return Math.floor(this.time * (this.reduceMotion ? Math.min(1, fps) : fps) + seed);
   }
 
   private drawAnimatedTiles(vis: [number, number, number, number]): void {
@@ -329,7 +335,7 @@ export class Renderer {
       for (let k = 0; k < shown; k++) {
         const ox = ((hash3(h.id, k, 1) % 7) - 3) * 1.5;
         const oy = ((hash3(h.id, k, 2) % 5) - 2) * 1.2;
-        atlas.draw(ctx, sp.sprite, h.x * TILE + ox, h.y * TILE + oy, this.frameIdx(4, k + h.id), undefined, h.tx < h.x);
+        atlas.draw(ctx, sp.sprite, h.x * TILE + ox, h.y * TILE + oy, this.frameIdx(4, k + h.id), undefined, h.tx < h.x, false, this.unitScale);
       }
     }
   }
@@ -346,7 +352,7 @@ export class Renderer {
       for (let k = 0; k < n; k++) {
         const ox = ((hash3(b.id, k, 1) % 9) - 4) * 1.6;
         const oy = ((hash3(b.id, k, 2) % 7) - 3) * 1.2;
-        atlas.draw(ctx, sprite, b.x * TILE + ox, b.y * TILE + oy, this.frameIdx(4, k), civ?.color, b.tx < b.x);
+        atlas.draw(ctx, sprite, b.x * TILE + ox, b.y * TILE + oy, this.frameIdx(4, k), civ?.color, b.tx < b.x, false, this.unitScale);
       }
     }
   }
@@ -362,7 +368,7 @@ export class Renderer {
       const id = onWater ? (civ && civ.caps.navalTier >= 5 ? 'veh.steamship' : 'veh.caravel') : a.kind === 'refugee' || a.kind === 'migrant' ? 'unit.refugee' : a.kind === 'colonist' ? 'unit.settler' : `unit.${a.kind}`;
       const next = a.path[Math.min(a.path.length - 1, a.pathPos + 1)];
       const flip = next !== undefined && w.map.xOf(next) + 0.5 < a.x;
-      atlas.draw(ctx, atlas.has(id) ? id : 'unit.settler', a.x * TILE, a.y * TILE, this.frameIdx(5, a.id), civ?.color, flip);
+      atlas.draw(ctx, atlas.has(id) ? id : 'unit.settler', a.x * TILE, a.y * TILE, this.frameIdx(5, a.id), civ?.color, flip, false, this.unitScale);
     }
   }
 
@@ -383,7 +389,7 @@ export class Renderer {
       if (onWater) {
         const naval = civ?.caps.navalTier ?? 2;
         const ship = naval >= 7 ? 'veh.droneship' : naval >= 6 ? 'veh.battleship' : naval >= 5 ? 'veh.ironclad' : naval >= 4 ? 'veh.galleon' : naval >= 3 ? 'veh.caravel' : 'veh.galley';
-        atlas.draw(ctx, ship, a.x * TILE, a.y * TILE, this.frameIdx(3), civ?.color, flip);
+        atlas.draw(ctx, ship, a.x * TILE, a.y * TILE, this.frameIdx(3), civ?.color, flip, false, this.unitScale);
         continue;
       }
       const tier = Math.min(12, a.tier);
@@ -392,7 +398,7 @@ export class Renderer {
       for (let k = 0; k < n; k++) {
         const col = k % 4;
         const row = Math.floor(k / 4);
-        atlas.draw(ctx, unit, a.x * TILE + (col - 1.5) * 4 + (row % 2), a.y * TILE + row * 3 - 3, this.frameIdx(a.state === 'battle' ? 8 : 5, k), civ?.color, flip);
+        atlas.draw(ctx, unit, a.x * TILE + (col - 1.5) * 4 + (row % 2), a.y * TILE + row * 3 - 3, this.frameIdx(a.state === 'battle' ? 8 : 5, k), civ?.color, flip, false, this.unitScale);
       }
       if (civ) {
         // banner pole + the nation's own flag (6×4 art px at world scale)
@@ -412,7 +418,7 @@ export class Renderer {
     for (const mo of this.sim.w.monsters.values()) {
       if (mo.x < x0 || mo.x > x1 || mo.y < y0 || mo.y > y1) continue;
       const def = MONSTERS.find((d) => d.kind === mo.kind);
-      if (def) atlas.draw(ctx, def.sprite, mo.x * TILE, mo.y * TILE, this.frameIdx(4, mo.id), undefined, mo.tx < mo.x);
+      if (def) atlas.draw(ctx, def.sprite, mo.x * TILE, mo.y * TILE, this.frameIdx(4, mo.id), undefined, mo.tx < mo.x, false, this.unitScale);
     }
   }
 

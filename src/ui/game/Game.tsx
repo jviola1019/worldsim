@@ -180,6 +180,15 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
     if (renderer.current) renderer.current.showLabels = prefs.labels;
   }, [prefs.labels]);
 
+  // reduce motion (setting or OS): the map's ambient animation slows to a crawl, people and traffic stop
+  useEffect(() => {
+    const mq = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+    const apply = () => { if (renderer.current) renderer.current.reduceMotion = prefs.reduceMotion || !!mq?.matches; };
+    apply();
+    mq?.addEventListener?.('change', apply);
+    return () => mq?.removeEventListener?.('change', apply);
+  }, [prefs.reduceMotion, sim]);
+
   // ticker auto-hide
   useEffect(() => {
     if (!ticker) return;

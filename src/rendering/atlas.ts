@@ -85,7 +85,16 @@ export class Atlas {
   }
 
   /** Draw a sprite frame with its anchor at (x, y) in the current transform. */
-  draw(ctx: CanvasRenderingContext2D, id: string, x: number, y: number, frame = 0, teamColor?: string, flip = false, muted = false): void {
+  draw(ctx: CanvasRenderingContext2D, id: string, x: number, y: number, frame = 0, teamColor?: string, flip = false, muted = false, scale = 1): void {
+    if (scale !== 1) {
+      // scaled about the anchor point (units at street scale in the close-up)
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      this.draw(ctx, id, 0, 0, frame, teamColor, flip, muted);
+      ctx.restore();
+      return;
+    }
     const s = this.get(id, teamColor, muted);
     if (!s) return;
     const f = frame % s.frames;

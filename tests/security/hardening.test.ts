@@ -39,6 +39,11 @@ describe('stored preferences are validated (threats 16, 31, 36)', () => {
     expect(Object.getPrototypeOf(p)).toBe(Object.prototype);
     expect(p.sound).toBe(false);
   });
+  it('the reduce-motion preference is a boolean, off by default', () => {
+    expect(DEFAULT_PREFS.reduceMotion).toBe(false);
+    expect(sanitizePrefs({ reduceMotion: true }).reduceMotion).toBe(true);
+    expect(sanitizePrefs({ reduceMotion: 'yes' }).reduceMotion).toBe(false);
+  });
   it('arrays, null and primitives fall back to defaults', () => {
     for (const raw of [null, [], 42, 'x', undefined]) expect(sanitizePrefs(raw)).toEqual(DEFAULT_PREFS);
   });

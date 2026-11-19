@@ -20,6 +20,14 @@ export function App() {
   const [sim, setSim] = useState<Simulation | null>(null);
   const [busy, setBusy] = useState('');
   const [prefs, setPrefs] = useState<Prefs>(loadPrefs());
+  // reduce motion: the player's setting or the operating system's
+  useEffect(() => {
+    const mq = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+    const apply = () => document.documentElement.classList.toggle('reduce-motion', prefs.reduceMotion || !!mq?.matches);
+    apply();
+    mq?.addEventListener?.('change', apply);
+    return () => mq?.removeEventListener?.('change', apply);
+  }, [prefs.reduceMotion]);
   const [storeReady, setStoreReady] = useState(false);
 
   useEffect(() => {

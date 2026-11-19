@@ -4,11 +4,13 @@ export interface Prefs {
   autosaveMinutes: number;
   tutorialSeen: boolean;
   newspaper: boolean;
+  /** Reduce motion: no UI transitions, map ambience frozen (also follows the OS setting). */
+  reduceMotion: boolean;
 }
 
 const KEY = 'epoch-prefs';
 
-export const DEFAULT_PREFS: Readonly<Prefs> = { sound: true, labels: true, autosaveMinutes: 3, tutorialSeen: false, newspaper: true };
+export const DEFAULT_PREFS: Readonly<Prefs> = { sound: true, labels: true, autosaveMinutes: 3, tutorialSeen: false, newspaper: true, reduceMotion: false };
 export const AUTOSAVE_CHOICES = [0, 1, 3, 10] as const;
 
 /**
@@ -20,7 +22,7 @@ export function sanitizePrefs(raw: unknown): Prefs {
   const p: Prefs = { ...DEFAULT_PREFS };
   if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return p;
   const r = raw as Record<string, unknown>;
-  for (const k of ['sound', 'labels', 'tutorialSeen', 'newspaper'] as const) {
+  for (const k of ['sound', 'labels', 'tutorialSeen', 'newspaper', 'reduceMotion'] as const) {
     if (Object.prototype.hasOwnProperty.call(r, k) && typeof r[k] === 'boolean') p[k] = r[k] as boolean;
   }
   const m = r.autosaveMinutes;
@@ -66,6 +68,10 @@ export function SettingsScreen({ back, prefs, setPrefs }: { back: () => void; pr
           <label class="toggle">
             Settlement & nation names on the map
             <input type="checkbox" checked={prefs.labels} onChange={(e) => update({ labels: (e.target as HTMLInputElement).checked })} />
+          </label>
+          <label class="toggle">
+            Reduce motion
+            <input type="checkbox" checked={prefs.reduceMotion} onChange={(e) => update({ reduceMotion: (e.target as HTMLInputElement).checked })} />
           </label>
           <label class="toggle">
             Headlines for major events

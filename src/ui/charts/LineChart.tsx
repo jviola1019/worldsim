@@ -66,7 +66,7 @@ export function LineChart({ series, markers = [], unit = '', height = 170, forma
     ctx.strokeStyle = 'rgba(169,178,198,0.15)';
     ctx.lineWidth = 1;
     ctx.fillStyle = '#a9b2c6';
-    ctx.font = '11px "Pixelify Sans", sans-serif';
+    ctx.font = '12px "Pixelify Sans", sans-serif';
     ctx.textAlign = 'right';
     for (let k = 0; k <= 3; k++) {
       const v = vmin + ((vmax - vmin) * k) / 3;
@@ -103,14 +103,18 @@ export function LineChart({ series, markers = [], unit = '', height = 170, forma
       ctx.stroke();
       ctx.setLineDash([]);
       // direct end label (text in ink, swatch carries color)
-      if (all.length <= 4) {
+      // (a single series is already named by the chart's heading; several get labels fitted to the space)
+      if (all.length > 1 && all.length <= 4) {
         const lx = X(s.years[s.years.length - 1]);
         const ly = Y(s.values[s.values.length - 1]);
         ctx.fillStyle = s.color;
         ctx.fillRect(lx + 3, ly - 3, 6, 6);
         ctx.fillStyle = '#ece2c8';
         ctx.textAlign = 'left';
-        ctx.fillText(s.label.slice(0, 7), lx + 11, ly + 4);
+        const room = W - (lx + 11) - 2;
+        let label = s.label;
+        while (label.length > 1 && ctx.measureText(label).width > room) label = label.slice(0, -2) + '…';
+        ctx.fillText(label, lx + 11, ly + 4);
       }
     });
     // crosshair + tooltip

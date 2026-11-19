@@ -61,6 +61,9 @@ function measure(touch) {
     }
     if (touch && el.matches('button, a[href], input, select, [role=tab], [role=button]')) {
       const r = el.getBoundingClientRect();
+      // a checkbox inside a label: the whole label is the target (WCAG 2.5.8)
+      const lab = el.closest('label');
+      if (lab && el.matches('input') && lab.getBoundingClientRect().height >= 44) continue;
       if (r.width < 44 || r.height < 44) smallTargets.push(`${sel(el)} ${Math.round(r.width)}x${Math.round(r.height)} "${(el.getAttribute('aria-label') ?? el.textContent ?? '').trim().slice(0, 24)}"`);
     }
   }

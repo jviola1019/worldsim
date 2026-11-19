@@ -3,6 +3,8 @@ import { App } from './ui/App';
 import { framedCrossOrigin } from './security/framing';
 import '@fontsource/pixelify-sans/400.css';
 import '@fontsource/pixelify-sans/600.css';
+import '@fontsource/atkinson-hyperlegible/400.css';
+import '@fontsource/atkinson-hyperlegible/700.css';
 import './ui/styles.css';
 
 const root = document.getElementById('app')!;
