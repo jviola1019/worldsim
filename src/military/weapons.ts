@@ -28,7 +28,8 @@ import { logEvent } from '../history/events';
 import { addPressure, worldEndings } from '../civilizations/endings';
 import { ensureRelation } from '../civilizations/knowledge';
 import { removeBuilding } from '../civilizations/urban';
-import { markTile, addFx } from '../sim/context';
+import { markTile } from '../sim/context';
+import { emitFx, STATE_FX } from '../sim/conceptFx';
 import { infect } from '../population/disease';
 import { makeName } from '../culture/language';
 import { phonOfCulture } from '../population/persons';
@@ -250,7 +251,7 @@ export function warOperations(sim: Sim, civ: Civ, war: War, enemies: number[], k
   if (m.weapons.includes('orbital') && city && rng.chance(0.2)) {
     const dead = civilianDeaths(sim, city, 0.01, 'orbital strike', `Orbital strike on ${city.name}`);
     wreck(sim, city, 2);
-    addFx(sim, 'fx.explosion', city.x, city.y, 2);
+    emitFx(sim, STATE_FX.orbitalStrike, city.x, city.y);
     logEvent(sim, { type: 'orbital_strike', cat: 'war', title: `Projectiles from ${civ.adjective} orbital platforms struck ${city.name}`, text: `About ${Math.round(dead).toLocaleString('en-US')} died.`, civs: [civ.id, city.civId], settlements: [city.id], x: city.x, y: city.y, importance: 3, causes: [{ label: war.name, weight: 1 }] });
   }
   // EMP: a nuclear burst high above an electrified enemy (no blast deaths; breaks the taboo)

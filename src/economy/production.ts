@@ -11,6 +11,7 @@
 import { mediaServiceMult } from '../media/media';
 import { bldTiles } from '../civilizations/territory';
 import type { Sim } from '../sim/context';
+import { setVeg, setPollution } from '../sim/context';
 import type { Civ, Settlement } from '../sim/types';
 import { B } from '../civilizations/buildingTypes';
 import { BUILDINGS, SECTOR } from '../civilizations/buildings';
@@ -557,7 +558,7 @@ function degradeAround(sim: Sim, x: number, y: number, r: number, intensity: num
   const rng = sim.rng;
   for (let k = 0; k < 3; k++) {
     const i = m.idx(clamp(Math.round(x + rng.range(-r, r)), 0, m.w - 1), clamp(Math.round(y + rng.range(-r, r)), 0, m.h - 1));
-    if (m.isLand(i)) m.veg[i] = Math.max(0, m.veg[i] - Math.round(6 * intensity));
+    if (m.isLand(i)) setVeg(sim, i, Math.max(0, m.veg[i] - Math.round(6 * intensity)));
   }
 }
 
@@ -648,9 +649,9 @@ function addPollution(sim: Sim, s: Settlement, type: number, factor: number): vo
   if (amount <= 0) return;
   // pollute the building tiles of this type (sampled) and the center
   const i = m.idx(s.x, s.y);
-  m.pollution[i] = Math.min(255, m.pollution[i] + amount * 0.3);
+  setPollution(sim, i, Math.min(255, m.pollution[i] + amount * 0.3));
   const tiles = bldTiles(sim, s.id);
-  for (const t of tiles) if (m.bld[t] === type) m.pollution[t] = Math.min(255, m.pollution[t] + amount);
+  for (const t of tiles) if (m.bld[t] === type) setPollution(sim, t, Math.min(255, m.pollution[t] + amount));
 }
 
 function produceEnergy(sim: Sim, s: Settlement, civ: Civ, staff: (t: number, l: number) => number, automation: number, sites: Sites, access: number): void {
@@ -729,7 +730,7 @@ export function extractDeposits(sim: Sim, s: Settlement, civ: Civ, tiles: number
     }
     give(civ, def.good, amount);
     s.output[def.good] += amount * 12 * 0.1;
-    if (d === Deposit.COAL || d === Deposit.URANIUM) m.pollution[i] = Math.min(255, m.pollution[i] + 0.15);
+    if (d === Deposit.COAL || d === Deposit.URANIUM) setPollution(sim, i, Math.min(255, m.pollution[i] + 0.15));
   }
 }
 

@@ -33,7 +33,8 @@ import { HAZARD } from '../world/tilemap';
 import { removePeople } from '../population/demography';
 import { flow } from '../population/ledger';
 import { removeBuilding } from '../civilizations/urban';
-import { addFx, markTile } from '../sim/context';
+import { markTile } from '../sim/context';
+import { emitFx, STATE_FX } from '../sim/conceptFx';
 import { logEvent } from '../history/events';
 import { ensureRelation, getRelation } from '../civilizations/knowledge';
 import { addPressure, logCatastrophe, worldEndings } from '../civilizations/endings';
@@ -297,7 +298,7 @@ export function nuclearStrike(sim: Sim, s: Settlement, byCiv = 0): number {
   e.lastNuclearUse = sim.year;
   logCatastrophe(sim, 'nuclear_strike', s.x, s.y);
   s.unrest = 1;
-  addFx(sim, 'fx.nuke', s.x, s.y, 4);
+  emitFx(sim, STATE_FX.nuclearBlast, s.x, s.y);
   void byCiv;
   return dead;
 }

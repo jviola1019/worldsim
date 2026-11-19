@@ -15,6 +15,7 @@
  * Religions survive the civilizations that founded them.
  */
 import type { Sim } from '../sim/context';
+import { markTile } from '../sim/context';
 import type { Civ, Religion, Settlement } from '../sim/types';
 import { clamp01 } from '../core/math';
 import { makeName, religionName } from './language';
@@ -108,6 +109,7 @@ export function foundReligion(sim: Sim, s: Settlement, civ: Civ, founderId = 0, 
   }, taken);
   w.religions.set(r.id, r);
   w.map.hazard[r.holySite] |= HAZARD.SACRED;
+  markTile(sim, r.holySite);
   const fp = w.persons.get(founder);
   if (fp) fp.religionId = r.id;
   return r;

@@ -9,7 +9,8 @@ import { removeBuilding } from '../civilizations/urban';
 import { record, residents } from '../population/ledger';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement, SpeciesKey } from '../sim/types';
-import { markTile, markOverlay, addFx } from '../sim/context';
+import { markTile, markOverlay } from '../sim/context';
+import { withPowerFx } from '../sim/conceptFx';
 import { T, TERRAIN, isWaterTerrain, type TerrainKey } from '../world/terrain';
 import { Deposit, DEPOSITS, type DepositKey } from '../world/resources';
 import { biomeFor, computeHydrology, vegCapacity } from '../world/worldgen';
@@ -205,7 +206,6 @@ const disaster = (kind: string, label: string, icon: string, r: number): PowerDe
       const d = { id: ++sim.w.ids.disease, name: 'Divine Plague', r0: 3.5, lethality: 0.12, duration: 1.2, immunity: 600, origin: s.id, emerged: sim.year, zoonotic: false, totalDeaths: 0 };
       sim.w.diseases.set(d.id, d);
       infect(sim, s, d, 0.02);
-      addFx(sim, 'fx.plague', s.x, s.y, 3);
       logEvent(sim, { type: 'god_plague', cat: 'god', title: `A divine plague descended on ${s.name}`, settlements: [s.id], civs: [s.civId], x: s.x, y: s.y, importance: 3 });
       return null;
     }
@@ -227,7 +227,6 @@ const horror = (kind: HorrorKind, label: string, icon: string, desc: string): Po
     const s = settlementAt(sim, x, y);
     if (!s) return 'Tap a settlement';
     unleashHorror(sim, s, kind);
-    addFx(sim, kind === 'blight' ? 'fx.plague' : 'fx.fire', s.x, s.y, 2);
     logEvent(sim, { type: 'god_horror', cat: 'god', title: kind === 'zombie' ? `The dead rose in ${s.name}` : kind === 'ghoul' ? `Ghouls crept out of the dark around ${s.name}` : `A creeping blight appeared in the fields of ${s.name}`, civs: [s.civId], settlements: [s.id], x: s.x, y: s.y, importance: 4, causes: [{ label: 'Divine intervention', weight: 1 }] });
     return null;
   },
@@ -429,7 +428,6 @@ export const POWERS: PowerDef[] = [
       addPeople(sim, s, blessed, s.cultures[0]?.id ?? 0, s.religions[0]?.id ?? 0);
       record(sim, s.civId, 'divine', blessed);
       s.prosperity += 0.2;
-      addFx(sim, 'fx.sparkle', s.x, s.y, 2);
       return null;
     },
   },
@@ -461,7 +459,6 @@ export const POWERS: PowerDef[] = [
     apply: (sim, x, y) => {
       const s = settlementAt(sim, x, y);
       if (!s) return 'Tap a settlement';
-      addFx(sim, 'fx.explosion', s.x, s.y, 2);
       destroySettlement(sim, s, 'divine wrath');
       return null;
     },
@@ -473,7 +470,6 @@ export const POWERS: PowerDef[] = [
       const s = settlementAt(sim, x, y);
       if (!s) return 'Tap a settlement';
       godFoundReligion(sim, s);
-      addFx(sim, 'fx.sparkle', s.x, s.y, 2);
       return null;
     },
   },
@@ -492,13 +488,13 @@ export const POWERS: PowerDef[] = [
     apply: (sim, x, y) => {
       const m = sim.w.map;
       m.hazard[m.idx(x, y)] |= HAZARD.SACRED;
+      markTile(sim, m.idx(x, y));
       const s = settlementAt(sim, x, y, 6);
       if (s) {
         const rid = s.religions.find((q) => q.id)?.id;
         if (rid) godSpreadReligion(sim, s, rid, 0.2);
         s.unrest = Math.max(0, s.unrest - 0.2);
       }
-      addFx(sim, 'fx.sparkle', x, y, 2);
       return null;
     },
   },
@@ -533,7 +529,6 @@ export const POWERS: PowerDef[] = [
       const target = civ.researchTarget || TECHS.filter((t) => techAvailable(sim, civ, t)).sort((a, b) => a.cost - b.cost)[0]?.id;
       if (!target) return 'Nothing left to learn';
       grantTech(sim, civ, target, 'god');
-      addFx(sim, 'fx.book', x, y, 2);
       return null;
     },
   },
@@ -544,7 +539,6 @@ export const POWERS: PowerDef[] = [
       const t = civ?.researchTarget ? TECHS.find((q) => q.id === civ.researchTarget) : undefined;
       if (!civ || !t) return 'Tap a nation that is researching';
       techState(civ, t.id).progress += effCost(t) * 0.5;
-      addFx(sim, 'fx.sparkle', x, y, 2);
       return null;
     },
   },
@@ -585,8 +579,8 @@ export const POWERS: PowerDef[] = [
       const t = sim.rng.pick(opts.length ? opts : TECHS.filter((q) => !civ.techs[q.id]?.known));
       if (!t) return 'Nothing left to learn';
       sim.w.map.hazard[sim.w.map.idx(x, y)] |= HAZARD.ANOMALY;
+      markTile(sim, sim.w.map.idx(x, y));
       grantTech(sim, civ, t.id, 'god');
-      addFx(sim, 'fx.anomaly', x, y, 4);
       return null;
     },
   },
@@ -659,7 +653,6 @@ export const POWERS: PowerDef[] = [
       civ.legitimacy = Math.min(1, civ.legitimacy + 0.3);
       const r = sim.w.persons.get(civ.rulerId);
       if (r && !r.traits.includes('charismatic')) r.traits.push('charismatic');
-      addFx(sim, 'fx.sparkle', x, y, 2);
       return null;
     },
   },
@@ -707,7 +700,6 @@ export const POWERS: PowerDef[] = [
     id: 'dis_lightning', cat: 'disaster', label: 'Lightning', icon: 'ico.lightning', kind: 'tap', destructive: true, desc: 'Strike with lightning; dry land may catch fire.',
     apply: (sim, x, y) => {
       ignite(sim, sim.w.map.idx(x, y), 220);
-      addFx(sim, 'fx.lightning', x, y, 0.6);
       return null;
     },
   },
@@ -841,8 +833,6 @@ export const POWERS: PowerDef[] = [
         if (opts.length) grantTech(sim, civ, sim.rng.pick(opts).id, 'god');
       }
       civ.stability = Math.max(0, civ.stability - 0.2);
-      addFx(sim, 'fx.ufo', x, y - 2, 4);
-      addFx(sim, 'fx.alien_beam', x, y, 3);
       logEvent(sim, { type: 'god_alien', cat: 'god', title: `Visitors from the stars made contact with ${civ.name}`, civs: [civ.id], x, y, importance: 4 });
       return null;
     },
@@ -903,7 +893,8 @@ export function applyPower(sim: Sim, id: string, x: number, y: number, r: number
   if (!p || !sim.w.map.inBounds(x, y)) return null;
   // observer (Realistic) worlds have no god powers at all, and never fictional threats
   if (sim.w.meta.settings.observer) return 'Observer mode: history runs on its own';
-  const res = p.apply(sim, x, y, r, ctx);
+  // one tap, one effect: the registry draws it (sim/conceptFx.ts); events the power logs stay quiet
+  const res = withPowerFx(sim, id, x, y, r, () => p.apply(sim, x, y, r, ctx), (out) => out === null);
   if (res === null) {
     sim.w.interventions.push({ tick: sim.w.tick, power: id, x, y, r, target: ctx.selectedCiv });
     if (sim.w.interventions.length > 5000) sim.w.interventions.splice(0, 1000);

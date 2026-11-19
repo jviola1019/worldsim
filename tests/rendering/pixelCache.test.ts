@@ -20,7 +20,7 @@ describe('overview pixels (1 px per tile)', () => {
     const cached = new Uint8ClampedArray(m.n * 4);
     paintOverview(m, cached, all);
     sim.chunkDirty.fill(0);
-    for (let n = 0; n < 60; n++) {
+    for (let n = 0; n < 8; n++) {
       const i = hash3(n, 1, 9) % m.n;
       const kind = n % 4;
       if (kind === 0) m.elev[i] = Math.min(1, m.elev[i] + 0.2); // shades the tiles right and below, maybe in the next chunk

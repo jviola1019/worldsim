@@ -21,7 +21,8 @@
  */
 import { flow } from '../population/ledger';
 import type { Sim } from '../sim/context';
-import { addFx, markTile } from '../sim/context';
+import { markTile, setVeg, setPollution } from '../sim/context';
+import { emitFx, DISASTER_FX } from '../sim/conceptFx';
 import { BALANCE } from '../config/balance';
 import { clamp, clamp01, DX4, DY4 } from '../core/math';
 import { T, isWaterTerrain } from './terrain';
@@ -92,7 +93,7 @@ export function environmentTick(sim: Sim): void {
     const x = i % m.w;
     const y = (i / m.w) | 0;
     // burn fuel
-    m.veg[i] = Math.max(0, m.veg[i] - 6);
+    setVeg(sim, i, Math.max(0, m.veg[i] - 6));
     m.fire[i] = Math.max(0, m.fire[i] - (m.veg[i] > 20 ? 2 : 12));
     if (m.bld[i] && m.bld[i] !== B.RUINS && m.bld[i] !== B.CRATER && rng.chance(0.02)) {
       removeBuilding(sim, i, true);
@@ -278,7 +279,7 @@ export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r:
     deaths += dead;
     s.unrest = clamp01(s.unrest + share * 2);
   }
-  addFx(sim, kind === 'volcano' ? 'fx.explosion' : kind === 'earthquake' ? 'fx.quake' : kind === 'flood' || kind === 'tsunami' ? 'fx.flood' : kind === 'storm' ? 'fx.tornado' : kind === 'meteor' ? 'fx.explosion' : 'fx.fire', x, y, 3, r);
+  emitFx(sim, DISASTER_FX[kind] ?? DISASTER_FX.fire, x, y, r);
   if (deaths > 10 || destroyed > 2 || !natural || kind === 'volcano')
     logEvent(sim, {
       type: 'disaster',
@@ -334,8 +335,11 @@ export function climateYearly(sim: Sim): void {
   if ((w.tick / 120) % 1 === 0) {
     for (let i = 0; i < m.n; i++) {
       if (!m.pollution[i]) continue;
-      m.pollution[i] = Math.max(0, Math.floor(m.pollution[i] * 0.93));
-      if (m.hazard[i] & HAZARD.RADIATION && sim.rng.chance(0.02)) m.hazard[i] &= ~HAZARD.RADIATION;
+      setPollution(sim, i, Math.max(0, Math.floor(m.pollution[i] * 0.93)));
+      if (m.hazard[i] & HAZARD.RADIATION && sim.rng.chance(0.02)) {
+        m.hazard[i] &= ~HAZARD.RADIATION;
+        markTile(sim, i);
+      }
     }
   }
 }

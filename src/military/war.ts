@@ -33,7 +33,8 @@ import { Good } from '../world/resources';
 import { B } from '../civilizations/buildingTypes';
 import { removePeople, workforceFromCohorts } from '../population/demography';
 import { logEvent } from '../history/events';
-import { addFx, markTile } from '../sim/context';
+import { markTile } from '../sim/context';
+import { emitFx, STATE_FX } from '../sim/conceptFx';
 import { makePeace, inAnyWar } from '../politics/diplomacy';
 import { createPerson } from '../population/persons';
 import { removeBuilding } from '../civilizations/urban';
@@ -399,7 +400,7 @@ function battleTick(sim: Sim, a: Army, war: War | undefined): void {
   killSoldiers(sim, b, lossB, war);
   a.morale = clamp01(a.morale - (lossA / Math.max(1, a.manpower + lossA)) * 3);
   b.morale = clamp01(b.morale - (lossB / Math.max(1, b.manpower + lossB)) * 3);
-  if (w.tick % 8 === 0) addFx(sim, 'fx.clash', (a.x + b.x) / 2, (a.y + b.y) / 2, 0.6);
+  if (w.tick % 8 === 0) emitFx(sim, STATE_FX.battle, (a.x + b.x) / 2, (a.y + b.y) / 2);
   const aBroke = a.morale < BALANCE.moraleBreak || a.manpower < 10;
   const bBroke = b.morale < BALANCE.moraleBreak || b.manpower < 10;
   if (aBroke || bBroke) {
@@ -410,6 +411,7 @@ function battleTick(sim: Sim, a: Army, war: War | undefined): void {
     war.score = clamp(war.score + (attackerWon ? 1 : -1) * (6 + Math.min(14, loser.manpower / 500)), -100, 100);
     const i = sim.w.map.idx(Math.floor(winner.x), Math.floor(winner.y));
     sim.w.map.hazard[i] |= HAZARD.BATTLEFIELD;
+    markTile(sim, i);
     const big = loser.manpower + winner.manpower > 20000;
     if (war.battles <= 2 || big)
       logEvent(sim, {
@@ -478,7 +480,7 @@ function siegeTick(sim: Sim, a: Army, civ: Civ, war: War | undefined): void {
   a.siege += rate;
   if (w.tick % 20 === 0) {
     killSoldiers(sim, a, a.manpower * 0.003 * walls, war);
-    addFx(sim, 'fx.smoke', s.x, s.y, 1);
+    emitFx(sim, STATE_FX.siege, s.x, s.y);
   }
   if (a.siege >= 1) {
     s.occupiedBy = civ.id;

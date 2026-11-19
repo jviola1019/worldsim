@@ -12,7 +12,7 @@
  */
 import { vehicleSprite, housingStyleForEthos, characterSprite, soldierSprite } from './art/select';
 import { flagCanvas } from './flag';
-import type { Sim } from '../sim/context';
+import type { Sim, VisualFx, FxSpec } from '../sim/context';
 import { CHUNK } from '../sim/context';
 import { Atlas } from './atlas';
 import { Camera, TILE } from './camera';
@@ -47,6 +47,9 @@ export class Renderer {
   cityChunksDrawn = 0;
   /** Reduce motion (player setting or OS): no walkers or street traffic; weather, ships, trains and sprites step at most once a second. */
   reduceMotion = false;
+  private flashT = 0;
+  private flashColor = '';
+  private lastFlash = -99;
   /** Units, settlers, herds and monsters shrink in the close-up so they do not dwarf city blocks. */
   private unitScale = 1;
   overlay: OverlayLayer;
@@ -156,6 +159,14 @@ export class Renderer {
     // labels in screen space
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     if (this.showLabels) this.drawLabels(tilePx);
+    if (this.flashT > 0) {
+      // full-screen tint (0.25 opacity, fading over 400 ms)
+      const rgb = this.flashColor === 'red' ? '230,60,40' : this.flashColor === 'green' ? '90,220,120' : '255,255,255';
+      ctx.fillStyle = `rgba(${rgb},${(0.25 * this.flashT) / 0.4})`;
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      this.flashT = Math.max(0, this.flashT - dt);
+    }
+    this.canvas.dataset.flash = this.flashT > 0 ? this.flashColor : '';
     this.frameMs = performance.now() - t0;
   }
 
@@ -552,18 +563,45 @@ export class Renderer {
   private drawFx(dt: number): void {
     const { ctx, atlas } = this;
     const fx = this.sim.fx;
+    const kinds = new Set<string>();
+    const reduce = this.reduceMotion;
     for (let k = fx.length - 1; k >= 0; k--) {
       const f = fx[k];
+      if (reduce && f.then) collapseSequence(f); // Reduce motion: the sequence shows only its final still
+      const fresh = f.t >= f.dur;
       f.t -= dt;
       if (f.t <= 0) {
         fx.splice(k, 1);
+        if (f.then) fx.push(followUp(f, f.then)); // meteor, then explosion, then smoke
         continue;
       }
+      // a brief screen tint for the biggest concepts: never under Reduce motion, at most every 2 s
+      if (f.flash && fresh && !reduce && this.time - this.lastFlash >= 2) {
+        this.lastFlash = this.time;
+        this.flashT = 0.4;
+        this.flashColor = f.flash;
+      }
+      if (f.x < 0) continue; // placeless: flash only
       const spr = atlas.get(f.kind);
       const progress = 1 - f.t / f.dur;
-      const frame = spr ? Math.min(spr.frames - 1, Math.floor(progress * spr.frames)) : 0;
-      atlas.draw(ctx, f.kind, f.x * TILE + 4, f.y * TILE + 6, spr && spr.frames > 1 ? (f.kind === 'fx.fire' || f.kind === 'fx.clash' ? this.frameIdx(8) : frame) : 0);
+      if (f.ring) {
+        // area ring: grows to the concept's radius and fades; a still ring under Reduce motion
+        const grow = reduce ? 1 : 0.35 + 0.65 * progress;
+        ctx.strokeStyle = f.kind === 'fx.nuke' ? `rgba(255,255,255,${reduce ? 0.6 : 0.85 * (1 - progress)})` : `rgba(248,232,137,${reduce ? 0.6 : 0.8 * (1 - progress)})`;
+        ctx.lineWidth = 2 / this.cam.zoom;
+        ctx.beginPath();
+        ctx.arc(f.x * TILE + 4, f.y * TILE + 4, f.ring * TILE * grow, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      let frame = 0;
+      if (spr && spr.frames > 1) {
+        if (reduce) frame = Math.floor((spr.frames - 1) / 2); // one still marker for the whole duration
+        else frame = f.kind === 'fx.fire' || f.kind === 'fx.clash' ? this.frameIdx(8) : Math.min(spr.frames - 1, Math.floor(progress * spr.frames));
+      }
+      atlas.draw(ctx, f.kind, f.x * TILE + 4, f.y * TILE + 6, frame);
+      kinds.add(f.kind);
     }
+    this.canvas.dataset.fx = [...kinds].sort().join(' ');
     if (this.highlight) {
       this.highlight.t -= dt;
       if (this.highlight.t <= 0) this.highlight = null;
@@ -714,4 +752,27 @@ function townsperson(emp: number[], tier: number, landTier: number, h: number): 
     case 5: return soldierSprite(landTier);
     default: return characterSprite('walker', tier, h);
   }
+}
+
+/** The follow-up effect of a sequence, at the same place. */
+function followUp(f: VisualFx, spec: FxSpec): VisualFx {
+  const ring = spec.area ? Math.max(1, spec.radius ?? f.data ?? f.ring ?? 0) : undefined;
+  return { kind: spec.kind, x: f.x, y: f.y, t: spec.dur, dur: spec.dur, data: f.data, ring, then: spec.then, flash: spec.flash };
+}
+
+/** Reduce motion: a sequence becomes its last effect, shown for the whole sequence's duration. */
+function collapseSequence(f: VisualFx): void {
+  let spec = f.then!;
+  let total = f.t;
+  let ring = f.ring ?? 0;
+  for (;;) {
+    total += spec.dur;
+    if (spec.area) ring = Math.max(ring, spec.radius ?? f.data ?? 1);
+    if (!spec.then) break;
+    spec = spec.then;
+  }
+  f.kind = spec.kind;
+  f.t = f.dur = total;
+  f.ring = ring || undefined;
+  f.then = undefined;
 }

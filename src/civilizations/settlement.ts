@@ -177,6 +177,7 @@ export function transferSettlement(sim: Sim, s: Settlement, to: Civ, cause: stri
   for (const i of territoryTiles(sim, s)) {
     w.map.owner[i] = to.id;
     markOverlay(sim, i);
+    if (w.map.bld[i]) markTile(sim, i); // buildings wear the owner's colours
   }
   if (!quiet)
     logEvent(sim, {

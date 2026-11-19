@@ -5,6 +5,7 @@
  * actually measured when the decision was made (factor label + weight).
  * Explanations shown to the player are built only from these recorded inputs.
  */
+import { eventFx } from '../sim/conceptFx';
 import type { Sim } from '../sim/context';
 import type { Cause, EventCategory, HistoryEvent } from '../sim/types';
 import { headlineFor } from './newspaper';
@@ -51,6 +52,7 @@ export function logEvent(sim: Sim, e: EventInput): HistoryEvent {
   if (teller) ev.medium = mediumOf(teller);
   ev.headline = headlineFor(sim, ev);
   w.events.push(ev);
+  eventFx(sim, ev); // the concept's map effect (visual only)
   if (w.events.length > MAX_EVENTS) pruneEvents(sim);
   for (const cid of ev.civs) {
     const c = w.civs.get(cid);

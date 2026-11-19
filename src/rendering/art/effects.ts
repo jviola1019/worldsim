@@ -761,4 +761,25 @@ E['fx.anomaly'] = S(
   { fps: 3 },
 );
 
+// round 7: fireworks for world games and championships (a rising spark, then a burst that fades)
+function firework(f: number): string[] {
+  const c = canvas(12, 12);
+  const cx = 6, cy = 5;
+  if (f === 0) {
+    plot(c, 6, 10, 'O'); plot(c, 6, 9, 'o'); plot(c, 6, 11, 'f');
+    return rowsOf(c);
+  }
+  const r = f === 1 ? 2 : f === 2 ? 4 : 5;
+  const cols = ['n', 'o', 'G', 'Q'];
+  for (let a = 0; a < 8; a++) {
+    const ang = (a / 8) * Math.PI * 2;
+    const x = Math.round(cx + Math.cos(ang) * r), y = Math.round(cy + Math.sin(ang) * r);
+    plot(c, x, y, f === 3 ? (a & 1 ? '.' : cols[a % 4]) : cols[a % 4]);
+    if (f === 2) plot(c, Math.round(cx + Math.cos(ang) * (r - 2)), Math.round(cy + Math.sin(ang) * (r - 2)), 'O');
+  }
+  if (f < 3) plot(c, cx, cy, '7');
+  return rowsOf(c);
+}
+E['fx.firework'] = S([0, 1, 2, 3].map(firework), { fps: 6, ax: 6, ay: 10 });
+
 export const EFFECT_SPRITES: SpriteSheet = E;

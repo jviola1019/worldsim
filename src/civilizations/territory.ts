@@ -9,7 +9,7 @@
  */
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement } from '../sim/types';
-import { markOverlay } from '../sim/context';
+import { markOverlay, markTile } from '../sim/context';
 import { T } from '../world/terrain';
 import { clamp } from '../core/math';
 import { ensureRelation } from './knowledge';
@@ -55,6 +55,7 @@ export function setTileSettlement(sim: Sim, i: number, sid: number): void {
     if (b) addBldTile(sim, sid, i);
   }
   markOverlay(sim, i);
+  if (b) markTile(sim, i); // a district changes hands: its tint and close-up block follow
 }
 
 /**

@@ -6,7 +6,7 @@
  * At far zoom an overview image (1 px per tile) is used instead.
  */
 import type { Sim } from '../sim/context';
-import { CHUNK } from '../sim/context';
+import { CHUNK, pollutionLook } from '../sim/context';
 import { TILE } from './camera';
 import type { Atlas } from './atlas';
 import { TERRAIN, T, isWaterTerrain } from '../world/terrain';
@@ -191,8 +191,9 @@ export class TerrainLayer {
             if (d === 4) ctx.fillRect(px, py, 1, 8);
             if (d === 6) ctx.fillRect(px, py, 8, 1);
           }
-          if (m.pollution[i] > 40) {
-            ctx.fillStyle = `rgba(70,60,50,${Math.min(0.45, m.pollution[i] / 400)})`;
+          const smog = pollutionLook(m.pollution[i]);
+          if (smog) {
+            ctx.fillStyle = `rgba(70,60,50,${smog * 0.05})`;
             ctx.fillRect(px, py, 8, 8);
           }
           if (m.hazard[i] & HAZARD.RADIATION) {

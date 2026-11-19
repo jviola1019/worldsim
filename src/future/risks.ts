@@ -28,7 +28,8 @@ import { createCiv, killCiv } from '../civilizations/civ';
 import { transferSettlement } from '../civilizations/settlement';
 import { createLeader, crown } from '../politics/succession';
 import { removeBuilding } from '../civilizations/urban';
-import { markTile, addFx } from '../sim/context';
+import { markTile } from '../sim/context';
+import { emitFx, STATE_FX } from '../sim/conceptFx';
 import { T } from '../world/terrain';
 import { GOOD_COUNT } from '../world/resources';
 
@@ -211,7 +212,7 @@ function gooYearly(sim: Sim): void {
       addPressure(sim, s.civId, 'grey_goo', d, 'Consumed by runaway nanomachines');
       s.unrest = clamp01(s.unrest + 0.4);
     }
-    addFx(sim, 'fx.plague', Math.round(g.x), Math.round(g.y), 2);
+    emitFx(sim, STATE_FX.gooSpread, Math.round(g.x), Math.round(g.y));
     return true;
   });
 }

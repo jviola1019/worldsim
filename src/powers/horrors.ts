@@ -21,7 +21,7 @@ import { removePeople, addPeople } from '../population/demography';
 import { flow, migrate } from '../population/ledger';
 import { logEvent } from '../history/events';
 import { addPressure, worldEndings } from '../civilizations/endings';
-import { addFx } from '../sim/context';
+import { emitFx, STATE_FX } from '../sim/conceptFx';
 import { B } from '../civilizations/buildingTypes';
 import { HAZARD } from '../world/tilemap';
 
@@ -114,7 +114,7 @@ export function horrorMonthly(sim: Sim, s: Settlement, civ: Civ): void {
       if (w.map.hazard[i] & HAZARD.BATTLEFIELD || w.map.bld[i] === B.RUINS) lair++;
     });
     h.level = Math.max(0, h.level * (1 + Math.min(0.15, 0.04 + lair * 0.01)) - defense * 0.04 * lit);
-    if (dead > 1) addFx(sim, 'fx.fire', s.x, s.y, 1);
+    if (dead > 1) emitFx(sim, STATE_FX.horrorAttack, s.x, s.y);
   } else {
     // blight: rots stored food too; grows, spreads, burns out; agricultural science contains it
     s.food *= 1 - 0.1 * h.level;

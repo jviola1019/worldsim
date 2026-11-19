@@ -15,7 +15,8 @@ import { clamp, clamp01, DX8, DY8 } from '../core/math';
 import { TICKS_PER_MONTH } from '../core/time';
 import { logEvent } from '../history/events';
 import { B } from '../civilizations/buildingTypes';
-import { markTile, addFx } from '../sim/context';
+import { markTile, setVeg } from '../sim/context';
+import { emitFx, STATE_FX } from '../sim/conceptFx';
 import { removePeople } from '../population/demography';
 import { addPressure, globalCooling } from '../civilizations/endings';
 
@@ -236,7 +237,7 @@ export function herdsMonthly(sim: Sim): void {
         if (!m.inBounds(x, y)) continue;
         const j = y * m.w + x;
         const take = Math.min(m.veg[j] * 0.08, demand);
-        m.veg[j] = Math.max(0, m.veg[j] - take);
+        setVeg(sim, j, Math.max(0, m.veg[j] - take));
         got += take;
         demand -= take;
       }
@@ -337,8 +338,7 @@ export function vegetationSlice(sim: Sim, slice: number): void {
       if (Math.abs(diff) < 1) continue;
       const r = diff > 0 ? rate * (0.5 + m.moist[i] / 255) : 0.08;
       const nv = v + diff * r;
-      m.veg[i] = clamp(Math.round(nv + (diff > 0 ? 0.5 : -0.5)), 0, 255);
-      if ((v >> 5) !== (m.veg[i] >> 5)) markTile(sim, i);
+      setVeg(sim, i, clamp(Math.round(nv + (diff > 0 ? 0.5 : -0.5)), 0, 255));
       // fertility recovery on unfarmed land
       if (b !== B.FARM && m.fert[i] < TERRAIN[t].fertility && (x + y + sim.w.tick) % 7 === 0) m.fert[i]++;
     }
@@ -473,7 +473,7 @@ export function monstersMonthly(sim: Sim): void {
         const dead = removePeople(sim, s, harm, 'monster attack');
         flow(sim, s, 'disaster', dead);
         addPressure(sim, s.civId, 'monsters', dead, `Attacks by a ${def.name.toLowerCase()}`);
-        addFx(sim, 'fx.fire', s.x, s.y, 2);
+        emitFx(sim, STATE_FX.monsterAttack, s.x, s.y);
         if (sim.rng.chance(0.15))
           logEvent(sim, { type: 'monster_attack', cat: 'disaster', title: `A ${def.name.toLowerCase()} attacked ${s.name}`, civs: [s.civId], settlements: [s.id], x: s.x, y: s.y, importance: 2 });
       }
