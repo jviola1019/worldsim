@@ -54,6 +54,15 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 | Full design review (13 findings) | Complete: 12 fixed, 1 partly (D11 spacing, low) | DESIGN-REVIEW.md; floors enforced in viewports |
 | Save determinism with fires (nuclear strike, rain) | Fixed (pre-existing bug) | `fire-determinism.test.ts` |
 | Duplicate league names | Fixed (pre-existing bug) | sports uniqueness test |
+| Final whole-branch review | 1 critical and 3 important findings fixed with tests (close-up cache thrash at large screens, reduce-motion weather, 2×2 access, a doc correction) | VALIDATION §R6 |
+
+Deferred minor findings from the final review:
+- an ethos switch between militarist and mercantile (same block signature) waits for another change to redraw;
+- fences and streets across a map-chunk boundary update within a year;
+- tall landmarks in a chunk's first row can clip;
+- road tier is not used when composing a block;
+- some planning tests check less than their names suggest;
+- ruins count as built for planning but open for drawing.
 
 ## Bug ledger, rounds 4 and 5
 

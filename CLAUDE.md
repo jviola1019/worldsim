@@ -9,7 +9,7 @@
 - Docs must be honest: no invented benchmarks or test runs, and emulation is not physical-device testing.
 
 ## Current plan
-Round 6 (city detail, planning rule, full design review): spec `docs/superpowers/specs/2026-11-18-city-detail-design.md` (approved), plan `docs/superpowers/plans/2026-11-18-city-detail.md`, progress ledger `.superpowers/sdd/2026-11-18-city-detail/progress.md` (git-ignored; if lost, use `git log`). Round 5 history: `docs/ROADMAP.md`. Read the ledger first after any restart.
+Round 6 (close-up cities, planning rule, full design review) is **done** (2026-11-19): spec `docs/superpowers/specs/2026-11-18-city-detail-design.md`, plan `docs/superpowers/plans/2026-11-18-city-detail.md`, results in `docs/VALIDATION.md` §R6 and `docs/DESIGN-REVIEW.md`. Deferred minors from the final review are listed in `docs/STATUS.md`. Round 5 history: `docs/ROADMAP.md`.
 
 ## Standing to-dos
 Do these **after all other work is finished**, as the last step of a round:
