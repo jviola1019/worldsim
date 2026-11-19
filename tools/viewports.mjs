@@ -1,11 +1,13 @@
 // Layout check across device profiles (Chromium emulation, not Safari/physical devices).
 // For each profile: create a world, run briefly, open the nations sheet and a person, and screenshot.
-// Reports elements that overflow the viewport and console errors.  Usage: node tools/viewports.mjs
+// Reports elements that overflow the viewport, console errors, and the design floors (round 6):
+// text >= 12 px, touch targets >= 44 px, WCAG AA text contrast.  Usage: node tools/viewports.mjs
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 let pw;
 try { pw = require('playwright'); } catch { pw = require('/opt/node-tools/node_modules/playwright'); }
 const { chromium, devices } = pw;
+import { measure } from './design-metrics.mjs';
 const url = process.env.URL ?? 'http://localhost:4173/';
 const profiles = ['iPhone SE', 'iPhone 13', 'iPhone 13 landscape', 'iPhone 15 Pro Max', 'iPad (gen 7)', 'Galaxy S9+'];
 const browser = await chromium.launch();
@@ -17,6 +19,14 @@ for (const name of profiles) {
   page.on('pageerror', (e) => errors.push(String(e)));
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   await page.goto(url);
+  const settingsFloors = await (async () => {
+    const b = page.getByText('Settings');
+    if (!(await b.count())) return null;
+    await b.first().click(); await page.waitForTimeout(300);
+    const m = await page.evaluate(measure, !!devices[name].hasTouch);
+    await page.getByText('Back').first().click(); await page.waitForTimeout(200);
+    return m;
+  })();
   await page.getByText('New world').first().click();
   await page.getByText('Create world').click();
   await page.waitForSelector('canvas.canvas', { timeout: 30000 });
@@ -39,17 +49,28 @@ for (const name of profiles) {
     const small = [...document.querySelectorAll('.hud-actions button, .playback button, .cat')].filter((b) => { const r = b.getBoundingClientRect(); return r.width > 0 && (r.width < 32 || r.height < 32); }).length;
     return { bad: bad.slice(0, 5), small };
   });
+  const floors = { smallText: [], smallTargets: [], lowContrast: [] };
+  if (settingsFloors) for (const k of Object.keys(floors)) floors[k].push(...settingsFloors[k]);
+  const addFloors = async () => { const m = await page.evaluate(measure, !!devices[name].hasTouch); for (const k of Object.keys(floors)) floors[k].push(...m[k]); };
+  await addFloors();
+  // the power dock (tool labels) and the settings screen are measured too
+  const cat = page.locator('.cat').first();
+  if (await cat.count()) { await cat.click(); await page.waitForTimeout(300); await addFloors(); await page.keyboard.press('Escape').catch(() => {}); await cat.click().catch(() => {}); }
   await page.getByLabel('Nations').click();
   await page.waitForTimeout(300);
+  await addFloors();
   await page.screenshot({ path: `tools/output/vp-${slug}-nations.png` });
   const row = page.locator('.sheet-body ul.list li button').first();
   if (await row.count()) { await row.click(); await page.waitForTimeout(300); }
   const card = page.locator('.sheet-body button.person-card').first();
   if (await card.count()) { await card.click(); await page.waitForTimeout(300); }
   await page.screenshot({ path: `tools/output/vp-${slug}-person.png` });
-  const ok = offscreen.bad.length === 0 && errors.length === 0;
+  await addFloors();
+  const floorFail = floors.smallText.length + floors.smallTargets.length + floors.lowContrast.length;
+  const ok = offscreen.bad.length === 0 && errors.length === 0 && floorFail === 0;
   if (!ok) problems++;
-  console.log(`${ok ? 'OK  ' : 'FAIL'} ${name.padEnd(20)} ${devices[name].viewport.width}x${devices[name].viewport.height} offscreen=${offscreen.bad.length} ${offscreen.bad.join(' ')} smallTargets=${offscreen.small} errors=${errors.length} ${errors.slice(0, 2).join(' | ')}`);
+  console.log(`${ok ? 'OK  ' : 'FAIL'} ${name.padEnd(20)} ${devices[name].viewport.width}x${devices[name].viewport.height} offscreen=${offscreen.bad.length} ${offscreen.bad.join(' ')} smallTargets=${offscreen.small} errors=${errors.length} ${errors.slice(0, 2).join(' | ')} text<12=${floors.smallText.length} targets<44=${floors.smallTargets.length} contrast<AA=${floors.lowContrast.length}`);
+  for (const [k, v] of Object.entries(floors)) for (const e of [...new Set(v)].slice(0, 4)) console.log(`     ${k}: ${e}`);
   await ctx.close();
 }
 await browser.close();
