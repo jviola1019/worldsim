@@ -227,3 +227,55 @@ describe('selection helpers return registered sprites', () => {
     expect(soldierSprite(12)).toBe('char.soldier_power_armour');
   });
 });
+
+// ---------------------------------------------------------------- round 6: close-up city lots
+import { composeBlock, type BlockContext, type SizeBand, type NeighbourKind } from '../../src/rendering/cityBlocks';
+import { B, BUILDING_KEY_BY_ID } from '../../src/civilizations/buildingTypes';
+import { BUILDINGS } from '../../src/civilizations/buildings';
+import type { EthosKey } from '../../src/civilizations/ethos';
+
+/** Every lot sprite the composer can ask for, over every detail district, era, size band and ethos. */
+function requestedLotSprites(): Set<string> {
+  const ids = new Set<string>();
+  const nbs: NeighbourKind[][] = [Array(8).fill('built'), Array(8).fill('open')];
+  const ethoses: (EthosKey | undefined)[] = [undefined, 'mercantile', 'egalitarian', 'militarist', 'theocratic', 'technocratic', 'artistic', 'ecological'];
+  for (let b = 1; b < BUILDINGS.length; b++) {
+    const cat = BUILDINGS[b].category;
+    if (!(['residential', 'commerce', 'civic', 'industry', 'energy'].includes(cat) || b === B.PARK)) continue;
+    if (BUILDING_KEY_BY_ID[b] === undefined) continue;
+    for (let tier = 0; tier <= 7; tier++)
+      for (const band of ['village', 'metropolis'] as SizeBand[])
+        for (const ethos of ethoses)
+          for (const nb of nbs)
+            for (let h = 0; h < 24; h++) {
+              const c: BlockContext = { b, tier, band, ethos, nb, road: 0, h: h * 2654435761 >>> 0 };
+              for (const l of composeBlock(c).lots) ids.add(l.sprite);
+            }
+  }
+  return ids;
+}
+const LOT_PROPS = ['lot.tree.0', 'lot.tree.1', 'lot.tree.2', 'lot.fence.h', 'lot.fence.v', 'lot.hedge.h', 'lot.hedge.v', 'lot.pool.0', 'lot.car.h.0', 'lot.car.h.1', 'lot.car.h.2', 'lot.car.v.0', 'lot.car.v.1', 'lot.car.v.2', 'lot.bench.0', 'lot.lamp.0', 'lot.fountain.0'];
+
+describe('close-up city lot sprites', () => {
+  const requested = requestedLotSprites();
+  it('every lot sprite the composer can request exists, and every street prop exists', () => {
+    const missing = [...requested, ...LOT_PROPS].filter((id) => !ALL_SPRITES[id]);
+    expect(missing).toEqual([]);
+  });
+  it('lot sprites fit their scale: houses 8–12 px wide, towers at most 28 px, nothing over 30×30', () => {
+    for (const id of Object.keys(ALL_SPRITES).filter((k) => k.startsWith('lot.'))) {
+      const d = ALL_SPRITES[id];
+      expect(d.w, id).toBeLessThanOrEqual(30);
+      expect(d.h, id).toBeLessThanOrEqual(30);
+      if (id.startsWith('lot.house.')) { expect(d.w, id).toBeGreaterThanOrEqual(8); expect(d.w, id).toBeLessThanOrEqual(12); }
+      if (id.startsWith('lot.tower.')) expect(d.w, id).toBeLessThanOrEqual(28);
+    }
+  });
+  it('lot sprites use the nation colour only as an accent (at most 15% of opaque pixels)', () => {
+    for (const id of Object.keys(ALL_SPRITES).filter((k) => k.startsWith('lot.'))) {
+      let team = 0, opaque = 0;
+      for (const row of ALL_SPRITES[id].frames[0]) for (const ch of row) { if (ch === '.') continue; opaque++; if ('TUV'.includes(ch)) team++; }
+      expect(team / Math.max(1, opaque), id).toBeLessThanOrEqual(0.15);
+    }
+  });
+});

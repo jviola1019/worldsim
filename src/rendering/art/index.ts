@@ -16,6 +16,7 @@ import { BUILDING_VENUE_SPRITES } from './buildings_venues';
 import { HOUSING_VARIANT_SPRITES } from './buildings_housing';
 import { ERA_VEHICLE_SPRITES } from './vehicles_era';
 import { CHARACTER_SPRITES } from './characters';
+import { CITY_LOT_SPRITES } from './city_lots';
 
 /** Every sheet, in registration order (also used by tests to detect duplicate ids). */
 export const SPRITE_SHEETS: Readonly<Record<string, SpriteSheet>> = {
@@ -32,6 +33,7 @@ export const SPRITE_SHEETS: Readonly<Record<string, SpriteSheet>> = {
   civic: CIVIC_BUILDING_SPRITES,
   venues: BUILDING_VENUE_SPRITES,
   icons: ICON_SPRITES,
+  cityLots: CITY_LOT_SPRITES,
 };
 
 export const ALL_SPRITES: SpriteSheet = Object.assign({}, ...Object.values(SPRITE_SHEETS)) as SpriteSheet;
