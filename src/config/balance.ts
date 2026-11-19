@@ -76,6 +76,14 @@ export const BALANCE = {
   industrialExtraction: 5,
   /** [S] Minimum construction priority for a full city to replace old housing with another use. */
   redevelopScore: 3,
+  // planning rule (round 6): new city buildings keep an open neighbour; parks for large cities
+  streetAccess: true,
+  parkPerResidential: 8,
+  parkMinPop: 2000,
+  urbanAdjBonus: 1.0,
+  enclosedPenalty: 2.0,
+  /** Housing pressure (people / homes) above which homes may fill the gaps between blocks. */
+  infillPressure: 1.5,
   /** [S] Per-capita stock of construction materials industry leaves for builders (industrial eras). */
   constructionReserve: 0.002,
   /** [S] Maximum market-service jobs per capita at high goods income. */

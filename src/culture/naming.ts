@@ -42,6 +42,7 @@ export function namesInUse(sim: Sim): Set<string> {
   for (const r of w.religions.values()) add(r.name);
   for (const o of w.outlets?.values() ?? []) add(o.name);
   for (const a of w.ais?.values() ?? []) { add(a.name); add(a.lab); }
+  for (const l of w.leagues?.values() ?? []) add(l.name);
   for (const c of w.colonies.values()) add(c.name);
   return out;
 }

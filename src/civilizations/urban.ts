@@ -17,7 +17,7 @@ import type { Civ, Settlement } from '../sim/types';
 import { markTile } from '../sim/context';
 import { B, eraToTier, type BuildingId } from './buildingTypes';
 import { BUILDINGS, RESIDENTIAL, type BuildingDef } from './buildings';
-import { BLDF } from '../world/tilemap';
+import { BLDF, type TileMap } from '../world/tilemap';
 import { TERRAIN, T, isWaterTerrain } from '../world/terrain';
 import { Good, GOOD_COUNT, DEPOSITS, Deposit, type GoodKey } from '../world/resources';
 import { clamp, saturate } from '../core/math';
@@ -183,7 +183,7 @@ function placementScore(sim: Sim, s: Settlement, def: BuildingDef, i: number, x:
         const j = (y + dy) * m.w + x + dx;
         if (m.inBounds(x + dx, y + dy) && m.bld[j] && m.settle[j] === s.id && BUILDINGS[m.bld[j]].category !== 'food') adj++;
       }
-      return 8 - d * 1.2 + adj * 1.5 - (t === T.HILLS ? 0.5 : 0);
+      return 8 - d * 1.2 + adj * BALANCE.urbanAdjBonus - (adj === 4 ? BALANCE.enclosedPenalty : 0) - (t === T.HILLS ? 0.5 : 0);
     }
     case 'farmland': {
       if (t === T.MOUNTAIN || t === T.SNOW || t === T.GLACIER || t === T.BEACH) return -1;
@@ -222,6 +222,34 @@ function placementScore(sim: Sim, s: Settlement, def: BuildingDef, i: number, x:
   return 0;
 }
 
+/** Open land for the planning rule: unbuilt land, water, a park or a field (food buildings). */
+export function isOpenTile(m: TileMap, j: number): boolean {
+  if (m.isWater(j)) return true;
+  const b = m.bld[j];
+  return !b || b === B.PARK || BUILDINGS[b].category === 'food';
+}
+
+/**
+ * Planning rule: with tile i built, i and every built 4-neighbour of i must still touch open land
+ * (the map edge counts as open). Keeps streets and breathing room between city blocks.
+ */
+export function keepsAccess(sim: Sim, i: number): boolean {
+  const m = sim.w.map;
+  const x = m.xOf(i), y = m.yOf(i);
+  const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]] as const;
+  const openAt = (xx: number, yy: number) => !m.inBounds(xx, yy) || (m.idx(xx, yy) !== i && isOpenTile(m, m.idx(xx, yy)));
+  if (!N4.some(([dx, dy]) => openAt(x + dx, y + dy))) return false;
+  for (const [dx, dy] of N4) {
+    const nx = x + dx, ny = y + dy;
+    if (!m.inBounds(nx, ny) || isOpenTile(m, m.idx(nx, ny))) continue;
+    if (!N4.some(([ex, ey]) => openAt(nx + ex, ny + ey))) return false;
+  }
+  return true;
+}
+
+// industry and energy are exempt: work yards give access, and refusing their sites cost jobs (VALIDATION §R6)
+const ACCESS_CATS = new Set(['residential', 'commerce', 'civic']);
+
 function hasLakeNeighbor(sim: Sim, i: number): boolean {
   const m = sim.w.map;
   const x = m.xOf(i);
@@ -234,7 +262,7 @@ function hasLakeNeighbor(sim: Sim, i: number): boolean {
 }
 
 /** Find the best free tile for a building type (null if none). */
-export function findSite(sim: Sim, s: Settlement, def: BuildingDef): number | null {
+export function findSite(sim: Sim, s: Settlement, def: BuildingDef, opts: { access?: boolean } = {}): number | null {
   const m = sim.w.map;
   let best = -1;
   let bestScore = 0;
@@ -249,6 +277,8 @@ export function findSite(sim: Sim, s: Settlement, def: BuildingDef): number | nu
         if (!isBuildable(sim, s, m.idx(x + dx, y + dy))) return;
       }
     }
+    // planning rule: city buildings keep access to open land (streets, breathing room)
+    if (BALANCE.streetAccess && opts.access !== false && ACCESS_CATS.has(def.category) && def.id !== B.PARK && !keepsAccess(sim, i)) return;
     if (def.category !== 'food' && def.placement !== 'deposit' && def.placement !== 'oil' && m.dep[i] && m.dep[i] !== Deposit.FISH) {
       // do not cover unexploited mineral deposits with houses
       if (DEPOSITS[m.dep[i]].good !== Good.LUXURY || def.category === 'residential') return;
@@ -379,7 +409,9 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   const hasTeam = [...sim.w.leagues.values()].some((l) => l.active && l.teams.some((t) => t.settlementId === s.id));
   add(B.ARENA, 0.8 + (hasTeam ? 2.5 : 0));
   add(B.MONUMENT, 0.6);
-  add(B.PARK, 0.7);
+  // green space: large cities aim for a park per few residential districts
+  const resDistricts = RESIDENTIAL_TYPES.reduce((a, b) => a + (s.bld[b] ?? 0), 0);
+  add(B.PARK, pop > BALANCE.parkMinPop && s.bld[B.PARK] < resDistricts / BALANCE.parkPerResidential ? 2.0 : 0.7);
   add(B.BANK, 1 + caps.finance);
   add(B.OFFICE, 1 + caps.finance * 0.5 + pop / 300000 - s.bld[B.OFFICE] * 0.5);
   add(B.WAREHOUSE, 0.8);
@@ -429,6 +461,8 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
     }
     siteTries++;
     let tile = c.upgrade !== undefined ? c.upgrade : findSite(sim, s, def);
+    // a severe housing crisis fills the gaps between blocks (towns densify when they must)
+    if (tile === null && c.upgrade === undefined && def.category === 'residential' && pressure > BALANCE.infillPressure) tile = findSite(sim, s, def, { access: false });
     let upgrade = c.upgrade !== undefined;
     // Land-use intensification: a built-up city with a strong need (jobs, power, services) replaces
     // its oldest, lowest-density housing instead of giving up -- as long as it is not overcrowded.
@@ -444,6 +478,8 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
     return;
   }
 }
+
+const RESIDENTIAL_TYPES = [B.HUT, B.HOUSE, B.TOWNHOUSE, B.TENEMENT, B.APARTMENT, B.SUBURB, B.TOWER, B.ARCOLOGY];
 
 function countFree(sim: Sim, s: Settlement): number {
   const m = sim.w.map;

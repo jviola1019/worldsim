@@ -17,7 +17,7 @@ import { clamp, clamp01 } from '../core/math';
 import { spawnHerd, spawnMonster } from '../ecology/ecology';
 import { MONSTERS } from '../ecology/species';
 import { spawnBand } from '../population/bands';
-import { triggerDisaster, ignite } from '../world/environment';
+import { triggerDisaster, ignite, extinguish } from '../world/environment';
 import { godFoundReligion, godSpreadReligion } from '../culture/religion';
 import { grantTech, forgetTech, techAvailable, effCost, techState } from '../technology/research';
 import { TECHS } from '../technology/techData';
@@ -386,9 +386,7 @@ export const POWERS: PowerDef[] = [
       const c = sim.w.climate;
       const cell = ((y / c.cellSize) | 0) * c.cellsX + ((x / c.cellSize) | 0);
       for (const k of [cell, cell - 1, cell + 1, cell - c.cellsX, cell + c.cellsX]) if (k >= 0 && k < c.rain.length) c.rain[k] = 0.6;
-      sim.w.map.forRadius(x, y, 8, (i) => {
-        sim.w.map.fire[i] = 0;
-      });
+      sim.w.map.forRadius(x, y, 8, (i) => extinguish(sim, i));
       logEvent(sim, { type: 'god_rain', cat: 'god', title: 'Rains came at a divine command', x, y, importance: 1 });
       return null;
     },

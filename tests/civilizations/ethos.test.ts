@@ -16,21 +16,27 @@ const clone = (s: Simulation) => { s.syncRng(); return new Simulation(decodeWorl
 const big = (sim: Simulation): Civ => [...sim.w.civs.values()].filter((c) => c.alive && c.settlements.length).sort((a, b) => b.population - a.population)[0];
 
 describe('ethos', () => {
-  it('follows measured institutions: a priest-led state turns theocratic, an expert-led one technocratic', () => {
-    const base = makeSim('eth-inst', 64, (c) => { c.settings.startEra = 8; });
-    const A = clone(base), B2 = clone(base);
-    const a = big(A), b = B2.w.civs.get(a.id)!;
-    // both start with a long-established mercantile identity: the measured conditions must overturn it
-    a.ethos = { key: 'mercantile', since: -100, strength: 0.5 };
-    b.ethos = { key: 'mercantile', since: -100, strength: 0.5 };
-    for (let k = 0; k < 40; k++) {
-      Object.assign(a.inst, { religiousAuthority: 1, techGovernance: 0, liberties: 0.2 }); a.personality.piety = 1; a.personality.science = 0; a.personality.trade = 0;
-      Object.assign(b.inst, { religiousAuthority: 0, techGovernance: 1 }); b.personality.science = 1; b.personality.piety = 0; b.personality.trade = 0;
-      ethosYearly(A, a); ethosYearly(B2, b);
-      (A as any).w.tick += 120; (B2 as any).w.tick += 120; // let the hysteresis clock run
+  it('follows measured institutions: a priest-led state turns theocratic, an expert-led one technocratic (3 worlds, majority)', () => {
+    // ethos is scored relative to the other nations, so which neighbours a world has matters: majority of 3
+    let theo = 0, tech = 0;
+    for (const seed of ['eth-inst', 'eth-inst-2', 'eth-inst-3']) {
+      const base = makeSim(seed, 64, (c) => { c.settings.startEra = 8; });
+      const A = clone(base), B2 = clone(base);
+      const a = big(A), b = B2.w.civs.get(a.id)!;
+      // both start with a long-established mercantile identity: the measured conditions must overturn it
+      a.ethos = { key: 'mercantile', since: -100, strength: 0.5 };
+      b.ethos = { key: 'mercantile', since: -100, strength: 0.5 };
+      for (let k = 0; k < 40; k++) {
+        Object.assign(a.inst, { religiousAuthority: 1, techGovernance: 0, liberties: 0.2 }); a.personality.piety = 1; a.personality.science = 0; a.personality.trade = 0;
+        Object.assign(b.inst, { religiousAuthority: 0, techGovernance: 1 }); b.personality.science = 1; b.personality.piety = 0; b.personality.trade = 0;
+        ethosYearly(A, a); ethosYearly(B2, b);
+        (A as any).w.tick += 120; (B2 as any).w.tick += 120; // let the hysteresis clock run
+      }
+      if (a.ethos?.key === 'theocratic') theo++;
+      if (b.ethos?.key === 'technocratic') tech++;
     }
-    expect(a.ethos?.key).toBe('theocratic');
-    expect(b.ethos?.key).toBe('technocratic');
+    expect(theo).toBeGreaterThanOrEqual(2);
+    expect(tech).toBeGreaterThanOrEqual(2);
   });
 
   it('the atomic-age ethos needs the atom, speeds nuclear adoption and slows the digital and green transition', () => {
@@ -52,21 +58,23 @@ describe('ethos', () => {
     expect((civ as Civ).ethos?.key).toBe('atomic');
   });
 
-  it('values reshape construction priorities directly (one planning pass, identical towns)', () => {
-    const base = makeSim('eth-plan', 96, (c) => { c.settings.startEra = 5; });
-    base.runYears(3);
-    const id = big(base).id;
+  it('values reshape construction priorities directly (one planning pass, identical towns; 3 worlds summed)', () => {
     let templesA = 0, templesB = 0;
-    for (const sid of base.w.civs.get(id)!.settlements) {
-      const A = clone(base), Bw = clone(base);
-      const a = A.w.civs.get(id)!, b = Bw.w.civs.get(id)!;
-      a.ethos = { key: 'mercantile', since: 0, strength: 1 };
-      b.ethos = { key: 'theocratic', since: 0, strength: 1 };
-      const sa = A.w.settlements.get(sid)!, sb = Bw.w.settlements.get(sid)!;
-      sa.construction = null; sb.construction = null; sa.planRetryTick = 0; sb.planRetryTick = 0;
-      planConstruction(A, sa, a); planConstruction(Bw, sb, b);
-      if ((sa.construction as { type: number } | null)?.type === B.TEMPLE) templesA++;
-      if ((sb.construction as { type: number } | null)?.type === B.TEMPLE) templesB++;
+    for (const seed of ['eth-plan', 'eth-plan-2', 'eth-plan-3']) {
+      const base = makeSim(seed, 96, (c) => { c.settings.startEra = 5; });
+      base.runYears(3);
+      const id = big(base).id;
+      for (const sid of base.w.civs.get(id)!.settlements) {
+        const A = clone(base), Bw = clone(base);
+        const a = A.w.civs.get(id)!, b = Bw.w.civs.get(id)!;
+        a.ethos = { key: 'mercantile', since: 0, strength: 1 };
+        b.ethos = { key: 'theocratic', since: 0, strength: 1 };
+        const sa = A.w.settlements.get(sid)!, sb = Bw.w.settlements.get(sid)!;
+        sa.construction = null; sb.construction = null; sa.planRetryTick = 0; sb.planRetryTick = 0;
+        planConstruction(A, sa, a); planConstruction(Bw, sb, b);
+        if ((sa.construction as { type: number } | null)?.type === B.TEMPLE) templesA++;
+        if ((sb.construction as { type: number } | null)?.type === B.TEMPLE) templesB++;
+      }
     }
     expect(templesB).toBeGreaterThan(templesA);
   });

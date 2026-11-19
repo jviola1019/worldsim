@@ -89,7 +89,7 @@ t('horseback_riding', 'Horseback Riding', 3, 'military', ['domestication'], { ca
 t('chariots', 'Chariots', 3, 'military', ['the_wheel', 'horseback_riding'], { militaryAttack: 0.12, mobility: 0.1 }, 'Fast war wagons dominate open battlefields.', { k: 1, req: { resources: ['HORSES'] } });
 t('standing_army', 'Standing Army', 3, 'military', ['bronze_working', 'code_of_laws'], { militaryAttack: 0.1, militaryDefense: 0.1, adminCapacity: 0.1 }, 'Professional soldiers paid by the state.', { k: 1, unlock: ['BARRACKS'] });
 t('astronomy', 'Astronomy', 3, 'science', ['mathematics', 'priesthood'], { research: 0.15, farming: 0.05 }, 'Calendars predict floods and seasons.', { k: 1.1 });
-t('urban_planning', 'Urban Planning', 3, 'civic', ['mathematics', 'mudbrick'], { urbanCapacity: 0.2, construction: 0.1, sanitation: 0.05 }, 'Streets, drains and districts for the first cities.', { k: 1.1 });
+t('urban_planning', 'Urban Planning', 3, 'civic', ['mathematics', 'mudbrick'], { urbanCapacity: 0.2, construction: 0.1, sanitation: 0.05 }, 'Streets, drains and districts for the first cities.', { k: 1.1, unlock: ['PARK'] });
 
 // ===================================================================== Era 4 — Iron & classical
 t('iron_working', 'Iron Working', 4, 'materials', ['bronze_working'], { metalTier: 3, landTier: 3, farming: 0.1, militaryAttack: 0.1 }, 'Abundant iron makes tools and weapons cheap — if iron ore is available.', { k: 1, req: { resources: ['IRON'] } });
@@ -150,7 +150,7 @@ t('coke_smelting', 'Coke Smelting', 7, 'materials', ['steam_engine', 'steelmakin
 t('railways', 'Railways', 7, 'transport', ['steam_engine', 'coke_smelting'], { railTier: 1, landSpeed: 0.5, logistics: 0.4, tradeEfficiency: 0.15, mobility: 0.2, adminCapacity: 0.2 }, 'Iron rails move goods, people and armies at unheard-of speeds.', { k: 1.2, req: { resources: ['COAL', 'IRON'] }, ay: 45, unlock: ['STATION', 'WAREHOUSE'] });
 t('steamships', 'Steamships', 7, 'maritime', ['steam_engine', 'navigation'], { navalTier: 5, tradeEfficiency: 0.1, navalPower: 0.2 }, 'Ships no longer wait for the wind.', { k: 1, req: { resources: ['COAL'] } });
 t('vaccination', 'Vaccination', 7, 'medicine', ['anatomy', 'scientific_method'], { healthcare: 0.1, infantCare: 0.2, diseaseControl: 0.2 }, 'Immunization prevents smallpox-like epidemics.', { k: 1 });
-t('sanitation', 'Public Sanitation', 7, 'medicine', ['engineering', 'vaccination'], { sanitation: 0.4, diseaseControl: 0.15, healthcare: 0.05 }, 'Sewers and clean water end the urban death trap.', { k: 1.1, unlock: ['PARK'] });
+t('sanitation', 'Public Sanitation', 7, 'medicine', ['engineering', 'vaccination'], { sanitation: 0.4, diseaseControl: 0.15, healthcare: 0.05 }, 'Sewers and clean water end the urban death trap.', { k: 1.1 });
 t('telegraph', 'Telegraph', 7, 'communication', ['railways', 'scientific_method'], { communication: 1, adminCapacity: 0.5, intelligence: 0.1 }, 'Messages cross continents in minutes.', { k: 1, req: { anyResources: ['COPPER', 'METAL'] } });
 t('mass_education', 'Mass Education', 7, 'culture', ['humanism', 'printing'], { literacy: 0.3, research: 0.2 }, 'Compulsory schooling for all children.', { k: 1.1, ay: 40 });
 t('rifles', 'Rifled Firearms', 7, 'military', ['muskets', 'coke_smelting'], { landTier: 7, militaryAttack: 0.15 }, 'Accurate rifles and breech-loaders.', { k: 1 });

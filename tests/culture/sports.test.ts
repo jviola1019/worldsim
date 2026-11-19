@@ -24,7 +24,8 @@ describe('sports', () => {
       const ev = sim.w.events.find((e) => e.type === 'league_founded' && e.title.includes(lg.name))!;
       expect(ev).toBeTruthy();
       if (def.tech) expect(sim.w.civs.get(lg.civId)!.techs[def.tech]?.known).toBe(true);
-      expect(lg.teams.length).toBeGreaterThanOrEqual(2);
+      // a league whose cities were lost folds (inactive) but stays in the records
+      if (lg.active) expect(lg.teams.length).toBeGreaterThanOrEqual(2);
     }
     const names = [...sim.w.leagues.values()].map((l) => l.name.toLowerCase());
     expect(new Set(names).size).toBe(names.length);

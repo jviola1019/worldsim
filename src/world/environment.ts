@@ -71,6 +71,15 @@ export function ignite(sim: Sim, i: number, intensity = 160): void {
   markTile(sim, i);
 }
 
+/** Put a fire out (keeps the cached fire set in step with the map, so saves resume identically). */
+export function extinguish(sim: Sim, i: number): void {
+  const m = sim.w.map;
+  if (!m.fire[i]) return;
+  m.fire[i] = 0;
+  fires(sim).delete(i);
+  markTile(sim, i);
+}
+
 /** Per-tick: fire spread and burnout. */
 export function environmentTick(sim: Sim): void {
   const w = sim.w;

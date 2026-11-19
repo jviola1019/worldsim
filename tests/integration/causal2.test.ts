@@ -101,8 +101,10 @@ describe('#3 education investment raises long-run technological capability', () 
       // a literate society (schooling scales with the literacy capability; near zero in early eras)
       const base = makeSim(seed, 96, (c) => { c.settings.startEra = 7; });
       base.runYears(2);
-      const id = [...base.w.civs.values()].filter((c) => c.alive && c.settlements.length).sort((a, b) => b.population - a.population)[0].id;
-      expect(base.w.civs.get(id)!.caps.literacy).toBeGreaterThan(0.3);
+      // the largest literate nation (which nation that is depends on how the start was laid out)
+      const literate = [...base.w.civs.values()].filter((c) => c.alive && c.settlements.length && c.caps.literacy > 0.3).sort((a, b) => b.population - a.population);
+      expect(literate.length, 'precondition: a literate nation').toBeGreaterThan(0);
+      const id = literate[0].id;
       const A = clone(base), B = clone(base);
       expect(B.digest()).toBe(A.digest());
       for (let y = 0; y < 30; y++) {
@@ -189,7 +191,10 @@ describe('#10 advanced technology stays unavailable without prerequisites or cre
     const pa0 = progress(ca), pb0 = progress(cb);
     researchYearly(A, ca);
     researchYearly(B, cb);
-    expect(progress(ca) - pa0).toBeGreaterThan(0); // contacts → diffusion progress
+    // contacts → diffusion: progress on a learnable technology, or its discovery (discovery resets
+    // progress to the base cost, which can be below the effective cost it had to reach)
+    expect(progress(ca) - pa0 > 0 || ids.some((id) => ca.techs[id]?.known)).toBe(true);
+    expect(ids.some((id) => cb.techs[id]?.known)).toBe(false);
     expect(progress(cb) - pb0).toBe(0); // no contacts → none
   }, 120000);
 });

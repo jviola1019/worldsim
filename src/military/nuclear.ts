@@ -28,6 +28,7 @@ import type { Cause, Civ, NuclearDoctrine, Settlement, War, Arsenal } from '../s
 import { clamp01, saturate } from '../core/math';
 import { Good } from '../world/resources';
 import { B } from '../civilizations/buildingTypes';
+import { ignite } from '../world/environment';
 import { HAZARD } from '../world/tilemap';
 import { removePeople } from '../population/demography';
 import { flow } from '../population/ledger';
@@ -274,7 +275,7 @@ export function nuclearStrike(sim: Sim, s: Settlement, byCiv = 0): number {
     m.hazard[i] |= HAZARD.RADIATION;
     m.pollution[i] = Math.min(255, m.pollution[i] + 180);
     m.veg[i] = 0;
-    m.fire[i] = 120;
+    ignite(sim, i, 120); // through ignite, so the fire is tracked (and a save resumes identically)
     markTile(sim, i);
   });
   // fallout: deaths and illness in nearby towns, falling with distance
