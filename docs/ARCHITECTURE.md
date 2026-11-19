@@ -26,6 +26,7 @@ The app is a static site with no server and no network calls (see [SECURITY.md](
 | `security/` | Browser security policy (CSP and headers, `policy.ts`) and the cross-origin frame check (`framing.ts`). |
 | `persistence/` | Binary save format, IndexedDB slots, autosave rotation, export and import, migrations. |
 | `powers/` | God-power definitions (97 tools in 10 categories), undo stack, **god-mode horrors** (`horrors.ts`: zombies, ghouls, blight; refused in observer worlds). |
+| `rendering/` (round 6) | **Close-up cities.** `cityBlocks.ts` is pure: one tile's real data becomes a 32×32 block plan (streets by era, plots with open ground, yards, amenities by size band and ethos, civic grounds). `cityLayer.ts` caches 8×8-tile detail chunks (LRU 48, invalidated by the map's dirty flags plus a yearly signature check) and draws them over the map from 20–26 px per tile; under it sits a base map without the city buildings. `art/city_lots.ts` holds 117 generated lot sprites. The aerial photo uses the same drawing. |
 | `rendering/` | Procedural pixel-art atlas (708 sprites, plus the round-5 pack: housing styles, sports venues, ports and airports, era vehicles, characters and jobs; selection rules in `art/select.ts`), camera, chunked terrain layer, overlays (16), renderer, procedural flags, **city photos** (`photos.ts`: aerial view from the real tiles, street-level postcard from layout records). |
 | `ui/` | Screens, HUD, tool dock, inspectors, panels, charts, input classification, audio, preferences. |
 | `workers/` | World generation in a Web Worker, so the UI never freezes during creation. |
@@ -125,6 +126,18 @@ Every field marked *optional* is absent from older saves. The defensive decoder 
 | `Treaty` kinds (round 4/5) | `visitors` (visitor accord), `arms_control` | — | `economy/visitors.ts`, `military/nuclear.ts` | diplomacy, war utility |
 
 Derived, never stored: feed posts and frames (hashed from event ids), photos (rendered from tiles and records), sprite choices (pure functions in `art/select.ts`). They cannot change the simulation, and tests compare digests to confirm it.
+
+### Planning rule (round 6)
+
+`civilizations/urban.ts` applies a rule when it picks sites. A new home, shop or civic building must leave itself and every built 4-neighbour touching open land: unbuilt land, water, a park, fields or the map edge (`isOpenTile`, `keepsAccess`).
+
+- Industry and energy are exempt.
+- A housing crisis (pressure > 1.5) may fill enclosed gaps.
+- Upgrades in place are never blocked.
+- Cities above 2,000 people aim for one park per 8 residential districts.
+- Settings: `BALANCE.streetAccess`, `parkPerResidential`, `parkMinPop`, `urbanAdjBonus`, `enclosedPenalty`, `infillPressure`.
+
+The rule adds no saved state.
 
 ### Yearly pipeline
 

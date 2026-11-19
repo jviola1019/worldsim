@@ -7,17 +7,18 @@ This report tracks completion against the requirements (R-IDs from [REQUIREMENTS
 - **Experimental:** works, but balance or behavior is not yet validated.
 - **Missing:** not implemented.
 
-Last verified 2026-11-18 (round 5, final gate):
+Last verified 2026-11-19 (round 6, final gate):
 
 | Check | Result |
 |---|---|
 | Typecheck | `tsc` 7.0.2: exit 0 |
-| Unit tests | `npm test` (Vitest 5.1.1): **506/506** (27 files, 0 skipped) |
+| Unit tests | `npm test` (Vitest 5.1.1): **545/545** (32 files, 0 skipped) |
 | Build | `vite build` 8.3.8: exit 0 |
-| E2E | **28/28**, phone and desktop Chromium, production build. Includes the CSP, injected-script and framing checks. |
+| E2E | **32/32**, phone and desktop Chromium, production build. Includes the close-up city, aerial blocks, CSP, injected-script and framing checks. |
+| Design floors | 6/6 device profiles: text ≥ 12 px, touch targets ≥ 44 px, WCAG AA (`tools/viewports.mjs`); 106 captures with 0 violations ([DESIGN-REVIEW.md](DESIGN-REVIEW.md)) |
 | Dependencies | `npm audit`: 0 vulnerabilities; `npm outdated`: none |
 | GitHub Actions | CI runs #26 and #27 green on Node 26 with the pinned actions. The Pages deploy waits for the owner to enable Pages (VALIDATION §R5). |
-| Multi-seed invariants | 20 seeds × 600 years: ledger, finite values and GDP identity hold in **20/20** |
+| Multi-seed invariants | 20 seeds × 600 years: ledger, finite values and GDP identity hold in **20/20** (round-6 code) |
 
 Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is in [PERFORMANCE.md](PERFORMANCE.md) and security in [SECURITY.md](SECURITY.md).
 
@@ -43,6 +44,17 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 | R16 | Persistence and security | Complete | Validating decoder, now including the round-5 fields. 92-threat audit with CSP, frame check, validated preferences and pinned CI (SECURITY.md). |
 | R17 | Tests, benchmarks, docs, CI | Partial | 506 tests and 28 e2e checks; CI on every push; weekly long run; ERD and data dictionary. Missing: WebKit, Firefox and physical-device runs. |
 
+## Round 6 (close-up cities, planning rule, design review)
+
+| Item | Status | Evidence |
+|---|---|---|
+| Close-up city blocks (streets, yards, shops, gyms, cafés, parks, civic grounds, street-scale life) | Complete | 28 rendering tests; e2e; screenshots in the README |
+| Planning rule (street access, parks, compactness) | Complete | 8 planning tests (counterfactual); balance within ±15% on reached milestones (VALIDATION §R6) |
+| Photos from the close-up drawing | Complete | e2e (aerial blocks) |
+| Full design review (13 findings) | Complete: 12 fixed, 1 partly (D11 spacing, low) | DESIGN-REVIEW.md; floors enforced in viewports |
+| Save determinism with fires (nuclear strike, rain) | Fixed (pre-existing bug) | `fire-determinism.test.ts` |
+| Duplicate league names | Fixed (pre-existing bug) | sports uniqueness test |
+
 ## Bug ledger, rounds 4 and 5
 
 Each fix has a regression test. "Mutation" means the test was confirmed to fail with the fix reverted.
@@ -62,12 +74,13 @@ Each fix has a regression test. "Mutation" means the test was confirmed to fail 
 
 ## Known issues and next steps (ranked)
 
-1. **Modern unemployment stays high:** 15–36% in the most advanced nation of the final 1,000-year runs. Automation displaces labor faster than services absorb it.
-2. **Warming can be strong:** 3.4–10.3 °C by year 1,000 (modern-2 is 10.27 °C). Emissions are normalized by map area, but mitigation (renewables adoption, policy) is weak.
-3. **No WebKit or physical-device verification (R13, R15).** Run the protocol in VALIDATION §8 on an iPhone; Safari's CSP behavior is untested.
-4. **Nuclear use was never observed** in the 20-world endings census (by design it is rare, and deterrence and the taboo work). This means the launch path is exercised only by tests, not by organic history.
-5. **GitHub Pages header limits:** HSTS, frame-ancestors and similar headers need another host or a CDN (SECURITY.md §5).
-6. **Favorites and follow camera:** not implemented (deferred, as agreed).
+1. **Modern unemployment stays high:** 19–27% in the round-6 runs (15–36% in round 5). Automation displaces labor faster than services absorb it. The access rule cost industrial sites, which is why industry is exempt.
+2. **City composition:** modern capitals are dominated by school and workshop districts (172 of 551 detail tiles were schools in one era-10 world). This is visible in the close-up and worth rebalancing in the planner.
+3. **Warming can be strong:** 3.4–10.3 °C by year 1,000 (modern-2 is 10.27 °C). Emissions are normalized by map area, but mitigation (renewables adoption, policy) is weak.
+4. **No WebKit or physical-device verification (R13, R15).** Run the protocol in VALIDATION §8 on an iPhone; Safari's CSP behavior is untested.
+5. **Nuclear use was never observed** in the 20-world endings census (by design it is rare, and deterrence and the taboo work). This means the launch path is exercised only by tests, not by organic history.
+6. **GitHub Pages header limits:** HSTS, frame-ancestors and similar headers need another host or a CDN (SECURITY.md §5).
+7. **Favorites and follow camera:** not implemented (deferred, as agreed).
 
 ## History
 

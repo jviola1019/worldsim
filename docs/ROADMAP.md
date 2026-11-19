@@ -30,6 +30,21 @@ This document records the requested scope and the decisions the owner made. Phas
 | P6 | Visuals | Sprites for stadiums, ports, airports, housing variety, jobs and characters, and era vehicles. City photos (aerial and postcard) in the nation overview, with the flag, statistics and drill-downs. The 50-year album. | **Done**: live aerial (era-graded) and street postcard from real tiles; 50-year album; key-figure tiles; PNG export; sprite pack merged (venues, ports, airports, ethos housing, era vehicles, job characters) and wired into the renderer |
 | P7 | Professional docs and release (**always last, after every addition**) | Architecture with an ERD and data dictionary, security review, README with new screenshots, package upgrades, CI green, a `main` branch and the Pages deployment. Then the standing to-dos in CLAUDE.md: audit the GitHub tests and the newest packages. Includes the full verification and README update (formerly R4-5). | **Done**: 92-threat security audit with fixes and tests; ERD and data dictionary; README with new screenshots; packages on their latest versions (npm audit 0); actions pinned at their latest releases; CI green; final gate 506/506 tests, 28/28 e2e, 6/6 viewports; `main` created for Pages (the deploy waits for the owner to enable Pages: Settings → Pages → Source: GitHub Actions) |
 
+## Round 6 (2026-11-19)
+
+Spec: `docs/superpowers/specs/2026-11-18-city-detail-design.md`. Plan: `docs/superpowers/plans/2026-11-18-city-detail.md`.
+
+| Task | Status |
+|---|---|
+| 1. Block composer | **Done** |
+| 2. City lot sprites (117) | **Done** |
+| 3. Close-up city layer | **Done** |
+| 4. Street-scale life, muted nation colour, street lines | **Done** |
+| 5. Planning rule and balance check (plus two pre-existing bugs fixed) | **Done** |
+| 6. Photos use the close-up drawing | **Done** |
+| 7–9. Design review: captures, 13 findings, fixes, enforced floors | **Done** |
+| 10. Verification, docs, standing to-dos | **Done** |
+
 ## Verification standard (every phase)
 
 - Unit and counterfactual tests, each confirmed to fail when its fix is reverted (mutation check).

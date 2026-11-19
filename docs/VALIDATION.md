@@ -6,6 +6,73 @@
 | Environment | Cloud container: 4 vCPU Intel Xeon @ 2.10 GHz, 15 GB RAM, Node 22.23.4, Playwright 1.63 with Chromium only (no WebKit or Firefox installed), Linux. **Not** a phone. |
 | Commands | `npm ci`, `npm run typecheck`, `npm test`, `npm run build`, `npm run e2e`, `node tools/viewports.mjs`, `npm run bench -- <size> <years>`, `npm run stats -- <seeds> <years> <size>`. Probe scripts are listed under each section. |
 
+## R6. Round 6: close-up cities, planning rule, design review (2026-11-19)
+
+Environment: the same cloud container (Chromium only, **not** a phone). Raw outputs are in [`docs/data/round6/`](data/round6/).
+
+### Gate
+
+| Check | Result |
+|---|---|
+| `npm run typecheck` | exit 0 |
+| `npm test` | **545 passed, 0 failed, 0 skipped** (32 files) |
+| `npm run build` | exit 0 |
+| `npm run e2e` (production build) | **32/32**. New checks: zooming into the capital draws close-up chunks; the aerial photo draws close-up blocks. |
+| `node tools/viewports.mjs` | **6/6**, now also enforcing text ≥ 12 px, touch targets ≥ 44 px and WCAG AA on the HUD, power dock, nations sheet, inspector and Settings. Mutation check: putting back the 10.5-px tool labels fails the run. |
+| `node tools/design-capture.mjs` | 106 captures on 5 devices. Text < 12 px: 968 → **0**. Touch targets < 44 px: 1,415 → **0**. Contrast < AA: **0**. See [DESIGN-REVIEW.md](DESIGN-REVIEW.md). |
+| `npm audit` / `npm outdated` | 0 vulnerabilities / nothing outdated |
+
+### New tests (all watched failing first)
+
+| File | Tests | Covers |
+|---|---|---|
+| `tests/rendering/cityBlocks.test.ts` | 17 | Size bands and amenity shares. The composer is deterministic. Open ground between buildings in every residential district and era. Streets, fences and quays by neighbour. Street width by era. Era gates (no cars or garages before the industrial era, no huts after it). Amenities rise with size. Ethos shifts the mix. Old towns are organic, later ones a grid. Which tiles get detail (farms, ruins, sites, craters and 2×2 parts do not). The map edge counts as open. Civic grounds: fields, car parks, yards, courts. |
+| `tests/rendering/cityLayer.test.ts` | 4 | Fade curve; map-to-detail chunk mapping, including ragged edges; LRU cap. |
+| `tests/rendering/palette.test.ts` | 4 | Muted nation colour. Walkers on sidewalks and vehicles in lanes, always inside a street. |
+| `tests/rendering/sprites.test.ts` | +3 | Every lot sprite the composer can request exists. Scale limits. Nation colour at most 15% of pixels. |
+| `tests/civilizations/planning.test.ts` | 8 | What counts as open. `keepsAccess` cases (self, neighbour, map edge). Every site `findSite` picks keeps access. Large cities have parks. A gap surrounded by homes has no access. Counterfactual: fewer boxed-in buildings with the rule. An already boxed-in city still develops. |
+| `tests/world/fire-determinism.test.ts` | 2 | Saves resume identically after a nuclear strike and after rain put out a fire (a pre-existing bug, fixed). |
+| `tests/security/hardening.test.ts` | +1 | The reduce-motion preference is a boolean, off by default. |
+
+Mutation checks: ethos bias, organic jitter, `streetAccess` off, the online-share fix and the 10.5-px labels were each reverted, and each was caught. Two tests that first passed with the behaviour reverted (organic layout, the floor check) were rewritten until they failed.
+
+### Planning rule: balance against round 5 (128², 1,000 years, no god powers)
+
+| World | Milestones vs round 5 | Unemployment (round 5 → now) | Food short | Warming |
+|---|---|---|---|---|
+| modern-1 | every milestone within ±6%; Spacefaring at 939 (973) | 31% → 22% | 0% | 7.29 °C |
+| modern-2 | within ±13% on every milestone reached; does not reach Advanced Future or Spacefaring by year 1000 (round 5: 900 and 988) | 15% → **27%** | 0% | 7.09 °C |
+| modern-3 | within ±14%; now reaches Digital (862) | 36% → 19% | 0% | 7.99 °C |
+| realistic-1 | within ±7% | 24% → 20% | 0% | 9.96 °C |
+
+- **20 seeds × 600 years:** ledger, finite values and GDP identity hold in 20/20.
+- **Era at year 600:** median 7, the same as round 5.
+- **Speed:** median 31.8 ms per simulated year.
+
+**Control runs.** The same code with the access rule switched off is in `docs/data/round6/control-rule-off/`. In that control, modern-2 also reaches Digital late (884) and its unemployment is also high (24%). The modern-2 shift is therefore mostly trajectory noise, not the rule.
+
+**What the rule did cost.** Paired twins built fewer industrial districts with the rule on (154 vs 190, 170 vs 173, 153 vs 161). That is why industry and energy are exempt in the final rule. Weakening the park target first, as the spec's order says, made the results worse, and that run was discarded.
+
+### Close-up frame times (`tools/perf-closeup.mjs`, Chromium, CPU throttled ×4, emulation)
+
+| View | Median frame | p95 | JS heap |
+|---|---|---|---|
+| Modern capital at maximum zoom (close-up on, 9 detail chunks) | 33.4 ms | 83.3 ms | 17 MB |
+| Just below the close-up threshold (normal map) | 66.6 ms | 116.6 ms | 17 MB |
+
+The close-up is cheaper than the normal map just below the threshold, because far fewer map tiles, walkers and vehicles are on screen. Not measured on a phone.
+
+### Standing to-dos (CLAUDE.md)
+
+- **Packages:** `npm audit` reports 0 vulnerabilities and `npm outdated` reports nothing. GitHub Actions are pinned at their latest releases, re-checked 2026-11-19 (checkout v7.0.1, setup-node v7.1.0, upload-artifact v7.0.2, configure-pages v6.0.0, upload-pages-artifact v5.0.0, deploy-pages v5.0.1). Playwright 1.65.1 is the latest. The only new dependency is `@fontsource/atkinson-hyperlegible` 5.3.0 (OFL-1.1).
+- **GitHub Actions audit:** CI run #31 failed because the owner added a Jekyll workflow with unpinned actions. That workflow published the raw source, and the CI security tests caught it. It was replaced by the build workflow, and the runs since are green (see the push of this round). Pages now deploys the built game from the default branch.
+
+### Found and fixed along the way
+
+- **Saves resuming differently after a nuclear strike or rain.** Fires set outside `ignite()` were missing from the cached fire set. Pre-existing; exposed when the new trajectories put a fire at the save moment.
+- **Duplicate league names.** Pre-existing, for the same reason.
+- **The world app frame said "0% online"** (round 5, fixed before this round).
+
 ## R5. Round 5 final verification (2026-11-18)
 
 Environment: the same cloud container (4 vCPU, Linux, **not** a phone), Node 22.23.4 locally and Node 26 LTS in CI, Chromium only. Every figure below comes from a recorded run, and raw outputs are in [`docs/data/round5/`](data/round5/).

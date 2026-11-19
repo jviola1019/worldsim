@@ -57,6 +57,17 @@ Worldgen plus bootstrap took 159–165 ms on 128² and 362–414 ms on 256². Th
 
 Worldgen plus bootstrap took 196 ms, and the heap stayed between 23 and 66 MB. **The cost per simulated year rose by roughly 10–30%** in every window, at lower populations. The new yearly systems add work in every window, the most in the modern and future eras. At 150 ms per year the simulation can run at most about 6–7 simulated years per second in the late game on this machine. It has not been measured on a phone. The 20-seed run measured a median of 32 ms per year on 96² (VALIDATION §R5).
 
+## 2c. Close-up city layer (round 6)
+
+`node tools/perf-closeup.mjs` measures a modern capital in Chromium with the CPU throttled ×4. This is emulation, not a phone.
+
+| View | Median frame | p95 | Heap |
+|---|---|---|---|
+| Close-up (maximum zoom) | 33.4 ms | 83.3 ms | 17 MB |
+| Normal map just below the threshold | 66.6 ms | 116.6 ms | 17 MB |
+
+Detail chunks are capped at 48 (LRU) and redrawn at most 2 per frame. The base map without city buildings is capped at 48 chunks. Raw output: [`data/round6/perf-closeup.txt`](data/round6/perf-closeup.txt).
+
 ## 3. Browser
 
 `npm run bench:browser -- phone|desktop` measured `requestAnimationFrame` over 10 s on a fresh 128² world.
