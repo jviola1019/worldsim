@@ -2,7 +2,7 @@
  "generated": "2026-11-19",
  "totals": {
   "srcFiles": 139,
-  "srcLines": 41759,
+  "srcLines": 41758,
   "testFiles": 40,
   "testCases": 315
  },
@@ -10,7 +10,7 @@
   {
    "name": "rendering",
    "files": 29,
-   "lines": 18332,
+   "lines": 18331,
    "deps": {
     "sim": 12,
     "world": 10,
@@ -875,7 +875,7 @@
   {
    "path": "src/rendering/renderer.ts",
    "folder": "rendering",
-   "lines": 796,
+   "lines": 795,
    "about": "Frame renderer. Draws (back to front): cached world chunks (or the far-zoom overview), the overlay, animated tiles (volcanoes, fires, smoke, windmills), living things and agents, traffic derived from real infrastructure and trade, effects, labels, selection an"
   },
   {

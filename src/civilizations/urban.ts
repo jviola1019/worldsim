@@ -597,7 +597,6 @@ function redevelopBlock(sim: Sim, s: Settlement, civ: Civ, targetRank: number): 
   return best;
 }
 
-/** Buildings a civilization has outgrown (never landmarks, which are preserved as historic). */
 /**
  * Craft workshops a settlement aims for. Before industry: one per 5,000 people. In industrial eras factories,
  * offices and services take over: one per 15,000 people, but at most 3 + 3 x (1 - automation) (round 8: a
@@ -627,6 +626,7 @@ function energyShort(civ: Civ): boolean {
   return used >= produced * 0.9 || civ.stock[Good.ENERGY] < civ.population * 0.05;
 }
 
+/** Buildings a civilization has outgrown (never landmarks, which are preserved as historic). */
 function isObsolete(civ: Civ, s: Settlement, b: number): boolean {
   const c = civ.caps;
   switch (b) {

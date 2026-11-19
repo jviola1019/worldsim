@@ -1,0 +1,15 @@
+seed modern-3 · 128² · preset default · 1000 years · 68 s · world population 2,878,568 · god-power interventions: 0
+first year the leading nation reached each era:
+  Prehistoric 6 → Agricultural 172 → Bronze & Early Urban 296 → Iron & Classical 345 → Medieval 423 → Renaissance & Exploration 484 → Early Industrial 568 → Late Industrial 657 → Early Modern 730 → Atomic & Space 812 → Digital 893
+most advanced nation, every 100 years:
+  year  100 · Prehistoric                pop       318 · urban   0% · literacy 0.00 · electrification 0.00 · life-exp index 0.33 · agri 48% industry 0% services 14% unemployed 0% · GDP/cap 1.23 · food short 0%
+  year  200 · Agricultural               pop      2275 · urban   0% · literacy 0.00 · electrification 0.00 · life-exp index 0.33 · agri 59% industry 29% services 5% unemployed 0% · GDP/cap 1.26 · food short 0%
+  year  300 · Bronze & Early Urban       pop     21592 · urban   0% · literacy 0.05 · electrification 0.00 · life-exp index 0.28 · agri 96% industry 1% services 1% unemployed 0% · GDP/cap 0.99 · food short 0%
+  year  400 · Iron & Classical           pop    124427 · urban  39% · literacy 0.15 · electrification 0.00 · life-exp index 0.28 · agri 63% industry 9% services 16% unemployed 0% · GDP/cap 1.33 · food short 0%
+  year  500 · Renaissance & Exploration  pop    278733 · urban  69% · literacy 0.41 · electrification 0.00 · life-exp index 0.33 · agri 40% industry 5% services 29% unemployed 0% · GDP/cap 1.67 · food short 4%
+  year  600 · Early Industrial           pop    528601 · urban  88% · literacy 0.81 · electrification 0.00 · life-exp index 0.64 · agri 29% industry 15% services 50% unemployed 3% · GDP/cap 2.54 · food short 12%
+  year  700 · Late Industrial            pop    728744 · urban  90% · literacy 0.81 · electrification 0.49 · life-exp index 0.68 · agri 24% industry 27% services 43% unemployed 3% · GDP/cap 2.31 · food short 5%
+  year  800 · Early Modern               pop   1057405 · urban  99% · literacy 0.81 · electrification 1.00 · life-exp index 0.81 · agri 6% industry 21% services 61% unemployed 9% · GDP/cap 3.28 · food short 0%
+  year  900 · Digital                    pop   1608038 · urban 100% · literacy 0.81 · electrification 1.00 · life-exp index 0.85 · agri 3% industry 13% services 67% unemployed 13% · GDP/cap 2.64 · food short 0%
+  year 1000 · Digital                    pop   1438530 · urban 100% · literacy 0.91 · electrification 1.00 · life-exp index 0.88 · agri 3% industry 13% services 70% unemployed 11% · GDP/cap 3.65 · food short 0%
+natural hazards (no intervention): 35 logged disasters {"An earthquake struck":28,"A storm struck":7}; 88,486 disaster deaths; 352 deadly epidemics; 2256 drought cell-years; 3 sea-level events; climate anomaly 6.27°C

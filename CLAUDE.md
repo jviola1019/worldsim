@@ -9,13 +9,14 @@
 - Docs must be honest: no invented benchmarks or test runs, and emulation is not physical-device testing.
 
 ## Current plan
-Round 7 is **done** (2026-11-19). It covered:
-- concept effects for every power and event, and Reduce motion everywhere;
-- render-cache freshness ("recall cache"): 9 stale cases fixed;
-- WorldBox-style zone caching;
-- jobs, streets, parks and traffic at real-world rates, home forms, highways, renovation.
+Round 8 is **done** (2026-11-19). It covered:
+- public-service jobs;
+- city composition;
+- the climate response and a finite feedback store;
+- the round-6 leftovers;
+- the code guide (`docs/GUIDE.md` and `/guide/`, facts from `tools/guide-facts.mjs`; run it after adding source files).
 
-Specs: `docs/superpowers/specs/2026-11-19-animations-design.md` and `2026-11-19-city-life-design.md`. Results are in `docs/VALIDATION.md` §R7. Known issues are ranked in `docs/STATUS.md`; the next candidate is capping workshop growth in modern cities. Round 6: `docs/VALIDATION.md` §R6, `docs/DESIGN-REVIEW.md`. Round 5 history: `docs/ROADMAP.md`.
+Plan: `docs/superpowers/plans/2026-11-19-round8.md`. Results: `docs/VALIDATION.md` §R8; compare balance runs with `tools/balance-compare.mjs`. Known issues are ranked in `docs/STATUS.md`. Earlier rounds: §R7 and §R6 in VALIDATION, and `docs/ROADMAP.md`.
 
 ## Standing to-dos
 Do these **after all other work is finished**, as the last step of a round:

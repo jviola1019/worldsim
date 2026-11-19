@@ -247,6 +247,10 @@ What is still simplified or limited is listed openly in [docs/STATUS.md](docs/ST
 
 ## For developers
 
+**New to the code?** Read [docs/GUIDE.md](docs/GUIDE.md), a guided tour of the whole code base with diagrams. Or open the [interactive code guide](https://jviola1019.github.io/worldsim/guide/): a clickable map of the code, the simulation's timeline, measured balance charts, and a search over every file.
+
+<img src="docs/images/r8-guide-map.png" alt="The interactive code guide: folders of the code and how they depend on each other" width="720" />
+
 TypeScript 7, Vite 8, Preact 11, Canvas2D, Vitest 5. Runtime dependencies: Preact and the bundled Pixelify Sans font.
 
 | Command | What it does |
@@ -256,7 +260,7 @@ TypeScript 7, Vite 8, Preact 11, Canvas2D, Vitest 5. Runtime dependencies: Preac
 | `npm run build` | Type-check and build the static site into `dist/` |
 | `npm run preview` / `npm run preview:lan` | Serve the built site on port 4173 |
 | `npm test` | 552 unit, integration, counterfactual, round-trip, map-preset and security tests (about 2 minutes) |
-| `npm run e2e` | Browser test on the production build (iPhone 13 emulation and desktop), 61 checks on phone, desktop and Reduce motion, including the close-up city, jobs, map effects, feed, city pictures, album, CSP and framing; needs `npm run preview` running |
+| `npm run e2e` | Browser test on the production build (iPhone 13 emulation and desktop), 62 checks on phone, desktop and Reduce motion, including the close-up city, jobs, map effects, the code guide, feed, city pictures, album, CSP and framing; needs `npm run preview` running |
 | `node tools/viewports.mjs` | Layout check on 6 device sizes, failing on text under 12 px, touch targets under 44 px or contrast below WCAG AA |
 | `node tools/design-capture.mjs` | Design-review captures of every screen on 5 devices, with measurements |
 | `node tools/perf-closeup.mjs` | Close-up frame times (CPU throttled ×4) |

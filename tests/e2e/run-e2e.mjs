@@ -157,6 +157,19 @@ async function run(label, ctxOpts) {
   const fonts = await page.evaluate(() => document.fonts.check('16px "Pixelify Sans"'));
   check(`${label}: self-hosted Pixelify Sans loaded`, fonts);
   check(`${label}: no console errors`, errors.length === 0, errors.slice(0, 3).join(' | '));
+  // round 8: the interactive code guide loads and draws under the same CSP
+  if (label === 'desktop') {
+    const g = await ctx.newPage();
+    const gErr = [];
+    g.on('pageerror', (e) => gErr.push(String(e)));
+    g.on('console', (m) => { if (m.type() === 'error') gErr.push(m.text()); });
+    await g.goto(new URL('guide/', url).href);
+    await g.waitForTimeout(800);
+    const nodes = await g.locator('#mapsvg .node').count();
+    const bars = await g.locator('#chart-unemp rect.r8').count();
+    check(`${label}: the code guide draws its map and charts with no errors`, nodes > 10 && bars >= 4 && gErr.length === 0, `${nodes} folders, ${bars} bars, ${gErr.length} errors ${gErr.slice(0, 2).join(' | ')}`);
+    await g.close();
+  }
   // dynamic security checks (authorized, local build only): an injected inline script must be blocked by the CSP
   const blocked = await page.evaluate(() => new Promise((res) => {
     const s = document.createElement('script');

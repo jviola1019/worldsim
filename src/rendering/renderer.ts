@@ -792,4 +792,3 @@ function collapseSequence(f: VisualFx): void {
   f.ring = ring || undefined;
   f.then = undefined;
 }
-

@@ -7,18 +7,18 @@ This report tracks completion against the requirements (R-IDs from [REQUIREMENTS
 - **Experimental:** works, but balance or behavior is not yet validated.
 - **Missing:** not implemented.
 
-Last verified 2026-11-19 (round 7, audit loop pass 2):
+Last verified 2026-11-19 (round 8):
 
 | Check | Result |
 |---|---|
 | Typecheck | `tsc` 7.0.2: exit 0 |
-| Unit tests | `npm test` (Vitest 5.1.1): **594/594** (38 files, 0 skipped) |
+| Unit tests | `npm test` (Vitest 5.1.1): **610 tests** (40 files). One test was widened from 3 to 5 worlds after a diagnosed trajectory-noise failure (VALIDATION §R8). |
 | Build | `vite build` 8.3.8: exit 0 |
-| E2E | **61/61**: phone, desktop and desktop with Reduce motion (Chromium), on the production build. Includes jobs, map effects, still markers under Reduce motion, the close-up city, CSP, injected-script and framing checks. |
-| Design floors | 6/6 device profiles: text ≥ 12 px, touch targets ≥ 44 px, WCAG AA (`tools/viewports.mjs`); 121 captures with 0 violations |
+| E2E | **62/62** (phone, desktop, Reduce motion; now also the code guide) |
+| Design floors | 6/6 device profiles; 121 captures with 0 violations |
 | Dependencies | `npm audit`: 0 vulnerabilities; `npm outdated`: none |
-| GitHub Actions | CI #44 green. Pages #15 deployed after it through the new CI gate (`workflow_run`). Long-run validation #1 green, its first run. A flaky e2e check that failed CI #42 is fixed (VALIDATION §R7). |
-| Multi-seed invariants | 20 seeds × 600 years: ledger, finite values and GDP identity hold in **20/20** (round-7 code) |
+| GitHub Actions | CI, then Pages after a green CI (`workflow_run`); weekly long run (VALIDATION §R7, §R8) |
+| Multi-seed invariants | 20 seeds × 600 years: **20/20** (round-8 code) |
 
 Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is in [PERFORMANCE.md](PERFORMANCE.md) and security in [SECURITY.md](SECURITY.md).
 
@@ -55,6 +55,16 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 | Save determinism with fires (nuclear strike, rain) | Fixed (pre-existing bug) | `fire-determinism.test.ts` |
 | Duplicate league names | Fixed (pre-existing bug) | sports uniqueness test |
 | Final whole-branch review | 1 critical and 3 important findings fixed with tests (close-up cache thrash at large screens, reduce-motion weather, 2×2 access, a doc correction) | VALIDATION §R6 |
+
+## Round 8 (city composition, public jobs, climate, leftovers, code guide)
+
+| Item | Status | Evidence |
+|---|---|---|
+| Public-service jobs | Complete | Counterfactual test; modern unemployment 22.6% → 12.4% (4-world mean) |
+| City composition (workshops, schools) | Complete | `round8.test.ts`; VALIDATION §R8 |
+| Climate response (policy follows warming, clean power, electric steel, merit-order dispatch, finite feedback store) | Complete. The feedback fix does most of the work; the levers are measured as small (about 4% fewer emissions in a test world). | Warming 7.96 → 6.26 °C (4-world mean) |
+| Round-6 leftovers (ethos signature, landmark clipping, ruins, chunk edges) | Complete | `round8.test.ts` |
+| Code guide (`docs/GUIDE.md` and `/guide/`) | Complete | `tests/ui/guide.test.ts`; e2e |
 
 ## Round 7 (concept effects, render-cache freshness, city life, jobs, WorldBox-style caching)
 
@@ -100,9 +110,9 @@ Each fix has a regression test. "Mutation" means the test was confirmed to fail 
 
 ## Known issues and next steps (ranked)
 
-1. **Modern unemployment stays high:** 19–27% in the round-6 runs (15–36% in round 5). Automation displaces labor faster than services absorb it. The access rule cost industrial sites, which is why industry is exempt.
-2. **City composition:** modern capitals are dominated by school and workshop districts (172 of 551 detail tiles were schools in one era-10 world). The workshop target keeps growing with population (one per 15,000 people), so a 480k capital had about 32 workshop districts in round 7. This is visible in the close-up and in the jobs list (many artisans), and worth rebalancing in the planner. Round 6 showed that fewer industrial districts raised unemployment, so it needs a careful balance pass.
-3. **Warming can be strong:** 3.4–10.3 °C by year 1,000 (modern-2 is 10.27 °C). Emissions are normalized by map area, but mitigation (renewables adoption, policy) is weak.
+1. **Modern unemployment:** 9–17% in the round-8 runs, from 16–28% after public-service jobs were added. Automation still displaces labour faster than market services absorb it.
+2. **City composition:** fixed in round 8 (workshop and school targets capped). Existing districts are retired gradually through redevelopment, so old cities change over decades, not at once.
+3. **Warming is still strong:** 5.8–6.7 °C by year 1,000 in the round-8 runs (6.3–9.2 °C in round 7). The climate levers are measured as small because grids become clean but short of power. More clean capacity and storage would be the next lever.
 4. **No WebKit or physical-device verification (R13, R15).** Run the protocol in VALIDATION §8 on an iPhone; Safari's CSP behavior is untested.
 5. **Nuclear use was never observed** in the 20-world endings census (by design it is rare, and deterrence and the taboo work). This means the launch path is exercised only by tests, not by organic history.
 6. **GitHub Pages header limits:** HSTS, frame-ancestors and similar headers need another host or a CDN (SECURITY.md §5).

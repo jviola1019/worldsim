@@ -7,6 +7,8 @@ This guide explains the whole code base of **EPOCH: Civilizations Unbound** in p
 - what every script and test suite is for.
 
 > **Interactive companion:** <https://jviola1019.github.io/worldsim/guide/> has a clickable map of the code (folders, files and who uses whom), the simulation's timeline, and charts from real balance runs. The page reads the same facts file that produces the numbers below (`tools/guide-facts.mjs`).
+>
+> <img src="images/r8-guide-map.png" alt="The interactive code map" width="640" />
 
 The diagrams below are [Mermaid](https://mermaid.js.org/). GitHub draws them; some other viewers show the source instead.
 
@@ -504,7 +506,7 @@ Panels read the simulation directly and refresh as it runs. Input (`ui/input.ts`
 | `security/` | CSP, framing, pinned CI actions, the Pages deploy gate. |
 | `rendering/` | Block composer, caches (incremental equals full rebuild), cache freshness, sprites. |
 | `integration/` | Long multi-system scenarios. |
-| `e2e/run-e2e.mjs` | A real browser (Chromium) runs the production build on phone, desktop and Reduce motion: 61 checks, including the close-up city, jobs, effects, saves, CSP and framing. |
+| `e2e/run-e2e.mjs` | A real browser (Chromium) runs the production build on phone, desktop and Reduce motion: 62 checks, including the close-up city, jobs, effects, this guide's page, saves, CSP and framing. |
 
 A **counterfactual** test is the main tool for checking cause and effect. It clones a world, changes one thing, runs both copies, and checks that the difference goes the right way.
 

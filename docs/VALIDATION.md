@@ -6,6 +6,70 @@
 | Environment | Cloud container: 4 vCPU Intel Xeon @ 2.10 GHz, 15 GB RAM, Node 22.23.4, Playwright 1.63 with Chromium only (no WebKit or Firefox installed), Linux. **Not** a phone. |
 | Commands | `npm ci`, `npm run typecheck`, `npm test`, `npm run build`, `npm run e2e`, `node tools/viewports.mjs`, `npm run bench -- <size> <years>`, `npm run stats -- <seeds> <years> <size>`. Probe scripts are listed under each section. |
 
+## R8. Round 8: city composition, public jobs, climate response, leftovers, code guide (2026-11-19)
+
+Environment: the same cloud container (Chromium only, **not** a phone). Plan: [`superpowers/plans/2026-11-19-round8.md`](superpowers/plans/2026-11-19-round8.md). Raw outputs are in [`docs/data/round8/`](data/round8/).
+
+### Gate
+
+| Check | Result |
+|---|---|
+| `npm run typecheck` | exit 0 |
+| `npm test` | **610 tests, 609 passed on the first full run.** The one failure was the government-variety test (below), which was then widened from 3 worlds to 5 and passes. |
+| `npm run build` | exit 0 |
+| `npm run e2e` | **62/62**. New check: the code guide at `/guide/` draws its map and charts under the game's CSP with no console errors. |
+| `node tools/viewports.mjs` | 6/6 |
+| `node tools/design-capture.mjs` | 121 captures: 0 text < 12 px, 0 targets < 44 px, 0 contrast failures |
+| `npm audit` / `npm outdated` | 0 vulnerabilities / nothing outdated |
+
+### Balance against round 7 (`tools/balance-compare.mjs docs/data/round7 final- docs/data/round8 final-`)
+
+| World | Milestones in both | Worst shift | Unemployment, mean of years 700–1,000 | Food short (y1000) | Warming (y1000) |
+|---|---|---|---|---|---|
+| modern-1 | 13 | Near Future +6.5% | 28% → 10% | 0% → 0% | 8.46 → 6.67 °C |
+| modern-2 | 12 | Advanced Future +1.9% | 20% → 14% | 0% → 0% | 9.20 → 6.35 °C |
+| modern-3 | 11 | Digital −5.7% | 16% → 9% | 0% → 0% | 6.33 → 6.27 °C |
+| realistic-1 | 12 | Near Future −9.1% | 26% → 17% | 0% → 0% | 7.84 → 5.76 °C |
+
+**Means over the 4 worlds:** unemployment 22.6% → 12.4%; warming 7.96 → 6.26 °C.
+
+**20 seeds × 600 years:**
+- ledger, finite values and GDP identity hold in **20/20**;
+- era at year 600: median 7 (round 7: 7);
+- population: median 1.24 M (1.25 M);
+- speed: median 24.8 ms per year (29.8 ms in round 7, which shared the CPU with other jobs, so the timing comparison is rough).
+
+### What each change did, measured honestly
+
+- **Public-service jobs** do most of the unemployment drop. In a counterfactual test, the same modern world has lower unemployment with them than without.
+- **City composition:** a 480k capital wanted about 32 workshop districts under the round-7 rule. It now aims for 3–6, and redevelopment retires the rest over time. Tested: the workshop share in grown modern cities is under 15%.
+- **Climate. The warming drop is mostly the feedback-store fix.**
+  - **Feedback store.** Past 3 °C the climate's own feedback added CO₂ every year without limit, so warming ran away whatever nations did. The store is now finite (300 ppm).
+  - **What the climate levers did:**
+    - **Policy.** Policy follows warming, and in a test world every nation that knows cleaner ways went strict.
+    - **Electric steel.** Steel caused 73% of a modern world's emissions (measured by instrumenting the emission sources), and electric steel moves up to 65–75% of it onto the grid.
+    - **Clean power.** Fossil plants are rebuilt as solar or wind farms.
+    - **Merit-order dispatch.** Fossil plants run only for what clean power does not cover.
+  - **Their measured effect is small.** In a future-era test world, emissions fell by about 4%: the grid was already clean but short of power, so electric steel often fell back to coal. In the four 1,000-year runs, dispatch changed nothing (identical output with and without it), because those grids were clean or demand-saturated. The levers are real but secondary. Most of the warming fix comes from bounding the feedback.
+- **Round-6 leftovers:**
+  - ethos signature collision fixed;
+  - close-up chunks are now drawn top to bottom with a 64-px overhang (arcologies rise 64 px above their footprint and were clipped);
+  - ruins count as open land for planning;
+  - map-chunk-edge changes dirty the close-up next door (tested).
+
+### Found along the way
+
+- **The government-variety test** (`ethos.test.ts`) failed with 2 forms across its 3 worlds.
+  - **Diagnosis:** with public jobs off, the same 3 worlds had one federation more (3 forms). The climate change made no difference.
+  - **Over 5 worlds:** the current code has 4 forms and 8 ethos types; with public jobs off, 4 forms and 6 ethos types.
+  - **Verdict:** this is trajectory noise, not lost variety. The test now uses 5 worlds, which makes it stronger.
+
+### The code guide
+
+- **`docs/GUIDE.md`:** the whole code base explained for readers with general coding knowledge, with 8 Mermaid diagrams and screenshots.
+- **`/guide/`:** an interactive companion page with a code map from the real import graph, the year timeline, the balance charts and a search over every file.
+- **Generated, not typed:** numbers come from `tools/guide-facts.mjs` and `tools/balance-compare.mjs`. A unit test fails if the facts are stale, if the page's CSP differs from the game's, or if it has inline script or style.
+
 ## R7. Round 7: concept effects, render-cache freshness, city life, jobs, WorldBox-style caching (2026-11-19)
 
 Environment: the same cloud container (Chromium only, **not** a phone). Designs: [animations](superpowers/specs/2026-11-19-animations-design.md) (owner-approved) and [city life](superpowers/specs/2026-11-19-city-life-design.md) (builder's calls, listed in its §9 for review). Raw outputs are in [`docs/data/round7/`](data/round7/).

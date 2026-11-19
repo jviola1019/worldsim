@@ -1,0 +1,38 @@
+{"seed":0,"maxEra":7,"agriYear":172,"alive":6,"fallen":0,"wars":52,"warsEnded":51,"annexEvents":0,"religions":13,"pop":1095387,"notables":610,"msPerYear":29.4,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":1,"maxEra":7,"agriYear":171,"alive":6,"fallen":3,"wars":60,"warsEnded":60,"annexEvents":6,"religions":20,"pop":1391772,"notables":650,"msPerYear":27.4,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":2,"maxEra":7,"agriYear":149,"alive":6,"fallen":0,"wars":71,"warsEnded":71,"annexEvents":0,"religions":16,"pop":1032137,"notables":620,"msPerYear":24.2,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":3,"maxEra":7,"agriYear":178,"alive":9,"fallen":14,"wars":117,"warsEnded":116,"annexEvents":28,"religions":21,"pop":1227742,"notables":880,"msPerYear":27.6,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":4,"maxEra":7,"agriYear":170,"alive":7,"fallen":2,"wars":71,"warsEnded":70,"annexEvents":4,"religions":17,"pop":1255371,"notables":614,"msPerYear":24.2,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":5,"maxEra":6,"agriYear":192,"alive":4,"fallen":1,"wars":21,"warsEnded":21,"annexEvents":1,"religions":8,"pop":1312956,"notables":457,"msPerYear":19.8,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":6,"maxEra":7,"agriYear":163,"alive":9,"fallen":5,"wars":115,"warsEnded":114,"annexEvents":10,"religions":20,"pop":1174539,"notables":776,"msPerYear":26,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":7,"maxEra":7,"agriYear":181,"alive":10,"fallen":1,"wars":50,"warsEnded":49,"annexEvents":2,"religions":15,"pop":876202,"notables":640,"msPerYear":25.1,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":8,"maxEra":7,"agriYear":181,"alive":6,"fallen":5,"wars":74,"warsEnded":73,"annexEvents":10,"religions":11,"pop":1294095,"notables":660,"msPerYear":24.8,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":9,"maxEra":7,"agriYear":188,"alive":9,"fallen":0,"wars":77,"warsEnded":76,"annexEvents":0,"religions":10,"pop":1286185,"notables":676,"msPerYear":24.8,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":10,"maxEra":7,"agriYear":190,"alive":6,"fallen":1,"wars":70,"warsEnded":69,"annexEvents":2,"religions":10,"pop":1541177,"notables":608,"msPerYear":24.6,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":11,"maxEra":6,"agriYear":192,"alive":7,"fallen":3,"wars":112,"warsEnded":112,"annexEvents":4,"religions":18,"pop":1288402,"notables":757,"msPerYear":25.4,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":12,"maxEra":7,"agriYear":163,"alive":6,"fallen":3,"wars":60,"warsEnded":60,"annexEvents":5,"religions":9,"pop":1277220,"notables":576,"msPerYear":23.9,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":13,"maxEra":7,"agriYear":163,"alive":8,"fallen":3,"wars":78,"warsEnded":78,"annexEvents":5,"religions":16,"pop":1201465,"notables":749,"msPerYear":26.1,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":14,"maxEra":7,"agriYear":173,"alive":6,"fallen":6,"wars":79,"warsEnded":79,"annexEvents":11,"religions":14,"pop":1022641,"notables":678,"msPerYear":24,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":15,"maxEra":6,"agriYear":178,"alive":7,"fallen":3,"wars":70,"warsEnded":70,"annexEvents":6,"religions":18,"pop":577401,"notables":621,"msPerYear":21.1,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":16,"maxEra":6,"agriYear":181,"alive":5,"fallen":3,"wars":69,"warsEnded":68,"annexEvents":5,"religions":11,"pop":969650,"notables":512,"msPerYear":20.4,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":17,"maxEra":7,"agriYear":192,"alive":6,"fallen":4,"wars":73,"warsEnded":73,"annexEvents":8,"religions":21,"pop":1593347,"notables":673,"msPerYear":25.4,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":18,"maxEra":7,"agriYear":154,"alive":8,"fallen":4,"wars":53,"warsEnded":53,"annexEvents":8,"religions":18,"pop":1445071,"notables":666,"msPerYear":25.1,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":19,"maxEra":6,"agriYear":181,"alive":5,"fallen":2,"wars":56,"warsEnded":56,"annexEvents":4,"religions":9,"pop":882371,"notables":530,"msPerYear":24.8,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+
+metric          min      median   max
+maxEra                6        7        7
+agriYear            149      178      192
+alive                 4        6       10
+fallen                0        3       14
+wars                 21       71      117
+warsEnded            21       70      116
+annexEvents           0        5       28
+religions             8       16       21
+pop              577401  1255371  1593347
+notables            457      650      880
+msPerYear          19.8     24.8     29.4
+ledgerOk              1        1        1
+finiteOk              1        1        1
+gdpOk                 1        1        1
+
+highest era per seed: Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Renaissance & Exploration, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Renaissance & Exploration, Early Industrial, Early Industrial, Early Industrial, Renaissance & Exploration, Renaissance & Exploration, Early Industrial, Early Industrial, Renaissance & Exploration
