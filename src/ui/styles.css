@@ -356,3 +356,7 @@ p, li, .footnote { line-height: 1.45; }
 @keyframes sheet-in { from { transform: translateX(24px); opacity: 0; } }
 /* D10: the player's Reduce motion setting does what the OS setting does */
 .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { animation: none !important; transition: none !important; }
+
+/* round 9: saves grouped by the device a world started on */
+.device-group { display: grid; gap: var(--s2, 8px); margin-bottom: var(--s4, 16px); }
+.device-title { font-size: var(--t-md, 16px); margin: var(--s2, 8px) 0 0; color: var(--parchment-2, inherit); }

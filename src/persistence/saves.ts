@@ -12,9 +12,17 @@
 import type { WorldState } from '../sim/types';
 import { packWorld, unpackWorld, SaveError } from './serialize';
 import { ENGINE_VERSION, SAVE_VERSION } from '../config/laws';
+import { currentDevice, stampDevice } from './device';
 
 export interface SlotMeta {
   slot: string;
+  /** Round 9: the device this save was made on (absent for saves from before round 9). */
+  deviceId?: string;
+  deviceName?: string;
+  /** The device the world started on (the oldest in its device history) and every device that saved it. */
+  originId?: string;
+  originName?: string;
+  devicesSeen?: string[];
   name: string;
   year: number;
   seed: string;
@@ -78,6 +86,8 @@ export class SaveStore {
 
   async save(slot: string, w: WorldState, extra: Partial<SlotMeta> = {}): Promise<SlotMeta> {
     if (!this.db) throw new SaveError('Saving is unavailable: ' + (this.error || 'storage not open'));
+    const device = currentDevice();
+    stampDevice(w, device);
     const bytes = await packWorld(w);
     const pop = [...w.civs.values()].filter((c) => c.alive).reduce((a, c) => a + c.population, 0);
     const meta: SlotMeta = {
@@ -92,6 +102,11 @@ export class SaveStore {
       population: Math.round(pop),
       civs: [...w.civs.values()].filter((c) => c.alive).length,
       branchOf: w.meta.branchOf?.name,
+      deviceId: device.id,
+      deviceName: device.name,
+      originId: w.meta.devices?.[w.meta.devices.length - 1]?.id,
+      originName: w.meta.devices?.[w.meta.devices.length - 1]?.name,
+      devicesSeen: w.meta.devices?.map((d) => d.name),
       ...extra,
     };
     const tx = this.db.transaction(['meta', 'data'], 'readwrite');
@@ -141,6 +156,7 @@ export class SaveStore {
 }
 
 export async function exportBlob(w: WorldState): Promise<Blob> {
+  stampDevice(w, currentDevice());
   return new Blob([(await packWorld(w)) as BlobPart], { type: 'application/octet-stream' });
 }
 
@@ -152,4 +168,17 @@ export async function importBytes(bytes: Uint8Array): Promise<WorldState> {
 export function branchMeta(w: WorldState, newName: string): void {
   w.meta.branchOf = { name: w.meta.name, year: w.meta.startYear + Math.floor(w.tick / 120), tick: w.tick };
   w.meta.name = newName;
+}
+
+/** Saves grouped for the load screen: worlds started on this device first, then by the device they came from. */
+export function groupByDevice(slots: SlotMeta[], here: string): { title: string; here: boolean; slots: SlotMeta[] }[] {
+  const groups = new Map<string, { title: string; here: boolean; slots: SlotMeta[] }>();
+  for (const s of slots) {
+    const origin = s.originId ?? here; // saves from before device labels were made in this browser
+    const key = origin === here ? 'here' : origin;
+    const g = groups.get(key) ?? { title: origin === here ? 'Started on this device' : `Started on ${s.originName ?? 'another device'}`, here: origin === here, slots: [] };
+    g.slots.push(s);
+    groups.set(key, g);
+  }
+  return [...groups.values()].sort((a, b) => Number(b.here) - Number(a.here) || a.title.localeCompare(b.title));
 }

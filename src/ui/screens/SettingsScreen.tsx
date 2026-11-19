@@ -1,3 +1,6 @@
+import { useState } from 'preact/hooks';
+import { currentDevice, setDeviceName, DEVICE_NAME_MAX } from '../../persistence/device';
+
 export interface Prefs {
   sound: boolean;
   labels: boolean;
@@ -89,8 +92,22 @@ export function SettingsScreen({ back, prefs, setPrefs }: { back: () => void; pr
           </div>
           <button class="btn small" onClick={() => update({ tutorialSeen: false })}>Show the introduction again</button>
         </section>
-        <p class="footnote">EPOCH stores worlds in this browser only. Use “Export” in the game menu to keep a copy elsewhere.</p>
+        <DeviceName />
+        <p class="footnote">EPOCH stores worlds in this browser only. Each save notes the device it was made on. Use “Export” in the game menu to move a world to another device.</p>
       </div>
     </main>
+  );
+}
+
+/** Round 9: this device's name, shown on every save made here (the device id itself stays private). */
+function DeviceName() {
+  const [name, setName] = useState(currentDevice().name);
+  return (
+    <section class="fieldset">
+      <div class="field">
+        <label for="device-name">This device's name on saves</label>
+        <input id="device-name" class="text" type="text" maxLength={DEVICE_NAME_MAX} value={name} onChange={(e) => setName(setDeviceName((e.target as HTMLInputElement).value).name)} />
+      </div>
+    </section>
   );
 }

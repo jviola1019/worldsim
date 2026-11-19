@@ -9,6 +9,8 @@
  * A CRC32 checksum of the uncompressed payload is stored in the outer frame
  * so corrupted or truncated saves are detected instead of loaded.
  */
+import { validDevices } from './device';
+import { validFavorites } from '../sim/favorites';
 import type { WorldState } from '../sim/types';
 import { TileMap } from '../world/tilemap';
 import { TERRAIN } from '../world/terrain';
@@ -178,6 +180,8 @@ function decodeChecked(bytes: Uint8Array): WorldState {
   if (!isInt(st.tick) || !Array.isArray(st.rng) || st.rng.length !== 4 || !st.rng.every((v: unknown) => isInt(v))) throw new SaveError('Save clock or random state is invalid');
   if (!isObj(st.meta) || !isObj(st.laws) || !isObj(st.ids) || !isObj(st.climate) || !isObj(st.milestones) || !isObj(st.stats)) throw new SaveError('Save state is incomplete');
   if (!Array.isArray(st.relations) || !Array.isArray(st.events)) throw new SaveError('Save state is incomplete');
+  if (!validDevices(st.meta.devices)) throw new SaveError('Save device history is invalid');
+  if (!validFavorites(st.meta.favorites)) throw new SaveError('Save favourites are invalid');
   if (typeof st.meta.name !== 'string' || st.meta.name.length > 200 || (st.meta.seed !== undefined && (typeof st.meta.seed !== 'string' || st.meta.seed.length > 200))) throw new SaveError('Save world name is invalid');
   for (const k of MAPS) {
     const list = st[k] ?? [];

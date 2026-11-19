@@ -74,7 +74,16 @@ export interface WorldMeta {
   scenario?: string;
   /** Timeline lineage for branched saves. */
   branchOf?: { name: string; year: number; tick: number };
+  /** Round 9: the devices that saved this world, newest first (persistence/device.ts). Never read by the simulation. */
+  devices?: DeviceStamp[];
+  /** Round 9: the player's favourite places, people and armies (never read by the simulation). */
+  favorites?: Favorite[];
 }
+
+/** A device that saved a world: a private random id, its name, and when. */
+export interface DeviceStamp { id: string; name: string; at: number }
+/** A favourite: what kind of thing, its id, and a label kept for when it no longer exists. */
+export interface Favorite { kind: 'settlement' | 'civ' | 'person' | 'army' | 'band' | 'herd'; id: number; label: string }
 
 // ---------------------------------------------------------------- people
 

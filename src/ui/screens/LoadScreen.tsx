@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { store } from '../App';
 import type { SlotMeta } from '../../persistence/saves';
-import { importBytes } from '../../persistence/saves';
+import { importBytes, groupByDevice } from '../../persistence/saves';
+import { currentDevice } from '../../persistence/device';
 import type { WorldState } from '../../sim/types';
 import { fmt } from '../shared';
 
@@ -9,6 +10,7 @@ export function LoadScreen({ back, open, setBusy }: { back: () => void; open: (w
   const [slots, setSlots] = useState<SlotMeta[]>([]);
   const [error, setError] = useState('');
   const file = useRef<HTMLInputElement>(null);
+  const device = currentDevice();
   const refresh = () => store.list().then(setSlots);
   useEffect(() => {
     refresh();
@@ -46,7 +48,10 @@ export function LoadScreen({ back, open, setBusy }: { back: () => void; open: (w
         {error && <p class="toast warn" role="alert">{error}</p>}
         <div class="slots">
           {slots.length === 0 && store.available && <p class="empty-note">No saved worlds yet. Create one, then save it from the in-game menu.</p>}
-          {slots.map((s) => (
+          {groupByDevice(slots, device.id).map((g) => (
+            <section key={g.title} class="device-group" aria-label={g.title}>
+              <h2 class="device-title">{g.title}{g.here ? ` (${device.name})` : ''}</h2>
+          {g.slots.map((s) => (
             <div class="slot" key={s.slot}>
               {s.thumbnail ? <img src={s.thumbnail} alt="" /> : <span />}
               <div>
@@ -57,6 +62,7 @@ export function LoadScreen({ back, open, setBusy }: { back: () => void; open: (w
                   <br />
                   Seed {s.seed} · saved {new Date(s.savedAt).toLocaleString()}
                   {s.branchOf ? <><br />Branch of {s.branchOf}</> : null}
+                  {s.deviceName ? <><br />Saved on {s.deviceId === device.id ? 'this device' : s.deviceName}{s.devicesSeen && s.devicesSeen.length > 1 ? ` · also saved on ${s.devicesSeen.filter((n) => n !== s.deviceName).join(', ')}` : ''}</> : null}
                 </div>
               </div>
               <div class="actions">
@@ -64,6 +70,8 @@ export function LoadScreen({ back, open, setBusy }: { back: () => void; open: (w
                 <button class="btn small danger" onClick={async () => { if (confirm(`Delete "${s.name}"?`)) { await store.remove(s.slot); refresh(); } }}>Delete</button>
               </div>
             </div>
+          ))}
+            </section>
           ))}
         </div>
         <div class="row">
