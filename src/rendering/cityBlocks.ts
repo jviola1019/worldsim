@@ -58,7 +58,7 @@ export interface BlockPlan {
 }
 
 /** Paved, cobbled, dirt, sidewalk and lane-mark colours (also used by the e2e pixel samplers). */
-export const STREET_COLORS = ['#55535a', '#8a8580', '#a08660', '#b9b4ab', '#e8d27a'] as const;
+export const STREET_COLORS = ['#55535a', '#8a8580', '#c9b184', '#b9b4ab', '#e8d27a'] as const; // dirt lanes are packed light earth, distinct from dirt yards
 const SURFACE_COLOR: Record<StreetSeg['surface'], string> = { paved: STREET_COLORS[0], cobble: STREET_COLORS[1], dirt: STREET_COLORS[2] };
 export const streetColor = (s: StreetSeg['surface']): string => SURFACE_COLOR[s];
 
@@ -206,7 +206,7 @@ function pickAmenity(c: BlockContext, salt: number): AmenityKind | null {
 }
 
 function groundFor(c: BlockContext, yard: Lot['yard']): string {
-  return yard === 'paved' ? '#8c8a86' : yard === 'dirt' ? '#9a8660' : yard === 'garden' ? '#7d8f52' : '#6f9a4e';
+  return yard === 'paved' ? '#8c8a86' : yard === 'dirt' ? '#8a7650' : yard === 'garden' ? '#7d8f52' : '#6f9a4e';
 }
 
 export function composeBlock(c: BlockContext): BlockPlan {

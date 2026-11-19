@@ -1,0 +1,2 @@
+max zoom (close-up on)             frames 198  median 33.4 ms  p95 83.3 ms  heap 17 MB  close-up chunks 9
+just below threshold (close-up off) frames 120  median 66.6 ms  p95 116.6 ms  heap 17 MB  close-up chunks 0

@@ -77,7 +77,7 @@ export class DetailCache<V> {
   }
 }
 
-const YARD: Record<string, string> = { grass: '#7aa456', dirt: '#a6906a', paved: '#9b9892', garden: '#88a05c' };
+const YARD: Record<string, string> = { grass: '#7aa456', dirt: '#957f58', paved: '#9b9892', garden: '#88a05c' };
 
 export class CityLayer {
   private cache = new DetailCache<HTMLCanvasElement>(48);

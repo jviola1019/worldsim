@@ -115,7 +115,7 @@ export class Renderer {
     const tilePx = cam.zoom * TILE;
     const far = tilePx < 2.6;
     const close = far ? 0 : detailAlpha(tilePx);
-    this.unitScale = tilePx >= 20 ? 0.5 : 1;
+    this.unitScale = tilePx >= 20 ? 0.3 : 1;
     if (far) {
       this.layer.updateOverview();
       ctx.drawImage(this.layer.overview, 0, 0, m.w * TILE, m.h * TILE);
@@ -398,17 +398,19 @@ export class Renderer {
       for (let k = 0; k < n; k++) {
         const col = k % 4;
         const row = Math.floor(k / 4);
-        atlas.draw(ctx, unit, a.x * TILE + (col - 1.5) * 4 + (row % 2), a.y * TILE + row * 3 - 3, this.frameIdx(a.state === 'battle' ? 8 : 5, k), civ?.color, flip, false, this.unitScale);
+        const u = this.unitScale;
+        atlas.draw(ctx, unit, a.x * TILE + ((col - 1.5) * 4 + (row % 2)) * u, a.y * TILE + (row * 3 - 3) * u, this.frameIdx(a.state === 'battle' ? 8 : 5, k), civ?.color, flip, false, u);
       }
       if (civ) {
         // banner pole + the nation's own flag (6×4 art px at world scale)
-        const bx = Math.round(a.x * TILE - 9), by = Math.round(a.y * TILE - 10);
+        const u = this.unitScale;
+        const bx = a.x * TILE - 9 * u, by = a.y * TILE - 10 * u;
         ctx.fillStyle = '#3b2a1a';
-        ctx.fillRect(bx, by, 1, 9);
+        ctx.fillRect(bx, by, Math.max(0.3, u), 9 * u);
         const wave = this.frameIdx(3) === 1 ? 1 : 0;
-        ctx.drawImage(flagCanvas(civ), bx + 1, by + wave * 0.5, 6, 4);
-      } else atlas.draw(ctx, 'fx.flag', a.x * TILE - 7, a.y * TILE - 4, this.frameIdx(3));
-      if (a.state === 'sieging') atlas.draw(ctx, 'fx.smoke', a.x * TILE + 6, a.y * TILE - 6, this.frameIdx(3));
+        ctx.drawImage(flagCanvas(civ), bx + u, by + wave * 0.5 * u, 6 * u, 4 * u);
+      } else atlas.draw(ctx, 'fx.flag', a.x * TILE - 7 * this.unitScale, a.y * TILE - 4 * this.unitScale, this.frameIdx(3), undefined, false, false, this.unitScale);
+      if (a.state === 'sieging') atlas.draw(ctx, 'fx.smoke', a.x * TILE + 6 * this.unitScale, a.y * TILE - 6 * this.unitScale, this.frameIdx(3), undefined, false, false, this.unitScale);
     }
   }
 
