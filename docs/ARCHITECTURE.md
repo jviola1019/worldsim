@@ -185,6 +185,23 @@ mountains and trees). Below 2.6 px per tile it switches to a single overview ima
 from real roads, rails and trade routes, and weather from real rain anomalies. Civilization flags are generated from
 `civ.emblem` (eight field divisions × twelve charges) and cached as canvases. The UI uses them as data URLs.
 
+**Zone caching (round 7, after WorldBox).**
+- **Overview and overlays.** The far-zoom overview (1 px per tile) and the 4-px overlay are pixel buffers. Only the 16×16 chunks ("zones") that changed are repainted, each with one dirty-rectangle `putImageData` (`rendering/pixelCache.ts`).
+- **Grow rules.** The overview repaints one extra tile right and down (relief reads the tiles above and to the left). Overlay borders repaint one extra tile on every side.
+- **Overlay sweeps.** Overlay modes driven by live statistics also refresh a rolling quarter of the map per pass. Tile-based modes get a slow safety sweep.
+- **What marks the map dirty.** `markTile` dirties a chunk, and also the chunk next door when the tile sits on a chunk edge (road joins, shorelines and relief read neighbours). Vegetation and smog redraw only when their drawn look changes (`setVeg`, `setPollution`).
+- **Tests.** One test checks every god power and 30-year runs from three eras: every tile whose drawn look changed lies in a dirty chunk. Another checks that incremental pixels equal a full rebuild byte for byte.
+
+**Concept effects (round 7).**
+- `sim/conceptFx.ts` maps every god power and every event type to an effect or a stated reason. Disasters and lasting states (battles, sieges, outbreaks, nuclear blasts) emit through the same registry, and no system calls `addFx` directly.
+- The renderer draws area rings and sequences, caps identical effects per place, and flashes the screen for the largest concepts.
+- Under Reduce motion, effects become still markers and there is no flash.
+
+**City life (round 7).**
+- **Streets.** `rendering/cityBlocks.ts` sizes streets to era street shares, widens districts on simulated paved roads into arterials (divided on highways), and draws future streets as transit decks.
+- **Homes and parks.** Homes take 16 forms by district type, era, wealth and inequality. Pocket parks cover what park districts leave short of the era's park share.
+- **Traffic and jobs.** `economy/traffic.ts` derives traffic from vehicles per 1,000 people over street capacity, and the vehicles on screen follow the load. `economy/occupations.ts` splits sector employment into 41 named jobs, and nations record job-group shares yearly.
+
 ## Persistence
 
 The `EPCH` binary format is a JSON header (meta, ids, entity arrays, a typed-array table) followed by

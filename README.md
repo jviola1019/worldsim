@@ -46,6 +46,14 @@ Zoom in and each district of a city opens into a proper block, drawn from what i
 
 Older towns grow organically, and industrial cities follow a grid. Cities also keep their breathing room: new homes, shops and civic buildings must stay next to open land, and large cities plant parks.
 
+Cities follow real-world rates:
+- **Streets and parks.** Street space grows from about a tenth of a block in early towns to nearly a third in modern cities. Parks follow each era's share of city land: cities short of green space set aside one district in every few they develop.
+- **Traffic.** Each city's vehicle trips are counted against its street capacity, from carts to cars to shared autonomous pods. Busier cities show more vehicles.
+- **Homes.** Past huts and caves, homes come in many forms: cottages, longhouses, villas, terraces, tenements, manors, detached houses, duplexes, mid-rise and high-rise flats, mansions, eco-pods and sky villas. The mix depends on the era, the district and how rich and unequal the nation is.
+- **Roads.** Paved roads and highways run through the blocks as arterials and divided highways.
+- **Rebuilding.** Old districts are renovated, built up denser or redeveloped for new uses.
+- **Jobs.** Each city lists what its people do for a living (gatherers, farmers, smiths, factory workers, programmers, AI supervisors and more). A chart shows how the nation's work changes as its technology changes.
+
 | A modern capital | A medieval town |
 |---|---|
 | <img src="docs/images/r6-close-up-modern.png" alt="Close-up of a modern city: blocks, streets, schools with sports fields, car parks, people and buses" /> | <img src="docs/images/r6-close-up-kingdoms.png" alt="Close-up of a medieval town: row houses, lanes, gardens, a market, a temple and fields" /> |
@@ -110,7 +118,7 @@ Every event is recorded with its causes. Charts show population, economy, techno
 
 ### Play god, or just watch
 
-**97 god powers** come in 10 groups: shape land, plant forests, place peoples, found faiths, grant knowledge, start or end wars, call down disasters, launch the space age, and change the **world laws**. You can also edit any person's traits ("divine touch").
+**108 god powers** come in 9 groups: shape land, plant forests, place peoples, found faiths, grant knowledge, start or end wars, call down disasters and launch the space age. You can also change the **world laws** and edit any person's traits ("divine touch"). Every power and every major event shows its effect where it happens (a quake ring, a meteor that falls and explodes, fireworks for world games), as a still marker if Reduce motion is on.
 
 Prefer to just watch? Choose the **Realistic (observer)** preset. God powers are switched off and history runs entirely on its own, including natural disasters and epidemics.
 
@@ -248,7 +256,7 @@ TypeScript 7, Vite 8, Preact 11, Canvas2D, Vitest 5. Runtime dependencies: Preac
 | `npm run build` | Type-check and build the static site into `dist/` |
 | `npm run preview` / `npm run preview:lan` | Serve the built site on port 4173 |
 | `npm test` | 552 unit, integration, counterfactual, round-trip, map-preset and security tests (about 2 minutes) |
-| `npm run e2e` | Browser test on the production build (iPhone 13 emulation and desktop), 33 checks including the close-up city, feed, city pictures, album, CSP and framing; needs `npm run preview` running |
+| `npm run e2e` | Browser test on the production build (iPhone 13 emulation and desktop), 61 checks on phone, desktop and Reduce motion, including the close-up city, jobs, map effects, feed, city pictures, album, CSP and framing; needs `npm run preview` running |
 | `node tools/viewports.mjs` | Layout check on 6 device sizes, failing on text under 12 px, touch targets under 44 px or contrast below WCAG AA |
 | `node tools/design-capture.mjs` | Design-review captures of every screen on 5 devices, with measurements |
 | `node tools/perf-closeup.mjs` | Close-up frame times (CPU throttled ×4) |

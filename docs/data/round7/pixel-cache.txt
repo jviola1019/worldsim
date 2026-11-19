@@ -1,0 +1,8 @@
+map 256² (256 chunks), 10 simulated years from the Renaissance, Node v22.23.4
+dirty chunks per month: map 42.0 (16.4%), overlay 42.4
+overview: full rebuild 1.70 ms per pass; dirty chunks only 0.433 ms per pass
+overlay:  full rebuild 4.14 ms per pass; dirty chunks only 1.566 ms per pass
+map 512² (1024 chunks), 5 simulated years from the Renaissance, Node v22.23.4
+dirty chunks per month: map 67.0 (6.5%), overlay 67.3
+overview: full rebuild 6.61 ms per pass; dirty chunks only 0.730 ms per pass
+overlay:  full rebuild 14.66 ms per pass; dirty chunks only 2.110 ms per pass

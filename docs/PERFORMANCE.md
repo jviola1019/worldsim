@@ -68,6 +68,17 @@ Worldgen plus bootstrap took 196 ms, and the heap stayed between 23 and 66 MB. *
 
 Detail chunks are capped at 48 (LRU) and redrawn at most 2 per frame. The base map without city buildings is capped at 48 chunks. Raw output: [`data/round6/perf-closeup.txt`](data/round6/perf-closeup.txt).
 
+## 2d. Zone caching of the overview and overlays (round 7)
+
+`npx tsx benchmarks/pixel-cache.ts <size> <years>` measures the CPU time of the pixel work in Node: a full rebuild against repainting only the chunks one simulated month dirtied (about one overlay refresh pass at normal speed). Renaissance start, seed `pixel-bench`. This is **not browser frame time**: `putImageData` and compositing are not included.
+
+| Map | Dirty chunks per month | Overview: full → zones | Overlay: full → zones |
+|---|---|---|---|
+| 256² (256 chunks) | 42.0 (16.4%) | 1.70 → 0.43 ms | 4.14 → 1.57 ms |
+| 512² (1,024 chunks) | 67.0 (6.5%) | 6.61 → 0.73 ms | 14.66 → 2.11 ms |
+
+The saving grows with map size, because changes are local. Live overlay modes also repaint a rolling quarter of the map per pass. Raw output: [`data/round7/pixel-cache.txt`](data/round7/pixel-cache.txt).
+
 ## 3. Browser
 
 `npm run bench:browser -- phone|desktop` measured `requestAnimationFrame` over 10 s on a fresh 128² world.

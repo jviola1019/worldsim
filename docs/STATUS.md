@@ -7,18 +7,18 @@ This report tracks completion against the requirements (R-IDs from [REQUIREMENTS
 - **Experimental:** works, but balance or behavior is not yet validated.
 - **Missing:** not implemented.
 
-Last verified 2026-11-19 (round 6, final gate):
+Last verified 2026-11-19 (round 7, audit loop pass 2):
 
 | Check | Result |
 |---|---|
 | Typecheck | `tsc` 7.0.2: exit 0 |
-| Unit tests | `npm test` (Vitest 5.1.1): **552/552** (32 files, 0 skipped) |
+| Unit tests | `npm test` (Vitest 5.1.1): **594/594** (38 files, 0 skipped) |
 | Build | `vite build` 8.3.8: exit 0 |
-| E2E | **33/33**, phone and desktop Chromium, production build. Includes the close-up city, aerial blocks, CSP, injected-script and framing checks. |
-| Design floors | 6/6 device profiles: text ≥ 12 px, touch targets ≥ 44 px, WCAG AA (`tools/viewports.mjs`); 106 captures with 0 violations ([DESIGN-REVIEW.md](DESIGN-REVIEW.md)) |
+| E2E | **61/61**: phone, desktop and desktop with Reduce motion (Chromium), on the production build. Includes jobs, map effects, still markers under Reduce motion, the close-up city, CSP, injected-script and framing checks. |
+| Design floors | 6/6 device profiles: text ≥ 12 px, touch targets ≥ 44 px, WCAG AA (`tools/viewports.mjs`); 121 captures with 0 violations |
 | Dependencies | `npm audit`: 0 vulnerabilities; `npm outdated`: none |
-| GitHub Actions | CI runs #26 and #27 green on Node 26 with the pinned actions. The Pages deploy waits for the owner to enable Pages (VALIDATION §R5). |
-| Multi-seed invariants | 20 seeds × 600 years: ledger, finite values and GDP identity hold in **20/20** (round-6 code) |
+| GitHub Actions | CI and Pages run on every push of this branch (VALIDATION §R7) |
+| Multi-seed invariants | 20 seeds × 600 years: ledger, finite values and GDP identity hold in **20/20** (round-7 code) |
 
 Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is in [PERFORMANCE.md](PERFORMANCE.md) and security in [SECURITY.md](SECURITY.md).
 
@@ -56,11 +56,28 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 | Duplicate league names | Fixed (pre-existing bug) | sports uniqueness test |
 | Final whole-branch review | 1 critical and 3 important findings fixed with tests (close-up cache thrash at large screens, reduce-motion weather, 2×2 access, a doc correction) | VALIDATION §R6 |
 
-Deferred minor findings from the final review:
+## Round 7 (concept effects, render-cache freshness, city life, jobs, WorldBox-style caching)
+
+| Item | Status | Evidence |
+|---|---|---|
+| A map effect for every concept (108 powers, every event type), area rings, sequences, a per-place cap, screen flashes | Complete | `conceptFx.test.ts` (coverage, one source, hooks, cap, determinism); e2e (an earthquake plays and ends) |
+| Reduce motion everywhere (still markers, no flash, sheets without animation) | Complete | e2e reduced-motion run; renderer collapses sequences |
+| Render caches follow every concept ("recall cache") | Complete: **9 stale-drawing cases found and fixed** | `cacheFreshness.test.ts` (every power and 30-year runs from 3 eras) |
+| WorldBox-style zone caching of the overview and overlays | Complete | `pixelCache.test.ts` (byte-equal to a full rebuild); PERFORMANCE §2d |
+| Jobs tracked and shown (41 occupations; history per nation) | Complete | `occupations.test.ts`; e2e (jobs panel) |
+| Streets and parks at real-world rates; traffic from demand over capacity | Complete. Parks are simulated (target and zoning) and drawn; streets and traffic are drawn and derived. | `cityLife.test.ts`; VALIDATION §R7 |
+| Homes past huts and caves (16 forms) | Complete (a visual and reporting mix; the housing stock is unchanged) | `cityLife.test.ts` |
+| Highways and future roads; road networks share trunk lines | Complete | `cityWorks.test.ts`; close-up arterials |
+| Renovation, build-up and redevelopment, counted per settlement | Complete | `cityWorks.test.ts` |
+| Repeated "third straight title" headlines | Fixed (pre-existing) | sports test |
+| Whole-branch review | 8 findings, all fixed | VALIDATION §R7 |
+
+Round-6 deferred minor fixed in round 7: blocks now use the simulated road tier (arterials and highways).
+
+Deferred minor findings from the round-6 final review:
 - an ethos switch between militarist and mercantile (same block signature) waits for another change to redraw;
 - fences and streets across a map-chunk boundary update within a year;
 - tall landmarks in a chunk's first row can clip;
-- road tier is not used when composing a block;
 - some planning tests check less than their names suggest;
 - ruins count as built for planning but open for drawing.
 
@@ -84,7 +101,7 @@ Each fix has a regression test. "Mutation" means the test was confirmed to fail 
 ## Known issues and next steps (ranked)
 
 1. **Modern unemployment stays high:** 19–27% in the round-6 runs (15–36% in round 5). Automation displaces labor faster than services absorb it. The access rule cost industrial sites, which is why industry is exempt.
-2. **City composition:** modern capitals are dominated by school and workshop districts (172 of 551 detail tiles were schools in one era-10 world). This is visible in the close-up and worth rebalancing in the planner.
+2. **City composition:** modern capitals are dominated by school and workshop districts (172 of 551 detail tiles were schools in one era-10 world). The workshop target keeps growing with population (one per 15,000 people), so a 480k capital had about 32 workshop districts in round 7. This is visible in the close-up and in the jobs list (many artisans), and worth rebalancing in the planner. Round 6 showed that fewer industrial districts raised unemployment, so it needs a careful balance pass.
 3. **Warming can be strong:** 3.4–10.3 °C by year 1,000 (modern-2 is 10.27 °C). Emissions are normalized by map area, but mitigation (renewables adoption, policy) is weak.
 4. **No WebKit or physical-device verification (R13, R15).** Run the protocol in VALIDATION §8 on an iPhone; Safari's CSP behavior is untested.
 5. **Nuclear use was never observed** in the 20-world endings census (by design it is rare, and deterrence and the taboo work). This means the launch path is exercised only by tests, not by organic history.

@@ -6,6 +6,99 @@
 | Environment | Cloud container: 4 vCPU Intel Xeon @ 2.10 GHz, 15 GB RAM, Node 22.23.4, Playwright 1.63 with Chromium only (no WebKit or Firefox installed), Linux. **Not** a phone. |
 | Commands | `npm ci`, `npm run typecheck`, `npm test`, `npm run build`, `npm run e2e`, `node tools/viewports.mjs`, `npm run bench -- <size> <years>`, `npm run stats -- <seeds> <years> <size>`. Probe scripts are listed under each section. |
 
+## R7. Round 7: concept effects, render-cache freshness, city life, jobs, WorldBox-style caching (2026-11-19)
+
+Environment: the same cloud container (Chromium only, **not** a phone). Designs: [animations](superpowers/specs/2026-11-19-animations-design.md) (owner-approved) and [city life](superpowers/specs/2026-11-19-city-life-design.md) (builder's calls, listed in its §9 for review). Raw outputs are in [`docs/data/round7/`](data/round7/).
+
+### Audit loop
+
+The loop repeated the full verification until a pass found nothing to fix.
+
+| Pass | What ran | Found | Fixed |
+|---|---|---|---|
+| 1 | Full gate, balance against round 6, whole-branch review (high effort, 4 angles) | 8 review findings (4 important, 4 minor); 1 e2e gap (a city could not be opened from its nation's panel); 1 news bug (below) | All, with tests where testable |
+| 2 | Full gate again on the final code: tests, build, e2e, viewports, design capture, 4 × 1,000-year runs, 20 seeds × 600 years | Nothing | — |
+
+### Gate (pass 2, final code)
+
+| Check | Result |
+|---|---|
+| `npm run typecheck` | exit 0 |
+| `npm test` | **594 passed, 0 failed, 0 skipped** (38 files) |
+| `npm run build` | exit 0 |
+| `npm run e2e` (production build) | **61/61** across 3 runs (phone, desktop, desktop with Reduce motion), twice in a row before the review fixes and once after. New checks: the capital's panel lists jobs and streets and traffic; sheets animate for 200 ms (none under Reduce motion); an earthquake used through the real dock shows its effect and ring, which moves and then ends; under Reduce motion the effect is a still marker (at most 1 of 3 frame pairs changes, from the once-a-second step). |
+| `node tools/viewports.mjs` | **6/6** (text ≥ 12 px, targets ≥ 44 px, WCAG AA) |
+| `node tools/design-capture.mjs` | 121 captures on 5 devices, now including nation statistics and the capital's panel: **0** text < 12 px, **0** targets < 44 px, **0** contrast < AA. Motion in use: only the tokens (120 ms transitions, 200 ms sheets, 250 ms ticker). |
+| `npm audit` / `npm outdated` | 0 vulnerabilities / nothing outdated |
+
+### New tests
+
+| File | Tests | Covers |
+|---|---|---|
+| `tests/sim/conceptFx.test.ts` | 12 | Every one of the 108 powers and every event type in the source (exact or prefix) has an entry. Every "none" has a reason. Every effect is a real sprite, and every effect sprite is used. No `addFx` outside the registry. Each power that takes effect shows exactly one effect. A brush shows one puff per place. A power's own events stay quiet. Placed, minor and placeless events. Per-place cap. Effects never change history (byte-equal saves with every effect dropped). |
+| `tests/rendering/cacheFreshness.test.ts` | 4 | **"Recall cache."** For each of the 108 powers, and for 30-year runs from eras 1, 4 and 6, every tile whose drawn look changed lies in a dirty chunk, and so do its 8 neighbours. |
+| `tests/rendering/pixelCache.test.ts` | 4 | Overview and overlay repaints of dirty chunks are byte-equal to a full rebuild, including chunk-edge borders. The one-tile margin is needed (without it, the test sees stale pixels). The rolling sweep visits every zone. |
+| `tests/economy/occupations.test.ts` | 7 | Jobs add up exactly to sector workers in a grown world. Foragers become farmers, mechanization moves farm work to machines, crafts give way to factories, computing and AI change office work, and power plants employ power plant workers. Yearly job-group shares add up to one. |
+| `tests/rendering/cityLife.test.ts` | 10 | Street share per era within 5 points of its target. Arterials and divided highways on simulated roads. A grown modern city's green space within 4 points of its era's share. Several home forms per era, with huts only in the earliest. Mansions are commoner in rich, unequal nations and take double plots. The home mix adds up to one. Traffic load is monotonic in people, districts and roads. |
+| `tests/civilizations/cityWorks.test.ts` | 4 | New towns start in their era's homes. Cities renovate, build up and redevelop, and keep most homes within two era styles. Counters survive a save. Road planning reuses the nation's own roads, and not foreign ones. |
+| `tests/culture/sports.test.ts` | +1 | Dynasty headlines at the 3rd, 5th and every 5th straight title, with correct ordinals. |
+
+### "Recall cache": stale drawing found and fixed
+
+Before round 7, any change anywhere redrew the whole overview and overlay, which masked missed invalidations. The freshness test found 9 cases where the cached map would have stayed stale:
+1. owner changes on built tiles (a city changing hands kept its old colours);
+2. settlement changes on built tiles;
+3. the anomaly power's hazard mark;
+4. sacred sites (religions founded);
+5. battlefields;
+6. radiation clearing;
+7. vegetation crossing the drawn thresholds (flowers, trees, dense forest, two trees), which regrowth, grazing, fire and industry missed;
+8. smog crossing its opacity steps;
+9. edits on chunk-edge tiles, which neighbours read (road joins, shorelines, relief).
+
+`markTile` now also dirties the chunk next door, and vegetation and smog go through `setVeg` and `setPollution`.
+
+**Effects and caching do not change history.** Before the four simulation changes below, a 1,000-year run (modern-1) was identical, line for line, to the round-6 baseline.
+
+### Balance against round 6 (128², 1,000 years, no god powers; baseline from a worktree at `836c3a6`)
+
+Four simulation changes were made, each part of the request:
+1. roads reuse existing roads;
+2. renovation projects;
+3. era-appropriate first homes;
+4. the park target and zoning.
+
+| World | Milestones reached in both runs | Worst milestone shift | Unemployment, mean of years 700–1,000 (round 6 → round 7) | Food short at year 1,000 | Warming |
+|---|---|---|---|---|---|
+| modern-1 | 13 | Spacefaring +9.7% | 26% → 28% | 0% → 0% | 6.84 → 8.46 °C |
+| modern-2 | 11 (now also reaches Advanced Future) | Iron & Classical −10.2% | 21% → 20% | 0% → 0% | 8.27 → 9.20 °C |
+| modern-3 | 10 (now also reaches Digital) | Atomic & Space −11.6% | 16% → 16% | 6% → 0% | 5.24 → 6.33 °C |
+| realistic-1 | 12 | Near Future +9.0% | 24% → 26% | 0% → 0% | 8.06 → 7.84 °C |
+
+- **20 seeds × 600 years:** ledger, finite values and GDP identity hold in **20/20**.
+- **Era at year 600:** median 7 (round 6: 7).
+- **Population:** median 1.25 M (round 6: 1.30 M).
+- **Speed:** median 29.8 ms per simulated year (round 6: 27.4). These runs shared the CPU with other jobs, so the timing comparison is rough.
+
+Shifts go both ways and stay within ±12% on every milestone reached. A run of the pre-review code gave mean unemployment of 17, 19, 11 and 22%, so the remaining differences look like trajectory noise. No control run isolating each change was made.
+
+### Zone caching cost (PERFORMANCE §2d)
+
+CPU time of the pixel work per refresh pass, in Node (not browser frame time):
+- **512² overview:** 6.61 → 0.73 ms;
+- **512² overlay:** 14.66 → 2.11 ms.
+
+### Found and fixed along the way
+
+- **News spam:** a winning streak was reported as "a third straight title" every season. Pre-existing.
+- **Large modern cities had no parks:** the round-6 target (one park per 8 home districts) gave dense cities, which have few, very large home districts, almost none. A 480k city in a test world had 0 of 92 districts as parks. The target now follows the era's park share of all city districts, with zoning.
+- **A city's panel could not be opened from its nation's panel.** An "Open <capital>" button was added, and e2e uses it.
+
+### Standing to-dos (CLAUDE.md)
+
+- **Packages:** `npm audit` reports 0 vulnerabilities and `npm outdated` reports nothing. Actions are pinned at the same releases checked in round 6 earlier the same day. No new dependencies.
+- **GitHub Actions:** see the run list in STATUS. CI and Pages run on every push of this branch.
+
 ## R6. Round 6: close-up cities, planning rule, design review (2026-11-19)
 
 Environment: the same cloud container (Chromium only, **not** a phone). Raw outputs are in [`docs/data/round6/`](data/round6/).
