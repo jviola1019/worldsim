@@ -63,7 +63,7 @@ Three ideas run through the whole code:
 
 The project is TypeScript built with **Vite**. The interface uses **Preact** (a small React). The map is drawn with **Canvas 2D**. Tests use **Vitest** (unit) and **Playwright** (browser).
 
-**Size** (from `node tools/guide-facts.mjs`, round 8): 139 source files, about 41,700 lines, and 41 test files. Nearly half the lines are pixel art defined as code (`src/rendering/art/`).
+**Size** (from `node tools/guide-facts.mjs`, round 8): 139 source files, about 41,700 lines, and 40 unit-test files plus the browser e2e runner. Nearly half the lines are pixel art defined as code (`src/rendering/art/`).
 
 ```mermaid
 flowchart TB
@@ -490,7 +490,7 @@ Panels read the simulation directly and refresh as it runs. Input (`ui/input.ts`
 
 ## 18. Tests, scripts and tools
 
-### Tests (`tests/`, 41 files; `npm test`)
+### Tests (`tests/`, 40 unit-test files; `npm test`)
 
 | Suite | What it proves |
 |---|---|
