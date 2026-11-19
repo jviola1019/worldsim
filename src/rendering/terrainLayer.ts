@@ -17,6 +17,7 @@ import { hexToRgb } from './art/palette';
 import { DX8, DY8 } from '../core/math';
 import { sportsVenueSprite, eraVenueSprite, airportSprite, portSprite, housingStyleForEthos, type Sport } from './art/select';
 import type { SportKey } from '../culture/sports';
+import { isDetailTile } from './cityBlocks';
 
 /** Which venue sprite each simulated sport plays in. */
 const SPORT_VENUE: Record<SportKey, Sport> = {
@@ -39,7 +40,12 @@ export class TerrainLayer {
   private lru: number[] = [];
   maxCached = 220;
 
-  constructor(private sim: Sim, private atlas: Atlas) {
+  /**
+   * `skipDetail`: leave out the buildings of close-up city tiles (drawn by CityLayer instead), so
+   * their 8-px sprites do not poke out above the 32-px blocks at close zoom.
+   */
+  constructor(private sim: Sim, private atlas: Atlas, private opts: { skipDetail?: boolean; maxCached?: number } = {}) {
+    if (opts.maxCached) this.maxCached = opts.maxCached;
     const m = sim.w.map;
     this.cx = Math.ceil(m.w / CHUNK);
     this.cy = Math.ceil(m.h / CHUNK);
@@ -51,15 +57,20 @@ export class TerrainLayer {
     this.overviewData = this.overview.getContext('2d')!.createImageData(m.w, m.h);
   }
 
-  /** Pull dirty flags from the simulation. */
-  syncDirty(): void {
+  /** Pull dirty flags from the simulation; `onDirty` lets other layers follow the same changes. */
+  syncDirty(onDirty?: (k: number) => void): void {
     const sd = this.sim.chunkDirty;
     for (let k = 0; k < sd.length; k++)
       if (sd[k]) {
         this.dirty[k] = 1;
         sd[k] = 0;
         this.overviewDirty = true;
+        onDirty?.(k);
       }
+  }
+
+  markDirty(k: number): void {
+    this.dirty[k] = 1;
   }
 
   invalidateAll(): void {
@@ -253,6 +264,7 @@ export class TerrainLayer {
         const b = m.bld[i];
         if (b) {
           if (m.bldFlags[i] & BLDF.PART) continue;
+          if (this.opts.skipDetail && isDetailTile(m, i)) continue;
           const key = BUILDING_KEY_BY_ID[b];
           const tier = m.bldFlags[i] & BLDF.TIER_MASK;
           const id = this.spriteFor(i, x, y, b, key, tier);
@@ -304,6 +316,14 @@ export class TerrainLayer {
    * era's venue), airports and harbours follow the era (a big port spreads over open water, else a
    * jetty), homes take the owner's ethos style (atomic-age or ecological) from the modern tier on.
    */
+  /** The map sprite id of the building on tile i (used by the close-up layer for 2×2 landmarks). */
+  spriteIdFor(i: number): string | undefined {
+    const m = this.sim.w.map;
+    const b = m.bld[i];
+    if (!b) return undefined;
+    return this.spriteFor(i, m.xOf(i), m.yOf(i), b, BUILDING_KEY_BY_ID[b], m.bldFlags[i] & BLDF.TIER_MASK);
+  }
+
   private spriteFor(i: number, x: number, y: number, b: number, key: string, tier: number): string | undefined {
     const m = this.sim.w.map;
     const civ = m.owner[i] ? this.sim.w.civs.get(m.owner[i]) : undefined;

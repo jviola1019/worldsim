@@ -66,6 +66,21 @@ async function run(label, ctxOpts) {
   const medium = posts ? await page.locator('article.post').first().getAttribute('class') : '';
   check(`${label}: news feed shows posts`, posts > 0, `${posts} posts (${medium})`);
   await page.getByLabel('Close').first().click();
+  // close-up city: zoom into the capital; streets of the 32-px blocks must be on screen
+  await page.getByLabel('Nations').click();
+  await page.locator('.sheet-body ul.list li button').first().click();
+  await page.waitForTimeout(300);
+  const showCap = page.getByText('Show capital');
+  if (await showCap.count()) await showCap.first().click();
+  await page.waitForTimeout(400);
+  await page.getByLabel('Close').first().click().catch(() => {});
+  const vp = page.viewportSize();
+  await page.mouse.move(vp.width / 2, vp.height / 2);
+  for (let k = 0; k < 30; k++) { await page.mouse.wheel(0, -300); await page.waitForTimeout(30); }
+  await page.waitForTimeout(1500);
+  const cityChunks = Number(await page.locator('canvas.canvas').getAttribute('data-city-chunks'));
+  check(`${label}: close-up city blocks drawn when zoomed in`, cityChunks > 0, `${cityChunks} close-up chunks on screen`);
+  for (let k = 0; k < 30; k++) { await page.mouse.wheel(0, 300); await page.waitForTimeout(20); }
   // save
   await page.getByLabel('Menu').click();
   const save = page.getByText(/^Save/).first();

@@ -40,13 +40,20 @@ export interface BlockContext {
   h: number;
 }
 
-export interface Lot { x: number; y: number; w: number; h: number; kind: LotKind; sprite: string; yard: 'grass' | 'dirt' | 'paved' | 'garden' }
+export interface Lot {
+  x: number; y: number; w: number; h: number; kind: LotKind; sprite: string; yard: 'grass' | 'dirt' | 'paved' | 'garden';
+  /** Draw the district's own map sprite (×2) instead of `sprite`: civic buildings and industry keep their identity. */
+  mapSprite?: boolean;
+}
+export interface Feature { x: number; y: number; w: number; h: number; kind: 'field' | 'parking' | 'yard' | 'court' }
 export interface StreetSeg { x: number; y: number; w: number; h: number; surface: 'dirt' | 'cobble' | 'paved'; sidewalk: boolean }
 export interface BlockPlan {
   ground: string;
   streets: StreetSeg[];
   edges: { side: 0 | 1 | 2 | 3; kind: 'fence' | 'hedge' | 'wall' | 'quay' }[];
   lots: Lot[];
+  /** Grounds of civic and industrial blocks: sports fields, car parks, work yards, courtyards. */
+  features: Feature[];
   trees: { x: number; y: number; size: 0 | 1 | 2 }[];
 }
 
@@ -203,7 +210,7 @@ function groundFor(c: BlockContext, yard: Lot['yard']): string {
 }
 
 export function composeBlock(c: BlockContext): BlockPlan {
-  const plan: BlockPlan = { ground: '', streets: [], edges: [], lots: [], trees: [] };
+  const plan: BlockPlan = { ground: '', streets: [], edges: [], lots: [], features: [], trees: [] };
   const st = streetFor(c.tier);
   const grid = c.tier >= 5;
   // E and S streets are owned by this block; W and N streets belong to the neighbour on that side.
@@ -224,6 +231,10 @@ export function composeBlock(c: BlockContext): BlockPlan {
   if (grid) { ux0 += ux0 & 1; uy0 += uy0 & 1; ux1 -= ux1 & 1; uy1 -= uy1 & 1; }
   const L = layoutFor(c);
   plan.ground = groundFor(c, L.yard);
+  if (L.kind === 'civic' || L.kind === 'industry') {
+    groundsBlock(c, plan, L, ux0, uy0, ux1, uy1, grid);
+    return plan;
+  }
   const gapX = L.shared ? 0 : 2, gapRow = 2;
   const W = ux1 - ux0, H = uy1 - uy0;
   const cw = Math.floor((W - gapX * (L.cols - 1)) / L.cols / 2) * 2;
@@ -258,6 +269,34 @@ export function composeBlock(c: BlockContext): BlockPlan {
     plan.trees.push({ x: ux0 + (th % Math.max(1, W)), y: uy0 + ((th >> 8) % Math.max(1, H)), size: ((th >> 16) % 3) as 0 | 1 | 2 });
   }
   return plan;
+}
+
+const FIELD_CIVIC = new Set<number>([B.SCHOOL, B.UNIVERSITY, B.LIBRARY]);
+const PARK_CIVIC = new Set<number>([B.HOSPITAL, B.LAB, B.DATA_CENTER]);
+
+/** One main building on its grounds: fields for schools, car parks for hospitals, courts for temples, yards for industry. */
+function groundsBlock(c: BlockContext, plan: BlockPlan, L: Layout, ux0: number, uy0: number, ux1: number, uy1: number, grid: boolean): void {
+  const W = ux1 - ux0, H = uy1 - uy0;
+  let mw = Math.max(8, Math.round((W * 0.56) / 2) * 2);
+  if (!grid) mw -= (c.h & 1);
+  const main: Lot = { x: ux0, y: uy0, w: mw, h: H, kind: L.kind, sprite: lotSprite(L.kind, c.tier, c.h), yard: L.yard, mapSprite: true };
+  plan.lots.push(main);
+  const fx = ux0 + mw + 2, fw = ux1 - fx;
+  if (fw < 4) return;
+  const modern = c.tier >= 5;
+  if (L.kind === 'industry') {
+    if (modern) {
+      const hh = Math.floor((H - 2) / 2);
+      plan.features.push({ x: fx, y: uy0, w: fw, h: hh, kind: 'yard' }, { x: fx, y: uy0 + hh + 2, w: fw, h: H - hh - 2, kind: 'parking' });
+    } else plan.features.push({ x: fx, y: uy0, w: fw, h: H, kind: 'yard' });
+    return;
+  }
+  if (FIELD_CIVIC.has(c.b) && c.tier >= 2) plan.features.push({ x: fx, y: uy0, w: fw, h: H, kind: 'field' });
+  else if (PARK_CIVIC.has(c.b) && modern) plan.features.push({ x: fx, y: uy0, w: fw, h: H, kind: 'parking' });
+  else {
+    plan.features.push({ x: fx, y: uy0, w: fw, h: H, kind: 'court' });
+    for (let t = 0; t < 2; t++) plan.trees.push({ x: fx + 1 + ((c.h >> (t * 4)) % Math.max(1, fw - 2)), y: uy0 + 2 + t * Math.max(2, (H >> 1)), size: 1 });
+  }
 }
 
 function pick(st: { surface: StreetSeg['surface']; sidewalk: boolean }): Pick<StreetSeg, 'surface' | 'sidewalk'> {

@@ -6,7 +6,7 @@ export class Camera {
   y = 0;
   zoom = 1;
   minZoom = 0.15;
-  maxZoom = 8;
+  maxZoom = 12;
   viewW = 1;
   viewH = 1;
 

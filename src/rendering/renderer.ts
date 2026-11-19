@@ -17,6 +17,7 @@ import { CHUNK } from '../sim/context';
 import { Atlas } from './atlas';
 import { Camera, TILE } from './camera';
 import { TerrainLayer, PAD } from './terrainLayer';
+import { CityLayer, DCHUNK, DETAIL, DPAD, detailAlpha } from './cityLayer';
 import { OverlayLayer, SCALE as OV_SCALE } from './overlays';
 import { HAZARD } from '../world/tilemap';
 import { B, eraToTier } from '../civilizations/buildingTypes';
@@ -37,6 +38,12 @@ export class Renderer {
   atlas: Atlas;
   cam = new Camera();
   layer: TerrainLayer;
+  /** The map without close-up city buildings (drawn under the city layer at close zoom). */
+  base: TerrainLayer;
+  city: CityLayer;
+  private cityYear = -1;
+  /** Close-up chunks drawn in the last frame (0 when the close-up is off); read by the e2e test. */
+  cityChunksDrawn = 0;
   overlay: OverlayLayer;
   ctx: CanvasRenderingContext2D;
   dpr = 1;
@@ -53,6 +60,8 @@ export class Renderer {
     this.atlas = atlas ?? new Atlas();
     this.ctx = canvas.getContext('2d', { alpha: false })!;
     this.layer = new TerrainLayer(sim, this.atlas);
+    this.base = new TerrainLayer(sim, this.atlas, { skipDetail: true, maxCached: 48 });
+    this.city = new CityLayer(sim, this.atlas, (i) => this.layer.spriteIdFor(i));
     this.overlay = new OverlayLayer(sim);
     const m = sim.w.map;
     for (let i = 0; i < m.n; i++) if (m.hazard[i] & HAZARD.VENT) this.vents.push(i);
@@ -61,6 +70,9 @@ export class Renderer {
   setSim(sim: Sim): void {
     this.sim = sim;
     this.layer = new TerrainLayer(sim, this.atlas);
+    this.base = new TerrainLayer(sim, this.atlas, { skipDetail: true, maxCached: 48 });
+    this.city = new CityLayer(sim, this.atlas, (i) => this.layer.spriteIdFor(i));
+    this.cityYear = -1;
     const mode = this.overlay.mode;
     this.overlay = new OverlayLayer(sim);
     this.overlay.mode = mode;
@@ -91,13 +103,20 @@ export class Renderer {
     const z = cam.zoom * this.dpr;
     // world transform: world px -> device px
     ctx.setTransform(z, 0, 0, z, -cam.x * z + (cam.viewW * this.dpr) / 2, -cam.y * z + (cam.viewH * this.dpr) / 2);
-    this.layer.syncDirty();
+    this.layer.syncDirty((k) => {
+      this.base.markDirty(k);
+      this.city.markMapChunk(k);
+    });
     const tilePx = cam.zoom * TILE;
     const far = tilePx < 2.6;
+    const close = far ? 0 : detailAlpha(tilePx);
     if (far) {
       this.layer.updateOverview();
       ctx.drawImage(this.layer.overview, 0, 0, m.w * TILE, m.h * TILE);
-    } else this.drawChunks();
+    } else this.drawChunks(close >= 1 ? this.base : this.layer);
+    if (close > 0) this.drawCity(close);
+    else this.cityChunksDrawn = 0;
+    this.canvas.dataset.cityChunks = String(this.cityChunksDrawn);
     // overlay
     this.overlayTimer -= dt;
     if (this.overlay.mode !== 'terrain' && this.overlayTimer <= 0) {
@@ -131,7 +150,38 @@ export class Renderer {
     this.frameMs = performance.now() - t0;
   }
 
-  private drawChunks(): void {
+  /** Close-up city blocks over the map, faded in between 20 and 26 px per tile. */
+  private drawCity(alpha: number): void {
+    const { ctx, cam } = this;
+    const m = this.sim.w.map;
+    if (this.sim.year !== this.cityYear) {
+      if (this.cityYear >= 0) this.city.yearlyCheck();
+      this.cityYear = this.sim.year;
+    }
+    const [tx0, ty0, tx1, ty1] = cam.visibleTiles(m.w, m.h, 1);
+    const wanted: number[] = [];
+    for (let cy = Math.floor(ty0 / DCHUNK); cy <= Math.min(this.city.cy - 1, Math.floor((ty1 + 2) / DCHUNK)); cy++)
+      for (let cx = Math.floor(tx0 / DCHUNK); cx <= Math.min(this.city.cx - 1, Math.floor(tx1 / DCHUNK)); cx++) wanted.push(cy * this.city.cx + cx);
+    const ccx = cam.x / (DCHUNK * TILE), ccy = cam.y / (DCHUNK * TILE);
+    const d2 = (k: number) => ((k % this.city.cx) - ccx) ** 2 + (Math.floor(k / this.city.cx) - ccy) ** 2;
+    this.city.refresh([...wanted].sort((a, b) => d2(a) - d2(b)), 2);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    const pad = DPAD / DETAIL;
+    let drawn = 0;
+    for (const k of wanted) {
+      const c = this.city.get(k);
+      if (!c) continue; // not drawn yet: the normal map shows through
+      drawn++;
+      const x = (k % this.city.cx) * DCHUNK * TILE;
+      const y = Math.floor(k / this.city.cx) * DCHUNK * TILE;
+      ctx.drawImage(c, x, y - pad, DCHUNK * TILE, DCHUNK * TILE + pad);
+    }
+    ctx.restore();
+    this.cityChunksDrawn = drawn;
+  }
+
+  private drawChunks(layer: TerrainLayer = this.layer): void {
     const { ctx, cam } = this;
     const m = this.sim.w.map;
     const [tx0, ty0, tx1, ty1] = cam.visibleTiles(m.w, m.h, 1);
@@ -146,14 +196,14 @@ export class Renderer {
     const ccx = cam.x / (CHUNK * TILE);
     const ccy = cam.y / (CHUNK * TILE);
     const sorted = [...wanted].sort((a, b) => ((a % cxN) - ccx) ** 2 + (Math.floor(a / cxN) - ccy) ** 2 - (((b % cxN) - ccx) ** 2 + (Math.floor(b / cxN) - ccy) ** 2));
-    this.layer.refresh(sorted, 4);
+    layer.refresh(sorted, 4);
     for (const k of wanted) {
-      const c = this.layer.get(k);
+      const c = layer.get(k);
       const x = (k % cxN) * CHUNK * TILE;
       const y = Math.floor(k / cxN) * CHUNK * TILE;
       if (c) {
         ctx.drawImage(c, x, y - PAD);
-        this.layer.touch(k);
+        layer.touch(k);
       } else {
         // not yet drawn: show the overview patch
         this.layer.updateOverview();

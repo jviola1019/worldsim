@@ -158,3 +158,32 @@ describe('which tiles get close-up detail', () => {
     expect(blockContext(sim, i)).toBeNull();
   });
 });
+
+describe('civic and industrial blocks have grounds', () => {
+  it('a modern school stands on its grounds with a sports field beside it, and keeps its own map look', () => {
+    const p = composeBlock(ctx({ b: B.SCHOOL, tier: 6 }));
+    expect(p.lots.length).toBe(1);
+    expect(p.lots[0].mapSprite).toBe(true);
+    const field = p.features.find((f) => f.kind === 'field');
+    expect(field).toBeTruthy();
+    expect(overlap(field!, p.lots[0])).toBe(false);
+  });
+  it('a modern factory has a yard and a car park; a hospital has a car park; a temple a courtyard', () => {
+    const f = composeBlock(ctx({ b: B.FACTORY, tier: 6 }));
+    expect(f.features.map((x) => x.kind)).toEqual(expect.arrayContaining(['yard', 'parking']));
+    expect(composeBlock(ctx({ b: B.HOSPITAL, tier: 6 })).features.some((x) => x.kind === 'parking')).toBe(true);
+    expect(composeBlock(ctx({ b: B.TEMPLE, tier: 3 })).features.some((x) => x.kind === 'court')).toBe(true);
+  });
+  it('no car parks before the industrial era', () => {
+    for (const b of [B.SCHOOL, B.FACTORY, B.HOSPITAL, B.TEMPLE, B.WORKSHOP]) for (let tier = 0; tier <= 4; tier++) expect(composeBlock(ctx({ b, tier })).features.some((x) => x.kind === 'parking'), `${b}/${tier}`).toBe(false);
+  });
+  it('features stay inside the block and out of the streets', () => {
+    for (const b of [B.SCHOOL, B.FACTORY, B.HOSPITAL, B.TEMPLE, B.UNIVERSITY, B.PALACE]) for (let tier = 0; tier <= 7; tier++) {
+      const p = composeBlock(ctx({ b, tier }));
+      for (const f of p.features) {
+        expect(f.x >= 0 && f.y >= 0 && f.x + f.w <= 32 && f.y + f.h <= 32).toBe(true);
+        for (const s of p.streets) expect(overlap(f, s)).toBe(false);
+      }
+    }
+  });
+});
