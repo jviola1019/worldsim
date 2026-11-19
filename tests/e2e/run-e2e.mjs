@@ -13,6 +13,7 @@ const results = [];
 const check = (name, ok, info = '') => { results.push({ name, ok, info }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${info ? ' — ' + info : ''}`); };
 
 async function run(label, ctxOpts) {
+  const reduced = ctxOpts.reducedMotion === 'reduce';
   const browser = await chromium.launch();
   const ctx = await browser.newContext(ctxOpts);
   const page = await ctx.newPage();
@@ -82,6 +83,40 @@ async function run(label, ctxOpts) {
   await page.waitForTimeout(1500);
   const cityChunks = Number(await page.locator('canvas.canvas').getAttribute('data-city-chunks'));
   check(`${label}: close-up city blocks drawn when zoomed in`, cityChunks > 0, `${cityChunks} close-up chunks on screen`);
+  // round 7: the capital's inspector lists jobs, homes, and streets and traffic
+  await page.mouse.click(vp.width / 2, vp.height / 2);
+  await page.waitForTimeout(500);
+  const jobRows = await page.locator('[data-testid=jobs] .row').count();
+  const trafficKv = await page.locator('[data-testid=traffic]').count();
+  check(`${label}: settlement shows its jobs and its streets and traffic`, jobRows > 0 && trafficKv === 1, `${jobRows} job rows, traffic panel ${trafficKv}`);
+  // round 7: interface motion follows the setting (200 ms sheet entrance; none under Reduce motion)
+  const anim = await page.locator('.sheet').first().evaluate((el) => { const cs = getComputedStyle(el); return { name: cs.animationName, dur: cs.animationDuration }; }).catch(() => ({ name: '?', dur: '?' }));
+  if (reduced) check(`${label}: sheets do not animate under Reduce motion`, anim.name === 'none' || anim.dur === '0s', `${anim.name} ${anim.dur}`);
+  else check(`${label}: sheets open with the 200 ms entrance`, anim.name !== 'none' && anim.dur === '0.2s', `${anim.name} ${anim.dur}`);
+  await page.getByLabel('Close').first().click().catch(() => {});
+  // round 7: a god power used through the real dock shows its effect where it lands, which moves and then ends
+  // (under Reduce motion it is a still marker)
+  await page.getByLabel('Disasters').click();
+  await page.locator('.tool', { hasText: 'Earthquake' }).first().click();
+  await page.mouse.click(vp.width / 2, vp.height / 2 + 40);
+  await page.waitForTimeout(120);
+  const fxNow = (await page.locator('canvas.canvas').getAttribute('data-fx')) ?? '';
+  const clip = { x: Math.round(vp.width / 2 - 90), y: Math.round(vp.height / 2 - 50), width: 180, height: 180 };
+  let changes = 0;
+  let prev = await page.screenshot({ clip });
+  for (let k = 0; k < 3; k++) {
+    await page.waitForTimeout(150);
+    const next = await page.screenshot({ clip });
+    if (!next.equals(prev)) changes++;
+    prev = next;
+  }
+  await page.waitForTimeout(3600);
+  const fxLater = (await page.locator('canvas.canvas').getAttribute('data-fx')) ?? '';
+  check(`${label}: an earthquake shows its effect and ring, then it ends`, fxNow.includes('fx.quake') && !fxLater.includes('fx.quake'), `now "${fxNow}", later "${fxLater}"`);
+  if (reduced) check(`${label}: under Reduce motion the effect is a still marker`, changes <= 1, `${changes} of 3 frame pairs changed`);
+  else check(`${label}: the effect animates`, changes >= 2, `${changes} of 3 frame pairs changed`);
+  await page.getByLabel('Stop using this power').click().catch(() => {});
+  await page.keyboard.press('Escape').catch(() => {});
   if (label === 'desktop') {
     // cache pressure: a big screen just past the close-up threshold wants more chunks than the cache
     // holds; the layer must settle (nothing pending) with at most 48 chunks drawn
@@ -135,6 +170,7 @@ async function run(label, ctxOpts) {
 
 await run('phone', { ...devices['iPhone 13'] });
 await run('desktop', { viewport: { width: 1280, height: 800 } });
+await run('reduced', { viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
 const failed = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - failed}/${results.length} checks passed`);
 process.exit(failed ? 1 : 0);

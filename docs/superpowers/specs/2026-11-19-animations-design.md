@@ -213,3 +213,20 @@ All other effects reuse the 34 existing sprites. The sprite tests cover the new 
 ## 8. Left to the builder
 
 Sprite frame timing; the ring style; how the throttle picks which effect to drop; the e2e sampling details.
+
+## 9. As built (round 7)
+
+These are the builder's changes from the text above:
+
+- **Location.** The registry lives in `src/sim/conceptFx.ts`, not `src/rendering/`. Simulation systems emit through it, and simulation code must not import from rendering.
+- **Ongoing states.** Battles, sieges, horror attacks, monster attacks, grey-goo spread and each nuclear blast are states that last. They emit through `emitFx` with a spec from `STATE_FX`. Disasters use `DISASTER_FX` and keep their real radius. No `addFx` call remains outside `context.ts` and `conceptFx.ts`, and a static test checks this.
+- **One tap, one effect.** Inside a power that has its own spec, the events and states it sets off draw nothing. The power draws at the place named by its first placed event, or else at the tap point. Powers whose entry is `none` (the disasters, nuke, nuclear war) let their disaster or blast draw.
+- **Throttle.** Each spec has a per-place cap (`cap`, default 3 alive within 2 tiles). Brushes use a cap of 1.
+- **Reduce motion.** The still marker is the sprite's middle frame (the first frame of several effects is nearly empty). A sequence collapses into its last effect, shown for the whole sequence's duration.
+- **Render-cache freshness** found real stale-drawing cases, all now fixed:
+  - owner and settlement changes on built tiles;
+  - sacred, anomaly, battlefield and radiation-cleared marks;
+  - vegetation and smog crossing their drawn thresholds;
+  - edits on chunk-edge tiles, which neighbours read.
+
+  `markTile` now also dirties the chunk next door, and `setVeg` and `setPollution` redraw only when the drawn look changes.

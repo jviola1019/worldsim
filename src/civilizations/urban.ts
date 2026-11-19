@@ -15,6 +15,7 @@ import { missionBuildMult } from './missions';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement } from '../sim/types';
 import { markTile, markOverlay } from '../sim/context';
+import { PARK_SHARE, streetBand } from '../economy/traffic';
 import { B, eraToTier, type BuildingId } from './buildingTypes';
 import { BUILDINGS, RESIDENTIAL, type BuildingDef } from './buildings';
 import { BLDF, type TileMap } from '../world/tilemap';
@@ -424,9 +425,20 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
   const hasTeam = [...sim.w.leagues.values()].some((l) => l.active && l.teams.some((t) => t.settlementId === s.id));
   add(B.ARENA, 0.8 + (hasTeam ? 2.5 : 0));
   add(B.MONUMENT, 0.6);
-  // green space: large cities aim for a park per few residential districts
+  // green space: large cities aim for a park per few residential districts, and (round 7) for the real-world park
+  // share of their era across all their city districts (dense modern cities have few, very large home districts)
   const resDistricts = RESIDENTIAL_TYPES.reduce((a, b) => a + (s.bld[b] ?? 0), 0);
-  add(B.PARK, pop > BALANCE.parkMinPop && s.bld[B.PARK] < resDistricts / BALANCE.parkPerResidential ? 2.0 : 0.7);
+  let cityDistricts = 0;
+  for (let t = 1; t < s.bld.length; t++) if (s.bld[t] && t !== B.PARK && CITY_CATS.has(BUILDINGS[t]?.category)) cityDistricts += s.bld[t];
+  const parkTarget = Math.max(resDistricts / BALANCE.parkPerResidential, cityDistricts * PARK_SHARE[streetBand(tier)]);
+  const parkGap = parkTarget > 0 ? Math.min(1, (parkTarget - s.bld[B.PARK]) / parkTarget) : 0;
+  add(B.PARK, pop > BALANCE.parkMinPop && s.bld[B.PARK] < parkTarget ? 2.0 + 2 * parkGap : 0.7);
+  // Regulated green space (round 7): a city below its era's park share sets aside one district in every
+  // 1/share it develops as a park, ahead of other needs, as zoning rules do.
+  const works = worksOf(s);
+  const done = works.built + works.builtUp + works.renovated + works.redeveloped;
+  const every = Math.max(4, Math.round(1 / PARK_SHARE[streetBand(tier)]));
+  const parkDue = pop > BALANCE.parkMinPop && s.bld[B.PARK] < Math.floor(parkTarget) && done % every === every - 1 && hasUnlocked(civ, B.PARK);
   add(B.BANK, 1 + caps.finance);
   add(B.OFFICE, 1 + caps.finance * 0.5 + pop / 300000 - s.bld[B.OFFICE] * 0.5);
   add(B.WAREHOUSE, 0.8);
@@ -469,6 +481,17 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
 
   if (!cands.length) return;
   cands.sort((a, b) => b.score - a.score || a.type - b.type);
+  if (parkDue && canAfford(civ, BUILDINGS[B.PARK])) {
+    // a park's site: open land, else a brownfield (era-obsolete district), else the oldest huts or houses
+    const def = BUILDINGS[B.PARK];
+    let tile = findSite(sim, s, def);
+    let upgrade = false;
+    if (tile === null) { tile = obsoleteSite(sim, s, civ) ?? oldestResidential(sim, s, residentialRank(B.TOWNHOUSE)); upgrade = tile !== null; }
+    if (tile !== null) {
+      startProject(sim, s, civ, B.PARK, tile, upgrade);
+      return;
+    }
+  }
   // walk down the ranked list: unaffordable wishes record demand but don't block cheaper needs
   let siteTries = 0;
   let wishes = 0;
@@ -494,12 +517,18 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
       else tile = obsoleteSite(sim, s, civ) ?? (pressure < 1.1 && def.category !== 'residential' ? oldestResidential(sim, s, residentialRank(resi.id)) : null);
       upgrade = tile !== null;
     }
+    // round 7: a built-up city that is short of green space turns a brownfield site (an era-obsolete district) into a park
+    if (tile === null && c.type === B.PARK && c.score >= 2) {
+      tile = obsoleteSite(sim, s, civ);
+      upgrade = tile !== null;
+    }
     if (tile === null) continue;
     startProject(sim, s, civ, c.type, tile, upgrade);
     return;
   }
 }
 
+const CITY_CATS = new Set<string | undefined>(['residential', 'commerce', 'civic', 'industry', 'energy']);
 const RESIDENTIAL_TYPES = [B.HUT, B.HOUSE, B.TOWNHOUSE, B.TENEMENT, B.APARTMENT, B.SUBURB, B.TOWER, B.ARCOLOGY];
 
 function countFree(sim: Sim, s: Settlement): number {

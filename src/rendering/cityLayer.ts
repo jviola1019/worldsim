@@ -336,14 +336,33 @@ export class CityLayer {
     for (const s of plan.streets) {
       ctx.fillStyle = streetColor(s.surface);
       ctx.fillRect(ox + s.x, oy + s.y, s.w, s.h);
+      const vert = s.w < s.h;
       if (s.sidewalk) {
         ctx.fillStyle = STREET_COLORS[3];
-        if (s.w < s.h) { ctx.fillRect(ox + s.x, oy + s.y, 1, s.h); ctx.fillRect(ox + s.x + s.w - 1, oy + s.y, 1, s.h); }
+        if (vert) { ctx.fillRect(ox + s.x, oy + s.y, 1, s.h); ctx.fillRect(ox + s.x + s.w - 1, oy + s.y, 1, s.h); }
         else { ctx.fillRect(ox + s.x, oy + s.y, s.w, 1); ctx.fillRect(ox + s.x, oy + s.y + s.h - 1, s.w, 1); }
+      }
+      const mid = vert ? s.x + (s.w >> 1) : s.y + (s.h >> 1);
+      if (s.surface === 'transit') {
+        // future streets: a pale deck with two guide rails for shared autonomous pods
+        ctx.fillStyle = STREET_COLORS[6];
+        if (vert) { ctx.fillRect(ox + mid - 1, oy + s.y, 1, s.h); ctx.fillRect(ox + mid + 1, oy + s.y, 1, s.h); }
+        else { ctx.fillRect(ox + s.x, oy + mid - 1, s.w, 1); ctx.fillRect(ox + s.x, oy + mid + 1, s.w, 1); }
+      } else if (s.lanes === 4) {
+        // divided highway: a green median and a dashed line on each carriageway
+        ctx.fillStyle = STREET_COLORS[7];
+        if (vert) ctx.fillRect(ox + mid, oy + s.y, 1, s.h);
+        else ctx.fillRect(ox + s.x, oy + mid, s.w, 1);
+        ctx.fillStyle = STREET_COLORS[4];
+        for (const off of [-2, 2]) {
+          if (vert) for (let j = 2; j < s.h; j += 6) ctx.fillRect(ox + mid + off, oy + s.y + j, 1, 3);
+          else for (let j = 2; j < s.w; j += 6) ctx.fillRect(ox + s.x + j, oy + mid + off, 3, 1);
+        }
+      } else if (s.sidewalk || s.lanes) {
         // centre lane marks
         ctx.fillStyle = STREET_COLORS[4];
-        if (s.w < s.h) for (let j = 2; j < s.h; j += 6) ctx.fillRect(ox + s.x + (s.w >> 1), oy + s.y + j, 1, 3);
-        else for (let j = 2; j < s.w; j += 6) ctx.fillRect(ox + s.x + j, oy + s.y + (s.h >> 1), 3, 1);
+        if (vert) for (let j = 2; j < s.h; j += 6) ctx.fillRect(ox + mid, oy + s.y + j, 1, 3);
+        else for (let j = 2; j < s.w; j += 6) ctx.fillRect(ox + s.x + j, oy + mid, 3, 1);
       }
     }
     for (const e of plan.edges) {

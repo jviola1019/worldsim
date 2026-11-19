@@ -38,9 +38,11 @@ Reference rates (approximate public urban-planning figures, used as targets, not
   - `composeBlock` sizes its streets so the street area of a block between built neighbours lands within ±5 points of the band's share.
   - Its arterials follow the tile's simulated road tier: a tile carrying a tier-3 or higher road gets a wider arterial with lane marks (closes the round-6 deferred minor "road tier unused when composing blocks").
   - A unit test measures street share per band.
-- **Parks.**
-  - Residential blocks of town size and up give a share of their lots to pocket parks, so the city-wide park share (simulated PARK districts plus pocket parks) reaches the band's target.
-  - A test measures that share over the blocks of a real grown city.
+- **Parks (simulated and drawn).**
+  - **Simulation.** The planner's park target is the larger of the round-6 rule (one park per 8 home districts) and the era's park share of all the city's districts. Dense modern cities have few, very large home districts, so the round-6 rule left them with no parks.
+  - **Zoning.** A city below its share sets aside one district in every 1/share it develops as a park, ahead of other needs, as zoning rules do. The park goes on open land if there is any, else on a brownfield (an era-obsolete district), else on the oldest huts or houses.
+  - **Drawing.** Residential blocks give pocket parks only to cover what the park districts leave short of the target.
+  - **Test.** A test measures the city-wide green share over the blocks of a real grown modern city.
 - **Traffic** (`src/economy/traffic.ts`, derived, never saved):
   - **Demand.** Vehicle trips are computed from population × vehicles per 1,000 × daily trip rate.
   - **Capacity.** Road capacity is computed from the settlement's street lane-km (district count × street share × lanes by tier) plus the road tier on its tiles.
@@ -104,7 +106,7 @@ Reference rates (approximate public urban-planning figures, used as targets, not
 - **Renovation** (simulation): a residential district at least 2 era tiers behind its nation gets a "renovate" project. The type stays the same, the tier is brought up to date, and the cost and labour are about 40%, like farm upgrades. This only happens while housing is not under pressure.
 - **Build-up and relocation** already happen in the simulation: in-place densification and redevelopment of obsolete sites. They become visible:
   - upgrade projects show scaffolding on the block;
-  - each settlement keeps yearly counters of districts built, built up (denser), renovated and relocated (an obsolete or central industrial site redeveloped while the same type is rebuilt elsewhere), shown in the inspector;
+  - each settlement keeps counters, since its founding, of districts built, built up (denser homes), renovated, and redeveloped for a new use (the old use is rebuilt elsewhere if it is still needed: this is how a district "moves"), shown in the inspector;
   - these counters are small saved integers, so saves keep them.
 
 ## 7. WorldBox-style caching
@@ -148,5 +150,5 @@ The loop repeats until a full pass finds nothing to fix. Each pass is recorded i
 - Streets, parks and traffic are visual and derived (the owner's "should be visual detail"). Traffic does not slow trade or growth.
 - Occupations are a named split of the existing sector employment, so no new labour simulation. Their history is stored as civ series.
 - Housing variety is a visual and reporting mix over the unchanged housing stock. The only housing change in the simulation is the first-district fix.
-- Three simulation changes, each balance-checked: road reuse, renovation projects, and the first district.
+- Four simulation changes, each balance-checked: road reuse, renovation projects, the first district, and the park target with zoning.
 - The rate table in §3 gives rough targets from general planning figures, not measured data.

@@ -236,7 +236,13 @@ export class TerrainLayer {
             const ny = y + DY8[dir];
             if (!m.inBounds(nx, ny)) continue;
             const j = ny * m.w + nx;
-            if (road && (m.roadTier(j) || m.bld[j])) line(ctx, cx, cy, cx + DX8[dir] * 4, cy + DY8[dir] * 4, road >= 4 ? 3 : 2, ROAD_COLORS[road]);
+            if (road && (m.roadTier(j) || m.bld[j])) {
+              line(ctx, cx, cy, cx + DX8[dir] * 4, cy + DY8[dir] * 4, road >= 4 ? 3 : 2, ROAD_COLORS[road]);
+              // round 7: highways read as highways: a dashed centre line on paved roads, a pale median on divided
+              // highways (only tile fields decide, so the cached chunk never goes stale; future transit decks are
+              // drawn by the close-up blocks, whose signature includes the era style)
+              if (road >= 3 && (road >= 4 || (x + y) % 2 === 0)) line(ctx, cx, cy, cx + DX8[dir] * 4, cy + DY8[dir] * 4, 1, road >= 4 ? '#b9b4ab' : '#e8d27a');
+            }
             if (rail && m.railTier(j)) {
               line(ctx, cx, cy, cx + DX8[dir] * 4, cy + DY8[dir] * 4, 1, '#3b3340');
             }

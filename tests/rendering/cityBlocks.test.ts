@@ -74,8 +74,10 @@ describe('composeBlock', () => {
   it('streets follow the era: dirt lanes, then cobbles, then paved roads with sidewalks', () => {
     const w = (tier: number) => composeBlock(ctx({ tier })).streets.filter((s) => s.x + s.w === 32)[0];
     expect(w(1)).toMatchObject({ w: 3, surface: 'dirt', sidewalk: false });
-    expect(w(3)).toMatchObject({ w: 4, surface: 'cobble', sidewalk: false });
-    expect(w(6)).toMatchObject({ w: 6, surface: 'paved', sidewalk: true });
+    expect(w(3)).toMatchObject({ w: 3, surface: 'cobble', sidewalk: false });
+    expect(w(5)).toMatchObject({ w: 4, surface: 'paved', sidewalk: true });
+    expect(w(6)).toMatchObject({ w: 5, surface: 'paved', sidewalk: true });
+    expect(w(7)).toMatchObject({ w: 4, surface: 'transit', sidewalk: true });
   });
 
   it('keeps cars and garages out of early eras, huts out of later ones, and amenities in their own era', () => {
@@ -117,10 +119,15 @@ describe('composeBlock', () => {
 
   it('early towns are organic (plot shapes vary from block to block), industrial and later towns follow a grid', () => {
     const rects = (tier: number, h: number) => composeBlock(ctx({ tier, h, band: 'village' })).lots.map((l) => [l.x, l.y, l.w, l.h].join(',')).join('|');
-    const organic = new Set<string>(), grid = new Set<string>();
-    for (let h = 0; h < 40; h++) { organic.add(rects(2, h * 7919)); grid.add(rects(6, h * 7919)); }
+    const organic = new Set<string>(), gridX = new Set<number>(), gridY = new Set<number>();
+    for (let h = 0; h < 40; h++) {
+      organic.add(rects(2, h * 7919));
+      for (const l of composeBlock(ctx({ tier: 6, h: h * 7919, band: 'village' })).lots) { gridX.add(l.x); gridY.add(l.y); }
+    }
     expect(organic.size).toBeGreaterThan(5);
-    expect(grid.size).toBe(1);
+    // round 7: modern plots vary in size (detached houses, duplexes, mansions on double plots), but all start on the grid's columns and rows
+    expect(gridX.size).toBeLessThanOrEqual(3);
+    expect(gridY.size).toBeLessThanOrEqual(2);
     for (let h = 0; h < 50; h++) for (const l of composeBlock(ctx({ tier: 6, h })).lots) {
       expect(l.x % 2).toBe(0);
       expect(l.y % 2).toBe(0);

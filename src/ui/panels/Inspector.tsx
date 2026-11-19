@@ -23,6 +23,9 @@ import { TRAIT_BY_KEY, TRAITS } from '../../population/traits';
 import { divineTrait } from '../../population/development';
 import { DOCTRINES } from '../../culture/religion';
 import { occupations, JOB_GROUPS, GROUP_LABEL, type JobGroup } from '../../economy/occupations';
+import { trafficOf, roadBonusOf, streetBand, STREET_SHARE, PARK_SHARE } from '../../economy/traffic';
+import { homeForms, wealthBuckets } from '../../rendering/cityBlocks';
+import { eraToTier } from '../../civilizations/buildingTypes';
 
 export type Selection = { kind: 'settlement' | 'civ' | 'person' | 'army' | 'herd' | 'band' | 'tile' | 'religion'; id: number };
 
@@ -245,6 +248,7 @@ function SettlementView({ sim, s, setSel, close, focus }: P & { s: Settlement })
           {emp.map((n, k) => (n > 0.5 ? <div key={k} class="row"><span style={{ width: '110px' }}>{SECTOR_NAMES[k]}</span><div style={{ flex: 1 }}><Bar value={n / empTotal} color={k === 6 ? '#e2654e' : undefined} /></div><span class="muted">{fmt(n)}</span></div> : null))}
         </div>
         <JobsList s={s} civ={civ} />
+        <CityLife sim={sim} s={s} civ={civ} />
         <div class="section">
           <h3>Districts</h3>
           <div class="row">{counts.map(([id, n]) => <span key={id} class="chip">{BUILDINGS[id].name} ×{n}</span>)}</div>
@@ -599,6 +603,42 @@ function JobsList({ s, civ }: { s: Settlement; civ: Civ | undefined }) {
       ))}
       {jobs.length > 10 && <p class="muted">{jobs.length - 10} more kinds of work, {fmt(jobs.slice(10).reduce((a, j) => a + j.count, 0))} people.</p>}
     </div>
+  );
+}
+
+/** Homes by form, streets and traffic at their era's rates, and what the city has built (round 7). */
+function CityLife({ sim, s, civ }: { sim: Simulation; s: Settlement; civ: Civ | undefined }) {
+  const tier = civ ? eraToTier(civ.era) : 0;
+  const { wealth, ineq } = civ ? wealthBuckets(civ.econ.livingStandard, civ.econ.inequality) : { wealth: 0, ineq: 0 };
+  const homes = homeForms(s.bld, tier, wealth, ineq);
+  const tr = trafficOf(s, civ, roadBonusOf(sim.w.map, s));
+  const band = streetBand(tier);
+  const works = s.works;
+  return (
+    <>
+      {homes.length > 0 && (
+        <div class="section" data-testid="homes">
+          <h3>Homes</h3>
+          {homes.slice(0, 6).map((h) => <div key={h.form} class="row"><span style={{ width: '170px' }}>{h.label}</span><div style={{ flex: 1 }}><Bar value={h.share} /></div><span class="muted">{pct(h.share)}</span></div>)}
+        </div>
+      )}
+      <div class="section" data-testid="traffic">
+        <h3>Streets and traffic</h3>
+        <Kv rows={[
+          ['Traffic', tr.level],
+          ...(tr.tripsPerDay > 0 ? [['Vehicle trips a day', fmt(tr.tripsPerDay)] as [string, string], ['Street capacity used', pct(Math.min(9.99, tr.load))] as [string, string]] : []),
+          ['On the streets', tr.vehicles.map((v) => v.label.toLowerCase()).join(', ')],
+          ['Street share of a block', pct(STREET_SHARE[band])],
+          ['Park share the city aims for', pct(PARK_SHARE[band])],
+        ]} />
+      </div>
+      {works && (
+        <div class="section" data-testid="works">
+          <h3>Building works since founding</h3>
+          <Kv rows={[['New districts', fmt(works.built)], ['Built up (denser homes)', fmt(works.builtUp)], ['Renovated', fmt(works.renovated)], ['Redeveloped for a new use', fmt(works.redeveloped)]]} />
+        </div>
+      )}
+    </>
   );
 }
 

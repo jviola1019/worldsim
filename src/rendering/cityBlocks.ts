@@ -38,15 +38,45 @@ export interface BlockContext {
   nb: NeighbourKind[];
   road: number;
   h: number;
+  /** Round 7: the owner's living standard (0–3) and inequality (0–4) buckets: they shape the mix of homes. */
+  wealth?: number;
+  ineq?: number;
+  /** Round 7: the settlement's park districts as a share of its city districts, in 2% steps (0–25). */
+  parks?: number;
 }
+
+/** Round 7: the forms homes take past huts and caves (drawn with the lot sprites, sized by plot). */
+export const DWELLING_FORMS = [
+  'hut', 'cottage', 'longhouse', 'courtyard', 'villa', 'terrace', 'tenement', 'manor',
+  'detached', 'duplex', 'midrise', 'highrise', 'mansion', 'ecopod', 'terraced_tower', 'sky_villa',
+] as const;
+export type DwellingForm = (typeof DWELLING_FORMS)[number];
+export const DWELLING_LABEL: Readonly<Record<DwellingForm, string>> = {
+  hut: 'Huts', cottage: 'Cottages', longhouse: 'Longhouses', courtyard: 'Courtyard houses', villa: 'Villas', terrace: 'Terraced houses',
+  tenement: 'Tenements', manor: 'Manor houses', detached: 'Detached houses', duplex: 'Duplexes', midrise: 'Mid-rise flats',
+  highrise: 'High-rise flats', mansion: 'Mansions', ecopod: 'Eco-pods', terraced_tower: 'Terraced towers', sky_villa: 'Sky villas',
+};
+/** How each form is drawn: its sprite kind, a big plot (two cells), a smaller house on its plot. */
+const FORM_LOOK: Readonly<Record<DwellingForm, { kind: LotKind; big?: boolean; inset?: number; yard?: Lot['yard'] }>> = {
+  hut: { kind: 'hut' }, cottage: { kind: 'house', inset: 1, yard: 'garden' }, longhouse: { kind: 'rowhouse' }, courtyard: { kind: 'house', yard: 'paved' },
+  villa: { kind: 'house', big: true, yard: 'garden' }, terrace: { kind: 'rowhouse' }, tenement: { kind: 'apartment' }, manor: { kind: 'house', big: true, yard: 'garden' },
+  detached: { kind: 'house' }, duplex: { kind: 'rowhouse' }, midrise: { kind: 'apartment' }, highrise: { kind: 'tower' },
+  mansion: { kind: 'house', big: true, yard: 'grass' }, ecopod: { kind: 'house', inset: 2, yard: 'garden' }, terraced_tower: { kind: 'apartment' }, sky_villa: { kind: 'tower' },
+};
 
 export interface Lot {
   x: number; y: number; w: number; h: number; kind: LotKind; sprite: string; yard: 'grass' | 'dirt' | 'paved' | 'garden';
+  /** Round 7: the form of a home lot (absent for shops, amenities and parks). */
+  form?: DwellingForm;
   /** Draw the district's own map sprite (×2) instead of `sprite`: civic buildings and industry keep their identity. */
   mapSprite?: boolean;
 }
 export interface Feature { x: number; y: number; w: number; h: number; kind: 'field' | 'parking' | 'yard' | 'court' }
-export interface StreetSeg { x: number; y: number; w: number; h: number; surface: 'dirt' | 'cobble' | 'paved'; sidewalk: boolean }
+export interface StreetSeg {
+  x: number; y: number; w: number; h: number; surface: 'dirt' | 'cobble' | 'paved' | 'transit'; sidewalk: boolean;
+  /** Round 7: an arterial on a simulated road: 2 = centre line, 4 = divided highway with a median. */
+  lanes?: number;
+}
 export interface BlockPlan {
   ground: string;
   streets: StreetSeg[];
@@ -58,8 +88,8 @@ export interface BlockPlan {
 }
 
 /** Paved, cobbled, dirt, sidewalk and lane-mark colours (also used by the e2e pixel samplers). */
-export const STREET_COLORS = ['#55535a', '#8a8580', '#c9b184', '#b9b4ab', '#e8d27a'] as const; // dirt lanes are packed light earth, distinct from dirt yards
-const SURFACE_COLOR: Record<StreetSeg['surface'], string> = { paved: STREET_COLORS[0], cobble: STREET_COLORS[1], dirt: STREET_COLORS[2] };
+export const STREET_COLORS = ['#55535a', '#8a8580', '#c9b184', '#b9b4ab', '#e8d27a', '#c9d3d8', '#3fd6e0', '#6b8f5a'] as const; // dirt lanes are packed light earth, distinct from dirt yards; then transit deck, guide rail, median
+const SURFACE_COLOR: Record<StreetSeg['surface'], string> = { paved: STREET_COLORS[0], cobble: STREET_COLORS[1], dirt: STREET_COLORS[2], transit: STREET_COLORS[5] };
 export const streetColor = (s: StreetSeg['surface']): string => SURFACE_COLOR[s];
 
 export function sizeBand(pop: number): SizeBand {
@@ -142,6 +172,8 @@ export function blockContext(sim: Sim, i: number): BlockContext | null {
     nb,
     road: m.roadTier(i),
     h: hash3(x, y, 61),
+    ...(civ ? wealthBuckets(civ.econ.livingStandard, civ.econ.inequality) : { wealth: 0, ineq: 0 }),
+    parks: s ? parkStep(s.bld) : 0,
   };
 }
 
@@ -153,15 +185,90 @@ export function blockSignature(c: BlockContext): number {
   s = s * 7 + BANDS.indexOf(c.band);
   s = (s * 13 + (c.ethos ? c.ethos.length * 31 + c.ethos.charCodeAt(0) : 0)) | 0;
   for (const k of c.nb) s = (s * 5 + KINDS.indexOf(k)) | 0;
-  return (s * 7 + c.road) >>> 0;
+  s = (s * 7 + c.road) | 0;
+  s = (s * 17 + (c.wealth ?? 0) * 5 + (c.ineq ?? 0)) | 0;
+  return (s * 31 + (c.parks ?? 0)) >>> 0;
 }
 
 // ------------------------------------------------------------------- composition
 
 const rnd = (c: BlockContext, salt: number) => hash3(c.h, salt, 977) / 4294967296;
 
-function streetFor(tier: number): { w: number; surface: StreetSeg['surface']; sidewalk: boolean } {
-  return tier <= 2 ? { w: 3, surface: 'dirt', sidewalk: false } : tier <= 4 ? { w: 4, surface: 'cobble', sidewalk: false } : { w: 6, surface: 'paved', sidewalk: true };
+/**
+ * Streets sized to real-world street shares (traffic.ts STREET_SHARE): early towns have one lane per
+ * block (~9%), medieval and early-modern towns lanes on two sides (~18%), industrial cities 4-px
+ * streets (~23%), modern cities 5-px streets with sidewalks (~29%), future cities transit decks (~23%).
+ */
+export function streetFor(tier: number): { w: number; surface: StreetSeg['surface']; sidewalk: boolean; oneSide: boolean } {
+  if (tier <= 2) return { w: 3, surface: 'dirt', sidewalk: false, oneSide: true };
+  if (tier <= 4) return { w: 3, surface: 'cobble', sidewalk: false, oneSide: false };
+  if (tier === 5) return { w: 4, surface: 'paved', sidewalk: true, oneSide: false };
+  if (tier === 6) return { w: 5, surface: 'paved', sidewalk: true, oneSide: false };
+  return { w: 4, surface: 'transit', sidewalk: true, oneSide: false };
+}
+
+/** Share of a block's area that is street (for tests and the rate table). */
+export function streetShare(plan: BlockPlan): number {
+  let a = 0;
+  for (const s of plan.streets) a += s.w * s.h;
+  // E and S streets overlap in the corner
+  const e = plan.streets.find((s) => s.h === BLOCK && s.x > 0), so = plan.streets.find((s) => s.w === BLOCK && s.y > 0);
+  if (e && so) a -= e.w * so.h;
+  return a / (BLOCK * BLOCK);
+}
+
+/** The settlement's simulated park districts as a share of its city districts, in 2% steps. */
+export function parkStep(bld: readonly number[]): number {
+  let city = 0;
+  for (let t = 1; t < bld.length; t++) if (bld[t] && BUILDINGS[t] && (t === B.PARK || DETAIL_CATS.has(BUILDINGS[t].category))) city += bld[t];
+  return city ? Math.min(25, Math.round(((bld[B.PARK] ?? 0) / city) * 50)) : 0;
+}
+
+/**
+ * Pocket parks: the share of home lots given to green space, so that a town's or city's green space
+ * (its simulated park districts plus pocket parks) reaches its era's park share (traffic.ts PARK_SHARE).
+ * Cities whose park districts already exceed it get none.
+ */
+export function pocketParkShare(tier: number, band: SizeBand, parks = 0): number {
+  if (band === 'village') return 0;
+  const target = [0.01, 0.03, 0.06, 0.09, 0.14][tier <= 2 ? 0 : tier <= 4 ? 1 : tier === 5 ? 2 : tier === 6 ? 3 : 4];
+  return Math.max(0, (target - parks * 0.02) * 1.6); // home blocks are ~60% of city blocks
+}
+
+/** Relative weights of the home forms a district of type b shows in its era, for its owner's wealth and inequality. */
+export function dwellingMix(b: number, tier: number, wealth = 0, ineq = 0): Partial<Record<DwellingForm, number>> {
+  const rich = 0.3 + wealth * 0.5 + ineq * 0.6;
+  if (tier <= 1) return { hut: 1 };
+  switch (b) {
+    case B.CAMP: case B.HUT: case B.HOUSE:
+      if (tier <= 3) return { cottage: 4, longhouse: 2, courtyard: 2, villa: rich };
+      if (tier <= 5) return { cottage: 3, terrace: 2, manor: rich };
+      if (tier === 6) return { detached: 5, duplex: 2, mansion: rich * 0.6 };
+      return { ecopod: 5, detached: 2, mansion: rich * 0.4 };
+    case B.SUBURB: return tier >= 7 ? { ecopod: 4, detached: 3, mansion: rich * 0.5 } : { detached: 5, duplex: 2, mansion: rich * 0.6 };
+    case B.TOWNHOUSE: case B.TENEMENT:
+      if (tier <= 3) return { longhouse: 3, courtyard: 2 };
+      if (tier === 4) return { terrace: 5, tenement: 2, manor: rich * 0.3 };
+      if (tier === 5) return { tenement: 4, terrace: 3 };
+      return { duplex: 3, midrise: 3, terrace: 2 };
+    case B.APARTMENT: return tier <= 5 ? { tenement: 3, midrise: 4 } : { midrise: 5, highrise: 1 };
+    case B.TOWER: return tier >= 7 ? { highrise: 3, terraced_tower: 2, sky_villa: rich * 0.5 } : { highrise: 5, midrise: 1 };
+    case B.ARCOLOGY: return { terraced_tower: 5, sky_villa: 1 + rich * 0.3 };
+  }
+  return { detached: 1 };
+}
+
+function pickForm(mix: Partial<Record<DwellingForm, number>>, r: number): DwellingForm {
+  let total = 0;
+  for (const v of Object.values(mix)) total += v ?? 0;
+  let x = r * total;
+  for (const f of DWELLING_FORMS) {
+    const v = mix[f] ?? 0;
+    if (v <= 0) continue;
+    x -= v;
+    if (x < 0) return f;
+  }
+  return (Object.keys(mix)[0] as DwellingForm) ?? 'detached';
 }
 
 type Layout = { kind: LotKind; cols: number; rows: number; shared?: boolean; yard: Lot['yard'] };
@@ -216,8 +323,11 @@ export function composeBlock(c: BlockContext): BlockPlan {
   // E and S streets are owned by this block; W and N streets belong to the neighbour on that side.
   const side = [c.nb[0], c.nb[2], c.nb[4], c.nb[6]];
   let ux0 = 0, uy0 = 0, ux1 = BLOCK, uy1 = BLOCK;
-  if (side[0] === 'built') { plan.streets.push({ x: BLOCK - st.w, y: 0, w: st.w, h: BLOCK, ...pick(st) }); ux1 = BLOCK - st.w; }
-  if (side[1] === 'built') { plan.streets.push({ x: 0, y: BLOCK - st.w, w: BLOCK, h: st.w, ...pick(st) }); uy1 = BLOCK - st.w; }
+  // a paved road or highway the simulation built through this district becomes a wider arterial with lanes
+  const arterial = c.road >= 3 && c.tier >= 3;
+  const ew = arterial ? st.w + 2 : st.w;
+  if (side[0] === 'built') { plan.streets.push({ x: BLOCK - ew, y: 0, w: ew, h: BLOCK, ...pick(st), ...(arterial ? { lanes: c.road >= 4 ? 4 : 2 } : {}) }); ux1 = BLOCK - ew; }
+  if (side[1] === 'built' && !st.oneSide) { plan.streets.push({ x: 0, y: BLOCK - st.w, w: BLOCK, h: st.w, ...pick(st) }); uy1 = BLOCK - st.w; }
   for (let s = 0 as 0 | 1 | 2 | 3; s < 4; s = (s + 1) as 0 | 1 | 2 | 3) {
     const k = side[s];
     if (k === 'water') plan.edges.push({ side: s, kind: 'quay' });
@@ -225,7 +335,7 @@ export function composeBlock(c: BlockContext): BlockPlan {
   }
   // keep 1 px clear of every edge that has no street of ours (fences, the neighbour's street)
   if (side[0] !== 'built') ux1 -= 1;
-  if (side[1] !== 'built') uy1 -= 1;
+  if (side[1] !== 'built' || st.oneSide) uy1 -= 1;
   ux0 += 1;
   uy0 += 1;
   if (grid) { ux0 += ux0 & 1; uy0 += uy0 & 1; ux1 -= ux1 & 1; uy1 -= uy1 & 1; }
@@ -240,20 +350,35 @@ export function composeBlock(c: BlockContext): BlockPlan {
   const cw = Math.floor((W - gapX * (L.cols - 1)) / L.cols / 2) * 2;
   const ch = Math.floor((H - gapRow * (L.rows - 1)) / L.rows / 2) * 2;
   let n = 0;
+  const homes = HOME_KINDS.has(L.kind);
+  const mix = homes ? dwellingMix(c.b, c.tier, c.wealth, c.ineq) : null;
+  const parkP = homes ? pocketParkShare(c.tier, c.band, c.parks) : 0;
   for (let r = 0; r < L.rows; r++)
     for (let q = 0; q < L.cols; q++, n++) {
       let x = ux0 + q * (cw + gapX), y = uy0 + r * (ch + gapRow), w = cw, h = ch;
+      let form: DwellingForm | undefined;
+      let look: (typeof FORM_LOOK)[DwellingForm] | undefined;
+      if (mix) {
+        form = pickForm(mix, rnd(c, 300 + n));
+        look = FORM_LOOK[form];
+        // a big plot (villa, manor, mansion) takes this cell and the next one in the row
+        if (look.big && q + 1 < L.cols && !L.shared) { w = cw * 2 + gapX; q++; n++; }
+        else if (look.big) { form = mix.detached ? 'detached' : mix.cottage ? 'cottage' : form; look = FORM_LOOK[form]; if (look.big) look = { ...look, big: false }; }
+      }
       if (!grid) {
         // organic plots: shrink-only jitter keeps the gaps
         const jx = (c.h >> (n * 2)) & 1, jy = (c.h >> (n * 2 + 1)) & 1;
         x += jx; w -= jx + ((c.h >> (n + 9)) & 1 && !L.shared ? 1 : 0);
         y += jy; h -= jy;
       }
-      let kind: LotKind = L.kind;
+      let kind: LotKind = look ? look.kind : L.kind;
+      let yard = look?.yard ?? L.yard;
       if (kind === 'house' || kind === 'rowhouse' || kind === 'apartment' || kind === 'shop' || kind === 'hut') {
         const a = pickAmenity(c, 100 + n);
-        if (a) kind = a;
+        if (a) { kind = a; form = undefined; }
+        else if (form && parkP > 0 && L.cols * L.rows > 1 && rnd(c, 700 + n) < parkP) { kind = 'park'; form = undefined; yard = 'grass'; } // a pocket park
       }
+      if (look?.inset && form) { x += look.inset; y += look.inset; w -= look.inset * 2; h -= look.inset; }
       if (L.shared && kind !== 'rowhouse') {
         // an amenity inside a terrace keeps a 1 px passage either side
         x += 1;
@@ -261,7 +386,8 @@ export function composeBlock(c: BlockContext): BlockPlan {
       }
       if (w < 4 || h < 4) continue;
       const vh = hash3(c.h, n, 41);
-      plan.lots.push({ x, y, w, h, kind, sprite: lotSprite(kind, c.tier, vh), yard: L.yard });
+      plan.lots.push({ x, y, w, h, kind, sprite: lotSprite(kind, c.tier, vh), yard, ...(form ? { form } : {}) });
+      if (form && look?.big && c.tier >= 2) plan.trees.push({ x: x + w - 3, y: y + 1, size: 2 }); // big gardens have a big tree
       if ((kind === 'house' || kind === 'apartment' || kind === 'park') && c.tier >= 2 && (vh & 3) !== 0) plan.trees.push({ x: x + 1 + (vh % Math.max(1, w - 2)), y: y + 2, size: ((vh >> 3) % 3) as 0 | 1 | 2 });
     }
   if (L.kind === 'park') for (let t = 0; t < 5; t++) {
@@ -271,6 +397,7 @@ export function composeBlock(c: BlockContext): BlockPlan {
   return plan;
 }
 
+const HOME_KINDS = new Set<LotKind>(['hut', 'house', 'rowhouse', 'apartment', 'tower']);
 const FIELD_CIVIC = new Set<number>([B.SCHOOL, B.UNIVERSITY, B.LIBRARY]);
 const PARK_CIVIC = new Set<number>([B.HOSPITAL, B.LAB, B.DATA_CENTER]);
 
@@ -318,4 +445,30 @@ export function streetPoint(plan: BlockPlan, h: number, t: number, lane: boolean
   if (lane) across = width <= 2 ? Math.min(1, width - 1) : 1 + ((h >> 3) % (width - 2));
   else across = (h >> 5) & 1 ? width - 1 : 0;
   return horiz ? { x: s.x + along, y: s.y + across, horiz, seg } : { x: s.x + across, y: s.y + along, horiz, seg };
+}
+
+/** Round 7: the expected share of each home form across a settlement's home districts (for the inspector). */
+export function homeForms(bld: readonly number[], tier: number, wealth = 0, ineq = 0): { form: DwellingForm; label: string; share: number }[] {
+  const RES = [B.HUT, B.HOUSE, B.TOWNHOUSE, B.TENEMENT, B.APARTMENT, B.SUBURB, B.TOWER, B.ARCOLOGY];
+  const acc: Partial<Record<DwellingForm, number>> = {};
+  let all = 0;
+  for (const t of RES) {
+    const n = bld[t] ?? 0;
+    if (!n) continue;
+    const mix = dwellingMix(t, tier, wealth, ineq);
+    let sum = 0;
+    for (const v of Object.values(mix)) sum += v ?? 0;
+    for (const [f, v] of Object.entries(mix) as [DwellingForm, number][]) {
+      acc[f] = (acc[f] ?? 0) + (n * v) / sum;
+      all += (n * v) / sum;
+    }
+  }
+  return (Object.entries(acc) as [DwellingForm, number][])
+    .map(([form, v]) => ({ form, label: DWELLING_LABEL[form], share: v / all }))
+    .sort((a, b) => b.share - a.share);
+}
+
+/** The wealth and inequality buckets used by blockContext, for a nation. */
+export function wealthBuckets(livingStandard: number, inequality: number): { wealth: number; ineq: number } {
+  return { wealth: Math.max(0, Math.min(3, Math.floor((livingStandard - 1) / 1.5))), ineq: Math.max(0, Math.min(4, Math.round((inequality - 0.2) / 0.1))) };
 }

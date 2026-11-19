@@ -10,6 +10,7 @@
  * (population, roads, rails, trade routes, airports) — they are not
  * simulated individuals and are documented as such.
  */
+import { trafficOf, roadBonusOf } from '../economy/traffic';
 import { vehicleSprite, housingStyleForEthos, characterSprite, soldierSprite } from './art/select';
 import { flagCanvas } from './flag';
 import type { Sim, VisualFx, FxSpec } from '../sim/context';
@@ -484,7 +485,10 @@ export class Renderer {
       }
       // street traffic of the era: porters and carts, horses and buggies, trams, cars and buses, hovercars
       if (civ.caps.roadTier >= 1 && s.pop > 2000 && !this.reduceMotion) {
-        const cars = Math.min(6, Math.floor(Math.log10(s.pop)));
+        // round 7: as many vehicles as the city's traffic load implies (demand over street capacity, traffic.ts)
+        const load = Math.min(1.5, trafficOf(s, civ, roadBonusOf(m, s)).load);
+        const cars = Math.min(8, Math.max(1, Math.round(Math.log10(s.pop) * (0.4 + load))));
+        const perBlock = 1 + Math.round(2 * load);
         const tier = eraToTier(civ.era);
         const style = housingStyleForEthos(civ.ethos?.key);
         for (let k = 0; k < cars; k++) {
@@ -499,7 +503,7 @@ export class Renderer {
             continue;
           }
           // close-up: in the lanes of the city's streets, at street scale
-          for (let q = 0; q < 3; q++) {
+          for (let q = 0; q < perBlock; q++) {
             const hh = hash3(s.id, k * 3 + q, 31);
             const plan = this.planAt(i);
             const p = plan && streetPoint(plan, hh, time * 0.05 * (1 + (hh % 2)) + (hh % 89) / 89, true);

@@ -140,7 +140,7 @@ const LIST: BuildingDef[] = [
   D('LAB', 'Research laboratory', 'civic', { jobs: 200, cost: { STONE: 300, METAL: 200, MACHINERY: 80, ELECTRONICS: 20 }, labor: 300, minPop: 20000, tiers: [6, 7] }),
   D('ARENA', 'Arena', 'civic', { jobs: 40, cost: { STONE: 600 }, labor: 400, minPop: 20000, max: 1, footprint: 2, landmark: true, tiers: [2, 6] }),
   D('MONUMENT', 'Monument', 'civic', { jobs: 2, cost: { STONE: 120 }, labor: 80, placement: 'center', minPop: 2000, max: 2, landmark: true, tiers: [0, 1, 2, 4, 6, 7] }),
-  D('PARK', 'Park', 'civic', { jobs: 5, cost: { WOOD: 10 }, labor: 20, minPop: 2000, max: 12, tiers: [5] }),
+  D('PARK', 'Park', 'civic', { jobs: 5, cost: { WOOD: 10 }, labor: 20, minPop: 2000, max: 24, tiers: [5] }),
   D('GRANARY', 'Granary', 'civic', { jobs: 6, cost: { WOOD: 20, STONE: 20 }, labor: 12, minPop: 250, max: 3, tiers: [1, 5] }),
   D('AQUEDUCT', 'Aqueduct', 'civic', { jobs: 6, cost: { STONE: 300 }, labor: 200, minPop: 6000, max: 1, landmark: true, tiers: [2] }),
   // military
