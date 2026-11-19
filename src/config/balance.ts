@@ -102,6 +102,12 @@ export const BALANCE = {
   climateStrictAt: 2.5,
   /** [E] Round 8: priority of rebuilding a fossil plant as a solar or wind farm under a strict climate policy. */
   cleanPowerScore: 2.2,
+  /** [E] Round 9: extra priority of new power plants when the nation's power is short (scaled by how short). */
+  powerUrgency: 3,
+  /** [E] Round 9: extra priority of clean power (and less for fossil) under a strict climate policy; half under basic. */
+  cleanPowerStrictBonus: 3,
+  /** [E] Round 9: elder-care workers per person aged 65+ in industrial eras (care work grows with ageing). */
+  careWorkersPerElder: 0.08,
   /** [E] Round 8: share of steel made with electricity, by environment policy (renewables add 0.1). */
   steelGreenNone: 0.1,
   steelGreenBasic: 0.35,

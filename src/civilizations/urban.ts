@@ -401,14 +401,19 @@ export function planConstruction(sim: Sim, s: Settlement, civ: Civ): void {
     const used = civ.acc.use[Good.ENERGY] + civ.acc.energyUse;
     const deficit = used >= produced * 0.9 || civ.stock[Good.ENERGY] < civ.population * 0.05;
     if (deficit) {
-      if (caps.fusionPower > 0) add(B.FUSION, 4);
-      if (caps.nuclearPower > 0 && civ.access[Good.URANIUM] > 0.3) add(B.POWER_NUCLEAR, 3);
+      // round 9: the shorter the power, the more urgent new plants are (they were outranked by everyday needs, so
+      // grids stayed short and electric steel fell back to coal); a climate policy steers the new capacity to clean power
+      const urgency = BALANCE.powerUrgency * clamp((used / Math.max(1, produced) - 0.9) * 5, 0, 1);
+      const policy = civ.policies.environment;
+      const cleanBonus = policy === 'strict' ? BALANCE.cleanPowerStrictBonus : policy === 'basic' ? BALANCE.cleanPowerStrictBonus / 2 : 0;
+      if (caps.fusionPower > 0) add(B.FUSION, 4 + urgency);
+      if (caps.nuclearPower > 0 && civ.access[Good.URANIUM] > 0.3) add(B.POWER_NUCLEAR, 3 + urgency + cleanBonus / 2);
       if (caps.renewables > 0) {
-        add(B.SOLAR, 2.5 + (civ.policies.environment === 'strict' ? 1.5 : 0));
-        add(B.WIND, 2.4 + (civ.policies.environment === 'strict' ? 1.5 : 0));
+        add(B.SOLAR, 2.5 + urgency + cleanBonus);
+        add(B.WIND, 2.4 + urgency + cleanBonus);
       }
-      if (s.river) add(B.HYDRO, 2.6);
-      add(B.POWER_FOSSIL, 2.8 - (civ.policies.environment === 'strict' ? 1.5 : 0));
+      if (s.river) add(B.HYDRO, 2.6 + urgency + cleanBonus / 2);
+      add(B.POWER_FOSSIL, 2.8 + urgency - cleanBonus);
     }
   }
   // services

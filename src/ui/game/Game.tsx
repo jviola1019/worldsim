@@ -14,6 +14,8 @@ import { HistoryPanel } from '../panels/HistoryPanel';
 import { StatsPanel } from '../panels/StatsPanel';
 import { LawsPanel } from '../panels/LawsPanel';
 import { MenuPanel } from '../panels/MenuPanel';
+import { favoritePosition } from '../../sim/favorites';
+import type { Favorite } from '../../sim/types';
 import { OverlayPanel } from '../panels/OverlayPanel';
 import { CivListPanel } from '../panels/CivListPanel';
 import { FeedPanel, PostCard } from '../panels/FeedPanel';
@@ -41,6 +43,9 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
   const [brushSize, setBrushSize] = useState(2);
   const [sheet, setSheet] = useState<Sheet>('none');
   const [selection, setSelection] = useState<Selection | null>(null);
+  const [following, setFollowing] = useState<Selection | null>(null);
+  const followRef = useRef<Selection | null>(null);
+  followRef.current = following;
   const [, setUi] = useState(0);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [ticker, setTicker] = useState<FeedPost | null>(null);
@@ -72,7 +77,9 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
     window.addEventListener('orientationchange', resize);
     const selectAt = (sx: number, sy: number) => {
       const [tx, ty] = r.cam.screenToTile(sx, sy);
-      const sel = pickEntity(sim, tx, ty);
+      // round 9: up close, a tap on one of the real people drawn opens that person
+      const pid = r.personAt(sx, sy);
+      const sel: Selection | null = pid !== null ? { kind: 'person', id: pid } : pickEntity(sim, tx, ty);
       setSelection(sel);
       r.selection = sel && sel.kind !== 'tile' && sel.kind !== 'civ' ? { kind: sel.kind, id: sel.id } : null;
       if (sel) {
@@ -126,7 +133,7 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
         const [tx, ty] = r.cam.screenToTile(sx, sy);
         r.brush = { x: tx, y: ty, r: p?.kind === 'brush' ? stateRef.current.brushSize : 0.6, color: p?.destructive ? '#e2654e' : '#5fd0c4', visible: visible && !!p };
       },
-      onCamera: () => {},
+      onCamera: (panned) => { if (panned) setFollowing(null); }, // dragging the map stops following; zooming does not
     });
     const unsub = sim.onEvent((e) => {
       // the newest world-level story appears as a post in its own medium (replaces the old headline ticker)
@@ -151,6 +158,17 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
         setSpeed(0);
         toast(`The simulation stopped on an error and was paused (${err instanceof Error ? err.message : String(err)}). Your autosaves are untouched.`, true);
         console.error(err);
+      }
+      // round 9: follow camera
+      const f = followRef.current;
+      if (f) {
+        const pos = favoritePosition(sim.w, { kind: f.kind as Favorite['kind'], id: f.id, label: '' });
+        if (!pos) setFollowing(null);
+        else {
+          const k = Math.min(1, dt * 6);
+          r.cam.x += ((pos.x + 0.5) * TILE - r.cam.x) * k;
+          r.cam.y += ((pos.y + 0.5) * TILE - r.cam.y) * k;
+        }
       }
       r.frame(dt);
       uiTimer += dt;
@@ -254,14 +272,14 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
           </div>
         ))}
       </div>
-      {sheet === 'inspect' && selection && <Inspector sim={sim} sel={selection} setSel={(s) => { setSelection(s); if (r) { r.selection = s && s.kind !== 'tile' && s.kind !== 'civ' ? { kind: s.kind, id: s.id } : null; if (s?.kind === 'civ') r.overlay.focusCiv = s.id; } }} close={() => { setSheet('none'); if (r) r.selection = null; }} focus={focusOn} />}
+      {sheet === 'inspect' && selection && <Inspector sim={sim} sel={selection} setSel={(s) => { setSelection(s); if (r) { r.selection = s && s.kind !== 'tile' && s.kind !== 'civ' ? { kind: s.kind, id: s.id } : null; if (s?.kind === 'civ') r.overlay.focusCiv = s.id; } }} close={() => { setSheet('none'); if (r) r.selection = null; }} focus={focusOn} follow={setFollowing} following={following} />}
       {sheet === 'history' && <HistoryPanel sim={sim} close={() => setSheet('none')} focus={focusOn} selectedCiv={selection?.kind === 'civ' ? selection.id : 0} openCiv={(id) => { setSelection({ kind: 'civ', id }); setSheet('inspect'); }} />}
       {sheet === 'stats' && <StatsPanel sim={sim} close={() => setSheet('none')} />}
       {sheet === 'feed' && <FeedPanel sim={sim} close={() => setSheet('none')} focus={focusOn} selectedCiv={selection?.kind === 'civ' ? selection.id : 0} />}
       {sheet === 'laws' && <LawsPanel sim={sim} close={() => setSheet('none')} />}
       {sheet === 'overlays' && r && <OverlayPanel renderer={r} close={() => setSheet('none')} />}
       {sheet === 'civs' && <CivListPanel sim={sim} close={() => setSheet('none')} open={(id) => { setSelection({ kind: 'civ', id }); setSheet('inspect'); const civ = sim.w.civs.get(id); const cap = civ ? sim.w.settlements.get(civ.capital) : undefined; if (cap) focusOn(cap.x, cap.y, false); }} />}
-      {sheet === 'menu' && r && <MenuPanel sim={sim} renderer={r} close={() => setSheet('none')} exit={exit} toast={toast} replaceSim={replaceSim} />}
+      {sheet === 'menu' && r && <MenuPanel sim={sim} renderer={r} close={() => setSheet('none')} exit={exit} toast={toast} replaceSim={replaceSim} openFavorite={(f) => { const pos = favoritePosition(sim.w, f); if (pos) focusOn(pos.x, pos.y); setSelection({ kind: f.kind, id: f.id }); setSheet('inspect'); }} />}
       {tutorial && (
         <Tutorial
           done={() => {

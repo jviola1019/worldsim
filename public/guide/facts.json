@@ -1,20 +1,20 @@
 {
  "generated": "2026-11-19",
  "totals": {
-  "srcFiles": 139,
-  "srcLines": 41758,
-  "testFiles": 40,
-  "testCases": 315
+  "srcFiles": 142,
+  "srcLines": 42245,
+  "testFiles": 42,
+  "testCases": 326
  },
  "folders": [
   {
    "name": "rendering",
-   "files": 29,
-   "lines": 18331,
+   "files": 30,
+   "lines": 18545,
    "deps": {
-    "sim": 12,
+    "sim": 13,
     "world": 10,
-    "civilizations": 9,
+    "civilizations": 10,
     "core": 7,
     "history": 2,
     "politics": 1,
@@ -26,10 +26,10 @@
   {
    "name": "ui",
    "files": 23,
-   "lines": 2907,
+   "lines": 2993,
    "deps": {
-    "sim": 25,
-    "persistence": 5,
+    "sim": 31,
+    "persistence": 7,
     "config": 5,
     "core": 3,
     "powers": 2,
@@ -49,7 +49,7 @@
   {
    "name": "civilizations",
    "files": 10,
-   "lines": 2801,
+   "lines": 2806,
    "deps": {
     "world": 7,
     "sim": 19,
@@ -79,8 +79,8 @@
   },
   {
    "name": "sim",
-   "files": 8,
-   "lines": 2319,
+   "files": 9,
+   "lines": 2382,
    "deps": {
     "civilizations": 18,
     "economy": 7,
@@ -120,7 +120,7 @@
   {
    "name": "economy",
    "files": 6,
-   "lines": 1513,
+   "lines": 1523,
    "deps": {
     "sim": 12,
     "world": 7,
@@ -231,6 +231,16 @@
    }
   },
   {
+   "name": "persistence",
+   "files": 4,
+   "lines": 626,
+   "deps": {
+    "sim": 4,
+    "config": 3,
+    "world": 2
+   }
+  },
+  {
    "name": "ecology",
    "files": 2,
    "lines": 578,
@@ -251,19 +261,9 @@
    "deps": {}
   },
   {
-   "name": "persistence",
-   "files": 3,
-   "lines": 523,
-   "deps": {
-    "config": 3,
-    "sim": 2,
-    "world": 2
-   }
-  },
-  {
    "name": "config",
    "files": 2,
-   "lines": 434,
+   "lines": 440,
    "deps": {
     "sim": 1,
     "world": 3
@@ -389,13 +389,13 @@
   {
    "path": "src/civilizations/urban.ts",
    "folder": "civilizations",
-   "lines": 898,
+   "lines": 903,
    "about": "Urban development. Each settlement runs at most one construction project at a time, chosen by utility from its measured needs (housing pressure, food deficit, material shortages, unworked deposits, energy deficit, services per capita, threats, transport links)"
   },
   {
    "path": "src/config/balance.ts",
    "folder": "config",
-   "lines": 212,
+   "lines": 218,
    "about": "Balance parameters. Every gameplay coefficient lives here (not scattered as magic numbers) so it can be tuned, tested for sensitivity and adjusted at runtime from the developer panel."
   },
   {
@@ -491,7 +491,7 @@
   {
    "path": "src/economy/production.ts",
    "folder": "economy",
-   "lines": 788,
+   "lines": 798,
    "about": "Settlement economy (monthly): labour allocation, food, materials, industry, energy, services and household consumption — all in physical units that flow through the settlement's food store and the civilization's national market stock."
   },
   {
@@ -597,6 +597,12 @@
    "about": "Weapons by era, land doctrine, arms races and special operations."
   },
   {
+   "path": "src/persistence/device.ts",
+   "folder": "persistence",
+   "lines": 70,
+   "about": "Round 9: which device a save was made on."
+  },
+  {
    "path": "src/persistence/migrations.ts",
    "folder": "persistence",
    "lines": 33,
@@ -605,13 +611,13 @@
   {
    "path": "src/persistence/saves.ts",
    "folder": "persistence",
-   "lines": 156,
+   "lines": 185,
    "about": "Local-first save storage in IndexedDB."
   },
   {
    "path": "src/persistence/serialize.ts",
    "folder": "persistence",
-   "lines": 334,
+   "lines": 338,
    "about": "World serialization (save format v1)."
   },
   {
@@ -849,6 +855,12 @@
    "about": "Close-up city layer (round 6)."
   },
   {
+   "path": "src/rendering/closeup.ts",
+   "folder": "rendering",
+   "lines": 107,
+   "about": "Round 9: WorldBox-style close zoom."
+  },
+  {
    "path": "src/rendering/flag.ts",
    "folder": "rendering",
    "lines": 122,
@@ -875,7 +887,7 @@
   {
    "path": "src/rendering/renderer.ts",
    "folder": "rendering",
-   "lines": 795,
+   "lines": 902,
    "about": "Frame renderer. Draws (back to front): cached world chunks (or the far-zoom overview), the overlay, animated tiles (volcanoes, fires, smoke, windmills), living things and agents, traffic derived from real infrastructure and trade, effects, labels, selection an"
   },
   {
@@ -927,6 +939,12 @@
    "about": "Sim: the runtime context passed to every system function."
   },
   {
+   "path": "src/sim/favorites.ts",
+   "folder": "sim",
+   "lines": 54,
+   "about": "Round 9: the player's favourites (places, nations, people, armies, bands, herds), kept with the world in meta.favorites so they travel with the save."
+  },
+  {
    "path": "src/sim/maintenance.ts",
    "folder": "sim",
    "lines": 36,
@@ -941,7 +959,7 @@
   {
    "path": "src/sim/types.ts",
    "folder": "sim",
-   "lines": 1121,
+   "lines": 1130,
    "about": "EPOCH world state model."
   },
   {
@@ -1001,7 +1019,7 @@
   {
    "path": "src/ui/game/Game.tsx",
    "folder": "ui",
-   "lines": 298,
+   "lines": 316,
    "about": ""
   },
   {
@@ -1019,7 +1037,7 @@
   {
    "path": "src/ui/input.ts",
    "folder": "ui",
-   "lines": 200,
+   "lines": 201,
    "about": "Pointer input for touch and mouse."
   },
   {
@@ -1049,7 +1067,7 @@
   {
    "path": "src/ui/panels/Inspector.tsx",
    "folder": "ui",
-   "lines": 749,
+   "lines": 776,
    "about": ""
   },
   {
@@ -1061,7 +1079,7 @@
   {
    "path": "src/ui/panels/MenuPanel.tsx",
    "folder": "ui",
-   "lines": 79,
+   "lines": 94,
    "about": ""
   },
   {
@@ -1079,7 +1097,7 @@
   {
    "path": "src/ui/screens/LoadScreen.tsx",
    "folder": "ui",
-   "lines": 77,
+   "lines": 85,
    "about": ""
   },
   {
@@ -1091,7 +1109,7 @@
   {
    "path": "src/ui/screens/SettingsScreen.tsx",
    "folder": "ui",
-   "lines": 97,
+   "lines": 114,
    "about": ""
   },
   {
@@ -1264,6 +1282,11 @@
    "about": "Media & AI (round 4): era-appropriate outlets, platform life cycles, named AI systems, and their causal effects, tested as counterfactuals on identical clones (one intervention, compare)."
   },
   {
+   "path": "tests/persistence/device.test.ts",
+   "cases": 5,
+   "about": "Round 9: saves are accounted to the device that made them."
+  },
+  {
    "path": "tests/persistence/roundtrip.test.ts",
    "cases": 3,
    "about": ""
@@ -1302,6 +1325,11 @@
    "path": "tests/rendering/cityLife.test.ts",
    "cases": 10,
    "about": "Round 7: streets and parks at real-world rates, homes in many forms past huts and caves, traffic from demand over street capacity, and highways on simulated roads."
+  },
+  {
+   "path": "tests/rendering/closeup.test.ts",
+   "cases": 6,
+   "about": "Round 9: WorldBox-style close zoom and the round-9 simulation changes (elder care, power urgency)."
   },
   {
    "path": "tests/rendering/palette.test.ts",

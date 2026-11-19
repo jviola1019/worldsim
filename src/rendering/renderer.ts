@@ -11,6 +11,7 @@
  * simulated individuals and are documented as such.
  */
 import { trafficOf, roadBonusOf } from '../economy/traffic';
+import { readableScale, personSprite, personSize, workSprite, peopleOf, crowdSize, herdShown, notablesBySettlement } from './closeup';
 import { vehicleSprite, housingStyleForEthos, characterSprite, soldierSprite } from './art/select';
 import { flagCanvas } from './flag';
 import type { Sim, VisualFx, FxSpec } from '../sim/context';
@@ -19,7 +20,8 @@ import { Atlas } from './atlas';
 import { Camera, TILE } from './camera';
 import { TerrainLayer, PAD } from './terrainLayer';
 import { CityLayer, DCHUNK, DETAIL, DPAD, detailAlpha, selectDetailChunks, motionTime, drawOrder } from './cityLayer';
-import { blockContext, blockSignature, composeBlock, streetPoint, type BlockPlan } from './cityBlocks';
+import { blockContext, blockSignature, composeBlock, streetPoint, isDetailTile, type BlockPlan } from './cityBlocks';
+import { BUILDINGS } from '../civilizations/buildings';
 import { OverlayLayer, SCALE as OV_SCALE } from './overlays';
 import { HAZARD } from '../world/tilemap';
 import { B, eraToTier } from '../civilizations/buildingTypes';
@@ -127,7 +129,7 @@ export class Renderer {
     const tilePx = cam.zoom * TILE;
     const far = tilePx < 2.6;
     const close = far ? 0 : detailAlpha(tilePx);
-    this.unitScale = tilePx >= 20 ? 0.3 : 1;
+    this.unitScale = tilePx >= 20 ? readableScale(cam.zoom) : 1; // round 9: readable, WorldBox-style actors up close
     if (far) {
       this.layer.updateOverview();
       ctx.drawImage(this.layer.overview, 0, 0, m.w * TILE, m.h * TILE);
@@ -148,8 +150,10 @@ export class Renderer {
     const vis = cam.visibleTiles(m.w, m.h);
     if (!far) {
       this.drawAnimatedTiles(vis);
+      if (tilePx >= 20) this.drawCityDetails(vis);
       if (tilePx >= 4.5) {
-        if (!this.reduceMotion) this.drawAmbient(vis, tilePx);
+        // up close people are always drawn (standing still under Reduce motion); farther out, walkers stop under Reduce motion
+        if (!this.reduceMotion || tilePx >= 20) this.drawAmbient(vis, tilePx);
         this.drawHerds(vis);
         this.drawBands(vis);
       }
@@ -278,6 +282,7 @@ export class Renderer {
         const b = m.bld[i];
         if (!b) continue;
         if (b === B.FACTORY || b === B.POWER_FOSSIL || b === B.STEEL_MILL || b === B.REFINERY || b === B.SMITHY) {
+          if (this.unitScale < 1 && isDetailTile(m, i)) continue; // up close, city blocks have their own chimney wisps (drawCityDetails)
           const f = this.frameIdx(3, hash3(x, y, 5) % 4);
           atlas.draw(ctx, b === B.SMITHY ? 'fx.smoke' : 'fx.smoke_dark', x * TILE + 5, y * TILE - 4 - (f % 4), f);
         } else if (b === B.MILL || b === B.WIND || b === B.OIL_WELL || b === B.CAMP || b === B.CONSTRUCTION || b === B.DATA_CENTER) {
@@ -294,40 +299,145 @@ export class Renderer {
   }
 
   /** Ambient citizens near settlements: visual representation of population (not simulated individuals). */
-  /** Below the close-up, people are drawn at half size; in the close-up, at street scale on sidewalks. */
+  /** Below the close-up, townsfolk at half size; in the close-up, real people and crowds at a readable size (drawPeople). */
   private drawAmbient(vis: [number, number, number, number], tilePx: number): void {
     if (tilePx < 9) return;
+    if (tilePx >= 20) { this.drawPeople(vis); return; }
+    if (this.reduceMotion) return;
     const { atlas } = this;
     const w = this.sim.w;
-    const m = w.map;
-    const close = tilePx >= 20;
     const [x0, y0, x1, y1] = vis;
     for (const s of w.settlements.values()) {
       if (s.x < x0 - 3 || s.x > x1 + 3 || s.y < y0 - 3 || s.y > y1 + 3) continue;
       const civ = w.civs.get(s.civId);
       const tier = civ ? eraToTier(civ.era) : 0;
-      const n = Math.min(10, Math.round(Math.log2(s.pop + 2))) * (close ? 4 : 1);
+      const n = Math.min(10, Math.round(Math.log2(s.pop + 2)));
       for (let k = 0; k < n; k++) {
         const h = hash3(s.id, k, 9);
         const ang = (h % 628) / 100 + this.time * 0.15 * ((h >> 10) % 2 ? 1 : -1);
         const rad = 0.6 + ((h >> 4) % 100) / 100 * Math.max(1, s.radius * 0.6);
         const wx = (s.x + 0.5 + Math.cos(ang) * rad) * TILE;
         const wy = (s.y + 0.5 + Math.sin(ang) * rad * 0.8) * TILE;
-        const flip = Math.sin(ang) > 0;
-        const job = townsperson(s.employment, tier, civ?.caps.landTier ?? 0, h);
-        const id = atlas.has(job) ? job : 'unit.citizen.0';
-        if (!close) {
-          this.drawScaled(id, wx, wy, this.frameIdx(4, k), civ?.color, flip, 0.5);
-          continue;
-        }
-        const tx = Math.floor(wx / TILE), ty = Math.floor(wy / TILE);
-        if (!m.inBounds(tx, ty)) continue;
-        const plan = this.planAt(m.idx(tx, ty));
-        const p = plan && streetPoint(plan, h, this.time * 0.03 * (1 + (h % 3)) + (h % 97) / 97, false);
-        if (!p) continue;
-        this.drawScaled(id, tx * TILE + p.x / DETAIL, ty * TILE + (p.y + 1) / DETAIL, this.frameIdx(4, k), civ?.color, flip, 1 / 8);
+        const job = workSprite(s.employment, tier, civ?.caps.landTier ?? 0, h);
+        this.drawScaled(atlas.has(job) ? job : 'unit.citizen.0', wx, wy, this.frameIdx(4, k), civ?.color, Math.sin(ang) > 0, 0.5);
       }
     }
+  }
+
+  /**
+   * Round 9, the close zoom: chimney smoke over industry and power districts, flags in the nation's colours over
+   * palaces, temples and civic districts. Animated; a still frame under Reduce motion.
+   */
+  private drawCityDetails(vis: [number, number, number, number]): void {
+    const { atlas } = this;
+    const m = this.sim.w.map;
+    const [x0, y0, x1, y1] = vis;
+    const k = this.unitScale;
+    let n = 0;
+    for (let y = y0; y <= y1; y++)
+      for (let x = x0; x <= x1; x++) {
+        const i = y * m.w + x;
+        if (!isDetailTile(m, i)) continue;
+        const def = BUILDINGS[m.bld[i]];
+        const h = hash3(x, y, 71);
+        const bx = x * TILE + 2 + (h % 4), by = y * TILE + 2;
+        if (def.category === 'industry' || def.category === 'energy') {
+          if (def.id === B.SOLAR || def.id === B.WIND || (h & 1)) continue; // every other chimney, light wisps
+          this.ctx.globalAlpha = 0.55;
+          atlas.draw(this.ctx, 'fx.smoke', bx, by, this.reduceMotion ? 0 : this.frameIdx(2, h % 7), undefined, false, false, k * 0.4);
+          this.ctx.globalAlpha = 1;
+          n++;
+        } else if (def.id === B.PALACE || def.id === B.TEMPLE || def.id === B.UNIVERSITY || def.category === 'civic' && (h & 3) === 0) {
+          const own = m.owner[i] ? this.sim.w.civs.get(m.owner[i])?.color : undefined;
+          atlas.draw(this.ctx, 'fx.flag', bx + 3, by + 2, this.reduceMotion ? 0 : this.frameIdx(3, h % 5), own, false, false, k);
+          n++;
+        }
+      }
+    this.setData('cityDetails', String(n));
+  }
+
+  /** Notable residents per settlement, rebuilt once a simulated year. */
+  private notables: { year: number; map: Map<number, number[]> } = { year: -1, map: new Map() };
+  /** Where each real person was drawn this frame (world px), for tapping. */
+  private peopleHits: { x: number; y: number; id: number }[] = [];
+
+  /**
+   * Round 9, the close zoom: every living member of a small town (the simulation's real individuals) and the
+   * notable residents of a big city walk its streets, with representative townsfolk sampled from the city's real
+   * employment around them, all at a readable size. Reduce motion: they stand still.
+   */
+  private drawPeople(vis: [number, number, number, number]): void {
+    const { atlas } = this;
+    const w = this.sim.w;
+    const m = w.map;
+    if (this.notables.year !== this.sim.year) this.notables = { year: this.sim.year, map: notablesBySettlement(w.persons) };
+    const [x0, y0, x1, y1] = vis;
+    const k = this.unitScale;
+    const t = this.reduceMotion ? 0 : this.time;
+    this.peopleHits = [];
+    let drawn = 0;
+    for (const s of w.settlements.values()) {
+      if (s.x < x0 - 3 || s.x > x1 + 3 || s.y < y0 - 3 || s.y > y1 + 3) continue;
+      const civ = w.civs.get(s.civId);
+      const tier = civ ? eraToTier(civ.era) : 0;
+      const land = civ?.caps.landTier ?? 0;
+      const real = peopleOf(s, w.persons, this.notables.map.get(s.id) ?? []);
+      const crowd = s.mode === 'individual' ? 0 : crowdSize(s.pop);
+      const total = real.length + crowd;
+      for (let n = 0; n < total; n++) {
+        const p = n < real.length ? real[n] : undefined;
+        const h = p ? hash3(p.id, 7, 13) : hash3(s.id, n, 9);
+        const pos = this.streetSpot(s, h, t);
+        if (!pos) continue;
+        const id = p ? personSprite(p, this.sim.year, tier, land, (hh) => workSprite(s.employment, tier, land, hh)) : workSprite(s.employment, tier, land, h);
+        const size = p ? personSize(p, this.sim.year) : 1;
+        this.drawScaled(atlas.has(id) ? id : 'unit.citizen.0', pos.x, pos.y, this.reduceMotion ? 0 : this.frameIdx(4, n), civ?.color, pos.flip, k * size);
+        if (p) {
+          this.peopleHits.push({ x: pos.x, y: pos.y, id: p.id });
+          if (p.role !== 'commoner') atlas.draw(this.ctx, 'fx.star', pos.x, pos.y - 13 * k, 0, undefined, false, false, k * 0.8); // a notable person
+        }
+        drawn++;
+      }
+    }
+    void m;
+    this.setData('people', String(drawn));
+    // test hook: where on screen (CSS px) one real person stands, clear of the top bar and the dock
+    const onScreen = this.peopleHits.map((p) => this.cam.worldToScreen(p.x, p.y - 4 * k)).find(([sx, sy]) => sx > 40 && sx < this.cam.viewW - 40 && sy > 140 && sy < this.cam.viewH - 180);
+    this.setData('personAt', onScreen ? `${Math.round(onScreen[0])},${Math.round(onScreen[1])}` : '');
+  }
+
+  /** A walking spot on the streets of a settlement for hash h (world px), or null. */
+  private streetSpot(s: { x: number; y: number; radius: number }, h: number, t: number): { x: number; y: number; flip: boolean } | null {
+    const m = this.sim.w.map;
+    const r = Math.max(1, Math.round(s.radius * 0.7));
+    const tx = s.x + ((h >>> 4) % (2 * r + 1)) - r, ty = s.y + ((h >>> 9) % (2 * r + 1)) - r;
+    if (!m.inBounds(tx, ty)) return null;
+    const plan = this.planAt(m.idx(tx, ty));
+    if (plan) {
+      const p = streetPoint(plan, h, t * 0.03 * (1 + (h % 3)) + (h % 97) / 97, false);
+      if (p) return { x: tx * TILE + p.x / DETAIL, y: ty * TILE + (p.y + 1) / DETAIL, flip: p.horiz ? ((h >> 2) & 1) === 1 : false };
+    }
+    // villages without close-up blocks: wander around the centre, on land only (pulled in toward the centre over water)
+    const ang = (h % 628) / 100 + t * 0.12 * ((h >> 10) % 2 ? 1 : -1);
+    let rad = 0.4 + (((h >> 4) % 100) / 100) * Math.max(0.8, s.radius * 0.5);
+    for (let k = 0; k < 4; k++) {
+      const wx = s.x + 0.5 + Math.cos(ang) * rad, wy = s.y + 0.5 + Math.sin(ang) * rad * 0.8;
+      if (m.inBounds(Math.floor(wx), Math.floor(wy)) && m.isLand(m.idx(Math.floor(wx), Math.floor(wy)))) return { x: wx * TILE, y: wy * TILE, flip: Math.sin(ang) > 0 };
+      rad *= 0.5;
+    }
+    return null;
+  }
+
+  /** The real person drawn under a screen point (CSS px), if any: tapping a person opens them. */
+  personAt(sx: number, sy: number): number | null {
+    const [wx, wy] = this.cam.screenToWorld(sx, sy);
+    const reach = Math.max(4, 9 * this.unitScale);
+    let best: number | null = null, bestD = reach * reach;
+    for (const p of this.peopleHits) {
+      const d = (p.x - wx) ** 2 + (p.y - 4 * this.unitScale - wy) ** 2;
+      if (d < bestD) { bestD = d; best = p.id; }
+    }
+    return best;
   }
 
   private plans = new Map<number, { sig: number; plan: BlockPlan }>();
@@ -362,10 +472,13 @@ export class Renderer {
       if (h.x < x0 || h.x > x1 + 1 || h.y < y0 || h.y > y1 + 1) continue;
       const sp = SPECIES_BY_KEY[h.species];
       if (!sp) continue;
-      const shown = Math.min(3, Math.max(1, Math.round(Math.log10(h.count + 1) * 1.5)));
+      // round 9: up close, up to 6 animals grazing over a wider patch
+      const close = this.unitScale < 1;
+      const shown = herdShown(h.count, close);
+      const spread = close ? 2.2 : 1;
       for (let k = 0; k < shown; k++) {
-        const ox = ((hash3(h.id, k, 1) % 7) - 3) * 1.5;
-        const oy = ((hash3(h.id, k, 2) % 5) - 2) * 1.2;
+        const ox = ((hash3(h.id, k, 1) % 7) - 3) * 1.5 * spread;
+        const oy = ((hash3(h.id, k, 2) % 5) - 2) * 1.2 * spread;
         atlas.draw(ctx, sp.sprite, h.x * TILE + ox, h.y * TILE + oy, this.frameIdx(4, k + h.id), undefined, h.tx < h.x, false, this.unitScale);
       }
     }
@@ -379,6 +492,18 @@ export class Renderer {
       if (b.x < x0 || b.x > x1 || b.y < y0 || b.y > y1) continue;
       const civ = w.civs.get(b.civId);
       const sprite = b.species === 'human' ? 'unit.citizen.0' : `unit.${b.species}`;
+      // round 9: up close, the band's real members (up to 12), each drawn by role and age
+      if (this.unitScale < 1 && b.species === 'human') {
+        const members = b.members.slice(0, 12).map((id) => w.persons.get(id)).filter((p): p is NonNullable<typeof p> => !!p && p.died === undefined);
+        members.forEach((p, k) => {
+          const ox = ((hash3(p.id, 1, 1) % 11) - 5) * 1.6, oy = ((hash3(p.id, 2, 2) % 9) - 4) * 1.3;
+          const id = personSprite(p, this.sim.year, 0, 0, () => 'unit.farmer');
+          const x = b.x * TILE + ox, y = b.y * TILE + oy;
+          this.drawScaled(atlas.has(id) ? id : sprite, x, y, this.frameIdx(4, k), civ?.color, b.tx < b.x, this.unitScale * personSize(p, this.sim.year));
+          this.peopleHits.push({ x, y, id: p.id });
+        });
+        continue;
+      }
       const n = Math.min(6, Math.ceil(b.members.length / 6));
       for (let k = 0; k < n; k++) {
         const ox = ((hash3(b.id, k, 1) % 9) - 4) * 1.6;
@@ -517,7 +642,7 @@ export class Renderer {
             const p = plan && streetPoint(plan, hh, time * 0.05 * (1 + (hh % 2)) + (hh % 89) / 89, true);
             if (!p) continue;
             const tx = m.xOf(i), ty = m.yOf(i);
-            this.drawScaled(veh, tx * TILE + p.x / DETAIL, ty * TILE + (p.y + 1) / DETAIL, this.frameIdx(4, k), civ.color, p.horiz ? (hh & 1) === 1 : false, 1 / 8);
+            this.drawScaled(veh, tx * TILE + p.x / DETAIL, ty * TILE + (p.y + 1) / DETAIL, this.frameIdx(4, k), civ.color, p.horiz ? (hh & 1) === 1 : false, this.unitScale * 0.9);
           }
         }
       }
@@ -752,24 +877,6 @@ export { OV_SCALE };
  * A walker drawn from the town's real employment mix: farmers, miners, smiths, merchants and scholars,
  * soldiers of the nation's land-warfare tier, builders, and the unemployed out walking.
  */
-function townsperson(emp: number[], tier: number, landTier: number, h: number): string {
-  let total = 0;
-  for (const v of emp) total += Math.max(0, v);
-  if (total <= 0 || h % 4 === 0) return `unit.citizen.${Math.min(7, tier)}`; // plain townsfolk too
-  let r = ((h >>> 3) % 1000) / 1000 * total;
-  let sector = 0;
-  for (; sector < emp.length - 1; sector++) { r -= Math.max(0, emp[sector]); if (r <= 0) break; }
-  switch (sector) {
-    case 0: return characterSprite('farmer', tier, h);
-    case 1: return characterSprite('miner', tier, h);
-    case 2: return characterSprite('smith', tier, h);
-    case 3: return `unit.citizen.${Math.min(7, tier)}`;
-    case 4: return characterSprite(h % 3 === 0 ? 'scholar' : h % 5 === 0 ? 'priest' : 'merchant', tier, h);
-    case 5: return soldierSprite(landTier);
-    default: return characterSprite('walker', tier, h);
-  }
-}
-
 /** The follow-up effect of a sequence, at the same place. */
 function followUp(f: VisualFx, spec: FxSpec): VisualFx {
   const ring = spec.area ? Math.max(1, spec.radius ?? f.data ?? f.ring ?? 0) : undefined;

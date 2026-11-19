@@ -21,7 +21,8 @@ export interface InputCallbacks {
   onPaint: (sx: number, sy: number, first: boolean) => void;
   onStrokeEnd: (cancelled: boolean) => void;
   onHover: (sx: number, sy: number, visible: boolean) => void;
-  onCamera: () => void;
+  /** The camera moved: `panned` is true for a drag (a pinch or wheel only zooms). */
+  onCamera: (panned: boolean) => void;
 }
 
 interface Ptr {
@@ -144,7 +145,7 @@ export class InputHandler {
       this.cam.zoomAt(mid[0], mid[1], dist / this.pinchDist);
       this.pinchDist = dist;
       this.pinchMid = mid;
-      this.cb.onCamera();
+      this.cb.onCamera(false);
       return;
     }
     if (this.gesture === 'pending' && Math.hypot(p.x - p.sx, p.y - p.sy) >= TAP_SLOP) {
@@ -153,7 +154,7 @@ export class InputHandler {
     }
     if (this.gesture === 'pan') {
       this.cam.pan(dx, dy);
-      this.cb.onCamera();
+      this.cb.onCamera(true);
     } else if (this.gesture === 'paint') {
       this.cb.onPaint(x, y, false);
       this.cb.onHover(x, y, true);
@@ -187,7 +188,7 @@ export class InputHandler {
     e.preventDefault();
     const [x, y] = [e.offsetX, e.offsetY];
     this.cam.zoomAt(x, y, Math.exp(-e.deltaY * 0.0015));
-    this.cb.onCamera();
+    this.cb.onCamera(false);
   }
 
   private clearLong(): void {

@@ -360,3 +360,5 @@ p, li, .footnote { line-height: 1.45; }
 /* round 9: saves grouped by the device a world started on */
 .device-group { display: grid; gap: var(--s2, 8px); margin-bottom: var(--s4, 16px); }
 .device-title { font-size: var(--t-md, 16px); margin: var(--s2, 8px) 0 0; color: var(--parchment-2, inherit); }
+/* round 9: follow and favourite in the inspector */
+.action-bar { display: flex; flex-wrap: wrap; gap: var(--s2, 8px); padding: var(--s2, 8px) var(--s4, 16px) var(--s4, 16px); border-top: 1px solid var(--line); }

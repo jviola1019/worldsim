@@ -6,8 +6,10 @@ import { store } from '../App';
 import { exportBlob, branchMeta, type SlotMeta } from '../../persistence/saves';
 import { unpackWorld, packWorld } from '../../persistence/serialize';
 import { Icon } from '../shared';
+import type { Favorite } from '../../sim/types';
+import { favoritePosition } from '../../sim/favorites';
 
-export function MenuPanel({ sim, renderer, close, exit, toast, replaceSim }: { sim: Simulation; renderer: Renderer; close: () => void; exit: () => void; toast: (t: string, warn?: boolean) => void; replaceSim: (s: Simulation) => void }) {
+export function MenuPanel({ sim, renderer, close, exit, toast, replaceSim, openFavorite }: { sim: Simulation; renderer: Renderer; close: () => void; exit: () => void; toast: (t: string, warn?: boolean) => void; replaceSim: (s: Simulation) => void; openFavorite?: (f: Favorite) => void }) {
   const [slots, setSlots] = useState<SlotMeta[]>([]);
   const [busy, setBusy] = useState(false);
   useEffect(() => {
@@ -67,6 +69,19 @@ export function MenuPanel({ sim, renderer, close, exit, toast, replaceSim }: { s
           <button onClick={exportFile}>Export world file</button>
           <button onClick={exit}>Leave to title</button>
         </div>
+        {openFavorite && (
+          <div class="section" data-testid="favorites">
+            <h3>Favourites</h3>
+            {(sim.w.meta.favorites ?? []).length === 0 ? <p class="muted">Add places, nations, people and armies with the star in their panel.</p> : (
+              <ul class="list">
+                {(sim.w.meta.favorites ?? []).map((f) => {
+                  const gone = !favoritePosition(sim.w, f);
+                  return <li key={`${f.kind}-${f.id}`}><button disabled={gone} onClick={() => { openFavorite(f); }}>{f.label || f.kind} <span class="muted">· {gone ? 'gone' : f.kind}</span></button></li>;
+                })}
+              </ul>
+            )}
+          </div>
+        )}
         {!store.available && <p class="toast warn">Saving in the browser is unavailable here ({store.error}). Export the world file to keep it.</p>}
         <div class="section">
           <h3>Saved worlds</h3>

@@ -487,7 +487,9 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
       // proportion to what they spend on welfare, schooling and health (about 15-20% of workers in modern
       // economies; a rough target, not measured data). These jobs do not depend on household goods income.
       const publicRate = Math.min(BALANCE.publicJobsMax, BALANCE.publicJobsBase + BALANCE.publicJobsWelfare * clamp01(caps.welfare) + BALANCE.publicJobsBudget * (civ.budget.education + civ.budget.health));
-      const publicJobs = Math.min(free, pop * publicRate);
+      // elder care (round 9): an ageing population needs carers, whatever goods households buy
+      const careJobs = Math.min(free - Math.min(free, pop * publicRate), elders(s) * BALANCE.careWorkersPerElder);
+      const publicJobs = Math.min(free, pop * publicRate) + Math.max(0, careJobs);
       emp[SECTOR.SERVICES] += publicJobs;
       free -= publicJobs;
       const goodsIncome = Math.log2(1 + (s.goodsPerCap ?? 0) / 0.9);
@@ -650,6 +652,14 @@ function manufacture(sim: Sim, civ: Civ, s: Settlement, cap: number, armsWanted:
   s.output[Good.GOODS] += units * (1 - machShare - armsShare) * 12 * 0.1;
   // local industrial pollution
   addPollution(sim, s, B.FACTORY, (1 - civ.caps.pollutionControl) * policyFactor(civ));
+}
+
+/** People aged 65 and over in a settlement (age cohorts 13+; individuals are counted by birth year elsewhere, so small towns count none). */
+function elders(s: Settlement): number {
+  if (s.mode !== 'cohort') return 0;
+  let n = 0;
+  for (let b = 13; b < s.cohorts.length; b++) n += s.cohorts[b];
+  return n;
 }
 
 /**

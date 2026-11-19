@@ -83,6 +83,18 @@ async function run(label, ctxOpts) {
   await page.waitForTimeout(1500);
   const cityChunks = Number(await page.locator('canvas.canvas').getAttribute('data-city-chunks'));
   check(`${label}: close-up city blocks drawn when zoomed in`, cityChunks > 0, `${cityChunks} close-up chunks on screen`);
+  // round 9: up close, people are drawn at a readable size, and tapping one of the real people opens that person
+  const peopleUp = Number(await page.locator('canvas.canvas').getAttribute('data-people'));
+  check(`${label}: zoomed in, people are drawn up close`, peopleUp > 0, `${peopleUp} people`);
+  const spot = await page.locator('canvas.canvas').getAttribute('data-person-at');
+  if (spot) {
+    const [px, py] = spot.split(',').map(Number);
+    await page.mouse.click(px, py);
+    await page.waitForTimeout(400);
+    const kind = await page.locator('aside.sheet').first().getAttribute('data-kind').catch(() => null);
+    check(`${label}: tapping a person up close opens that person`, kind === 'person', `opened ${kind}`);
+    await page.getByLabel('Close').first().click().catch(() => {});
+  } else check(`${label}: tapping a person up close opens that person`, false, 'no real person on screen');
   // round 7: the capital's inspector lists jobs, homes, and streets and traffic
   // open the capital from its nation's panel
   await page.getByLabel('Nations').click();
@@ -93,6 +105,13 @@ async function run(label, ctxOpts) {
   const jobRows = await page.locator('[data-testid=jobs] .row').count();
   const trafficKv = await page.locator('[data-testid=traffic]').count();
   check(`${label}: settlement shows its jobs and its streets and traffic`, jobRows > 0 && trafficKv === 1, `${jobRows} job rows, traffic panel ${trafficKv}`);
+  // round 9: follow the capital and make it a favourite
+  await page.locator('[data-testid=follow]').first().click();
+  const followed = await page.locator('[data-testid=follow]').first().getAttribute('aria-pressed');
+  await page.locator('[data-testid=favorite]').first().click();
+  const fav = await page.locator('[data-testid=favorite]').first().getAttribute('aria-pressed');
+  check(`${label}: follow and favourite from the panel`, followed === 'true' && fav === 'true', `follow ${followed}, favourite ${fav}`);
+  await page.locator('[data-testid=follow]').first().click();
   // round 7: interface motion follows the setting (200 ms sheet entrance; none under Reduce motion)
   const anim = await page.locator('.sheet').first().evaluate((el) => { const cs = getComputedStyle(el); return { name: cs.animationName, dur: cs.animationDuration }; }).catch(() => ({ name: '?', dur: '?' }));
   if (reduced) check(`${label}: sheets do not animate under Reduce motion`, anim.name === 'none' || anim.dur === '0s', `${anim.name} ${anim.dur}`);
@@ -152,6 +171,20 @@ async function run(label, ctxOpts) {
   if (await save.count()) { await save.click(); await page.waitForTimeout(800); }
   const saved = await page.evaluate(() => new Promise((res) => { const r = indexedDB.open('epoch-saves'); r.onsuccess = () => { const db = r.result; res([...db.objectStoreNames].length); }; r.onerror = () => res(0); }));
   check(`${label}: IndexedDB save store exists`, saved > 0);
+  // round 9: the load screen groups saves by device; this save started on this device
+  await page.getByLabel('Close').first().click().catch(() => {});
+  const menu2 = page.getByLabel('Menu');
+  if (await menu2.count()) {
+    await menu2.click();
+    const leave = page.getByText('Leave to title');
+    if (await leave.count()) {
+      await leave.click();
+      await page.getByText(/^Load|Continue|Saved worlds/).first().click().catch(() => {});
+      await page.waitForTimeout(600);
+      const groupTitle = await page.locator('.device-title').first().innerText().catch(() => '');
+      check(`${label}: saves are grouped by the device they started on`, groupTitle.startsWith('Started on this device'), groupTitle || 'no device group');
+    }
+  }
   const csp = await page.evaluate(() => window.__csp);
   check(`${label}: no CSP violations`, csp.length === 0, csp.slice(0, 3).join(' | '));
   const fonts = await page.evaluate(() => document.fonts.check('16px "Pixelify Sans"'));

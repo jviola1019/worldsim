@@ -22,6 +22,8 @@ import { effCost } from '../../technology/research';
 import { TRAIT_BY_KEY, TRAITS } from '../../population/traits';
 import { divineTrait } from '../../population/development';
 import { DOCTRINES } from '../../culture/religion';
+import { isFavorite, toggleFavorite } from '../../sim/favorites';
+import type { Favorite } from '../../sim/types';
 import { occupations, JOB_GROUPS, GROUP_LABEL, type JobGroup } from '../../economy/occupations';
 import { trafficOf, roadBonusOf, streetBand, STREET_SHARE, PARK_SHARE } from '../../economy/traffic';
 import { homeForms, wealthBuckets } from '../../rendering/cityBlocks';
@@ -35,6 +37,30 @@ interface P {
   setSel: (s: Selection | null) => void;
   close: () => void;
   focus: (x: number, y: number, zoom?: boolean) => void;
+  /** Round 9: follow this entity with the camera (null stops), and what is followed now. */
+  follow?: (s: Selection | null) => void;
+  following?: Selection | null;
+}
+
+const FOLLOWABLE = new Set<Selection['kind']>(['settlement', 'person', 'army', 'band', 'herd']);
+const FAVORABLE = new Set<Selection['kind']>(['settlement', 'civ', 'person', 'army', 'band', 'herd']);
+
+/** Round 9: Follow and Favourite for the selected entity. */
+function ActionBar({ sim, sel, follow, following }: P) {
+  const [, force] = useState(0);
+  if (!FAVORABLE.has(sel.kind)) return null;
+  const w = sim.w;
+  const label = sel.kind === 'settlement' ? w.settlements.get(sel.id)?.name : sel.kind === 'civ' ? w.civs.get(sel.id)?.name : sel.kind === 'person' ? w.persons.get(sel.id)?.name : sel.kind === 'army' ? `Army of ${w.civs.get(w.armies.get(sel.id)?.civId ?? 0)?.name ?? 'a fallen nation'}` : sel.kind === 'herd' ? 'Herd' : 'Band';
+  const fav = isFavorite(w, sel.kind as Favorite['kind'], sel.id);
+  const isFollowed = following?.kind === sel.kind && following.id === sel.id;
+  return (
+    <div class="action-bar">
+      {follow && FOLLOWABLE.has(sel.kind) && (
+        <button class="btn small" aria-pressed={isFollowed} data-testid="follow" onClick={() => follow(isFollowed ? null : sel)}>{isFollowed ? 'Stop following' : 'Follow'}</button>
+      )}
+      <button class="btn small" aria-pressed={fav} data-testid="favorite" onClick={() => { toggleFavorite(w, sel.kind as Favorite['kind'], sel.id, label ?? ''); force((x) => x + 1); }}>{fav ? '★ Favourite' : '☆ Add to favourites'}</button>
+    </div>
+  );
 }
 
 function Head({ title, sub, icon, close }: { title: string; sub?: string; icon?: preact.JSX.Element; close: () => void }) {
@@ -181,8 +207,9 @@ export function Inspector(p: P) {
       </>
     );
   return (
-    <aside class="sheet" aria-label="Inspector">
+    <aside class="sheet" aria-label="Inspector" data-kind={sel.kind}>
       {body}
+      <ActionBar {...p} />
     </aside>
   );
 }
