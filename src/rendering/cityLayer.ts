@@ -189,15 +189,37 @@ export class CityLayer {
     for (let y = y0 - 1; y < y1; y++)
       for (let x = x0 - 1; x < x1; x++) {
         if (!m.inBounds(x, y)) continue;
-        const i = y * m.w + x;
-        if (m.bldFlags[i] & BLDF.PART || !isDetailTile(m, i) || BUILDINGS[m.bld[i]].footprint !== 2) continue;
-        const id = this.spriteIdFor(i);
-        const spr = id ? this.atlas.get(id, this.ownerColor(i), true) : undefined;
-        if (!spr) continue;
-        // anchor at the bottom-centre of the 2×2 footprint, scaled ×DETAIL
-        const bx = (x - x0) * BLOCK + BLOCK, by = (y - y0) * BLOCK + 2 * BLOCK + DPAD;
-        ctx.drawImage(spr.canvas, 0, 0, spr.w, spr.h, bx - spr.ax * DETAIL, by - (spr.ay + 1) * DETAIL, spr.w * DETAIL, spr.h * DETAIL);
+        this.drawLandmark(ctx, y * m.w + x, (x - x0) * BLOCK, (y - y0) * BLOCK + DPAD);
       }
+  }
+
+  /** Draw a 2×2 landmark anchored on tile i whose block origin is (ox, oy); no-op for other tiles. */
+  drawLandmark(ctx: CanvasRenderingContext2D, i: number, ox: number, oy: number): boolean {
+    const m = this.sim.w.map;
+    if (m.bldFlags[i] & BLDF.PART || !isDetailTile(m, i) || BUILDINGS[m.bld[i]].footprint !== 2) return false;
+    const id = this.spriteIdFor(i);
+    const spr = id ? this.atlas.get(id, this.ownerColor(i), true) : undefined;
+    if (!spr) return false;
+    // anchor at the bottom-centre of the 2×2 footprint, scaled ×DETAIL
+    const bx = ox + BLOCK, by = oy + 2 * BLOCK;
+    ctx.drawImage(spr.canvas, 0, 0, spr.w, spr.h, bx - spr.ax * DETAIL, by - (spr.ay + 1) * DETAIL, spr.w * DETAIL, spr.h * DETAIL);
+    return true;
+  }
+
+  /** Draw tile i as a close-up block at (ox, oy) (plazas for 2×2 parts); returns true when a block was drawn. */
+  drawTileBlock(ctx: CanvasRenderingContext2D, i: number, ox: number, oy: number): boolean {
+    const m = this.sim.w.map;
+    const x = m.xOf(i), y = m.yOf(i);
+    if (m.bldFlags[i] & BLDF.PART && m.settle[i]) {
+      const a = this.anchorOf(x, y);
+      if (a >= 0 && isDetailTile(m, a)) { this.plaza(ctx, ox, oy); return true; }
+      return false;
+    }
+    const cx = blockContext(this.sim, i);
+    if (!cx) return false;
+    if (BUILDINGS[cx.b].footprint === 2) { this.plaza(ctx, ox, oy); return true; }
+    this.drawPlan(ctx, composeBlock(cx), ox, oy, cx.color, cx.tier, x, y, this.spriteIdFor(i));
+    return true;
   }
 
   private anchorOf(x: number, y: number): number {

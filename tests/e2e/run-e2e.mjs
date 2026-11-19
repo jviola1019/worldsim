@@ -55,6 +55,8 @@ async function run(label, ctxOpts) {
   const pics = await page.locator('.photo canvas').count();
   const tiles = await page.locator('.stat-tile').count();
   check(`${label}: nation overview shows key figures and city pictures`, pics >= 2 && tiles >= 6, `${tiles} figures, ${pics} pictures`);
+  const aerialBlocks = Number(await page.locator('.photo canvas').first().getAttribute('data-blocks'));
+  check(`${label}: aerial photo shows the close-up city blocks`, aerialBlocks > 0, `${aerialBlocks} blocks`);
   await page.getByRole('tab', { name: 'Album' }).click();
   await page.waitForTimeout(300);
   check(`${label}: album tab opens`, (await page.locator('.album, .sheet-body p.muted').count()) > 0);

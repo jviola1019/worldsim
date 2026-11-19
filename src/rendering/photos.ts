@@ -22,6 +22,8 @@ import { TILE } from './camera';
 import { B } from '../civilizations/buildingTypes';
 import { unb64, heightOf, type CitySnapshot } from '../history/album';
 import { flagCanvas } from './flag';
+import { CityLayer, DETAIL } from './cityLayer';
+import { BLOCK } from './cityBlocks';
 
 export const POSTCARD_W = 480;
 export const POSTCARD_H = 300;
@@ -92,6 +94,22 @@ function windows(ctx: CanvasRenderingContext2D, x: number, y: number, w: number,
 }
 
 /** One building seen from the street. */
+const LOW_DENSITY = new Set<number>([B.CAMP, B.HUT, B.HOUSE, B.SUBURB]);
+
+/** A few round-topped trees along a stretch of ground (parks, gardens between houses). */
+function drawTrees(ctx: CanvasRenderingContext2D, x: number, base: number, w: number, seed: number): void {
+  const n = Math.max(1, Math.round(w / 9));
+  for (let k = 0; k < n; k++) {
+    const tx = x + (k + 0.5) * (w / n), h = 6 + (hash(seed, k) % 5);
+    ctx.fillStyle = '#5a4030';
+    ctx.fillRect(tx - 0.5, base - h * 0.45, 1.5, h * 0.45);
+    ctx.fillStyle = k % 2 ? '#4f8a3c' : '#3f7a34';
+    ctx.beginPath();
+    ctx.arc(tx, base - h * 0.6, h * 0.42, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
 function drawBuilding(ctx: CanvasRenderingContext2D, bld: number, tier: number, x: number, base: number, w: number, scale: number, snap: CitySnapshot, lit: boolean, seed: number): void {
   if (!bld) return;
   const p = palette(tier, snap.ethos);
@@ -204,7 +222,19 @@ export function drawPostcard(canvas: HTMLCanvasElement, snap: CitySnapshot): voi
   for (let k = 0; k < n; k++) maxH = Math.max(maxH, heightOf(bytes[k * 5], bytes[k * 5 + 1]));
   const scale = Math.min(14, (ground - 30) / maxH);
   const colW = pw / n;
-  for (let k = 0; k < n; k++) drawBuilding(ctx, bytes[k * 5], bytes[k * 5 + 1], k * colW, ground - 4, colW * 0.9, scale, snap, lit, seed + k);
+  // each column is one city block: a street gap between blocks, parks as trees, and low-density
+  // blocks as separate houses with gardens between them
+  for (let k = 0; k < n; k++) {
+    const b = bytes[k * 5], t = bytes[k * 5 + 1], x = k * colW;
+    if (b === B.PARK) { drawTrees(ctx, x + colW * 0.1, ground - 4, colW * 0.8, seed + k); continue; }
+    if (LOW_DENSITY.has(b)) {
+      drawBuilding(ctx, b, t, x + colW * 0.06, ground - 4, colW * 0.34, scale, snap, lit, seed + k);
+      drawBuilding(ctx, b, t, x + colW * 0.52, ground - 4, colW * 0.34, scale, snap, lit, seed + k + 7);
+      drawTrees(ctx, x + colW * 0.4, ground - 4, colW * 0.12, seed + k * 3);
+      continue;
+    }
+    drawBuilding(ctx, b, t, x + colW * 0.08, ground - 4, colW * 0.78, scale, snap, lit, seed + k);
+  }
   ctx.fillStyle = sky === 'night' ? 'rgba(10,14,30,0.35)' : 'rgba(255,255,255,0.12)';
   ctx.fillRect(0, 0, pw, ground);
   for (let k = 0; k < n; k++) drawBuilding(ctx, bytes[k * 5 + 2], bytes[k * 5 + 3], k * colW + colW * 0.2, ground + 4, colW * 0.8, scale * 0.55, snap, lit, seed + 50 + k);
@@ -257,12 +287,14 @@ export function aerialStyle(era: number, hasFlight: boolean, hasSatellites: bool
 /** Draw a top-down picture of the real tiles around a settlement. */
 export function drawAerial(canvas: HTMLCanvasElement, sim: Sim, atlas: Atlas, s: Settlement, style: AerialStyle, sizePx = 320): void {
   const m = sim.w.map;
-  const r = Math.ceil(s.radius) + 3;
+  // the city centre at close-up block resolution (32 px per tile): at most 13 tiles across, so streets,
+  // yards and parks stay legible in a 320 px photo
+  const r = Math.min(6, Math.ceil(s.radius) + 1);
   const x0 = Math.max(0, s.x - r), y0 = Math.max(0, s.y - r);
   const x1 = Math.min(m.w - 1, s.x + r), y1 = Math.min(m.h - 1, s.y + r);
   const tw = x1 - x0 + 1, th = y1 - y0 + 1;
-  // render the needed chunks with the map's own renderer, then copy the window
-  const layer = new TerrainLayer(sim, atlas);
+  // the land itself, rendered by the map's chunk renderer without the city buildings, scaled ×4
+  const layer = new TerrainLayer(sim, atlas, { skipDetail: true });
   const cx = Math.ceil(m.w / CHUNK);
   const wanted: number[] = [];
   for (let ky = Math.floor(y0 / CHUNK); ky <= Math.floor(y1 / CHUNK); ky++)
@@ -270,16 +302,22 @@ export function drawAerial(canvas: HTMLCanvasElement, sim: Sim, atlas: Atlas, s:
   layer.maxCached = wanted.length + 4;
   layer.refresh(wanted, wanted.length);
   const raw = document.createElement('canvas');
-  raw.width = tw * TILE;
-  raw.height = th * TILE;
+  raw.width = tw * BLOCK;
+  raw.height = th * BLOCK;
   const rc = raw.getContext('2d')!;
   rc.imageSmoothingEnabled = false;
   for (const k of wanted) {
     const c = layer.get(k);
     if (!c) continue;
     const kx = (k % cx) * CHUNK, ky = Math.floor(k / cx) * CHUNK;
-    rc.drawImage(c, 0, PAD, CHUNK * TILE, CHUNK * TILE, (kx - x0) * TILE, (ky - y0) * TILE, CHUNK * TILE, CHUNK * TILE);
+    rc.drawImage(c, 0, PAD, CHUNK * TILE, CHUNK * TILE, (kx - x0) * BLOCK, (ky - y0) * BLOCK, CHUNK * TILE * DETAIL, CHUNK * TILE * DETAIL);
   }
+  // then every city district as its close-up block, and 2×2 landmarks on top
+  const city = new CityLayer(sim, atlas, (i) => layer.spriteIdFor(i));
+  let blocks = 0;
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (city.drawTileBlock(rc, m.idx(x, y), (x - x0) * BLOCK, (y - y0) * BLOCK)) blocks++;
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) city.drawLandmark(rc, m.idx(x, y), (x - x0) * BLOCK, (y - y0) * BLOCK);
+  canvas.dataset.blocks = String(blocks);
   canvas.width = sizePx;
   canvas.height = sizePx;
   const ctx = canvas.getContext('2d')!;
@@ -289,7 +327,10 @@ export function drawAerial(canvas: HTMLCanvasElement, sim: Sim, atlas: Atlas, s:
   ctx.fillStyle = '#0c1220';
   ctx.fillRect(0, 0, sizePx, sizePx);
   ctx.filter = style === 'survey' ? 'sepia(0.85) contrast(1.1) brightness(1.05)' : style === 'film-bw' ? 'grayscale(1) contrast(1.15)' : style === 'film' ? 'saturate(0.8) contrast(1.05) sepia(0.15)' : 'saturate(1.15) contrast(1.05)';
+  ctx.imageSmoothingEnabled = k < 1; // a photograph is downsampled smoothly, not point-sampled
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(raw, (sizePx - dw) / 2, (sizePx - dh) / 2, dw, dh);
+  ctx.imageSmoothingEnabled = false;
   ctx.filter = 'none';
   // photographic finish: vignette, caption and (for satellites) a crosshair grid
   const v = ctx.createRadialGradient(sizePx / 2, sizePx / 2, sizePx * 0.3, sizePx / 2, sizePx / 2, sizePx * 0.72);
