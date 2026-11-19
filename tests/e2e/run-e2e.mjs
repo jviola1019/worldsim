@@ -84,8 +84,12 @@ async function run(label, ctxOpts) {
   const cityChunks = Number(await page.locator('canvas.canvas').getAttribute('data-city-chunks'));
   check(`${label}: close-up city blocks drawn when zoomed in`, cityChunks > 0, `${cityChunks} close-up chunks on screen`);
   // round 7: the capital's inspector lists jobs, homes, and streets and traffic
-  await page.mouse.click(vp.width / 2, vp.height / 2);
-  await page.waitForTimeout(500);
+  // open the capital from its nation's panel
+  await page.getByLabel('Nations').click();
+  await page.locator('.sheet-body ul.list li button').first().click();
+  await page.waitForTimeout(300);
+  await page.locator('[data-testid=open-capital]').first().click();
+  await page.waitForTimeout(400);
   const jobRows = await page.locator('[data-testid=jobs] .row').count();
   const trafficKv = await page.locator('[data-testid=traffic]').count();
   check(`${label}: settlement shows its jobs and its streets and traffic`, jobRows > 0 && trafficKv === 1, `${jobRows} job rows, traffic panel ${trafficKv}`);
@@ -99,7 +103,8 @@ async function run(label, ctxOpts) {
   await page.getByLabel('Disasters').click();
   await page.locator('.tool', { hasText: 'Earthquake' }).first().click();
   await page.mouse.click(vp.width / 2, vp.height / 2 + 40);
-  await page.waitForTimeout(120);
+  // let the map redraw what the quake destroyed (cached chunks repaint over a few frames), then sample the effect
+  await page.waitForTimeout(700);
   const fxNow = (await page.locator('canvas.canvas').getAttribute('data-fx')) ?? '';
   const clip = { x: Math.round(vp.width / 2 - 90), y: Math.round(vp.height / 2 - 50), width: 180, height: 180 };
   let changes = 0;
@@ -110,7 +115,7 @@ async function run(label, ctxOpts) {
     if (!next.equals(prev)) changes++;
     prev = next;
   }
-  await page.waitForTimeout(3600);
+  await page.waitForTimeout(3000);
   const fxLater = (await page.locator('canvas.canvas').getAttribute('data-fx')) ?? '';
   check(`${label}: an earthquake shows its effect and ring, then it ends`, fxNow.includes('fx.quake') && !fxLater.includes('fx.quake'), `now "${fxNow}", later "${fxLater}"`);
   if (reduced) check(`${label}: under Reduce motion the effect is a still marker`, changes <= 1, `${changes} of 3 frame pairs changed`);

@@ -486,6 +486,7 @@ function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
             <div class="section"><h3>Unrest</h3><Bar value={civ.unrest} color="#e2654e" /></div>
             {ruler && <button class="btn small" onClick={() => setSel({ kind: 'person', id: ruler.id })}>Leader's biography</button>}
             {cap && <button class="btn small" onClick={() => focus(cap.x, cap.y)}>Show capital</button>}
+            {cap && <button class="btn small" data-testid="open-capital" onClick={() => { focus(cap.x, cap.y); setSel({ kind: 'settlement', id: cap.id }); }}>Open {cap.name}</button>}
             <div class="section">
               <h3>Institutions (the label summarizes these)</h3>
               <Kv rows={Object.entries(civ.inst).map(([k, v]) => [k.replace(/([A-Z])/g, ' $1').toLowerCase(), pct(v)] as [string, string])} />
