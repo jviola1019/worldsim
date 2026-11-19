@@ -111,6 +111,7 @@ export class Renderer {
     this.layer.syncDirty((k) => {
       this.base.markDirty(k);
       this.city.markMapChunk(k);
+      this.overlay.markZone(k);
     });
     const tilePx = cam.zoom * TILE;
     const far = tilePx < 2.6;
@@ -123,6 +124,8 @@ export class Renderer {
     if (close > 0) this.drawCity(close);
     else this.cityChunksDrawn = 0;
     this.canvas.dataset.cityChunks = String(this.cityChunksDrawn);
+    this.canvas.dataset.overviewRepaints = String(this.layer.overviewRepaints);
+    this.canvas.dataset.overlayRepaints = String(this.overlay.repaints);
     // overlay
     this.overlayTimer -= dt;
     if (this.overlay.mode !== 'terrain' && this.overlayTimer <= 0) {

@@ -18,6 +18,7 @@ import { DX8, DY8 } from '../core/math';
 import { sportsVenueSprite, eraVenueSprite, airportSprite, portSprite, housingStyleForEthos, type Sport } from './art/select';
 import type { SportKey } from '../culture/sports';
 import { isDetailTile } from './cityBlocks';
+import { ChunkSweep, chunkRect, paintOverview, OVERVIEW_GROW } from './pixelCache';
 
 /** Which venue sprite each simulated sport plays in. */
 const SPORT_VENUE: Record<SportKey, Sport> = {
@@ -35,6 +36,10 @@ export class TerrainLayer {
   overview: HTMLCanvasElement;
   private overviewData: ImageData;
   private overviewDirty = true;
+  /** Chunks whose overview pixels are stale. */
+  private overviewZones: ChunkSweep;
+  /** Overview chunks repainted so far (test and perf hook). */
+  overviewRepaints = 0;
   private cx: number;
   private cy: number;
   private lru: number[] = [];
@@ -55,6 +60,7 @@ export class TerrainLayer {
     this.overview.width = m.w;
     this.overview.height = m.h;
     this.overviewData = this.overview.getContext('2d')!.createImageData(m.w, m.h);
+    this.overviewZones = new ChunkSweep(this.cx * this.cy);
   }
 
   /** Pull dirty flags from the simulation; `onDirty` lets other layers follow the same changes. */
@@ -65,6 +71,7 @@ export class TerrainLayer {
         this.dirty[k] = 1;
         sd[k] = 0;
         this.overviewDirty = true;
+        this.overviewZones.mark(k);
         onDirty?.(k);
       }
   }
@@ -76,39 +83,23 @@ export class TerrainLayer {
   invalidateAll(): void {
     this.dirty.fill(1);
     this.overviewDirty = true;
+    this.overviewZones.markAll();
   }
 
-  updateOverview(): void {
-    if (!this.overviewDirty) return;
+  /** Rewrite only the overview pixels of chunks that changed (WorldBox-style), one dirty rectangle each. */
+  updateOverview(): number {
+    if (!this.overviewDirty) return 0;
     this.overviewDirty = false;
     const m = this.sim.w.map;
-    const d = this.overviewData.data;
-    const colors = TERRAIN.map((t) => hexToRgb(t.color));
-    for (let i = 0; i < m.n; i++) {
-      let [r, g, b] = colors[m.terrain[i]];
-      if (!isWaterTerrain(m.terrain[i])) {
-        const x = i % m.w;
-        const up = i >= m.w ? m.elev[i - m.w] : m.elev[i];
-        const left = x > 0 ? m.elev[i - 1] : m.elev[i];
-        const shade = 1 + (m.elev[i] - (up + left) / 2) * 5;
-        r *= shade;
-        g *= shade;
-        b *= shade;
-        if (m.veg[i] > 150 && m.terrain[i] !== T.MOUNTAIN) {
-          r *= 0.85;
-          g *= 0.92;
-          b *= 0.85;
-        }
-        if (m.river[i] > 0) [r, g, b] = [70, 140, 210];
-        if (m.bld[i]) [r, g, b] = m.bld[i] === B.FARM ? [196, 178, 92] : [150, 120, 100];
-        if (m.fire[i]) [r, g, b] = [240, 120, 40];
-      }
-      d[i * 4] = r;
-      d[i * 4 + 1] = g;
-      d[i * 4 + 2] = b;
-      d[i * 4 + 3] = 255;
+    const ks = this.overviewZones.take();
+    const ctx = this.overview.getContext('2d')!;
+    for (const k of ks) {
+      const r = chunkRect(m, k, OVERVIEW_GROW);
+      paintOverview(m, this.overviewData.data, r);
+      ctx.putImageData(this.overviewData, 0, 0, r.x0, r.y0, r.x1 - r.x0, r.y1 - r.y0);
     }
-    this.overview.getContext('2d')!.putImageData(this.overviewData, 0, 0);
+    this.overviewRepaints += ks.length;
+    return ks.length;
   }
 
   /** Redraw up to `budget` dirty chunks among `wanted` (visible) ones. */

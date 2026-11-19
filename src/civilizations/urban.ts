@@ -14,7 +14,7 @@ import { ethosBuildMult } from './ethos';
 import { missionBuildMult } from './missions';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement } from '../sim/types';
-import { markTile } from '../sim/context';
+import { markTile, markOverlay } from '../sim/context';
 import { B, eraToTier, type BuildingId } from './buildingTypes';
 import { BUILDINGS, RESIDENTIAL, type BuildingDef } from './buildings';
 import { BLDF, type TileMap } from '../world/tilemap';
@@ -39,6 +39,7 @@ export function placeBuilding(sim: Sim, s: Settlement, type: number, tile: numbe
       forgetOwnTiles(sim, s.id);
       m.owner[t] = s.civId;
       s.territory++;
+      markOverlay(sim, t);
     }
     markTile(sim, t);
     addBldTile(sim, s.id, t);

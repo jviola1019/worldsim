@@ -12,6 +12,7 @@ import { getRelation } from '../civilizations/knowledge';
 import { atWarWith } from '../politics/diplomacy';
 import { INFRA } from '../world/tilemap';
 import { localHeat } from '../ecology/ecology';
+import { ChunkSweep, chunkRect, paintOverlay, OVERLAY_GROW, OVERLAY_SCALE, type OverlayColor } from './pixelCache';
 
 export type OverlayMode =
   | 'terrain' | 'political' | 'population' | 'technology' | 'religion' | 'culture' | 'language' | 'resources'
@@ -57,7 +58,9 @@ function hashColor(n: number): [number, number, number] {
   return [60 + (h & 0x7f) + 40, 60 + ((h >> 8) & 0x7f) + 30, 60 + ((h >> 16) & 0x7f) + 30];
 }
 
-export const SCALE = 4;
+export const SCALE = OVERLAY_SCALE;
+/** Modes drawn only from tile fields: repainted when their chunks change, plus a slow safety sweep. */
+const TILE_MODES = new Set<OverlayMode>(['political', 'resources', 'infrastructure', 'history', 'terrain', 'trade']);
 
 export class OverlayLayer {
   canvas: HTMLCanvasElement;
@@ -85,24 +88,48 @@ export class OverlayLayer {
     this.canvas.width = m.w * SCALE;
     this.canvas.height = m.h * SCALE;
     this.img = this.canvas.getContext('2d')!.createImageData(this.canvas.width, this.canvas.height);
+    this.zones = new ChunkSweep(sim.chunksX * sim.chunksY);
   }
 
-  /** Recompute when the mode changes or the world changed since the last pass (throttled by caller). */
-  update(force = false): void {
+  /** Overlay zones (chunks) whose pixels are stale; live modes also refresh a rolling sweep of them. */
+  private zones: ChunkSweep;
+  private shownMode: OverlayMode | null = null;
+  private shownFocus = -1;
+  /** Zones repainted so far (test and perf hook). */
+  repaints = 0;
+
+  /** A map chunk changed (terrain, infrastructure, deposits): its overlay zone is stale too. */
+  markZone(k: number): void {
+    this.zones.mark(k);
+  }
+
+  /**
+   * WorldBox-style zone refresh (throttled by the caller). Only changed chunks are repainted, plus,
+   * for modes that follow live statistics, a rolling sweep (a quarter of the map per pass) and, for
+   * tile-based modes, a slow safety sweep. A mode or focus change repaints everything once.
+   */
+  update(force = false): number {
     const sim = this.sim;
-    let dirty = force;
+    if (force || this.mode !== this.shownMode || this.focusCiv !== this.shownFocus) {
+      this.zones.markAll();
+      this.shownMode = this.mode;
+      this.shownFocus = this.focusCiv;
+    }
     for (let k = 0; k < sim.overlayDirty.length; k++) if (sim.overlayDirty[k]) {
-      dirty = true;
+      this.zones.mark(k);
       sim.overlayDirty[k] = 0;
     }
     if (this.mode === 'history' && !this.historyYear) {
       const l = sim.w.stats.territory;
-      if (l?.length && this.histCache?.year !== l[l.length - 1].year) dirty = true; // a newer snapshot was recorded
+      if (l?.length && this.histCache?.year !== l[l.length - 1].year) this.zones.markAll(); // a newer snapshot was recorded
     }
-    if (!dirty && this.stamp === sim.w.tick) return;
-    if (!dirty && this.mode !== 'population' && this.mode !== 'pollution' && this.mode !== 'climate' && this.mode !== 'military' && this.mode !== 'economy' && this.mode !== 'diplomacy' && this.mode !== 'technology') return;
+    const n = this.zones.count;
+    const live = !TILE_MODES.has(this.mode);
+    const sweep = this.stamp === sim.w.tick ? 0 : live ? Math.ceil(n / 4) : Math.ceil(n / 16);
     this.stamp = sim.w.tick;
-    this.render();
+    const ks = this.zones.take(sweep);
+    if (ks.length) this.render(ks);
+    return ks.length;
   }
 
   private colorFor(i: number): [number, number, number, number] | null {
@@ -189,38 +216,19 @@ export class OverlayLayer {
     }
   }
 
-  private render(): void {
+  private render(ks: number[]): void {
     const m = this.sim.w.map;
     const d = this.img.data;
-    d.fill(0);
-    if (this.mode === 'terrain' || this.mode === 'trade') {
-      this.canvas.getContext('2d')!.putImageData(this.img, 0, 0);
-      return;
-    }
-    const W = m.w * SCALE;
+    const ctx = this.canvas.getContext('2d')!;
+    const blank = this.mode === 'terrain' || this.mode === 'trade';
     const border = this.mode === 'political' || this.mode === 'diplomacy' || this.mode === 'military';
-    for (let y = 0; y < m.h; y++)
-      for (let x = 0; x < m.w; x++) {
-        const i = y * m.w + x;
-        const c = this.colorFor(i);
-        if (!c) continue;
-        const o = m.owner[i];
-        for (let sy = 0; sy < SCALE; sy++)
-          for (let sx = 0; sx < SCALE; sx++) {
-            let a = c[3];
-            if (border && o) {
-              const edgeX = sx === 0 ? x - 1 : sx === SCALE - 1 ? x + 1 : -1;
-              const edgeY = sy === 0 ? y - 1 : sy === SCALE - 1 ? y + 1 : -1;
-              if ((edgeX >= 0 && edgeX < m.w && m.owner[y * m.w + edgeX] !== o) || (edgeY >= 0 && edgeY < m.h && m.owner[edgeY * m.w + x] !== o) || edgeX === m.w || edgeY === m.h) a = 235;
-            }
-            const p = ((y * SCALE + sy) * W + x * SCALE + sx) * 4;
-            d[p] = c[0];
-            d[p + 1] = c[1];
-            d[p + 2] = c[2];
-            d[p + 3] = a;
-          }
-      }
-    this.canvas.getContext('2d')!.putImageData(this.img, 0, 0);
+    const color: OverlayColor = blank ? () => null : (i) => this.colorFor(i);
+    for (const k of ks) {
+      const r = chunkRect(m, k, OVERLAY_GROW);
+      paintOverlay(m, d, r, color, border);
+      ctx.putImageData(this.img, 0, 0, r.x0 * SCALE, r.y0 * SCALE, (r.x1 - r.x0) * SCALE, (r.y1 - r.y0) * SCALE);
+    }
+    this.repaints += ks.length;
   }
 }
 
