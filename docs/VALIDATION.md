@@ -64,6 +64,12 @@ Environment: the same cloud container (Chromium only, **not** a phone). Plan: [`
   - **Over 5 worlds:** the current code has 4 forms and 8 ethos types; with public jobs off, 4 forms and 6 ethos types.
   - **Verdict:** this is trajectory noise, not lost variety. The test now uses 5 worlds, which makes it stronger.
 
+### GitHub Actions and the live site (round 8)
+
+- **Actions:** CI #46 on `bec6e36` succeeded, then "Deploy to GitHub Pages" #17 started from `workflow_run` (the CI gate) and succeeded.
+- **Live guide:** `https://jviola1019.github.io/worldsim/guide/` and its `guide.js`, `guide.css`, `facts.json` and `balance.json` all return 200. Checked in Chromium on the live site: 23 folders on the map, the balance bars drawn, 20 files listed, 0 console errors.
+- **Packages:** `npm audit` reports 0 vulnerabilities and `npm outdated` reports nothing. Actions are unchanged since round 7 (pinned at their latest releases).
+
 ### The code guide
 
 - **`docs/GUIDE.md`:** the whole code base explained for readers with general coding knowledge, with 8 Mermaid diagrams and screenshots.
