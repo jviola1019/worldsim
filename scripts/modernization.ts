@@ -1,7 +1,7 @@
 /**
  * Natural-history run with NO god powers: does civilization modernize on its own, and do natural
  * hazards happen during ordinary ticks?
- *   npx tsx scripts/modernization.ts [seed=modern-1] [years=1000] [size=128] [preset=default|realistic]
+ *   npx tsx scripts/modernization.ts [seed=modern-1] [years=1000] [size=128] [preset=default|realistic]  (round 10: 'realistic' runs the Observer preset, the old hands-off Realistic)
  * Prints the year the leading nation first reaches each era, modernization indicators of the most
  * advanced nation every 100 years, and natural-hazard counts.
  */
@@ -16,7 +16,7 @@ const YEARS = Number(process.argv[3] ?? 1000);
 const SIZE = Number(process.argv[4] ?? 128);
 const preset = process.argv[5] ?? 'default';
 const cfg = defaultConfig();
-if (preset !== 'default') PRESETS.find((p) => p.key === preset)?.apply(cfg);
+if (preset !== 'default') PRESETS.find((p) => p.key === (preset === 'realistic' ? 'observer' : preset))?.apply(cfg);
 cfg.gen.seed = seed;
 cfg.gen.width = SIZE;
 cfg.gen.height = SIZE;

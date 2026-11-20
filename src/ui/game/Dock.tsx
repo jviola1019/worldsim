@@ -4,7 +4,7 @@ import { Icon } from '../shared';
 import type { WorldSettings } from '../../sim/types';
 import { powerAllowed, powerSetOf } from '../../powers/powerSet';
 
-export function Dock({ settings, tool, setTool, brushSize, setBrushSize, openLaws, canUndo, onUndo }: { settings: WorldSettings; tool: string; setTool: (t: string) => void; brushSize: number; setBrushSize: (n: number) => void; openLaws: () => void; canUndo: boolean; onUndo: () => void }) {
+export function Dock({ settings, noPeople = false, tool, setTool, brushSize, setBrushSize, openLaws, canUndo, onUndo }: { settings: WorldSettings; noPeople?: boolean; tool: string; setTool: (t: string) => void; brushSize: number; setBrushSize: (n: number) => void; openLaws: () => void; canUndo: boolean; onUndo: () => void }) {
   const [cat, setCat] = useState<PowerCategory | null>(null);
   const active = POWER_BY_ID[tool];
   // round 10: only the powers this world allows (Realistic: grounded; god mode: all)
@@ -14,7 +14,11 @@ export function Dock({ settings, tool, setTool, brushSize, setBrushSize, openLaw
   const cats = CATEGORIES.filter((c) => (c.id === 'laws' ? !grounded : allowed.some((p) => p.cat === c.id)));
   return (
     <div class="dock">
-      {grounded && !cat && <div class="realism-note" role="note">Realistic: real people, animals, land and natural disasters only</div>}
+      {grounded && !cat && (
+        <div class="realism-note" role="note">
+          {noPeople ? 'No people yet: pick Humans in the Peoples tools and tap dry land near water to place the first band.' : 'Realistic: real people, animals, land and natural disasters only'}
+        </div>
+      )}
       {active && (
         <div class="active-tool" role="status">
           <Icon id={active.icon} size={20} />

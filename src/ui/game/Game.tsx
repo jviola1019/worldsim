@@ -265,6 +265,7 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
       ) : (
       <Dock
         settings={sim.w.meta.settings}
+        noPeople={sim.w.civs.size === 0 && sim.w.bands.size === 0}
         tool={tool}
         setTool={pickTool}
         brushSize={brushSize}

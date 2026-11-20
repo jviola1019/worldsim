@@ -260,6 +260,30 @@ async function narrow() {
   await browser.close();
 }
 
+// round 10: Realistic is a grounded sandbox: empty at year 0, a hint to place the first humans, and only
+// grounded tools (Peoples offers Humans alone; no Warfare, Technology or Laws categories)
+async function realistic() {
+  const browser = await engine.launch();
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const page = await ctx.newPage();
+  await page.goto(url);
+  await page.getByText('New world').first().click();
+  await page.locator('button.preset', { hasText: /^Realistic/ }).click();
+  await page.getByText('Create world').click();
+  await page.waitForSelector('canvas.canvas', { timeout: 30000 });
+  const skip = page.getByText('Skip');
+  if (await skip.count()) await skip.click();
+  const hud = await page.locator('.world-card').innerText();
+  const note = await page.locator('.realism-note').innerText().catch(() => '');
+  const cats = await page.locator('.cat-row .cat').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')));
+  await page.getByLabel('Peoples').click();
+  const people = await page.locator('.tool-row .tool span').allInnerTexts();
+  check('realistic: empty at year 0 with a hint to place the first humans', /Year 0/.test(hud) && /No people yet/.test(hud) && /Humans/.test(note), `${hud.replace(/\n/g, ' | ')} / ${note}`);
+  check('realistic: only grounded tools', JSON.stringify(people) === JSON.stringify(['Inspect', 'Humans']) && !cats.includes('Warfare') && !cats.includes('Technology') && !cats.includes('World laws'), `${cats.join(',')} / ${people.join(',')}`);
+  await browser.close();
+}
+
+await realistic();
 await narrow();
 await run('phone', { ...devices['iPhone 13'] });
 await run('desktop', { viewport: { width: 1280, height: 800 } });

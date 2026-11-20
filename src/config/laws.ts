@@ -86,9 +86,31 @@ export interface Preset {
 export const PRESETS: Preset[] = [
   {
     key: 'realistic',
-    name: 'Realistic (observer)',
-    description: 'Earth-like world left entirely to itself: grounded technology, no fantasy, natural disasters and diseases on, and no god powers. Watch history happen.',
+    name: 'Realistic',
+    description: 'An empty Earth-like world at year 0, with land, plants and wild animals. Place the first humans and watch them take generations to settle and centuries to build cities. Only real people, animals, land shaping and natural disasters.',
     apply: (c) => {
+      c.settings.startEra = 1;
+      c.settings.startCivs = 0; // you place the first humans
+      c.settings.realism = 'grounded';
+      c.settings.fantasy = false;
+      c.settings.alien = false;
+      c.settings.disasterFrequency = 1;
+      c.settings.observer = false;
+      c.settings.powerSet = 'grounded';
+      c.settings.pace = 'slow';
+      c.laws.fantasyCreatures = false;
+      c.laws.speculativeTech = false;
+      c.laws.disasters = true;
+      c.laws.diseases = true;
+      c.laws.horrors = false;
+    },
+  },
+  {
+    key: 'observer',
+    name: 'Observer',
+    description: 'An Earth-like world left entirely to itself: grounded technology, no fantasy, natural disasters and diseases on, and no god powers. Watch history happen.',
+    apply: (c) => {
+      c.settings.powerSet = 'none';
       c.settings.startEra = 1;
       c.settings.startCivs = 5;
       c.settings.realism = 'grounded';
