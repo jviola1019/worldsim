@@ -78,7 +78,9 @@ The review found 9 issues: 5 important and 4 minor. All were fixed:
 
 ### GitHub Actions and the live site (round 9)
 
-Recorded after the push (see the next commit).
+- **Actions:** CI #48 on `5868a52` succeeded, including the new WebKit e2e step. Then "Deploy to GitHub Pages" #19 started from `workflow_run` (the CI gate) and succeeded.
+- **Live site:** `/`, `/guide/` and `/guide/facts.json` return 200, and the live page loads the same bundle (`index-BzPUR60i.js`) as the local build of `5868a52`.
+- **Packages:** `npm audit` reports 0 vulnerabilities and `npm outdated` reports nothing. Every action, and Playwright 1.65.1, is at its latest release.
 
 ## R8. Round 8: city composition, public jobs, climate response, leftovers, code guide (2026-11-19)
 
