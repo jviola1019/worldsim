@@ -32,7 +32,7 @@ export function LawsPanel({ sim, close }: { sim: Simulation; close: () => void }
         <h2>World laws</h2>
         <button class="icon-btn" aria-label="Close" onClick={close}><Icon id="ico.close" size={24} /></button>
       </div>
-      <div class="sheet-body">
+      <div class="sheet-body" tabIndex={0}>
         <section class="fieldset">
           {boolKeys.map((k) => (
             <label class="toggle" key={k}>
@@ -41,12 +41,12 @@ export function LawsPanel({ sim, close }: { sim: Simulation; close: () => void }
             </label>
           ))}
           <div class="field">
-            <label>Research speed: {laws.researchSpeed.toFixed(2)}×</label>
-            <input type="range" min={0.1} max={5} step={0.05} value={laws.researchSpeed} onInput={(e) => { laws.researchSpeed = Number((e.target as HTMLInputElement).value); force((x) => x + 1); }} />
+            <label for="law-research">Research speed: {laws.researchSpeed.toFixed(2)}×</label>
+            <input id="law-research" type="range" min={0.1} max={5} step={0.05} value={laws.researchSpeed} onInput={(e) => { laws.researchSpeed = Number((e.target as HTMLInputElement).value); force((x) => x + 1); }} />
           </div>
           <div class="field">
-            <label>Population cap: {laws.populationCap ? laws.populationCap.toLocaleString('en-US') : 'none'}</label>
-            <input type="range" min={0} max={10} step={1} value={laws.populationCap ? Math.log10(laws.populationCap) : 0} onInput={(e) => { const v = Number((e.target as HTMLInputElement).value); laws.populationCap = v === 0 ? 0 : Math.pow(10, v); force((x) => x + 1); }} />
+            <label for="law-popcap">Population cap: {laws.populationCap ? laws.populationCap.toLocaleString('en-US') : 'none'}</label>
+            <input id="law-popcap" type="range" min={0} max={10} step={1} value={laws.populationCap ? Math.log10(laws.populationCap) : 0} onInput={(e) => { const v = Number((e.target as HTMLInputElement).value); laws.populationCap = v === 0 ? 0 : Math.pow(10, v); force((x) => x + 1); }} />
           </div>
         </section>
         <details class="fieldset">
@@ -54,8 +54,8 @@ export function LawsPanel({ sim, close }: { sim: Simulation; close: () => void }
           <p class="muted">These change the simulation coefficients for this session. They are shared by all worlds until you reload the page.</p>
           {TUNABLE.map((t) => (
             <div class="field" key={t.key}>
-              <label>{t.label}: {(BALANCE[t.key] as number).toFixed(3)}</label>
-              <input type="range" min={t.min} max={t.max} step={t.step} value={BALANCE[t.key] as number} onInput={(e) => { (BALANCE as any)[t.key] = Number((e.target as HTMLInputElement).value); force((x) => x + 1); }} />
+              <label for={`bal-${t.key}`}>{t.label}: {(BALANCE[t.key] as number).toFixed(3)}</label>
+              <input id={`bal-${t.key}`} type="range" min={t.min} max={t.max} step={t.step} value={BALANCE[t.key] as number} onInput={(e) => { (BALANCE as any)[t.key] = Number((e.target as HTMLInputElement).value); force((x) => x + 1); }} />
             </div>
           ))}
         </details>

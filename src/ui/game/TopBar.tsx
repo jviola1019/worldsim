@@ -43,7 +43,7 @@ export function TopBar({ sim, speed, setSpeed, openSheet, sheet, objectives, don
         <button class="icon-btn" aria-pressed={sheet === 'civs'} aria-label="Nations" title="Nations" onClick={() => openSheet('civs')}>
           <Icon id="ico.crown" size={28} />
         </button>
-        <button class="icon-btn" aria-pressed={sheet === 'history'} aria-label="History" title="History" onClick={() => openSheet('history')}>
+        <button class="icon-btn" aria-pressed={sheet === 'history'} aria-label={wars ? `History, ${wars} active ${wars === 1 ? 'war' : 'wars'}` : 'History'} title="History" onClick={() => openSheet('history')}>
           <Icon id="ico.history" size={28} />
           {wars > 0 && <span class="badge">{wars}</span>}
         </button>

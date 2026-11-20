@@ -13,7 +13,7 @@ export function OverlayPanel({ renderer, close }: { renderer: Renderer; close: (
         <h2>Map layers</h2>
         <button class="icon-btn" aria-label="Close" onClick={close}><Icon id="ico.close" size={24} /></button>
       </div>
-      <div class="sheet-body">
+      <div class="sheet-body" tabIndex={0}>
         <div class="overlay-grid">
           {OVERLAYS.map((o) => (
             <button

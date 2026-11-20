@@ -190,7 +190,7 @@ export function Inspector(p: P) {
       body = a ? (
         <>
           <Head title={`Army of ${civ?.name ?? '?'}`} sub={a.state} icon={<Sprite id={`unit.soldier.${Math.min(12, a.tier)}`} color={civ?.color} />} close={close} />
-          <div class="sheet-body">
+          <div class="sheet-body" tabIndex={0}>
             <Kv rows={[['Soldiers', fmt(a.manpower)], ['Weapons era', String(a.tier)], ['Equipment', pct(a.equipment)], ['Training', pct(a.training)], ['Morale', pct(a.morale)], ['Supply', pct(a.supply)], ['General', w.persons.get(a.generalId)?.name ?? 'none'], ['War', a.warId ? w.wars.get(a.warId)?.name ?? '—' : 'none']]} />
           </div>
         </>
@@ -204,7 +204,7 @@ export function Inspector(p: P) {
       body = h && sp ? (
         <>
           <Head title={ss?.name ?? sp.name} sub={h.owner ? `Domesticated by ${w.civs.get(h.owner)?.name}` : 'Wild'} icon={<Sprite id={sp.sprite} />} close={close} />
-          <div class="sheet-body">
+          <div class="sheet-body" tabIndex={0}>
             <Kv rows={[['Animals', fmt(h.count)], ['Diet', sp.diet], ['Size gene', pct(h.genes[0])], ['Cold tolerance', pct(h.genes[2])], ['Worldwide', fmt(w.speciesStatus[h.species]?.count ?? 0)]]} />
             <p class="muted">Genes drift and adapt to climate over generations; long divergence produces new subspecies.</p>
           </div>
@@ -217,7 +217,7 @@ export function Inspector(p: P) {
       body = b ? (
         <>
           <Head title={`${w.civs.get(b.civId)?.adjective ?? ''} band`} sub="Nomadic foragers" icon={<Sprite id="unit.citizen.0" color={w.civs.get(b.civId)?.color} />} close={close} />
-          <div class="sheet-body">
+          <div class="sheet-body" tabIndex={0}>
             <Kv rows={[['People', String(b.members.length)], ['Food stored', fmt(b.food)], ['Since', String(b.founded)]]} />
             <div class="section">
               <h3>Members</h3>
@@ -242,7 +242,7 @@ export function Inspector(p: P) {
     body = (
       <>
         <Head title="Gone" close={close} />
-        <div class="sheet-body">
+        <div class="sheet-body" tabIndex={0}>
           <p class="muted">This no longer exists. Its story is kept in the history book.</p>
         </div>
       </>
@@ -262,7 +262,7 @@ function TileView({ sim, sel, close, setSel }: P) {
   return (
     <>
       <Head title={t.name} sub={`Tile ${m.xOf(i)}, ${m.yOf(i)}`} close={close} />
-      <div class="sheet-body">
+      <div class="sheet-body" tabIndex={0}>
         <Kv rows={[
           ['Elevation', m.elev[i] > 0 ? `${Math.round(m.elev[i] * 5000)} m` : `${Math.round(-m.elev[i] * 5000)} m deep`],
           ['Temperature', `${m.temp[i]} °C (base)`],
@@ -290,7 +290,7 @@ function SettlementView({ sim, s, setSel, close, focus }: P & { s: Settlement })
   return (
     <>
       <Head title={s.name} sub={`${s.capital ? 'Capital · ' : ''}${civ?.name ?? ''} · founded ${s.founded}`} icon={civ ? <Flag civ={civ} size={24} /> : <Icon id={s.capital ? 'ico.crown' : 'ico.found_city'} size={32} />} close={close} />
-      <div class="sheet-body">
+      <div class="sheet-body" tabIndex={0}>
         <Kv rows={[
           ['People', fmt(s.pop)],
           ['Housing', `${fmt(s.housing)} places`],
@@ -307,12 +307,12 @@ function SettlementView({ sim, s, setSel, close, focus }: P & { s: Settlement })
           <div class="section">
             <h3>Building now</h3>
             <p>{BUILDINGS[s.construction.type].name} — {pct(s.construction.progress)}</p>
-            <Bar value={s.construction.progress} />
+            <Bar value={s.construction.progress} label="Construction progress" />
           </div>
         )}
         <div class="section">
           <h3>Work</h3>
-          {emp.map((n, k) => (n > 0.5 ? <div key={k} class="row"><span style={{ width: '110px' }}>{SECTOR_NAMES[k]}</span><div style={{ flex: 1 }}><Bar value={n / empTotal} color={k === 6 ? '#e2654e' : undefined} /></div><span class="muted">{fmt(n)}</span></div> : null))}
+          {emp.map((n, k) => (n > 0.5 ? <div key={k} class="row"><span style={{ width: '110px' }}>{SECTOR_NAMES[k]}</span><div style={{ flex: 1 }}><Bar value={n / empTotal} color={k === 6 ? '#e2654e' : undefined} label={SECTOR_NAMES[k]} /></div><span class="muted">{fmt(n)}</span></div> : null))}
         </div>
         <JobsList s={s} civ={civ} />
         <CityLife sim={sim} s={s} civ={civ} />
@@ -404,7 +404,7 @@ function PersonView({ sim, person, setSel, close, focus }: P & { person: Person 
   return (
     <>
       <Head title={`${person.titles.length ? person.titles[person.titles.length - 1] + ' ' : ''}${person.name}${person.family ? ' ' + person.family : ''}`} sub={`${person.role.replace('_', ' ')} · ${person.died !== undefined ? `${person.born}–${person.died}` : `born ${person.born}, age ${age}`}`} close={close} />
-      <div class="sheet-body">
+      <div class="sheet-body" tabIndex={0}>
         <Kv rows={[
           ['Species', person.species],
           ['Culture', w.cultures.get(person.cultureId)?.name ?? '—'],
@@ -418,14 +418,14 @@ function PersonView({ sim, person, setSel, close, focus }: P & { person: Person 
           {(['admin', 'military', 'diplomacy', 'learning'] as const).map((k) => (
             <div key={k} class="skill-row">
               <span>{SKILL_NAMES[k]}</span>
-              <Bar value={person.skills[k] / 10} />
+              <Bar value={person.skills[k] / 10} label={SKILL_NAMES[k]} />
               <span class="num">{person.skills[k].toFixed(1)}</span>
             </div>
           ))}
           {person.stress !== undefined && person.died === undefined && (
             <div class="skill-row">
               <span>Stress</span>
-              <Bar value={person.stress} color="#e2654e" />
+              <Bar value={person.stress} color="#e2654e" label="Stress" />
               <span class="num">{Math.round(person.stress * 100)}%</span>
             </div>
           )}
@@ -477,7 +477,7 @@ function ReligionView({ sim, sel, close }: P) {
   return (
     <>
       <Head title={r.name} sub={`Founded ${r.founded}${r.extinct ? ` · faded ${r.extinct}` : ''}`} close={close} />
-      <div class="sheet-body">
+      <div class="sheet-body" tabIndex={0}>
         <p>{r.myth}</p>
         <Kv rows={[['Followers', fmt(r.adherents)], ['Kind', r.kind], ['Deity', r.deity], ['Cohesion', pct(r.cohesion)], ['Founder', sim.w.persons.get(r.founderId)?.name ?? 'unknown'], ['Branch of', r.parentId ? sim.w.religions.get(r.parentId)?.name ?? '—' : '—']]} />
         <div class="section">
@@ -504,7 +504,7 @@ function CivView({ sim, civ, setSel, close, focus, setMedium }: P & { civ: Civ; 
     <>
       <Head title={civ.name} sub={civ.alive ? `${gov?.label ?? civ.govForm} · ${ERA_NAMES[civ.era]} era` : `Fell in ${civ.fell}: ${civ.fellCause}`} icon={<Flag civ={civ} size={26} />} close={close} />
       <TabRow tabs={TABS} tab={tab} setTab={setTab} label={`${civ.name} sections`} />
-      <div class="sheet-body" role="tabpanel" id="civ-tabpanel" aria-labelledby={`civ-tab-${tab}`}>
+      <div class="sheet-body" role="tabpanel" id="civ-tabpanel" tabIndex={0} aria-labelledby={`civ-tab-${tab}`}>
         {tab === 'Overview' && (
           <>
             <div class="stat-tiles" role="group" aria-label="Key figures (tap for details)">
@@ -544,9 +544,9 @@ function CivView({ sim, civ, setSel, close, focus, setMedium }: P & { civ: Civ; 
               ) : <span class="muted">No recognised leader</span>}
               {heir && <button class="chip" onClick={() => setSel({ kind: 'person', id: heir.id })}>Heir: {heir.name}</button>}
             </div>
-            <div class="section"><h3>Stability</h3><Bar value={civ.stability} /></div>
-            <div class="section"><h3>Legitimacy</h3><Bar value={civ.legitimacy} /></div>
-            <div class="section"><h3>Unrest</h3><Bar value={civ.unrest} color="#e2654e" /></div>
+            <div class="section"><h3>Stability</h3><Bar value={civ.stability} label="Stability" /></div>
+            <div class="section"><h3>Legitimacy</h3><Bar value={civ.legitimacy} label="Legitimacy" /></div>
+            <div class="section"><h3>Unrest</h3><Bar value={civ.unrest} color="#e2654e" label="Unrest" /></div>
             {ruler && <button class="btn small" onClick={() => setSel({ kind: 'person', id: ruler.id })}>Leader's biography</button>}
             {cap && <button class="btn small" onClick={() => focus(cap.x, cap.y)}>Show capital</button>}
             {cap && <button class="btn small" data-testid="open-capital" onClick={() => { focus(cap.x, cap.y); setSel({ kind: 'settlement', id: cap.id }); }}>Open {cap.name}</button>}
@@ -633,7 +633,7 @@ function TechTab({ civ }: { civ: Civ }) {
         <div class="section">
           <h3>Researching</h3>
           <p>{target.name} — {target.description}</p>
-          <Bar value={(civ.techs[target.id]?.progress ?? 0) / effCost(target)} />
+          <Bar value={(civ.techs[target.id]?.progress ?? 0) / effCost(target)} label={`Research progress: ${target.name}`} />
         </div>
       )}
       <div class="section">
@@ -645,7 +645,7 @@ function TechTab({ civ }: { civ: Civ }) {
                 <span>{t.name} <span class="muted">· era {t.era}</span></span>
                 <span class="muted">{pct(civ.techs[t.id].adoption)}</span>
               </div>
-              <Bar value={civ.techs[t.id].adoption} />
+              <Bar value={civ.techs[t.id].adoption} label={`Adoption of ${t.name}`} />
             </li>
           ))}
         </ul>
@@ -663,7 +663,7 @@ function JobsList({ s, civ }: { s: Settlement; civ: Civ | undefined }) {
     <div class="section" data-testid="jobs">
       <h3>Jobs</h3>
       {jobs.slice(0, 10).map((j) => (
-        <div key={j.key} class="row"><span style={{ width: '170px' }}>{j.label}</span><div style={{ flex: 1 }}><Bar value={j.count / total} color={j.key === 'job_seekers' ? '#e2654e' : undefined} /></div><span class="muted">{fmt(j.count)}</span></div>
+        <div key={j.key} class="row"><span style={{ width: '170px' }}>{j.label}</span><div style={{ flex: 1 }}><Bar value={j.count / total} color={j.key === 'job_seekers' ? '#e2654e' : undefined} label={j.label} /></div><span class="muted">{fmt(j.count)}</span></div>
       ))}
       {jobs.length > 10 && <p class="muted">{jobs.length - 10} more kinds of work, {fmt(jobs.slice(10).reduce((a, j) => a + j.count, 0))} people.</p>}
     </div>
@@ -683,7 +683,7 @@ function CityLife({ sim, s, civ }: { sim: Simulation; s: Settlement; civ: Civ | 
       {homes.length > 0 && (
         <div class="section" data-testid="homes">
           <h3>Homes</h3>
-          {homes.slice(0, 6).map((h) => <div key={h.form} class="row"><span style={{ width: '170px' }}>{h.label}</span><div style={{ flex: 1 }}><Bar value={h.share} /></div><span class="muted">{pct(h.share)}</span></div>)}
+          {homes.slice(0, 6).map((h) => <div key={h.form} class="row"><span style={{ width: '170px' }}>{h.label}</span><div style={{ flex: 1 }}><Bar value={h.share} label={h.label} /></div><span class="muted">{pct(h.share)}</span></div>)}
         </div>
       )}
       <div class="section" data-testid="traffic">
@@ -775,7 +775,7 @@ function MissionBox({ sim, civ }: { sim: P['sim']; civ: Civ }) {
       {m ? (
         <>
           <p class="muted">{MISSIONS[m.kind].goal}. Because: {m.reason}. Deadline: year {m.until}.</p>
-          <Bar value={Math.max(0, Math.min(1, progress))} />
+          <Bar value={Math.max(0, Math.min(1, progress))} label="Mission progress" />
         </>
       ) : <p class="muted">No national mission right now.</p>}
       {done.length > 0 && <p class="muted small">Past missions: {done.filter((d) => d.ok).length} achieved, {done.filter((d) => !d.ok).length} failed.</p>}

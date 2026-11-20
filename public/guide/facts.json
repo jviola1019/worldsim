@@ -2,7 +2,7 @@
  "generated": "2026-11-20",
  "totals": {
   "srcFiles": 146,
-  "srcLines": 42517,
+  "srcLines": 42529,
   "testFiles": 47,
   "testCases": 347
  },
@@ -26,7 +26,7 @@
   {
    "name": "ui",
    "files": 24,
-   "lines": 3120,
+   "lines": 3132,
    "deps": {
     "sim": 37,
     "persistence": 7,
@@ -1037,7 +1037,7 @@
   {
    "path": "src/ui/game/Game.tsx",
    "folder": "ui",
-   "lines": 330,
+   "lines": 340,
    "about": ""
   },
   {
@@ -1079,7 +1079,7 @@
   {
    "path": "src/ui/panels/FeedPanel.tsx",
    "folder": "ui",
-   "lines": 168,
+   "lines": 169,
    "about": ""
   },
   {
@@ -1145,7 +1145,7 @@
   {
    "path": "src/ui/shared.tsx",
    "folder": "ui",
-   "lines": 54,
+   "lines": 55,
    "about": ""
   },
   {

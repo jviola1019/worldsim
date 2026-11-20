@@ -48,6 +48,16 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
   const followRef = useRef<Selection | null>(null);
   followRef.current = following;
   useEffect(() => { setFollowing(null); }, [sim]); // a loaded or branched world: ids belong to another history
+  // round 10: Escape closes the open sheet (WCAG 2.1.2 / expected dialog behaviour), unless the player is typing
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (e.key !== 'Escape' || (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT'))) return;
+      setSheet((s) => { if (s !== 'none' && renderer.current) renderer.current.selection = null; return 'none'; });
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   const [, setUi] = useState(0);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [ticker, setTicker] = useState<FeedPost | null>(null);

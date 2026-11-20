@@ -150,7 +150,8 @@ export function FeedPanel({ sim, close, focus, selectedCiv }: { sim: Simulation;
         <h2>{civId ? `News of ${sim.w.civs.get(civId)?.name ?? 'a nation'}` : 'World news'}</h2>
         <button class="icon-btn" aria-label="Close" onClick={close}><Icon id="ico.close" size={24} /></button>
       </div>
-      <div class="sheet-body" ref={body}>
+      {/* round 10: focusable so the keyboard can scroll it in every browser (Safari does not focus scroll areas) */}
+      <div class="sheet-body" ref={body} tabIndex={0} role="region" aria-label="Posts">
         <p class="muted small">Every post retells something that really happened in this world, in the medium of its time. Tap a post to see where.</p>
         <div class="filters" role="group" aria-label="Whose news">
           <button aria-pressed={civId === 0} onClick={() => pick(0)}>World</button>

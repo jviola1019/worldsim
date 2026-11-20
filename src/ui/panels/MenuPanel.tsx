@@ -61,7 +61,7 @@ export function MenuPanel({ sim, renderer, close, exit, toast, replaceSim, openF
         <h2>{sim.w.meta.name}</h2>
         <button class="icon-btn" aria-label="Close" onClick={close}><Icon id="ico.close" size={24} /></button>
       </div>
-      <div class="sheet-body">
+      <div class="sheet-body" tabIndex={0}>
         <p class="muted">Seed “{sim.w.meta.seed}” · engine {sim.w.meta.engineVersion} · {sim.w.interventions.length} divine interventions recorded{sim.w.meta.branchOf ? ` · branched from ${sim.w.meta.branchOf.name} in year ${sim.w.meta.branchOf.year}` : ''}</p>
         <div class="menu">
           <button class="primary" disabled={busy || !store.available} onClick={save}>Save world</button>

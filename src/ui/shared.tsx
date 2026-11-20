@@ -38,9 +38,10 @@ export function Kv({ rows }: { rows: [string, string | number | preact.JSX.Eleme
   );
 }
 
-export function Bar({ value, color }: { value: number; color?: string }) {
+/** A 0..1 meter. Round 10: `label` is required, so every meter has an accessible name (WCAG 4.1.2). */
+export function Bar({ value, color, label }: { value: number; color?: string; label: string }) {
   return (
-    <div class="bar" role="meter" aria-valuenow={Math.round(value * 100)} aria-valuemin={0} aria-valuemax={100}>
+    <div class="bar" role="meter" aria-label={label} aria-valuenow={Math.round(value * 100)} aria-valuemin={0} aria-valuemax={100} aria-valuetext={`${Math.round(Math.max(0, Math.min(1, value)) * 100)}%`}>
       <i style={{ width: `${Math.max(0, Math.min(1, value)) * 100}%`, background: color }} />
     </div>
   );

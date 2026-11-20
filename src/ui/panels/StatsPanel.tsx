@@ -45,7 +45,7 @@ export function StatsPanel({ sim, close }: { sim: Simulation; close: () => void 
         <button role="tab" aria-selected={view === 'world'} onClick={() => setView('world')}>World</button>
         <button role="tab" aria-selected={view === 'compare'} onClick={() => setView('compare')}>Compare nations</button>
       </div>
-      <div class="sheet-body">
+      <div class="sheet-body" tabIndex={0}>
         {view === 'world' && (
           <>
             <Kv rows={[

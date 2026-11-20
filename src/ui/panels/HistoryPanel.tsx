@@ -35,7 +35,7 @@ export function HistoryPanel({ sim, close, focus, selectedCiv, openCiv }: { sim:
         <h2>History of {sim.w.meta.name}</h2>
         <button class="icon-btn" aria-label="Close" onClick={close}><Icon id="ico.close" size={24} /></button>
       </div>
-      <div class="sheet-body">
+      <div class="sheet-body" tabIndex={0}>
         <input type="text" placeholder="Search events or a year" value={q} onInput={(e) => setQ((e.target as HTMLInputElement).value)} aria-label="Search history" />
         <div class="filters" role="group" aria-label="Categories">
           {CATS.map(([k, label]) => (

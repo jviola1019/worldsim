@@ -4,11 +4,14 @@
 // Fails (exit 1) on any serious or critical axe violation or a failed scripted check; moderate and minor
 // violations are written to tools/output/a11y-<browser>.json for the audit report (docs/DESIGN-REVIEW.md §R10).
 // axe runs in a test-only context with bypassCSP, so the shipped Content-Security-Policy is unchanged.
-import { chromium, webkit, devices } from 'playwright';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
+// like run-e2e.mjs: the project's playwright (CI installs it) or the container's copy
+let pw;
+try { pw = require('playwright'); } catch { pw = require('/opt/node-tools/node_modules/playwright'); }
+const { chromium, webkit, devices } = pw;
 const AXE = readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 const url = process.env.URL ?? 'http://localhost:4173/';
 const engineName = process.env.BROWSER === 'webkit' ? 'webkit' : 'chromium';
@@ -86,8 +89,19 @@ async function run(label, ctxOpts) {
     await page.waitForTimeout(250);
     await audit(page, `${label}: nation ${tab.trim()}`);
   }
-  // settlement and person: show the capital, tap it, then open a person from its panel
+  // person: the ruler's card on the nation overview
   await page.getByRole('tab', { name: 'Overview' }).click();
+  const ruler = page.locator('aside.sheet .person-card').first();
+  if (await ruler.count()) {
+    await ruler.click();
+    await page.waitForTimeout(300);
+    await audit(page, `${label}: inspector (person)`);
+    await close(page);
+    await page.getByLabel('Nations', { exact: true }).click();
+    await page.locator('.sheet-body ul.list li button').first().click();
+    await page.waitForTimeout(300);
+  } else check(`${label}: a ruler card to open the person inspector`, false);
+  // settlement: show the capital and tap it
   const cap = page.getByText('Show capital');
   if (await cap.count()) {
     await cap.first().click();
@@ -97,13 +111,6 @@ async function run(label, ctxOpts) {
     await page.waitForTimeout(400);
     const kind = await page.locator('aside.sheet').getAttribute('data-kind').catch(() => null);
     if (kind) await audit(page, `${label}: inspector (${kind})`);
-    const person = page.locator('aside.sheet .sheet-body button', { hasText: /^[A-Z][a-z]+ [A-Z]/ }).first();
-    if (await person.count()) {
-      await person.click();
-      await page.waitForTimeout(300);
-      const k2 = await page.locator('aside.sheet').getAttribute('data-kind').catch(() => null);
-      if (k2 === 'person') await audit(page, `${label}: inspector (person)`);
-    }
     await close(page);
   }
   // keyboard: Tab reaches the controls, and focus is always visible (2.4.7) with a 2 px+ outline

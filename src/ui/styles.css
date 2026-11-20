@@ -178,7 +178,7 @@ input[type=range] { width: 100%; accent-color: var(--brass); height: 28px; }
   .world-card { grid-area: card; max-width: 100%; min-width: 0; padding: 4px 8px; }
   .dial .year { font-size: 19px; }
   .playback { grid-area: play; justify-self: start; }
-  .hud-actions { grid-area: actions; flex-direction: column; max-width: none; }
+  .hud-actions { grid-area: actions; display: grid; grid-template-columns: repeat(2, var(--tap)); align-content: start; max-width: none; } /* round 10: 3×2, clear of an open sheet */
   .cat-row { display: grid; grid-template-columns: repeat(5, 1fr); }
   .cat { min-width: 0; height: var(--tap); }
   .ticker { bottom: calc(150px + var(--safe-b)); }
@@ -265,7 +265,7 @@ img.flag { image-rendering: pixelated; border: 1px solid rgba(0,0,0,.5); box-sha
 .frame-titles { min-width: 0; }
 .frame-title { font-weight: 800; font-size: 17px; line-height: 1.1; overflow-wrap: anywhere; }
 .frame-sub { font-size: 12px; opacity: .8; }
-.frame-switch { display: flex; gap: 6px; overflow-x: auto; padding: 0 12px 8px; }
+.frame-switch { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 8px; } /* round 10: wraps (a scrolling row of plain text is not keyboard-reachable) */
 .frame-chip { white-space: nowrap; font-size: 12px; padding: 3px 8px; border-radius: 999px; border: 1px solid currentColor; opacity: .85; }
 .frame-body { display: grid; grid-template-columns: 1fr; gap: 12px; padding: 10px 12px 12px; }
 .frame-side { font-size: 13px; border-radius: 8px; padding: 8px 10px; }

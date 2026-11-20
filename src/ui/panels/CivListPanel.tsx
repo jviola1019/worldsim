@@ -14,7 +14,7 @@ export function CivListPanel({ sim, close, open }: { sim: Simulation; close: () 
         <h2>Nations</h2>
         <button class="icon-btn" aria-label="Close" onClick={close}><Icon id="ico.close" size={24} /></button>
       </div>
-      <div class="sheet-body">
+      <div class="sheet-body" tabIndex={0}>
         {(() => { const n = countPeoples(sim.w); return <p class="muted" data-testid="peoples-count">{n.nations} {n.nations === 1 ? 'nation' : 'nations'} · {n.tribes} {n.tribes === 1 ? 'tribe' : 'tribes'} (wandering, no settlements yet)</p>; })()}
         <div class="filters">
           <button aria-pressed={showFallen} onClick={() => setShowFallen(!showFallen)}>Include fallen nations</button>

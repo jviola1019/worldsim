@@ -36,3 +36,8 @@ jobs:
         run: |
           npx playwright install --with-deps webkit
           BROWSER=webkit npm run e2e
+      # round 10: accessibility audit (axe-core WCAG 2.2 A/AA rules + keyboard, Escape, reflow, text spacing)
+      - name: Accessibility audit (Chromium and WebKit)
+        run: |
+          npm run a11y
+          BROWSER=webkit npm run a11y
