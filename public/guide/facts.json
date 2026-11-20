@@ -1,10 +1,10 @@
 {
- "generated": "2026-11-19",
+ "generated": "2026-11-20",
  "totals": {
-  "srcFiles": 142,
-  "srcLines": 42282,
-  "testFiles": 42,
-  "testCases": 328
+  "srcFiles": 143,
+  "srcLines": 42311,
+  "testFiles": 43,
+  "testCases": 331
  },
  "folders": [
   {
@@ -26,9 +26,9 @@
   {
    "name": "ui",
    "files": 23,
-   "lines": 3015,
+   "lines": 3012,
    "deps": {
-    "sim": 31,
+    "sim": 34,
     "persistence": 7,
     "config": 5,
     "core": 3,
@@ -79,8 +79,8 @@
   },
   {
    "name": "sim",
-   "files": 9,
-   "lines": 2384,
+   "files": 10,
+   "lines": 2416,
    "deps": {
     "civilizations": 18,
     "economy": 7,
@@ -92,7 +92,7 @@
     "history": 5,
     "politics": 6,
     "culture": 4,
-    "core": 8,
+    "core": 9,
     "military": 2,
     "future": 3,
     "media": 1,
@@ -951,6 +951,12 @@
    "about": "Archive maintenance: keeps long-running worlds bounded in memory and save size."
   },
   {
+   "path": "src/sim/peoples.ts",
+   "folder": "sim",
+   "lines": 32,
+   "about": "Round 10: who lives in the world, counted honestly."
+  },
+  {
    "path": "src/sim/simulation.ts",
    "folder": "sim",
    "lines": 189,
@@ -1025,7 +1031,7 @@
   {
    "path": "src/ui/game/TopBar.tsx",
    "folder": "ui",
-   "lines": 69,
+   "lines": 63,
    "about": ""
   },
   {
@@ -1043,7 +1049,7 @@
   {
    "path": "src/ui/panels/CivListPanel.tsx",
    "folder": "ui",
-   "lines": 40,
+   "lines": 42,
    "about": ""
   },
   {
@@ -1091,7 +1097,7 @@
   {
    "path": "src/ui/panels/StatsPanel.tsx",
    "folder": "ui",
-   "lines": 96,
+   "lines": 97,
    "about": ""
   },
   {
@@ -1380,6 +1386,11 @@
    "path": "tests/ui/guide.test.ts",
    "cases": 3,
    "about": "Round 8: the interactive code guide (public/guide/, served at /guide/) keeps the game's security policy and its facts stay in step with the code (regenerate with `node tools/guide-facts.mjs`)."
+  },
+  {
+   "path": "tests/ui/peoples.test.ts",
+   "cases": 3,
+   "about": "Round 10: the HUD's nation count is honest."
   },
   {
    "path": "tests/world/fire-determinism.test.ts",
