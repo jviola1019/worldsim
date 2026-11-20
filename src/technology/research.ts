@@ -11,6 +11,7 @@
  * geographic requirements are met, and decays when they are lost. Collapse of
  * literacy and institutions can make a civilization FORGET techs.
  */
+import { paceMult } from '../sim/pace';
 import { mediaResearchMult } from '../media/media';
 import { ethosResearchMult, ethosAdoptionMult } from '../civilizations/ethos';
 import { missionResearchMult } from '../civilizations/missions';
@@ -223,7 +224,8 @@ export function researchOutput(sim: Sim, civ: Civ): number {
     mediaResearchMult(civ) *
     (1 - 0.35 * (civ.sclerosis ?? 0)) *
     w.laws.researchSpeed *
-    w.meta.settings.techSpeed;
+    w.meta.settings.techSpeed *
+    paceMult(w.meta.settings, 'research');
   return (folkRP + learnedRP * spend) * mult;
 }
 

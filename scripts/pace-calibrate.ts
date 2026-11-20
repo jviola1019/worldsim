@@ -1,0 +1,36 @@
+/**
+ * Round 10: pace calibration. One band of 24 humans placed next to fresh water on an empty 128² world;
+ * prints when the first village, town (2,000 people) and city (10,000 people) appear.
+ *   npx tsx scripts/pace-calibrate.ts [years=1600] [pace=slow|standard] [seeds=pace-a,pace-b,pace-c,pace-d,pace-e]
+ */
+import { defaultConfig } from '../src/config/laws';
+import { createSimulation } from '../src/sim/bootstrap';
+import { spawnBand } from '../src/population/bands';
+
+const years = Number(process.argv[2] ?? 1600);
+const pace = (process.argv[3] ?? 'slow') as 'slow' | 'standard';
+const seeds = (process.argv[4] ?? 'pace-a,pace-b,pace-c,pace-d,pace-e').split(',');
+for (const seed of seeds) {
+  const cfg = defaultConfig();
+  cfg.name = 'Test'; cfg.gen.seed = seed; cfg.gen.width = 128; cfg.gen.height = 128;
+  cfg.settings.startCivs = 0; cfg.settings.startEra = 1; cfg.settings.pace = pace;
+  const sim = createSimulation(cfg);
+  const m = sim.w.map;
+  for (let i = 0; i < m.n; i += 7) {
+    const x = i % m.w, y = (i / m.w) | 0;
+    if (m.hasFreshWater(i) && !m.isWater(i) && x > 20 && y > 20 && x < m.w - 20 && spawnBand(sim, x, y, 'human', 24)) break;
+  }
+  const ms: Record<string, number> = {};
+  let died = -1;
+  for (let y = 1; y <= years; y++) {
+    sim.runYears(1);
+    const ss = [...sim.w.settlements.values()];
+    const maxPop = Math.max(0, ...ss.map((s) => s.pop));
+    if (ss.length && ms.village === undefined) ms.village = y;
+    if (maxPop >= 2000 && ms.town === undefined) ms.town = y;
+    if (maxPop >= 10000 && ms.city === undefined) { ms.city = y; break; }
+    if (!sim.w.bands.size && !ss.length) { died = y; break; }
+  }
+  const era = Math.max(1, ...[...sim.w.civs.values()].filter((c) => c.alive).map((c) => c.era));
+  console.log(`${seed}\t${pace}\tvillage ${ms.village ?? '-'}\ttown ${ms.town ?? '-'}\tcity ${ms.city ?? '-'}\tdied ${died < 0 ? '-' : died}\tera ${era}\tyear ${sim.year}`);
+}

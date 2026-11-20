@@ -44,6 +44,14 @@ export const BALANCE = {
   /** [S] Max yearly emigration share under distress. */
   maxEmigration: 0.06,
   bandSplitSize: 90,
+  /** [C] Round 10, Slow pace (sim/pace.ts): multipliers on the band settle chance, research, construction and births.
+   *  Calibrated to a first village ~100 years and a first city of 10,000 ~1,000 years after placing humans (VALIDATION §R10). */
+  slowSettleMult: 0.03,
+  slowResearchMult: 0.45,
+  slowBuildMult: 0.5,
+  slowBirthMult: 0.65, // settlements only: small wandering bands keep their fertility (they die out otherwise)
+  /** [C] Slow pace: a band's chance to settle ramps up over its first N years on the land (people learn it first). */
+  slowSettleRampYears: 60,
   bandMinSize: 8,
 
   // ---------------- food & subsistence (units: person-years of food)

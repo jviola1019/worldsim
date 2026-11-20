@@ -1453,6 +1453,11 @@
    "about": "How often each ending and catastrophe actually happens in natural worlds (no god powers)."
   },
   {
+   "path": "scripts/mode-audit.ts",
+   "lines": 157,
+   "about": "Round 10: game-mode audit."
+  },
+  {
    "path": "scripts/modernization.ts",
    "lines": 60,
    "about": "Natural-history run with NO god powers: does civilization modernize on its own, and do natural hazards happen during ordinary ticks?"

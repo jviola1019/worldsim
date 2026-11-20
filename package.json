@@ -20,7 +20,8 @@
     "bench:browser": "node benchmarks/browser-bench.mjs",
     "e2e": "node tests/e2e/run-e2e.mjs",
     "sprites": "tsx tools/render-sprites.ts",
-    "sprites:sheet": "tsx tools/contact-sheet.ts"
+    "sprites:sheet": "tsx tools/contact-sheet.ts",
+    "a11y": "node tests/e2e/run-a11y.mjs"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "5.3.0",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@types/node": "26.6.6",
+    "axe-core": "4.14.1",
     "fake-indexeddb": "6.2.8",
     "tsx": "4.23.15",
     "typescript": "7.0.2",

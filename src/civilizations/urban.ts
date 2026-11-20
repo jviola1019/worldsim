@@ -8,6 +8,7 @@
  * at higher tiers when technology allows, so older districts persist, and old
  * landmarks (temples, walls, monuments, arenas) become protected HISTORIC sites.
  */
+import { paceMult } from '../sim/pace';
 import { eachOwnTile, forgetOwnTiles } from './territory';
 import { BALANCE } from '../config/balance';
 import { ethosBuildMult } from './ethos';
@@ -774,7 +775,7 @@ export function progressConstruction(sim: Sim, s: Settlement, civ: Civ, builders
     cancelProject(sim, s);
     return;
   }
-  const productivity = (1 + civ.caps.construction) * (1 + civ.caps.robotics * 0.6) * (1 + civ.caps.automation * 0.3);
+  const productivity = (1 + civ.caps.construction) * (1 + civ.caps.robotics * 0.6) * (1 + civ.caps.automation * 0.3) * paceMult(sim.w.meta.settings, 'build');
   const work = (Math.max(0, builders) / 12) * productivity;
   if (!(work > 0)) return;
   const total = BUILDINGS[job.type].labor || 1;
