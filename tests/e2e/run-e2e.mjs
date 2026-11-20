@@ -41,6 +41,9 @@ async function run(label, ctxOpts) {
   await page.waitForSelector('canvas.canvas', { timeout: 30000 });
   const skip = page.getByText('Skip');
   if (await skip.count()) await skip.click();
+  // round 10: an honest count, wandering bands are tribes, not nations
+  const hud0 = (await page.locator('.world-card').innerText()).replace(/\n/g, ' | ');
+  check(`${label}: HUD counts tribes at year 0`, /\btribes?\b/.test(hud0) && !/\bnations?\b/.test(hud0), hud0);
   const yearOf = async () => Number((await page.locator('.world-card .year').innerText()).replace(/\D/g, ''));
   const y0 = await yearOf();
   await page.locator('.playback button').nth(5).click().catch(() => page.locator('.playback button').last().click());
@@ -233,6 +236,31 @@ async function run(label, ctxOpts) {
   await browser.close();
 }
 
+// round 10: the HUD card at 320 px with a long world name: no overlap with the speed controls, no sideways scroll,
+// and the people/nation line is shown whole (it wraps, never cut off with an ellipsis)
+async function narrow() {
+  const browser = await engine.launch();
+  const ctx = await browser.newContext({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  await page.goto(url);
+  await page.getByText('New world').first().click();
+  await page.locator('#wname').fill('The Exceedingly Long-Named World of Q');
+  await page.getByText('Create world').click();
+  await page.waitForSelector('canvas.canvas', { timeout: 30000 });
+  const skip = page.getByText('Skip');
+  if (await skip.count()) await skip.click();
+  const m = await page.evaluate(() => {
+    const card = document.querySelector('.world-card').getBoundingClientRect();
+    const play = document.querySelector('.playback').getBoundingClientRect();
+    const overlap = !(card.right <= play.left || play.right <= card.left || card.bottom <= play.top || play.bottom <= card.top);
+    const line = [...document.querySelectorAll('.world-card .era')].find((e) => /people/.test(e.textContent));
+    return { overlap, sw: document.documentElement.scrollWidth, cut: line ? line.scrollWidth > line.clientWidth + 1 : true };
+  });
+  check('narrow 320: HUD card clear of the speed controls, whole, no sideways scroll', !m.overlap && m.sw <= 320 && !m.cut, JSON.stringify(m));
+  await browser.close();
+}
+
+await narrow();
 await run('phone', { ...devices['iPhone 13'] });
 await run('desktop', { viewport: { width: 1280, height: 800 } });
 await run('reduced', { viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });

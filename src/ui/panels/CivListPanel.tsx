@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import type { Simulation } from '../../sim/simulation';
 import { Icon, fmt, Flag } from '../shared';
 import { ERA_NAMES } from '../../technology/techData';
+import { countPeoples } from '../../sim/peoples';
 
 export function CivListPanel({ sim, close, open }: { sim: Simulation; close: () => void; open: (id: number) => void }) {
   const [showFallen, setShowFallen] = useState(false);
@@ -14,6 +15,7 @@ export function CivListPanel({ sim, close, open }: { sim: Simulation; close: () 
         <button class="icon-btn" aria-label="Close" onClick={close}><Icon id="ico.close" size={24} /></button>
       </div>
       <div class="sheet-body">
+        {(() => { const n = countPeoples(sim.w); return <p class="muted" data-testid="peoples-count">{n.nations} {n.nations === 1 ? 'nation' : 'nations'} · {n.tribes} {n.tribes === 1 ? 'tribe' : 'tribes'} (wandering, no settlements yet)</p>; })()}
         <div class="filters">
           <button aria-pressed={showFallen} onClick={() => setShowFallen(!showFallen)}>Include fallen nations</button>
         </div>
@@ -26,7 +28,7 @@ export function CivListPanel({ sim, close, open }: { sim: Simulation; close: () 
                   <strong>{c.name}</strong>
                 </div>
                 <div class="muted">
-                  {c.alive ? `${fmt(c.population)} people · ${c.settlements.length} settlements · ${ERA_NAMES[c.era]}` : `Fell ${c.fell}: ${c.fellCause}`}
+                  {c.alive ? (c.settlements.length ? `${fmt(c.population)} people · ${c.settlements.length} ${c.settlements.length === 1 ? 'settlement' : 'settlements'} · ${ERA_NAMES[c.era]}` : `Tribe (no settlements yet) · ${ERA_NAMES[c.era]}`) : `Fell ${c.fell}: ${c.fellCause}`}
                 </div>
               </button>
             </li>

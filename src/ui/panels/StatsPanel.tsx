@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks';
+import { countPeoples } from '../../sim/peoples';
 import type { Simulation } from '../../sim/simulation';
 import { Icon, Kv, fmt } from '../shared';
 import { LineChart, type Series } from '../charts/LineChart';
@@ -7,7 +8,7 @@ import { CIV_SERIES } from '../../history/stats';
 const GLOBAL: { key: string; label: string; unit?: string; fmt?: (v: number) => string }[] = [
   { key: 'population', label: 'World population' },
   { key: 'gdp', label: 'World output (GDP)' },
-  { key: 'civs', label: 'Nations' },
+  { key: 'civs', label: 'Peoples (nations and tribes)' },
   { key: 'wars', label: 'Active wars' },
   { key: 'techScore', label: 'Most advanced technology score' },
   { key: 'temperature', label: 'Global temperature change', unit: '°C', fmt: (v) => v.toFixed(2) },
@@ -48,7 +49,7 @@ export function StatsPanel({ sim, close }: { sim: Simulation; close: () => void 
         {view === 'world' && (
           <>
             <Kv rows={[
-              ['People', fmt(latest('population'))], ['Nations', String(latest('civs'))], ['Settlements', String(sim.w.settlements.size)], ['Extinct nations', String(latest('extinctCivs'))],
+              ['People', fmt(latest('population'))], ['Nations', String(countPeoples(sim.w).nations)], ['Tribes', String(countPeoples(sim.w).tribes)], ['Settlements', String(sim.w.settlements.size)], ['Extinct nations', String(latest('extinctCivs'))],
               ['Active wars', String(latest('wars'))], ['Warming', `${sim.w.climate.anomaly.toFixed(2)} °C`], ['Sea level rise', `${sim.w.climate.seaLevel.toFixed(2)} m`], ['Energy used / yr', fmt(latest('energy'))],
             ]} />
             <p class="muted">Gold lines mark world-shaking events. Touch a chart to read values.</p>

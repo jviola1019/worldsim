@@ -1,7 +1,8 @@
 import type { Simulation } from '../../sim/simulation';
 import { SPEED_LABELS } from '../../sim/simulation';
 import { ERA_NAMES } from '../../technology/techData';
-import { Icon, fmt } from '../shared';
+import { Icon } from '../shared';
+import { countPeoples, peoplesLine } from '../../sim/peoples';
 import type { Sheet } from './Game';
 import type { Objective } from '../../scenarios/scenarios';
 import { monthOf, MONTH_NAMES } from '../../core/time';
@@ -10,16 +11,9 @@ const SPEED_ICONS = ['ico.pause', 'ico.play', 'ico.speed1', 'ico.speed2', 'ico.s
 
 export function TopBar({ sim, speed, setSpeed, openSheet, sheet, objectives, done }: { sim: Simulation; speed: number; setSpeed: (n: number) => void; openSheet: (s: Sheet) => void; sheet: Sheet; objectives: Objective[]; done: string[] }) {
   const w = sim.w;
-  let pop = 0;
   let era = 1;
-  let civs = 0;
-  for (const c of w.civs.values()) {
-    if (!c.alive) continue;
-    civs++;
-    pop += c.population;
-    if (c.era > era) era = c.era;
-  }
-  for (const b of w.bands.values()) pop += b.members.length;
+  for (const c of w.civs.values()) if (c.alive && c.era > era) era = c.era;
+  const peoples = countPeoples(w);
   let wars = 0;
   for (const x of w.wars.values()) if (!x.end) wars++;
   return (
@@ -31,7 +25,7 @@ export function TopBar({ sim, speed, setSpeed, openSheet, sheet, objectives, don
           <span class="era">{MONTH_NAMES[monthOf(w.tick)]}</span>
         </div>
         <div class="era">
-          {civs ? `${ERA_NAMES[era]} · ${fmt(pop)} people · ${civs} ${civs === 1 ? 'people' : 'nations'}` : pop ? `${fmt(pop)} wanderers` : 'No people yet'}
+          {peoplesLine(peoples, ERA_NAMES[era])}
         </div>
         {objectives.length > 0 && <div class="era muted">Objectives {done.length}/{objectives.length}</div>}
       </div>

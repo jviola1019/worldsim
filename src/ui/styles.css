@@ -167,7 +167,9 @@ input[type=range] { width: 100%; accent-color: var(--brass); height: 28px; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
 /* ------------------------------------------------ narrow phones */
-.world-card .dial, .world-card .era { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.world-card .dial { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* round 10: the people/nation line wraps rather than hiding the count behind an ellipsis */
+.world-card .era { white-space: normal; overflow-wrap: anywhere; }
 .ticker { top: auto; bottom: calc(132px + var(--safe-b)); }
 @media (max-width: 560px) {
   .hud-top { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'card actions' 'play actions'; row-gap: 6px; }
