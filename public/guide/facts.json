@@ -1,10 +1,10 @@
 {
  "generated": "2026-11-20",
  "totals": {
-  "srcFiles": 144,
-  "srcLines": 42369,
-  "testFiles": 44,
-  "testCases": 338
+  "srcFiles": 146,
+  "srcLines": 42517,
+  "testFiles": 47,
+  "testCases": 347
  },
  "folders": [
   {
@@ -25,10 +25,10 @@
   },
   {
    "name": "ui",
-   "files": 23,
-   "lines": 3023,
+   "files": 24,
+   "lines": 3120,
    "deps": {
-    "sim": 35,
+    "sim": 37,
     "persistence": 7,
     "config": 5,
     "core": 3,
@@ -49,10 +49,10 @@
   {
    "name": "civilizations",
    "files": 10,
-   "lines": 2807,
+   "lines": 2809,
    "deps": {
     "world": 7,
-    "sim": 19,
+    "sim": 21,
     "culture": 4,
     "core": 8,
     "technology": 5,
@@ -79,14 +79,14 @@
   },
   {
    "name": "sim",
-   "files": 10,
-   "lines": 2425,
+   "files": 11,
+   "lines": 2439,
    "deps": {
     "civilizations": 18,
     "economy": 7,
     "technology": 9,
     "population": 8,
-    "config": 4,
+    "config": 5,
     "ecology": 4,
     "world": 11,
     "history": 5,
@@ -102,9 +102,9 @@
   {
    "name": "population",
    "files": 9,
-   "lines": 1617,
+   "lines": 1620,
    "deps": {
-    "sim": 16,
+    "sim": 17,
     "world": 3,
     "config": 5,
     "civilizations": 11,
@@ -190,9 +190,9 @@
   {
    "name": "technology",
    "files": 4,
-   "lines": 1053,
+   "lines": 1055,
    "deps": {
-    "sim": 4,
+    "sim": 5,
     "core": 2,
     "civilizations": 6,
     "history": 2,
@@ -263,7 +263,7 @@
   {
    "name": "config",
    "files": 2,
-   "lines": 440,
+   "lines": 470,
    "deps": {
     "sim": 1,
     "world": 3
@@ -377,7 +377,7 @@
   {
    "path": "src/civilizations/settlement.ts",
    "folder": "civilizations",
-   "lines": 370,
+   "lines": 371,
    "about": "Settlements: founding, the monthly cycle (economy -> demography -> construction -> health/migration), yearly upkeep (territory, education, access), transfer between civilizations and destruction."
   },
   {
@@ -389,19 +389,19 @@
   {
    "path": "src/civilizations/urban.ts",
    "folder": "civilizations",
-   "lines": 903,
+   "lines": 904,
    "about": "Urban development. Each settlement runs at most one construction project at a time, chosen by utility from its measured needs (housing pressure, food deficit, material shortages, unworked deposits, energy deficit, services per capita, threats, transport links)"
   },
   {
    "path": "src/config/balance.ts",
    "folder": "config",
-   "lines": 218,
+   "lines": 226,
    "about": "Balance parameters. Every gameplay coefficient lives here (not scattered as magic numbers) so it can be tuned, tested for sensitivity and adjusted at runtime from the developer panel."
   },
   {
    "path": "src/config/laws.ts",
    "folder": "config",
-   "lines": 222,
+   "lines": 244,
    "about": ""
   },
   {
@@ -653,7 +653,7 @@
   {
    "path": "src/population/bands.ts",
    "folder": "population",
-   "lines": 240,
+   "lines": 243,
    "about": "Nomadic bands (individual-level hunter-gatherer groups)."
   },
   {
@@ -957,6 +957,12 @@
    "about": "Archive maintenance: keeps long-running worlds bounded in memory and save size."
   },
   {
+   "path": "src/sim/pace.ts",
+   "folder": "sim",
+   "lines": 14,
+   "about": "Round 10: development pace."
+  },
+  {
    "path": "src/sim/peoples.ts",
    "folder": "sim",
    "lines": 32,
@@ -989,7 +995,7 @@
   {
    "path": "src/technology/research.ts",
    "folder": "technology",
-   "lines": 513,
+   "lines": 515,
    "about": "Technology runtime: research, discovery, adoption, diffusion, loss."
   },
   {
@@ -1025,13 +1031,13 @@
   {
    "path": "src/ui/game/Dock.tsx",
    "folder": "ui",
-   "lines": 76,
+   "lines": 80,
    "about": ""
   },
   {
    "path": "src/ui/game/Game.tsx",
    "folder": "ui",
-   "lines": 329,
+   "lines": 330,
    "about": ""
   },
   {
@@ -1053,6 +1059,12 @@
    "about": "Pointer input for touch and mouse."
   },
   {
+   "path": "src/ui/mediumTheme.ts",
+   "folder": "ui",
+   "lines": 20,
+   "about": "Round 10: the colours of each news medium."
+  },
+  {
    "path": "src/ui/panels/CivListPanel.tsx",
    "folder": "ui",
    "lines": 42,
@@ -1067,7 +1079,7 @@
   {
    "path": "src/ui/panels/FeedPanel.tsx",
    "folder": "ui",
-   "lines": 142,
+   "lines": 168,
    "about": ""
   },
   {
@@ -1079,7 +1091,7 @@
   {
    "path": "src/ui/panels/Inspector.tsx",
    "folder": "ui",
-   "lines": 777,
+   "lines": 812,
    "about": ""
   },
   {
@@ -1115,7 +1127,7 @@
   {
    "path": "src/ui/screens/NewWorldScreen.tsx",
    "folder": "ui",
-   "lines": 173,
+   "lines": 184,
    "about": ""
   },
   {
@@ -1227,6 +1239,11 @@
    "path": "tests/civilizations/round8.test.ts",
    "cases": 12,
    "about": "Round 8: city composition, public-service jobs, climate mitigation, and the round-6 leftovers."
+  },
+  {
+   "path": "tests/config/presets.test.ts",
+   "cases": 2,
+   "about": "Round 10: Realistic is a grounded sandbox that starts empty and slow; Observer keeps the old hands-off Realistic exactly (so long-run balance data stays comparable)."
   },
   {
    "path": "tests/culture/sports.test.ts",
@@ -1379,6 +1396,11 @@
    "about": ""
   },
   {
+   "path": "tests/sim/pace.test.ts",
+   "cases": 4,
+   "about": "Round 10: Slow pace. Placed humans take generations to settle and centuries to build cities; Standard pace is untouched (every lever exactly 1)."
+  },
+  {
    "path": "tests/sim/systems.test.ts",
    "cases": 7,
    "about": ""
@@ -1397,6 +1419,11 @@
    "path": "tests/ui/guide.test.ts",
    "cases": 3,
    "about": "Round 8: the interactive code guide (public/guide/, served at /guide/) keeps the game's security policy and its facts stay in step with the code (regenerate with `node tools/guide-facts.mjs`)."
+  },
+  {
+   "path": "tests/ui/mediumTheme.test.ts",
+   "cases": 3,
+   "about": "Round 10: each news medium themes the whole feed panel."
   },
   {
    "path": "tests/ui/peoples.test.ts",
@@ -1434,6 +1461,11 @@
    "path": "scripts/multi-seed.ts",
    "lines": 65,
    "about": "Statistical multi-seed run: same config, N seeds, Y years."
+  },
+  {
+   "path": "scripts/pace-calibrate.ts",
+   "lines": 37,
+   "about": "Round 10: pace calibration."
   },
   {
    "path": "scripts/run-sim.ts",

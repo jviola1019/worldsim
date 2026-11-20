@@ -162,6 +162,17 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
             </div>
             <span class="footnote">Grounded stops at credible near-future tech. Science fiction unlocks speculative eras (megastructures, AGI, terraforming).</span>
           </div>
+          <div class="field">
+            <span class="label" id="pace-label">Pace</span>
+            <div class="seg" role="group" aria-labelledby="pace-label" data-testid="pace">
+              {(['standard', 'slow'] as const).map((p) => (
+                <button key={p} aria-pressed={(cfg.settings.pace ?? 'standard') === p} onClick={() => set((c) => (c.settings.pace = p))}>
+                  {p === 'standard' ? 'Standard' : 'Slow'}
+                </button>
+              ))}
+            </div>
+            <span class="footnote">Slow: people take generations to settle and centuries to build cities.</span>
+          </div>
         </section>
         <div class="sticky-actions">
           <button class="btn primary" onClick={() => start(cfg)}>Create world</button>

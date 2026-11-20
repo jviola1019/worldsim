@@ -76,6 +76,34 @@ async function run(label, ctxOpts) {
   await page.getByRole('tab', { name: 'Album' }).click();
   await page.waitForTimeout(300);
   check(`${label}: album tab opens`, (await page.locator('.album, .sheet-body p.muted').count()) > 0);
+  // round 10: the nation's tabs sit on one row you can swipe, arrow keys move between them (ARIA tabs),
+  // Follow and Favourite live in the header, and the Feed tab shows its first post without scrolling
+  const tabs = await page.evaluate(() => {
+    const list = document.querySelector('aside.sheet .tabs[role=tablist]');
+    const btns = [...list.querySelectorAll('[role=tab]')];
+    return { rows: new Set(btns.map((b) => Math.round(b.getBoundingClientRect().top))).size, swipes: list.scrollWidth > list.clientWidth || btns.length <= 4 };
+  });
+  await page.getByRole('tab', { name: 'Album' }).focus();
+  await page.keyboard.press('ArrowRight');
+  const nextSel = await page.getByRole('tab', { name: 'History' }).getAttribute('aria-selected');
+  const nextFocus = await page.evaluate(() => document.activeElement?.textContent);
+  await page.keyboard.press('Home');
+  const homeSel = await page.getByRole('tab', { name: 'Overview' }).getAttribute('aria-selected');
+  const head = await page.evaluate(() => ['follow', 'favorite'].map((id) => {
+    const b = document.querySelector(`aside.sheet .sheet-head [data-testid=${id}]`);
+    const r = b?.getBoundingClientRect();
+    return b ? !!b.getAttribute('aria-label') && r.width >= 44 && r.height >= 44 : false;
+  }));
+  check(`${label}: nation tabs on one row, arrow keys, header actions`, tabs.rows === 1 && tabs.swipes && nextSel === 'true' && /History/.test(nextFocus ?? '') && homeSel === 'true' && head.every(Boolean), JSON.stringify({ tabs, nextSel, nextFocus, homeSel, head }));
+  await page.getByRole('tab', { name: 'Feed' }).click();
+  await page.waitForTimeout(300);
+  const firstPost = await page.evaluate(() => {
+    const body = document.querySelector('aside.sheet .sheet-body').getBoundingClientRect();
+    const post = document.querySelector('aside.sheet article.post')?.getBoundingClientRect();
+    return post ? { visible: Math.round(Math.min(post.bottom, body.bottom) - post.top), height: Math.round(post.height), offset: Math.round(post.top - body.top) } : null;
+  });
+  check(`${label}: the Feed tab shows its first post`, !!firstPost && firstPost.visible >= Math.min(firstPost.height, 120), JSON.stringify(firstPost));
+  await page.getByRole('tab', { name: 'Album' }).click();
   await page.getByLabel('Close').first().click();
   // news feed: posts in the medium of their time
   await page.getByLabel('News feed').click();
@@ -83,6 +111,42 @@ async function run(label, ctxOpts) {
   const posts = await page.locator('article.post').count();
   const medium = posts ? await page.locator('article.post').first().getAttribute('class') : '';
   check(`${label}: news feed shows posts`, posts > 0, `${posts} posts (${medium})`);
+  // round 10: the whole sheet wears the medium, and the posts scroll as one list
+  const sheetSel = 'aside.sheet[aria-label="News feed"]';
+  const worn = await page.evaluate((sel) => {
+    const sh = document.querySelector(sel);
+    const frame = sh?.querySelector('.feed-frame');
+    return { sheet: sh?.getAttribute('data-medium'), frame: frame?.getAttribute('data-medium'), bg: sh ? getComputedStyle(sh).backgroundColor : '' };
+  }, sheetSel);
+  check(`${label}: feed sheet wears its medium`, !!worn.sheet && worn.sheet === worn.frame && worn.bg !== 'rgb(20, 28, 48)', JSON.stringify(worn));
+  const scrollers = await page.evaluate((sel) => [...document.querySelectorAll(`${sel} *`)].filter((e) => {
+    const oy = getComputedStyle(e).overflowY;
+    return (oy === 'auto' || oy === 'scroll') && e.scrollHeight > e.clientHeight + 1 && !e.classList.contains('sheet-body');
+  }).map((e) => e.className), sheetSel);
+  const body = page.locator(`${sheetSel} .sheet-body`);
+  const box = await body.boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  const st0 = await body.evaluate((e) => e.scrollTop);
+  await page.mouse.wheel(0, 600).catch(() => {});
+  await page.waitForTimeout(300);
+  let st1 = await body.evaluate((e) => e.scrollTop);
+  if (st1 === st0) { await body.focus().catch(() => {}); await page.keyboard.press('PageDown'); await page.waitForTimeout(300); st1 = await body.evaluate((e) => e.scrollTop); }
+  check(`${label}: feed scrolls as one list`, scrollers.length === 0 && st1 > st0, `inner scrollers: ${JSON.stringify(scrollers)}; scrollTop ${st0} → ${st1}`);
+  if (posts >= 20) {
+    await body.evaluate((e) => { e.scrollTop = e.scrollHeight; });
+    await page.waitForTimeout(800);
+    const more = await page.locator('article.post').count();
+    const button = await page.locator(`${sheetSel} button`, { hasText: 'Older posts' }).count();
+    check(`${label}: older posts load on scroll`, more > posts || button === 0, `${posts} → ${more}, older-posts button ${button ? 'still shown' : 'gone (no more)'}`);
+  }
+  const chip = page.locator(`${sheetSel} .filters button`).nth(1);
+  if (await chip.count()) {
+    await body.evaluate((e) => { e.scrollTop = 400; });
+    await chip.click();
+    await page.waitForTimeout(300);
+    const after = await page.evaluate((sel) => ({ top: document.querySelector(`${sel} .sheet-body`).scrollTop, sheet: document.querySelector(sel).getAttribute('data-medium'), frame: document.querySelector(`${sel} .feed-frame`)?.getAttribute('data-medium') }), sheetSel);
+    check(`${label}: switching whose news resets the scroll and the medium`, after.top === 0 && !!after.sheet && after.sheet === after.frame, JSON.stringify(after));
+  }
   await page.getByLabel('Close').first().click();
   // close-up city: zoom into the capital; streets of the 32-px blocks must be on screen
   await page.getByLabel('Nations').click();
@@ -269,6 +333,8 @@ async function realistic() {
   await page.goto(url);
   await page.getByText('New world').first().click();
   await page.locator('button.preset', { hasText: /^Realistic/ }).click();
+  const slowPressed = await page.locator('[data-testid=pace] button', { hasText: 'Slow' }).getAttribute('aria-pressed');
+  check('realistic: Slow pace is chosen', slowPressed === 'true', String(slowPressed));
   await page.getByText('Create world').click();
   await page.waitForSelector('canvas.canvas', { timeout: 30000 });
   const skip = page.getByText('Skip');

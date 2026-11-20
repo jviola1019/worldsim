@@ -1,9 +1,11 @@
 import { godMode } from '../../powers/powerSet';
-import { useState } from 'preact/hooks';
+import { useContext, useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
+import { createContext } from 'preact';
 import type { Simulation } from '../../sim/simulation';
 import type { Civ, HistoryEvent, Person, Settlement, SeriesStore } from '../../sim/types';
 import { Icon, Kv, Bar, fmt, pct, Sprite, Flag } from '../shared';
-import { PostList } from './FeedPanel';
+import { PostList, feedMedium } from './FeedPanel';
+import type { Medium } from '../../sim/types';
 import { CityPictures, Album } from './CivPhotos';
 import { ETHOS } from '../../civilizations/ethos';
 import { MISSIONS, missionMetric, assignMission, type MissionKind } from '../../civilizations/missions';
@@ -43,10 +45,13 @@ interface P {
   following?: Selection | null;
 }
 
-const FOLLOWABLE = new Set<Selection['kind']>(['settlement', 'person', 'army', 'band', 'herd']);
+const FOLLOWABLE = new Set<Selection['kind']>(['settlement', 'civ', 'person', 'army', 'band', 'herd']); // a nation is followed at its capital
 const FAVORABLE = new Set<Selection['kind']>(['settlement', 'civ', 'person', 'army', 'band', 'herd']);
 
-/** Round 9: Follow and Favourite for the selected entity. */
+/** Round 10: the header's action buttons (Follow, Favourite), provided by the Inspector to every view's Head. */
+const HeadActions = createContext<preact.JSX.Element | null>(null);
+
+/** Round 9: Follow and Favourite for the selected entity (round 10: icon buttons in the sheet header). */
 function ActionBar({ sim, sel, follow, following }: P) {
   const [, force] = useState(0);
   if (!FAVORABLE.has(sel.kind)) return null;
@@ -55,11 +60,43 @@ function ActionBar({ sim, sel, follow, following }: P) {
   const fav = isFavorite(w, sel.kind as Favorite['kind'], sel.id);
   const isFollowed = following?.kind === sel.kind && following.id === sel.id;
   return (
-    <div class="action-bar">
+    <div class="head-actions">
       {follow && FOLLOWABLE.has(sel.kind) && (
-        <button class="btn small" aria-pressed={isFollowed} data-testid="follow" onClick={() => follow(isFollowed ? null : sel)}>{isFollowed ? 'Stop following' : 'Follow'}</button>
+        <button class="icon-btn glyph" aria-pressed={isFollowed} aria-label={isFollowed ? 'Stop following with the camera' : 'Follow with the camera'} title={isFollowed ? 'Stop following' : 'Follow'} data-testid="follow" onClick={() => follow(isFollowed ? null : sel)}>
+          <Icon id="ico.follow" size={24} />
+        </button>
       )}
-      <button class="btn small" aria-pressed={fav} data-testid="favorite" onClick={() => { toggleFavorite(w, sel.kind as Favorite['kind'], sel.id, label ?? ''); force((x) => x + 1); }}>{fav ? '★ Favourite' : '☆ Add to favourites'}</button>
+      <button class="icon-btn glyph" aria-pressed={fav} aria-label={fav ? 'Remove from favourites' : 'Add to favourites'} title={fav ? 'Favourite' : 'Add to favourites'} data-testid="favorite" onClick={() => { toggleFavorite(w, sel.kind as Favorite['kind'], sel.id, label ?? ''); force((x) => x + 1); }}>
+        <Icon id="ico.star" size={24} />
+      </button>
+    </div>
+  );
+}
+
+/** Round 10: the ARIA tabs pattern on one swipeable row. Arrow keys, Home and End move between tabs; only the
+ *  selected tab is in the Tab order; the selected tab scrolls into view. */
+function TabRow<T extends string>({ tabs, tab, setTab, label }: { tabs: readonly T[]; tab: T; setTab: (t: T) => void; label: string }) {
+  const moveFocus = useRef(false);
+  const go = (t: T, focus: boolean) => { moveFocus.current = focus; setTab(t); };
+  // after the re-render, before paint: keyboard moves focus with the selection; the tab scrolls into view
+  useLayoutEffect(() => {
+    const b = document.getElementById(`civ-tab-${tab}`);
+    if (moveFocus.current) b?.focus();
+    moveFocus.current = false;
+    b?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  }, [tab]);
+  const onKey = (e: KeyboardEvent) => {
+    const k = tabs.indexOf(tab);
+    const next = e.key === 'ArrowRight' ? tabs[(k + 1) % tabs.length] : e.key === 'ArrowLeft' ? tabs[(k - 1 + tabs.length) % tabs.length] : e.key === 'Home' ? tabs[0] : e.key === 'End' ? tabs[tabs.length - 1] : null;
+    if (next) { e.preventDefault(); go(next, true); }
+  };
+  return (
+    <div class="tabs swipe" role="tablist" aria-label={label} onKeyDown={onKey}>
+      {tabs.map((t) => (
+        <button key={t} id={`civ-tab-${t}`} role="tab" aria-selected={tab === t} aria-controls="civ-tabpanel" tabIndex={tab === t ? 0 : -1} onClick={() => go(t, false)}>
+          {t}
+        </button>
+      ))}
     </div>
   );
 }
@@ -72,6 +109,7 @@ function Head({ title, sub, icon, close }: { title: string; sub?: string; icon?:
         <h2>{title}</h2>
         {sub && <div class="sub">{sub}</div>}
       </div>
+      {useContext(HeadActions)}
       <button class="icon-btn" aria-label="Close" onClick={close}>
         <Icon id="ico.close" size={24} />
       </button>
@@ -123,6 +161,8 @@ const civLink = (sim: Simulation, id: number, setSel: P['setSel']) => {
 
 export function Inspector(p: P) {
   const { sim, sel, close } = p;
+  // round 10: a nation's Feed tab dresses the whole sheet in its medium
+  const [medium, setMedium] = useState<Medium | null>(null);
   const w = sim.w;
   let body: preact.JSX.Element | null = null;
   switch (sel.kind) {
@@ -133,7 +173,7 @@ export function Inspector(p: P) {
     }
     case 'civ': {
       const c = w.civs.get(sel.id);
-      body = c ? <CivView {...p} civ={c} /> : null;
+      body = c ? <CivView {...p} civ={c} setMedium={setMedium} /> : null;
       break;
     }
     case 'person': {
@@ -208,9 +248,8 @@ export function Inspector(p: P) {
       </>
     );
   return (
-    <aside class="sheet" aria-label="Inspector" data-kind={sel.kind}>
-      {body}
-      <ActionBar {...p} />
+    <aside class="sheet" aria-label="Inspector" data-kind={sel.kind} data-medium={sel.kind === 'civ' && medium ? medium : undefined}>
+      <HeadActions.Provider value={<ActionBar {...p} />}>{body}</HeadActions.Provider>
     </aside>
   );
 }
@@ -452,8 +491,10 @@ function ReligionView({ sim, sel, close }: P) {
 
 const TABS = ['Overview', 'Feed', 'Album', 'History', 'Technology', 'Military', 'Economy', 'Culture', 'Diplomacy', 'Statistics'] as const;
 
-function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
+function CivView({ sim, civ, setSel, close, focus, setMedium }: P & { civ: Civ; setMedium: (m: Medium | null) => void }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>('Overview');
+  useEffect(() => { setMedium(tab === 'Feed' ? feedMedium(sim, civ.id) : null); }, [tab, civ.id]);
+  useEffect(() => () => setMedium(null), []);
   const w = sim.w;
   const ruler = w.persons.get(civ.rulerId);
   const heir = civ.heirId ? w.persons.get(civ.heirId) : undefined;
@@ -462,14 +503,8 @@ function CivView({ sim, civ, setSel, close, focus }: P & { civ: Civ }) {
   return (
     <>
       <Head title={civ.name} sub={civ.alive ? `${gov?.label ?? civ.govForm} · ${ERA_NAMES[civ.era]} era` : `Fell in ${civ.fell}: ${civ.fellCause}`} icon={<Flag civ={civ} size={26} />} close={close} />
-      <div class="tabs" role="tablist">
-        {TABS.map((t) => (
-          <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}>
-            {t}
-          </button>
-        ))}
-      </div>
-      <div class="sheet-body">
+      <TabRow tabs={TABS} tab={tab} setTab={setTab} label={`${civ.name} sections`} />
+      <div class="sheet-body" role="tabpanel" id="civ-tabpanel" aria-labelledby={`civ-tab-${tab}`}>
         {tab === 'Overview' && (
           <>
             <div class="stat-tiles" role="group" aria-label="Key figures (tap for details)">

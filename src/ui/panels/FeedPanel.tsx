@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { Simulation } from '../../sim/simulation';
 import type { Medium } from '../../sim/types';
 import { buildFeed, type FeedPost } from '../../history/feed';
@@ -53,14 +53,23 @@ export function PostCard({ post, sim, focus }: { post: FeedPost; sim: Simulation
 }
 
 /** A paged list of posts for one nation (civId) or the world (0). */
+/** Round 10: the medium a feed is told in (the whole panel takes on its look). */
+export const feedMedium = (sim: Simulation, civId: number): Medium => feedFrame(sim, civId ? sim.w.civs.get(civId) : undefined).medium;
+
 export function PostList({ sim, civId, focus }: { sim: Simulation; civId: number; focus: (x: number, y: number) => void }) {
   const [limit, setLimit] = useState(20);
-  const posts = useMemo(() => buildFeed(sim, civId, limit), [sim.w.events.length, civId, limit]);
+  // round 10: older posts load by themselves when the end of the list scrolls into view (the button stays)
+  const sentinel = useRef<HTMLDivElement>(null);
+  useEffect(() => setLimit(20), [civId]);
+  // one extra post tells whether older ones exist (so 'Older posts' never shows when there are none)
+  const all = useMemo(() => buildFeed(sim, civId, limit + 1), [sim.w.events.length, civId, limit]);
+  const hasMore = all.length > limit;
+  const posts = hasMore ? all.slice(0, limit) : all;
   const frame = useMemo(() => feedFrame(sim, civId ? sim.w.civs.get(civId) : undefined), [sim.w.events.length, civId]);
   const m = frame.medium;
   const app = m === 'social' || m === 'holo';
   return (
-    <section class={`feed-frame frame-${m}`} aria-label={frame.title}>
+    <section class={`feed-frame frame-${m}`} data-medium={m} aria-label={frame.title}>
       <header class="frame-head">
         <div class="frame-logo" aria-hidden="true">{FRAME_GLYPH[m]}</div>
         <div class="frame-titles">
@@ -80,7 +89,9 @@ export function PostList({ sim, civId, focus }: { sim: Simulation; civId: number
         <div class="feed">
           {posts.map((p) => <PostCard key={p.key} post={p} sim={sim} focus={focus} />)}
           {!posts.length && <p class="muted">{EMPTY[m]}</p>}
-          {posts.length >= limit && <button class="btn small" onClick={() => setLimit(limit + 20)}>Older posts</button>}
+          {hasMore && <button class="btn small" onClick={() => setLimit(limit + 20)}>Older posts</button>}
+          {hasMore && <MoreWhenSeen key={limit} target={sentinel} more={() => setLimit(limit + 20)} />}
+          <div ref={sentinel} aria-hidden="true" class="feed-end" />
         </div>
         {(frame.trending.length > 0 || frame.people.length > 0) && (
           <aside class="frame-side" aria-label={app ? 'Trending' : 'Talk of the town'}>
@@ -106,6 +117,18 @@ export function PostList({ sim, civId, focus }: { sim: Simulation; civId: number
   );
 }
 
+/** Calls more() once when the sentinel scrolls into view. */
+function MoreWhenSeen({ target, more }: { target: { current: HTMLDivElement | null }; more: () => void }) {
+  useEffect(() => {
+    const el = target.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); more(); } });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return null;
+}
+
 const FRAME_GLYPH: Record<Medium, string> = {
   carving: '✺', tablet: '▤', scroll: '✒', broadsheet: '▦', newspaper: '¶', broadcast: '◎', social: '◉', holo: '◈',
 };
@@ -116,20 +139,23 @@ const EMPTY: Record<Medium, string> = {
 
 export function FeedPanel({ sim, close, focus, selectedCiv }: { sim: Simulation; close: () => void; focus: (x: number, y: number) => void; selectedCiv: number }) {
   const [civId, setCivId] = useState(selectedCiv);
+  const body = useRef<HTMLDivElement>(null);
+  const medium = useMemo(() => feedMedium(sim, civId), [sim.w.events.length, civId]);
+  const pick = (id: number) => { setCivId(id); if (body.current) body.current.scrollTop = 0; };
   const civs = [...sim.w.civs.values()].filter((c) => c.alive && c.settlements.length).sort((a, b) => b.population - a.population).slice(0, 12);
   return (
-    <aside class="sheet" aria-label="News feed">
+    <aside class="sheet" aria-label="News feed" data-medium={medium}>
       <div class="sheet-head">
         <Icon id="ico.newspaper" size={28} />
         <h2>{civId ? `News of ${sim.w.civs.get(civId)?.name ?? 'a nation'}` : 'World news'}</h2>
         <button class="icon-btn" aria-label="Close" onClick={close}><Icon id="ico.close" size={24} /></button>
       </div>
-      <div class="sheet-body">
+      <div class="sheet-body" ref={body}>
         <p class="muted small">Every post retells something that really happened in this world, in the medium of its time. Tap a post to see where.</p>
         <div class="filters" role="group" aria-label="Whose news">
-          <button aria-pressed={civId === 0} onClick={() => setCivId(0)}>World</button>
+          <button aria-pressed={civId === 0} onClick={() => pick(0)}>World</button>
           {civs.map((c) => (
-            <button key={c.id} aria-pressed={civId === c.id} onClick={() => setCivId(c.id)}>
+            <button key={c.id} aria-pressed={civId === c.id} onClick={() => pick(c.id)}>
               <Flag civ={c} size={14} /> {c.baseName}
             </button>
           ))}
