@@ -9,6 +9,7 @@
  * failure (they fall), recorded with the measured numbers. In god mode the player can also assign
  * a mission (assignMission); observer worlds never receive player missions.
  */
+import { godMode } from '../powers/powerSet';
 import type { Sim } from '../sim/context';
 import type { Civ } from '../sim/types';
 import type { TechCategory } from '../technology/types';
@@ -166,7 +167,7 @@ export function startMission(sim: Sim, civ: Civ, kind: MissionKind, reason: stri
 
 /** God mode: set a nation's mission (refused in observer worlds). */
 export function assignMission(sim: Sim, civ: Civ, kind: MissionKind): boolean {
-  if (sim.w.meta.settings.observer || !civ.alive) return false;
+  if (!godMode(sim.w.meta.settings) || !civ.alive) return false;
   civ.mission = undefined;
   startMission(sim, civ, kind, 'Decreed by a higher power', true);
   return true;

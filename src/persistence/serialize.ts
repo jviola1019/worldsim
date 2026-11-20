@@ -183,6 +183,9 @@ function decodeChecked(bytes: Uint8Array): WorldState {
   if (!validDevices(st.meta.devices)) throw new SaveError('Save device history is invalid');
   if (st.meta.origin !== undefined && !validDevices([st.meta.origin])) throw new SaveError('Save origin device is invalid');
   if (!validFavorites(st.meta.favorites)) throw new SaveError('Save favourites are invalid');
+  const set = isObj(st.meta.settings) ? st.meta.settings : {};
+  if (set.powerSet !== undefined && !['all', 'grounded', 'none'].includes(set.powerSet)) throw new SaveError('Save power set is invalid');
+  if (set.pace !== undefined && !['standard', 'slow'].includes(set.pace)) throw new SaveError('Save pace is invalid');
   if (typeof st.meta.name !== 'string' || st.meta.name.length > 200 || (st.meta.seed !== undefined && (typeof st.meta.seed !== 'string' || st.meta.seed.length > 200))) throw new SaveError('Save world name is invalid');
   for (const k of MAPS) {
     const list = st[k] ?? [];

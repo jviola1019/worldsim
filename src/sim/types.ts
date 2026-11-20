@@ -57,9 +57,18 @@ export interface WorldSettings {
   realism: RealismMode;
   alien: boolean;
   empty: boolean;
-  /** Observer mode: god powers are unavailable; history runs only on its own (Realistic preset). */
+  /** Observer mode: god powers are unavailable; history runs only on its own. Kept for old saves; read through powerSetOf. */
   observer?: boolean;
+  /** Round 10: which god powers this world allows (powers/powerSet.ts). Absent in older saves (derived from observer). */
+  powerSet?: PowerSet;
+  /** Round 10: development pace (sim/pace.ts). Absent in older saves (= standard). */
+  pace?: Pace;
 }
+
+/** Round 10: 'all' = god mode, 'grounded' = Realistic (real people, animals, land, natural disasters), 'none' = Observer. */
+export type PowerSet = 'all' | 'grounded' | 'none';
+/** Round 10: 'slow' = generations to settle, centuries to build cities. */
+export type Pace = 'standard' | 'slow';
 
 export interface WorldMeta {
   name: string;

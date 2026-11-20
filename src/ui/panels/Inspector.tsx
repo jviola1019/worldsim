@@ -1,3 +1,4 @@
+import { godMode } from '../../powers/powerSet';
 import { useState } from 'preact/hooks';
 import type { Simulation } from '../../sim/simulation';
 import type { Civ, HistoryEvent, Person, Settlement, SeriesStore } from '../../sim/types';
@@ -403,7 +404,7 @@ function PersonView({ sim, person, setSel, close, focus }: P & { person: Person 
             })}
           </div>
           <div class="muted small">Outlined traits were earned through life events; others were inborn or inherited.</div>
-          {person.died === undefined && !sim.w.meta.settings.observer && <TraitEditor sim={sim} person={person} />}
+          {person.died === undefined && godMode(sim.w.meta.settings) && <TraitEditor sim={sim} person={person} />}
         </div>
         {person.deeds && person.deeds.length > 0 && (
           <div class="section">
@@ -726,7 +727,7 @@ function CivStats({ sim, civ }: { sim: Simulation; civ: Civ }) {
 function MissionBox({ sim, civ }: { sim: P['sim']; civ: Civ }) {
   const [, force] = useState(0);
   const m = civ.mission;
-  const god = !sim.w.meta.settings.observer && civ.alive;
+  const god = godMode(sim.w.meta.settings) && civ.alive;
   let progress = 0;
   if (m) {
     const now = missionMetric(sim, civ, m.kind);

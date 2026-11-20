@@ -1,13 +1,20 @@
 import { useState } from 'preact/hooks';
 import { CATEGORIES, POWERS, POWER_BY_ID, type PowerCategory } from '../../powers/powers';
 import { Icon } from '../shared';
+import type { WorldSettings } from '../../sim/types';
+import { powerAllowed, powerSetOf } from '../../powers/powerSet';
 
-export function Dock({ tool, setTool, brushSize, setBrushSize, openLaws, canUndo, onUndo }: { tool: string; setTool: (t: string) => void; brushSize: number; setBrushSize: (n: number) => void; openLaws: () => void; canUndo: boolean; onUndo: () => void }) {
+export function Dock({ settings, tool, setTool, brushSize, setBrushSize, openLaws, canUndo, onUndo }: { settings: WorldSettings; tool: string; setTool: (t: string) => void; brushSize: number; setBrushSize: (n: number) => void; openLaws: () => void; canUndo: boolean; onUndo: () => void }) {
   const [cat, setCat] = useState<PowerCategory | null>(null);
   const active = POWER_BY_ID[tool];
-  const tools = cat ? POWERS.filter((p) => p.cat === cat) : [];
+  // round 10: only the powers this world allows (Realistic: grounded; god mode: all)
+  const allowed = POWERS.filter((p) => powerAllowed(settings, p));
+  const tools = cat ? allowed.filter((p) => p.cat === cat) : [];
+  const grounded = powerSetOf(settings) === 'grounded';
+  const cats = CATEGORIES.filter((c) => (c.id === 'laws' ? !grounded : allowed.some((p) => p.cat === c.id)));
   return (
     <div class="dock">
+      {grounded && !cat && <div class="realism-note" role="note">Realistic: real people, animals, land and natural disasters only</div>}
       {active && (
         <div class="active-tool" role="status">
           <Icon id={active.icon} size={20} />
@@ -44,7 +51,7 @@ export function Dock({ tool, setTool, brushSize, setBrushSize, openLaws, canUndo
         </div>
       )}
       <nav class="cat-row" aria-label="Power categories">
-        {CATEGORIES.map((c) => (
+        {cats.map((c) => (
           <button
             key={c.id}
             class="cat"

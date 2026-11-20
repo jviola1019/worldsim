@@ -1,10 +1,10 @@
 {
  "generated": "2026-11-20",
  "totals": {
-  "srcFiles": 143,
-  "srcLines": 42311,
-  "testFiles": 43,
-  "testCases": 331
+  "srcFiles": 144,
+  "srcLines": 42369,
+  "testFiles": 44,
+  "testCases": 338
  },
  "folders": [
   {
@@ -26,13 +26,13 @@
   {
    "name": "ui",
    "files": 23,
-   "lines": 3012,
+   "lines": 3023,
    "deps": {
-    "sim": 34,
+    "sim": 35,
     "persistence": 7,
     "config": 5,
     "core": 3,
-    "powers": 2,
+    "powers": 6,
     "rendering": 11,
     "history": 7,
     "scenarios": 3,
@@ -49,7 +49,7 @@
   {
    "name": "civilizations",
    "files": 10,
-   "lines": 2806,
+   "lines": 2807,
    "deps": {
     "world": 7,
     "sim": 19,
@@ -59,9 +59,9 @@
     "history": 6,
     "politics": 2,
     "population": 6,
+    "powers": 2,
     "config": 2,
-    "economy": 4,
-    "powers": 1
+    "economy": 4
    }
   },
   {
@@ -80,7 +80,7 @@
   {
    "name": "sim",
    "files": 10,
-   "lines": 2416,
+   "lines": 2425,
    "deps": {
     "civilizations": 18,
     "economy": 7,
@@ -152,6 +152,25 @@
    }
   },
   {
+   "name": "powers",
+   "files": 4,
+   "lines": 1205,
+   "deps": {
+    "sim": 11,
+    "core": 2,
+    "population": 6,
+    "history": 2,
+    "civilizations": 6,
+    "world": 10,
+    "ecology": 2,
+    "culture": 1,
+    "technology": 2,
+    "politics": 3,
+    "military": 2,
+    "future": 1
+   }
+  },
+  {
    "name": "military",
    "files": 3,
    "lines": 1180,
@@ -166,25 +185,6 @@
     "config": 1,
     "politics": 1,
     "culture": 1
-   }
-  },
-  {
-   "name": "powers",
-   "files": 3,
-   "lines": 1171,
-   "deps": {
-    "sim": 10,
-    "core": 2,
-    "population": 6,
-    "history": 2,
-    "civilizations": 6,
-    "world": 10,
-    "ecology": 2,
-    "culture": 1,
-    "technology": 2,
-    "politics": 3,
-    "military": 2,
-    "future": 1
    }
   },
   {
@@ -233,7 +233,7 @@
   {
    "name": "persistence",
    "files": 4,
-   "lines": 636,
+   "lines": 639,
    "deps": {
     "sim": 4,
     "config": 3,
@@ -371,7 +371,7 @@
   {
    "path": "src/civilizations/missions.ts",
    "folder": "civilizations",
-   "lines": 200,
+   "lines": 201,
    "about": "NATIONAL MISSIONS: the goal a nation is pursuing right now."
   },
   {
@@ -617,7 +617,7 @@
   {
    "path": "src/persistence/serialize.ts",
    "folder": "persistence",
-   "lines": 339,
+   "lines": 342,
    "about": "World serialization (save format v1)."
   },
   {
@@ -701,14 +701,20 @@
   {
    "path": "src/powers/horrors.ts",
    "folder": "powers",
-   "lines": 164,
+   "lines": 165,
    "about": "Fictional horrors: GOD MODE ONLY."
   },
   {
    "path": "src/powers/powers.ts",
    "folder": "powers",
-   "lines": 913,
+   "lines": 925,
    "about": "God powers. Every power mutates simulation state (terrain, climate, people, institutions, technology, relations...) — never just a label — and is recorded in WorldState.interventions so a timeline can be reproduced."
+  },
+  {
+   "path": "src/powers/powerSet.ts",
+   "folder": "powers",
+   "lines": 21,
+   "about": "Round 10: which god powers a world allows."
   },
   {
    "path": "src/powers/undo.ts",
@@ -965,7 +971,7 @@
   {
    "path": "src/sim/types.ts",
    "folder": "sim",
-   "lines": 1132,
+   "lines": 1141,
    "about": "EPOCH world state model."
   },
   {
@@ -1019,13 +1025,13 @@
   {
    "path": "src/ui/game/Dock.tsx",
    "folder": "ui",
-   "lines": 69,
+   "lines": 76,
    "about": ""
   },
   {
    "path": "src/ui/game/Game.tsx",
    "folder": "ui",
-   "lines": 327,
+   "lines": 329,
    "about": ""
   },
   {
@@ -1073,13 +1079,13 @@
   {
    "path": "src/ui/panels/Inspector.tsx",
    "folder": "ui",
-   "lines": 776,
+   "lines": 777,
    "about": ""
   },
   {
    "path": "src/ui/panels/LawsPanel.tsx",
    "folder": "ui",
-   "lines": 65,
+   "lines": 66,
    "about": ""
   },
   {
@@ -1311,6 +1317,11 @@
    "path": "tests/population/ledger.test.ts",
    "cases": 9,
    "about": "Population accounting (R12.4): for the world and for every civilization, Δ boundary population == Σ signed ledger components exactly (up to float rounding), across every way people are created, moved, transferred or removed."
+  },
+  {
+   "path": "tests/powers/powerSets.test.ts",
+   "cases": 7,
+   "about": "Round 10: worlds have a power set."
   },
   {
    "path": "tests/rendering/cacheFreshness.test.ts",

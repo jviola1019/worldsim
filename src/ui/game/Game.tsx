@@ -1,3 +1,4 @@
+import { powerSetOf } from '../../powers/powerSet';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { Simulation } from '../../sim/simulation';
 import { SPEEDS } from '../../sim/simulation';
@@ -259,10 +260,11 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
           <PostCard post={{ ...ticker, replies: ticker.replies.slice(0, 1) }} sim={sim} focus={(x, y) => focusOn(x, y)} />
         </div>
       )}
-      {sim.w.meta.settings.observer ? (
+      {powerSetOf(sim.w.meta.settings) === 'none' ? (
         <div class="observer-badge" role="status">Observer mode: history unfolds on its own (no god powers)</div>
       ) : (
       <Dock
+        settings={sim.w.meta.settings}
         tool={tool}
         setTool={pickTool}
         brushSize={brushSize}

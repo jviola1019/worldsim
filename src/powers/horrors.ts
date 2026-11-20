@@ -14,6 +14,7 @@
  *    spreads to linked towns and burns out over a few years; agricultural science contains it. Famine
  *    under the blight is attributed to it.
  */
+import { godMode } from './powerSet';
 import type { Sim } from '../sim/context';
 import type { Civ, HorrorKind, Settlement } from '../sim/types';
 import { clamp01 } from '../core/math';
@@ -27,9 +28,9 @@ import { HAZARD } from '../world/tilemap';
 
 export const HORROR_LABEL: Record<HorrorKind, string> = { zombie: 'zombie horde', ghoul: 'ghoul pack', blight: 'Creeping Blight' };
 
-/** God-mode-only threats are refused in observer (Realistic) worlds. */
+/** God-mode-only threats: refused in Observer and Realistic worlds (round 10: only power set 'all'). */
 export function horrorsAllowed(sim: Sim): boolean {
-  return !sim.w.meta.settings.observer;
+  return godMode(sim.w.meta.settings);
 }
 
 /** Start (or feed) a horror in a settlement. Returns false in observer worlds. */

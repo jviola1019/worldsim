@@ -5,6 +5,7 @@
  * Brush powers apply to a radius around the touched tile; tap powers act on
  * the settlement/civilization under the finger.
  */
+import { powerAllowed } from './powerSet';
 import { removeBuilding } from '../civilizations/urban';
 import { record, residents } from '../population/ledger';
 import type { Sim } from '../sim/context';
@@ -60,6 +61,8 @@ export interface PowerDef {
   apply: (sim: Sim, x: number, y: number, r: number, ctx: PowerCtx) => string | null;
   /** Repeat while dragging (brush) — ticks between applications. */
   continuous?: boolean;
+  /** Round 10: allowed in Realistic (grounded) worlds: real people, real animals, land, natural disasters. */
+  grounded?: boolean;
 }
 
 export const CATEGORIES: { id: PowerCategory; label: string; icon: string }[] = [
@@ -126,6 +129,7 @@ function civAt(sim: Sim, x: number, y: number): Civ | undefined {
 
 const biome = (key: TerrainKey, label: string): PowerDef => ({
   id: 'biome_' + key.toLowerCase(),
+  grounded: !['ALIEN_GRASS', 'CORRUPT', 'CRYSTAL'].includes(key),
   cat: 'terrain',
   label,
   icon: 'ico.biome_' + (key === 'ALIEN_GRASS' ? 'alien' : key === 'TAIGA' ? 'forest' : key === 'HILLS' ? 'steppe' : key === 'ASH' ? 'volcanic' : key.toLowerCase()),
@@ -148,6 +152,7 @@ const biome = (key: TerrainKey, label: string): PowerDef => ({
 
 const deposit = (key: DepositKey, label: string): PowerDef => ({
   id: 'res_' + key.toLowerCase(),
+  grounded: key !== 'EXOTIC',
   cat: 'terrain',
   label,
   icon: 'ico.res_' + key.toLowerCase(),
@@ -167,6 +172,7 @@ const deposit = (key: DepositKey, label: string): PowerDef => ({
 
 const animal = (key: string, label: string, icon: string): PowerDef => ({
   id: 'animal_' + key,
+  grounded: true,
   cat: 'nature',
   label,
   icon,
@@ -178,6 +184,7 @@ const animal = (key: string, label: string, icon: string): PowerDef => ({
 const people = (species: SpeciesKey, label: string): PowerDef => ({
   id: 'spawn_' + species,
   cat: 'civ',
+  grounded: species === 'human',
   label,
   icon: species === 'human' ? 'ico.spawn_human' : `ico.spawn_${species}`,
   kind: 'tap',
@@ -193,6 +200,7 @@ const people = (species: SpeciesKey, label: string): PowerDef => ({
 
 const disaster = (kind: string, label: string, icon: string, r: number): PowerDef => ({
   id: 'dis_' + kind,
+  grounded: true,
   cat: 'disaster',
   label,
   icon,
@@ -882,6 +890,10 @@ function relationsBrush(sim: Sim, x: number, y: number, r: number, delta: number
   return null;
 }
 
+/** Round 10: literal powers allowed in Realistic worlds (the factories above tag their own). */
+const GROUNDED_LITERALS = new Set(['raise', 'lower', 'mountain', 'ocean', 'shallow', 'river', 'fertility_up', 'fertility_down', 'res_remove', 'trees', 'clear', 'rain', 'dis_lightning', 'dis_fire', 'asteroid', 'supervolcano', 'superflare', 'gamma_burst', 'emp']);
+for (const p of POWERS) if (GROUNDED_LITERALS.has(p.id)) p.grounded = true;
+
 export const POWER_BY_ID: Record<string, PowerDef> = Object.fromEntries(POWERS.map((p) => [p.id, p]));
 
 /** Powers that create fictional (god-mode-only) threats. */
@@ -891,8 +903,8 @@ export const HORROR_POWERS: ReadonlySet<string> = new Set(['horror_zombie', 'hor
 export function applyPower(sim: Sim, id: string, x: number, y: number, r: number, ctx: PowerCtx): string | null {
   const p = POWER_BY_ID[id];
   if (!p || !sim.w.map.inBounds(x, y)) return null;
-  // observer (Realistic) worlds have no god powers at all, and never fictional threats
-  if (sim.w.meta.settings.observer) return 'Observer mode: history runs on its own';
+  // round 10: Observer worlds allow no powers; Realistic worlds only the grounded ones (never fictional threats)
+  if (!powerAllowed(sim.w.meta.settings, p)) return 'Not available in this world';
   // one tap, one effect: the registry draws it (sim/conceptFx.ts); events the power logs stay quiet
   const res = withPowerFx(sim, id, x, y, r, () => p.apply(sim, x, y, r, ctx), (out) => out === null);
   if (res === null) {
