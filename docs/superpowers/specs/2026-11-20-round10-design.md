@@ -1,6 +1,6 @@
 # Round 10 design: Realistic sandbox, slow pace, honest nation count, medium-themed feed, accessibility
 
-Status: **draft for approval** · 2026-11-20 · branch `claude/epoch-civilizations-unbound-dap8pc`
+Status: **approved** by the user, 2026-11-20 (with the game-mode audit, §6) · branch `claude/epoch-civilizations-unbound-dap8pc`
 
 ## Why
 
@@ -152,6 +152,23 @@ These would make the round a failure even if everything technically works:
 - **Browsers:** Chromium and WebKit, both e2e.
 - **Honesty:** the docs state "WCAG 2.2 AA automated and manual checks passed in emulated Chromium and WebKit". They do not say "ADA compliant" or "certified", and they say no screen-reader or physical-device test was done.
 
+### 6. Game-mode audit (added at approval)
+
+**The user's verdict:** God mode (every power), Realistic (grounded) and Observer (no powers) are good. Every other mode must be checked: does it deliver what its description promises, and does it play differently from its neighbours?
+
+**Modes audited (13):**
+- **7 presets:** Primitive Earth, Age of Kingdoms, Industrializing World, Modern Geopolitics, After the Collapse, Alien Planet, Complete Randomization.
+- **6 scenario worlds:** Cradles of Civilization, Island Realms, The Long Standoff, Space Race, Realms of Legend, New World.
+
+**Method:**
+1. **Promise.** Turn each description and objective list into 2–4 measurable promises. Examples: Industrializing World ("coal decides the future") means coal-rich nations industrialize first. After the Collapse ("ruins, lost knowledge, scattered survivors") means ruins exist at start and lost techs are re-learned. Space Race means a launch happens and the rivals compete.
+2. **Run.** A probe script (`scripts/mode-audit.ts`) runs 3 seeds per mode, on 128² worlds, for 150 years or the mode's horizon. It records the promise metrics, plus era reached, peoples, wars, population and errors.
+3. **Distinctness.** Compare each mode's metrics with its nearest neighbour (same start era). A mode is redundant if nothing but the start era and nation count differs, and that difference is already a slider.
+4. **Verdict per mode:** **Keep** (delivers and is distinct), **Fix** (a clear, contained change makes it deliver: wrong start settings, a missing ingredient, an unreachable objective), or **Remove** (adds nothing over another mode, or cannot deliver without a large new system). Fixes are made and re-measured. Removed modes leave the menus. Old saves that used them still load, because a save stores its settings, not a preset reference.
+5. **Record.** A table in VALIDATION §R10 lists each mode with its promises, measurements, verdict and evidence. A test keeps each kept mode's promise checked in a bounded run.
+
+**The user's policy (at approval): fix or remove** without asking again. Each removal is still explained in the report.
+
 ## Settled during the builder check
 
 - **Megafauna** (mammoths) count as real animals and are grounded. *(my call)*
@@ -169,4 +186,5 @@ These would make the round a failure even if everything technically works:
 
 - Gate: tsc, full `npm test`, build, e2e in Chromium and WebKit (the new checks included), viewports, design capture with 0 violations, and axe with 0 serious or critical violations.
 - Standard-pace modernization outputs identical to round 9. Slow calibration table recorded in VALIDATION §R10.
+- The game-mode audit table completed. Every remaining mode has its promise test, and removals are documented.
 - Code review of the whole diff, with findings fixed. Then the docs (VALIDATION, STATUS, GUIDE, README, SECURITY for the new dependency), push, and the standing to-dos: Actions, Pages, live site and packages.
