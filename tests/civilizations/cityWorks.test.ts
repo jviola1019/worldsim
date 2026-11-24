@@ -17,7 +17,7 @@ import { eraToTier } from '../../src/civilizations/buildingTypes';
 describe('new towns start in the homes of their era', () => {
   it('a modern nation founds a town of houses, an early one a camp of huts', () => {
     for (const [era, want] of [[6, B.HOUSE], [1, -1]] as const) {
-      const sim = makeSim(`first-${era}`, 48, (c) => { c.settings.startEra = era; });
+      const sim = makeSim(`first-${era}`, 64, (c) => { c.settings.startEra = era; }); // round 10: 64² (era-6 starts now truly reach era 6 and their territory filled every free tile of a 48² map)
       const civ = [...sim.w.civs.values()][0];
       const m = sim.w.map;
       let spot = -1;

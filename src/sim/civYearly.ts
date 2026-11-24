@@ -3,6 +3,7 @@
  * economy, politics, diplomacy, military, infrastructure, space, expansion
  * and domestication. Order is fixed for determinism.
  */
+import { BALANCE } from '../config/balance';
 import type { Sim } from './context';
 import type { Civ, Settlement } from './types';
 import { researchYearly, computeCaps } from '../technology/research';
@@ -68,6 +69,7 @@ export function civYearly(sim: Sim, civ: Civ): void {
   researchYearly(sim, civ);
   civEconomyYearly(sim, civ, civ.tradeExp ?? 0, civ.tradeImp ?? 0);
   politicsYearly(sim, civ);
+  exploreYearly(sim, civ);
   if (!civ.alive) return;
   diplomacyYearly(sim, civ);
   militaryYearly(sim, civ);
@@ -216,4 +218,31 @@ export function tryAbsorption(sim: Sim, civ: Civ, chance: number): boolean {
   });
   killCiv(sim, civ, c.type === 'assimilation' ? `Absorbed by ${c.by.name}` : `Absorbed by ${c.by.name} after demographic collapse`, c.by, { type: c.type, causes: c.causes });
   return true;
+}
+
+/**
+ * Round 10 (mode audit): seafaring nations send explorers. The explorer agent reveals the land it passes and
+ * makes first contact (population/agents.ts), but nothing launched one, so peoples across water never met.
+ * A nation that can sail (naval tier ≥ 2) and has a coastal town sends at most one voyage at a time, toward
+ * a coast it has not charted, 20–60 tiles away.
+ */
+function exploreYearly(sim: Sim, civ: Civ): void {
+  const w = sim.w;
+  const m = w.map;
+  const rng = sim.rng;
+  if (civ.caps.navalTier < 2) return;
+  if (!rng.chance(BALANCE.explorerChance)) return;
+  for (const a of w.agents.values()) if (a.civId === civ.id && a.kind === 'explorer') return;
+  const ports = civ.settlements.map((id) => w.settlements.get(id)).filter((s): s is NonNullable<typeof s> => !!s && s.coastal && !s.occupiedBy);
+  if (!ports.length) return;
+  const s = rng.pick(ports);
+  for (let k = 0; k < 24; k++) {
+    const r = rng.range(20, 60);
+    const ang = rng.range(0, Math.PI * 2);
+    const x = clamp(Math.round(s.x + Math.cos(ang) * r), 1, m.w - 2);
+    const y = clamp(Math.round(s.y + Math.sin(ang) * r), 1, m.h - 2);
+    const i = m.idx(x, y);
+    if (!m.isLand(i) || !m.isCoastal(i) || isKnown(sim, civ.id, i)) continue;
+    if (spawnAgent(sim, 'explorer', civ.id, s.x, s.y, x, y, { sea: true, from: s.id })) return;
+  }
 }

@@ -6,6 +6,11 @@
  * (not by simulated history) — this is recorded in the world history so it is
  * never presented as emergent.
  */
+import { makeName } from '../culture/language';
+import { phonOfCulture } from '../population/persons';
+import { makeTreaty } from '../politics/diplomacy';
+import { ensureRelation } from '../civilizations/knowledge';
+import type { IntlOrg } from './types';
 import { eraToTier } from '../civilizations/buildingTypes';
 import { BUILDINGS } from '../civilizations/buildings';
 import { getSites } from '../economy/production';
@@ -104,6 +109,7 @@ export function seedLife(sim: Sim): void {
       const cb = w.settlements.get(b.capital);
       if (ca && cb && Math.hypot(ca.x - cb.x, ca.y - cb.y) < 25 + st.startEra * 5) makeContact(sim, a.id, b.id);
     }
+    if (st.startEra >= 9) seedDiplomaticPast(sim);
     logEvent(sim, {
       type: 'generated_start',
       cat: 'founding',
@@ -344,4 +350,53 @@ function layOutFarmland(sim: Sim, civ: Civ): void {
     }
     if (!placed) break;
   }
+}
+
+/**
+ * Round 10 (mode audit): a developed modern world begins with a diplomatic past instead of every pair neutral.
+ * Nations whose cultures hold similar values are friends with trust and a defensive pact; the most different
+ * neighbours start cold (tense borders). From the atomic age (era 10) the largest bloc has founded a treaty
+ * organization. Measured before: no alliance or organization formed in 100 years of an era-10 world.
+ */
+function seedDiplomaticPast(sim: Sim): void {
+  const w = sim.w;
+  const rng = sim.rng;
+  const civs = [...w.civs.values()].filter((c) => c.alive);
+  const dist = (a: Civ, b: Civ) => {
+    const va = w.cultures.get(a.cultureId)?.values, vb = w.cultures.get(b.cultureId)?.values;
+    if (!va || !vb) return 1;
+    const ks = Object.keys(va) as (keyof typeof va)[];
+    return Math.sqrt(ks.reduce((t, k) => t + (va[k] - vb[k]) ** 2, 0) / ks.length);
+  };
+  const pairs: { a: Civ; b: Civ; d: number }[] = [];
+  for (const a of civs) for (const b of civs) if (a.id < b.id && a.knownCivs.includes(b.id)) pairs.push({ a, b, d: dist(a, b) });
+  if (pairs.length < 2) return;
+  pairs.sort((x, y) => x.d - y.d);
+  const third = Math.max(1, Math.floor(pairs.length / 3));
+  for (const p of pairs.slice(0, third)) {
+    const rel = ensureRelation(sim, p.a.id, p.b.id);
+    rel.opinion = rng.range(35, 55);
+    rel.trust = rng.range(0.55, 0.75);
+    makeTreaty(sim, p.a, p.b, 'defensive', 40, true);
+  }
+  for (const p of pairs.slice(-third)) {
+    const rel = ensureRelation(sim, p.a.id, p.b.id);
+    rel.opinion = rng.range(-40, -22);
+    rel.trust = rng.range(0.1, 0.25);
+  }
+  if (sim.w.meta.settings.startEra < 10) return;
+  // the largest group of mutual friends founds a treaty organization
+  const friends = new Map<number, number[]>();
+  for (const p of pairs.slice(0, third)) {
+    friends.set(p.a.id, [...(friends.get(p.a.id) ?? []), p.b.id]);
+    friends.set(p.b.id, [...(friends.get(p.b.id) ?? []), p.a.id]);
+  }
+  const hub = [...friends.entries()].sort((x, y) => y[1].length - x[1].length)[0];
+  if (!hub || hub[1].length < 2) return;
+  const founder = w.civs.get(hub[0])!;
+  const phon = phonOfCulture(sim, founder.cultureId);
+  const word = phon ? makeName(rng, phon, 'word') : 'Concord';
+  const org: IntlOrg = { id: ++w.ids.org, name: `${word} ${rng.pick(['Treaty Organization', 'Pact', 'Alliance', 'Compact'])}`, kind: 'alliance', founded: w.meta.startYear, founder: founder.id, members: [founder.id, ...hub[1].slice(0, 6)] };
+  w.orgs.set(org.id, org);
+  logEvent(sim, { type: 'org_founded', cat: 'diplomacy', title: `The ${org.name} binds ${org.members.length} nations in mutual defence`, civs: org.members, importance: 3 });
 }

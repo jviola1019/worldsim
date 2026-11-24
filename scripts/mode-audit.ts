@@ -96,6 +96,10 @@ export const MODES: ModeSpec[] = [
     { id: 'sail', text: 'objective: ocean navigation', at: 'any', check: (s) => objective('islands', 'sail')(s) },
     { id: 'sea_trade', text: 'objective: a sea trade route', at: 'any', check: (s) => objective('islands', 'sea_trade')(s) },
   ] },
+  { key: 'islands4', kind: 'scenario', horizon: 200, promises: [
+    { id: 'sail', text: 'objective: ocean navigation', at: 'any', check: (s) => objective('islands', 'sail')(s) },
+    { id: 'sea_trade', text: 'objective: a sea trade route', at: 'any', check: (s) => objective('islands', 'sea_trade')(s) },
+  ] },
   { key: 'standoff', kind: 'scenario', horizon: 110, promises: [
     { id: 'org', text: 'objective: an international organization', at: 'any', check: (s) => objective('standoff', 'org')(s) },
     { id: 'no_nukes', text: 'objective: 100 years without a nuclear strike', at: 'horizon', check: (s) => objective('standoff', 'no_nukes')(s) },
@@ -117,6 +121,7 @@ export function configFor(key: string, seed: string): WorldConfig {
   c.name = 'Audit'; c.gen.seed = seed; c.gen.width = 128; c.gen.height = 128;
   const p = PRESETS.find((x) => x.key === key);
   const sc = SCENARIOS.find((x) => x.key === key);
+  if (key === 'islands4') { SCENARIOS.find((x) => x.key === 'islands')!.apply(c); c.settings.startEra = 4; c.gen.width = 128; c.gen.height = 128; return c; } // probe variant
   if (key === 'random') randomizeConfig(c);
   else if (p) p.apply(c);
   else if (sc) sc.apply(c);
