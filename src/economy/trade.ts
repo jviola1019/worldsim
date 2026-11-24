@@ -26,6 +26,9 @@ import { atWarWith, hasTreaty } from '../politics/diplomacy';
 import { logEvent } from '../history/events';
 import { INFRA } from '../world/tilemap';
 
+/** Cost of shipping per tile relative to land transport. */
+const SEA_COST = 0.6;
+
 function nearestOwn(sim: Sim, s: Settlement, civ: Civ, k: number): Settlement[] {
   const out: { s: Settlement; d: number }[] = [];
   for (const id of civ.settlements) {
@@ -146,9 +149,14 @@ export function tradeYearly(sim: Sim): Map<number, { exp: number; imp: number }>
     const sea = sa.coastal && sb.coastal && Math.min(a.caps.navalTier, b.caps.navalTier) >= 2;
     let path = findPath(m, m.idx(sa.x, sa.y), m.idx(sb.x, sb.y), { mode: 'land', maxNodes: 12000 });
     let mode: TradeRoute['mode'] = 'land';
-    if (!path && sea) {
-      path = findPath(m, m.idx(sa.x, sa.y), m.idx(sb.x, sb.y), { mode: 'any', maxNodes: 20000, deepOk: Math.min(a.caps.navalTier, b.caps.navalTier) >= 4 });
-      mode = 'sea';
+    if (sea) {
+      // round 10 (mode audit): ports ship by sea whenever the voyage is cheaper than the land detour (shipping
+      // costs SEA_COST of land per tile, as in the route cost below), not only when no land path exists
+      const voyage = findPath(m, m.idx(sa.x, sa.y), m.idx(sb.x, sb.y), { mode: 'any', maxNodes: 20000, deepOk: Math.min(a.caps.navalTier, b.caps.navalTier) >= 4 });
+      if (voyage && (!path || voyage.length * SEA_COST < path.length)) {
+        path = voyage;
+        mode = 'sea';
+      }
     }
     if (!path) continue;
     const r: TradeRoute = { id: ++w.ids.route, a: sa.id, b: sb.id, civA: a.id, civB: b.id, path, mode, length: path.length, cost: 0, capacity: 0, volume: 0, flows: new Array(GOOD_COUNT).fill(0), established: sim.year, active: true, blockedUntil: 0 };
@@ -182,7 +190,7 @@ export function tradeYearly(sim: Sim): Map<number, { exp: number; imp: number }>
       continue;
     }
     const eff = 1 - clamp(Math.max(a.caps.tradeEfficiency, b.caps.tradeEfficiency), 0, 0.9);
-    r.cost = (r.length / 10) * eff * (r.mode === 'sea' ? 0.6 : 1);
+    r.cost = (r.length / 10) * eff * (r.mode === 'sea' ? SEA_COST : 1);
     const gravity = Math.sqrt(Math.max(1, a.econ.gdp) * Math.max(1, b.econ.gdp)) / (1 + r.cost);
     r.capacity = gravity * 0.15;
     const tariff = (c: Civ) => (c.policies.trade === 'tariffs' ? 0.85 : 1);

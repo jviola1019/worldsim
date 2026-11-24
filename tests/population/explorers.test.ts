@@ -23,3 +23,13 @@ describe('explorers', () => {
     expect([...sim.w.agents.values()].some((a) => a.kind === 'explorer')).toBe(false);
   }, 120000);
 });
+
+describe('sea trade', () => {
+  it('coastal partners ship by sea when the voyage is cheaper than the land detour (Island Realms)', () => {
+    const sim = createSimulation(configFor('islands', 'audit-islands-1'));
+    sim.runYears(120);
+    const routes = [...sim.w.routes.values()];
+    expect(routes.length).toBeGreaterThan(0);
+    expect(routes.some((r) => r.mode === 'sea'), routes.map((r) => r.mode).join(',')).toBe(true);
+  }, 300000);
+});
