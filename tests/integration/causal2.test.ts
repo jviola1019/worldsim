@@ -6,6 +6,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { makeSim } from '../helpers';
+import { BALANCE } from '../../src/config/balance';
 import { encodeWorld, decodeWorld } from '../../src/persistence/serialize';
 import { Simulation } from '../../src/sim/simulation';
 import { makeTreaty } from '../../src/politics/diplomacy';
@@ -189,8 +190,9 @@ describe('#10 advanced technology stays unavailable without prerequisites or cre
     const ca = A.w.civs.get(target.id)!, cb = B.w.civs.get(target.id)!;
     cb.knownCivs = [];
     const pa0 = progress(ca), pb0 = progress(cb);
-    researchYearly(A, ca);
-    researchYearly(B, cb);
+    // serendipity (independent invention) is real but random; switch it off in both arms so only diffusion differs
+    const keepSer = BALANCE.serendipity;
+    try { BALANCE.serendipity = 0; researchYearly(A, ca); researchYearly(B, cb); } finally { BALANCE.serendipity = keepSer; }
     // contacts → diffusion: progress on a learnable technology, or its discovery (discovery resets
     // progress to the base cost, which can be below the effective cost it had to reach)
     expect(progress(ca) - pa0 > 0 || ids.some((id) => ca.techs[id]?.known)).toBe(true);

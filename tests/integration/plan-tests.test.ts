@@ -11,9 +11,10 @@ import { computeHydrology } from '../../src/world/worldgen';
 import { civEconomyYearly } from '../../src/economy/market';
 import { declareWar, makeTreaty } from '../../src/politics/diplomacy';
 import { spawnHerd } from '../../src/ecology/ecology';
-import { planConstruction } from '../../src/civilizations/urban';
+import { planConstruction, findSite } from '../../src/civilizations/urban';
 import { BUILDINGS, SECTOR } from '../../src/civilizations/buildings';
 import { BLDF } from '../../src/world/tilemap';
+import { B } from '../../src/civilizations/buildingTypes';
 import { eraToTier } from '../../src/civilizations/buildingTypes';
 import { applyPower, undo, endStroke } from '../../src/powers/powers';
 import type { Civ } from '../../src/sim/types';
@@ -52,11 +53,10 @@ describe('world & simulation', () => {
 
   it('housingDrivesConstruction: an overcrowded town plans housing', () => {
     const A = clone(sim);
-    // the town with the most buildable land (a built-up capital could only upgrade)
-    const m = A.w.map;
-    const free = (x: { id: number }) => { let k = 0; for (let i = 0; i < m.n; i++) if (m.settle[i] === x.id && !m.bld[i] && m.isLand(i)) k++; return k; };
-    const s = [...A.w.settlements.values()].sort((a, b) => free(b) - free(a))[0];
-    expect(free(s)).toBeGreaterThan(3);
+    // a town with room to build homes (round 10: territory tiles are not building sites; the planner builds
+    // within the town's radius and beside open land, so ask it directly; a built-up capital could only upgrade)
+    const s = [...A.w.settlements.values()].sort((a, b) => b.pop - a.pop).find((x) => findSite(A, x, BUILDINGS[B.HOUSE]) !== null)!;
+    expect(s, 'precondition: a town with a free building site').toBeTruthy();
     const civ = A.w.civs.get(s.civId)!;
     s.construction = null;
     s.housing = Math.max(1, s.pop / 3); // three times more people than homes

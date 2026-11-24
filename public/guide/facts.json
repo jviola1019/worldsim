@@ -2,9 +2,9 @@
  "generated": "2026-11-24",
  "totals": {
   "srcFiles": 146,
-  "srcLines": 42726,
+  "srcLines": 42722,
   "testFiles": 53,
-  "testCases": 366
+  "testCases": 367
  },
  "folders": [
   {
@@ -67,7 +67,7 @@
   {
    "name": "sim",
    "files": 11,
-   "lines": 2554,
+   "lines": 2550,
    "deps": {
     "culture": 5,
     "population": 9,
@@ -923,7 +923,7 @@
   {
    "path": "src/sim/bootstrap.ts",
    "folder": "sim",
-   "lines": 410,
+   "lines": 406,
    "about": "Seeding a new world: wildlife, optional fantasy monsters, and starting peoples."
   },
   {
@@ -1337,7 +1337,7 @@
   },
   {
    "path": "tests/politics/startDiplomacy.test.ts",
-   "cases": 4,
+   "cases": 5,
    "about": "Round 10 (mode audit): developed worlds start with a diplomatic past."
   },
   {
@@ -1509,7 +1509,7 @@
   },
   {
    "path": "tools/balance-compare.mjs",
-   "lines": 56,
+   "lines": 57,
    "about": "Compare two sets of 1,000-year modernization runs (scripts/modernization.ts output)."
   },
   {

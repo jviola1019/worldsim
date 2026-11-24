@@ -34,7 +34,9 @@ describe('nuclear deterrence', () => {
     const [x, y] = living(A);
     for (const S of [A, B]) {
       makeContact(S, x.id, y.id);
-      S.w.civs.get(y.id)!.nukes = 0;
+      // round 10: modern starts now have allies, whose arsenals deter too (extended deterrence); no warheads
+      // anywhere, so the target's 20 are the only difference
+      for (const c of S.w.civs.values()) c.nukes = 0;
     }
     B.w.civs.get(y.id)!.nukes = 20; // the only difference
     const ua = warUtility(A, A.w.civs.get(x.id)!, A.w.civs.get(y.id)!, ensureRelation(A, x.id, y.id));
