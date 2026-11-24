@@ -53,3 +53,18 @@ describe('scenario objectives are not pre-completed (review fix)', () => {
     }
   });
 });
+
+describe('The Long Standoff can reach its own goal (final audit fix)', () => {
+  it('starts with friends and pacts but no organization, and one is founded during play', async () => {
+    const { configFor } = await import('../../scripts/mode-audit');
+    const { createSimulation } = await import('../../src/sim/bootstrap');
+    const { scenarioObjectives } = await import('../../src/scenarios/scenarios');
+    const sim = createSimulation(configFor('standoff', 'audit-standoff-0'));
+    expect(sim.w.orgs.size).toBe(0); // founding one is the scenario's goal
+    expect([...sim.w.relations.values()].some((r) => r.opinion > 30 && r.trust > 0.5)).toBe(true);
+    const goal = scenarioObjectives('standoff').find((o) => o.id === 'org')!;
+    let years = 0;
+    while (!goal.check(sim) && years < 60) { sim.runYears(5); years += 5; }
+    expect(goal.check(sim), `no organization after ${years} years`).toBe(true);
+  }, 300000);
+});

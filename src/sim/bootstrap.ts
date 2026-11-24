@@ -107,7 +107,8 @@ export function seedLife(sim: Sim): void {
     for (const a of civs) for (const b of civs) if (a.id < b.id) {
       const ca = w.settlements.get(a.capital);
       const cb = w.settlements.get(b.capital);
-      if (ca && cb && Math.hypot(ca.x - cb.x, ca.y - cb.y) < 25 + st.startEra * 5) makeContact(sim, a.id, b.id);
+      // round 10: from era 9 (telegraph, radio, flight) every nation knows every other; earlier, only neighbours
+      if (ca && cb && (st.startEra >= 9 || Math.hypot(ca.x - cb.x, ca.y - cb.y) < 25 + st.startEra * 5)) makeContact(sim, a.id, b.id);
     }
     if (st.startEra >= 9) seedDiplomaticPast(sim);
     logEvent(sim, {
@@ -362,45 +363,40 @@ function seedDiplomaticPast(sim: Sim): void {
   const w = sim.w;
   const rng = sim.rng;
   const civs = [...w.civs.values()].filter((c) => c.alive);
+  if (civs.length < 3) return;
   const dist = (a: Civ, b: Civ) => {
     const va = w.cultures.get(a.cultureId)?.values, vb = w.cultures.get(b.cultureId)?.values;
     if (!va || !vb) return 1;
     const ks = Object.keys(va) as (keyof typeof va)[];
     return Math.sqrt(ks.reduce((t, k) => t + (va[k] - vb[k]) ** 2, 0) / ks.length);
   };
+  // two blocs, like a cold war: the two most different cultures anchor them; each nation joins the nearer one
+  let seedA = civs[0], seedB = civs[1], far = -1;
+  for (const a of civs) for (const b of civs) if (a.id < b.id && dist(a, b) > far) { far = dist(a, b); seedA = a; seedB = b; }
+  const blocOf = new Map<number, number>();
+  for (const c of civs) blocOf.set(c.id, dist(c, seedA) <= dist(c, seedB) ? 0 : 1);
+  blocOf.set(seedA.id, 0); blocOf.set(seedB.id, 1);
   const pairs: { a: Civ; b: Civ; d: number }[] = [];
   for (const a of civs) for (const b of civs) if (a.id < b.id && a.knownCivs.includes(b.id)) pairs.push({ a, b, d: dist(a, b) });
-  if (pairs.length < 2) return;
-  pairs.sort((x, y) => x.d - y.d);
-  const third = Math.max(1, Math.floor(pairs.length / 3));
-  for (const p of pairs.slice(0, third)) {
+  const across = pairs.filter((p) => blocOf.get(p.a.id) !== blocOf.get(p.b.id)).sort((x, y) => y.d - x.d);
+  for (const p of pairs) {
+    if (blocOf.get(p.a.id) !== blocOf.get(p.b.id)) continue;
     const rel = ensureRelation(sim, p.a.id, p.b.id);
     rel.opinion = rng.range(35, 55);
     rel.trust = rng.range(0.55, 0.75);
     makeTreaty(sim, p.a, p.b, 'defensive', 40, true);
   }
-  for (const p of pairs.slice(-third)) {
+  for (const p of across.slice(0, Math.max(1, Math.ceil(across.length / 2)))) {
     const rel = ensureRelation(sim, p.a.id, p.b.id);
     rel.opinion = rng.range(-40, -22);
     rel.trust = rng.range(0.1, 0.25);
   }
-  if (sim.w.meta.settings.startEra < 10) return;
-  // the largest group of mutual friends founds a treaty organization
-  const friends = new Map<number, number[]>();
-  for (const p of pairs.slice(0, third)) {
-    friends.set(p.a.id, [...(friends.get(p.a.id) ?? []), p.b.id]);
-    friends.set(p.b.id, [...(friends.get(p.b.id) ?? []), p.a.id]);
-  }
-  const hub = [...friends.entries()].sort((x, y) => y[1].length - x[1].length)[0];
-  if (!hub || hub[1].length < 2) return;
-  const founder = w.civs.get(hub[0])!;
-  // members must not be cold to anyone already in (a hub's friends can dislike each other)
-  const members = [founder.id];
-  for (const id of hub[1]) {
-    if (members.length >= 7) break;
-    if (members.every((m) => (getRelation(sim, m, id)?.opinion ?? 0) > -20)) members.push(id);
-  }
+  // from the atomic age the larger bloc has a treaty organization, unless founding one is the scenario's own goal
+  if (w.meta.settings.startEra < 10 || w.meta.scenario === 'standoff') return;
+  const big = [0, 1].map((k) => civs.filter((c) => blocOf.get(c.id) === k)).sort((x, y) => y.length - x.length)[0];
+  const members = big.filter((c) => big.some((o) => o.id !== c.id && c.knownCivs.includes(o.id))).slice(0, 7).map((c) => c.id);
   if (members.length < 3) return;
+  const founder = w.civs.get(members[0])!;
   const phon = phonOfCulture(sim, founder.cultureId);
   const word = phon ? makeName(rng, phon, 'word') : 'Concord';
   const org: IntlOrg = { id: ++w.ids.org, name: `${word} ${rng.pick(['Treaty Organization', 'Pact', 'Alliance', 'Compact'])}`, kind: 'alliance', founded: w.meta.startYear, founder: founder.id, members };
