@@ -22,7 +22,7 @@ export const MEDIUM_THEME: Record<Medium, Record<MediumToken, string>> = {
 export const MEDIUM_FONTS: Record<Medium, { display: string; body: string }> = {
   carving: { display: "'Pixelify Sans', monospace", body: "'Pixelify Sans', monospace" },
   tablet: { display: "'Cinzel', serif", body: "'Alegreya', serif" },
-  scroll: { display: "'Uncial Antiqua', serif", body: "'Alegreya', serif" },
+  scroll: { display: "'Almendra', serif", body: "'Alegreya', serif" },
   broadsheet: { display: "'IM Fell English', serif", body: "'IM Fell English', serif" },
   newspaper: { display: "'Old Standard TT', serif", body: "'Old Standard TT', serif" },
   broadcast: { display: "'Oswald', sans-serif", body: "'Atkinson Hyperlegible', sans-serif" },

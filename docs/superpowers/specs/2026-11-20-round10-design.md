@@ -204,7 +204,7 @@ These would make the round a failure even if everything technically works:
 |---|---|---|---|
 | carving | Pixelify Sans (game face) | Pixelify Sans | scratched pixel marks |
 | tablet | Cinzel (inscriptional capitals) | Alegreya | carved inscription; calligraphic, very legible body |
-| scroll | Uncial Antiqua (manuscript uncials) | Alegreya | medieval scriptorium |
+| scroll | Almendra (medieval calligraphy; replaced Uncial Antiqua, whose uncial t/c made invented names hard to read) | Alegreya | medieval scriptorium |
 | broadsheet | IM Fell English (17th-century Fell types) | IM Fell English | the early printing house |
 | newspaper | UnifrakturMaguntia, masthead only; Old Standard TT for headlines | Old Standard TT | the 19th-century front page |
 | broadcast | Oswald (condensed lower-third caps) | Atkinson Hyperlegible | TV graphics |

@@ -7,7 +7,8 @@ import '@fontsource/atkinson-hyperlegible/400.css';
 import '@fontsource/atkinson-hyperlegible/700.css';
 // round 10: era typography for the news mediums and postcards (OFL, bundled; a browser downloads a face only when a medium uses it)
 import '@fontsource/cinzel/600.css';
-import '@fontsource/uncial-antiqua/400.css';
+import '@fontsource/almendra/400.css';
+import '@fontsource/almendra/700.css';
 import '@fontsource/im-fell-english/400.css';
 import '@fontsource/im-fell-english/400-italic.css';
 import '@fontsource/unifrakturmaguntia/400.css';

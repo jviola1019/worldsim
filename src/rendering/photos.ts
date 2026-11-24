@@ -267,7 +267,7 @@ export function drawPostcard(canvas: HTMLCanvasElement, snap: CitySnapshot): voi
   ctx.strokeStyle = '#2b2620'; ctx.lineWidth = 1; ctx.strokeRect(px + 0.5, py + 0.5, pw - 1, ph - 1);
   ctx.fillStyle = '#2b2620';
   // round 10: the postcard's lettering follows its era (manuscript, then letterpress, then modern print)
-  ctx.font = snap.tier <= 3 ? '19px "Uncial Antiqua", serif' : snap.tier <= 5 ? 'bold 18px "Old Standard TT", serif' : '500 19px "Oswald", sans-serif';
+  ctx.font = snap.tier <= 3 ? '19px "Almendra", serif' : snap.tier <= 5 ? 'bold 18px "Old Standard TT", serif' : '500 19px "Oswald", sans-serif';
   ctx.fillText(`Greetings from ${snap.name}!`, 14, H - 26);
   ctx.font = '11px "Atkinson Hyperlegible", sans-serif';
   ctx.fillText(`${snap.civName} · year ${snap.year} · ${snap.pop.toLocaleString('en-US')} people`, 14, H - 10);
@@ -351,7 +351,7 @@ export function drawAerial(canvas: HTMLCanvasElement, sim: Sim, atlas: Atlas, s:
 
 /** Round 10: the faces the photos letter with. Canvas text does not wait for web fonts, so callers await this
  *  once before drawing (it resolves at once when the faces are already loaded, and never rejects). */
-export const PHOTO_FONTS = ['19px "Uncial Antiqua"', 'bold 18px "Old Standard TT"', '500 19px "Oswald"', '11px "Atkinson Hyperlegible"', 'italic 13px "IM Fell English"', '11px "Pixelify Sans"'];
+export const PHOTO_FONTS = ['19px "Almendra"', 'bold 18px "Old Standard TT"', '500 19px "Oswald"', '11px "Atkinson Hyperlegible"', 'italic 13px "IM Fell English"', '11px "Pixelify Sans"'];
 export function photoFontsReady(): Promise<unknown> {
   const fonts = typeof document !== 'undefined' ? document.fonts : undefined;
   if (!fonts?.load) return Promise.resolve();

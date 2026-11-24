@@ -370,7 +370,7 @@ p, li, .footnote { line-height: 1.45; }
 /* ------------------------------------------------ round 10: medium themes (values = src/ui/mediumTheme.ts) */
 [data-medium="carving"] { --m-surface: #3f342a; --m-ink: #f3e7cf; --m-muted: #d2c0a0; --m-accent: #f0a070; --m-line: #9a8466; --m-chip: #56483a; --m-chipInk: #f3e7cf; --m-focus: #ffd27a; --m-card: #4d4034; --m-cardInk: #f3e7cf; --m-display: 'Pixelify Sans', monospace; --m-body: 'Pixelify Sans', monospace; }
 [data-medium="tablet"] { --m-surface: #c7a77a; --m-ink: #2a1a0c; --m-muted: #4e3820; --m-accent: #6b2410; --m-line: #6e5434; --m-chip: #b39066; --m-chipInk: #2a1a0c; --m-focus: #2a1a0c; --m-card: #d6bb92; --m-cardInk: #2a1a0c; --m-display: 'Cinzel', serif; --m-body: 'Alegreya', serif; }
-[data-medium="scroll"] { --m-surface: #e4d3a0; --m-ink: #2a1c0e; --m-muted: #55432a; --m-accent: #7a2a12; --m-line: #8a7448; --m-chip: #d3bf86; --m-chipInk: #2a1c0e; --m-focus: #2a1c0e; --m-card: #ecdfb4; --m-cardInk: #2a1c0e; --m-display: 'Uncial Antiqua', serif; --m-body: 'Alegreya', serif; }
+[data-medium="scroll"] { --m-surface: #e4d3a0; --m-ink: #2a1c0e; --m-muted: #55432a; --m-accent: #7a2a12; --m-line: #8a7448; --m-chip: #d3bf86; --m-chipInk: #2a1c0e; --m-focus: #2a1c0e; --m-card: #ecdfb4; --m-cardInk: #2a1c0e; --m-display: 'Almendra', serif; --m-body: 'Alegreya', serif; }
 [data-medium="broadsheet"] { --m-surface: #efe3c8; --m-ink: #2b2118; --m-muted: #5a4b3a; --m-accent: #8c1c13; --m-line: #8a7a62; --m-chip: #e2d3b2; --m-chipInk: #2b2118; --m-focus: #8c1c13; --m-card: #f6edd8; --m-cardInk: #2b2118; --m-display: 'IM Fell English', serif; --m-body: 'IM Fell English', serif; }
 [data-medium="newspaper"] { --m-surface: #e8e6df; --m-ink: #1d1d1b; --m-muted: #4a4a46; --m-accent: #1d1d1b; --m-line: #7d7b74; --m-chip: #d9d6cd; --m-chipInk: #1d1d1b; --m-focus: #1d1d1b; --m-card: #f4f3ee; --m-cardInk: #1d1d1b; --m-display: 'Old Standard TT', serif; --m-body: 'Old Standard TT', serif; }
 [data-medium="broadcast"] { --m-surface: #10233f; --m-ink: #ffffff; --m-muted: #c4d0e4; --m-accent: #f2b544; --m-line: #5f7aa6; --m-chip: #1c3760; --m-chipInk: #ffffff; --m-focus: #f2b544; --m-card: #173057; --m-cardInk: #ffffff; --m-display: 'Oswald', sans-serif; --m-body: 'Atkinson Hyperlegible', sans-serif; }
@@ -425,7 +425,7 @@ p, li, .footnote { line-height: 1.45; }
 .sheet[data-medium] .sheet-head h2, .sheet[data-medium] .frame-title, .sheet[data-medium] .post-headline, .sheet[data-medium] .frame-side h4 { font-family: var(--m-display); font-weight: 600; letter-spacing: .01em; }
 .sheet[data-medium] .post-text { font-size: 16px; line-height: 1.5; }
 .sheet[data-medium] .sheet-head h2 { font-size: 21px; }
-.sheet[data-medium="scroll"] .sheet-head h2, .sheet[data-medium="scroll"] .frame-title, .sheet[data-medium="scroll"] .post-headline { font-weight: 400; letter-spacing: .02em; }
+.sheet[data-medium="scroll"] .sheet-head h2, .sheet[data-medium="scroll"] .frame-title, .sheet[data-medium="scroll"] .post-headline { font-weight: 700; letter-spacing: .01em; }
 .sheet[data-medium="newspaper"] .frame-title { font-family: 'UnifrakturMaguntia', serif; font-weight: 400; font-size: 30px; }
 .sheet[data-medium="newspaper"] .post-headline { font-weight: 700; }
 .sheet[data-medium="broadcast"] .sheet-head h2, .sheet[data-medium="broadcast"] .frame-title, .sheet[data-medium="broadcast"] .post-headline { text-transform: uppercase; letter-spacing: .04em; font-weight: 500; }
@@ -437,3 +437,9 @@ p, li, .footnote { line-height: 1.45; }
 .stat-tile .v { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
 .sheet[data-medium] .sheet-head h2 { font-size: 19px; }
 .sheet[data-medium="scroll"] .post-text, .sheet[data-medium="tablet"] .post-text { font-style: normal; }
+/* round 10 (design critique, false floor): on phones the nation chips sit on one swipeable row, so the first
+   post shows without scrolling past four rows of filters. The chips are buttons, so the row stays keyboard-reachable. */
+@media (max-width: 560px) {
+  .sheet .filters[role=group] { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; min-height: 48px; align-items: center; /* a scrolling grid item would otherwise shrink to nothing */ scroll-snap-type: x proximity; scrollbar-width: thin; padding-bottom: 4px; }
+  .sheet .filters[role=group] > button { flex: none; scroll-snap-align: start; }
+}
