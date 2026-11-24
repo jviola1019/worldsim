@@ -12,7 +12,18 @@
 
 ### Gate
 
-*(Pending: the final gate runs after the measurement batch.)*
+| Check | Result |
+|---|---|
+| `npm run typecheck` | exit 0 |
+| `npm test` | **684 tests, all passing** (53 files). The first full run on the final code had 3 failures; all were test preconditions overtaken by the history fixes and were root-caused (round ledger): allies' warheads now deter (extended deterrence); serendipity fired in a diffusion control; territory tiles are not building sites. |
+| `npm run build` | exit 0 |
+| e2e, Chromium | **97/97** (new: tribes at year 0, the HUD at 320 px, the Realistic sandbox, Slow pace, the medium-themed feed, one scroll, older posts, swipeable ARIA tabs, header actions) |
+| e2e, WebKit | **96/96** (the "older posts" check runs only when 20 or more posts exist) |
+| `npm run a11y`, Chromium and WebKit | **80/80 each**, 0 axe violations at any impact; first pass 37/78 (DESIGN-REVIEW §R10) |
+| `node tools/viewports.mjs` | 6/6 |
+| `node tools/design-capture.mjs` | 121 captures: 0 text < 12 px, 0 targets < 44 px, 0 contrast failures |
+| Code review (code-review skill, whole round) | 3 important and 5 minor findings; all important and 4 minor fixed with tests. Kept by ruling: split bands restart the Slow settle ramp |
+| `npm audit` | 0 vulnerabilities |
 
 ### Nation count
 
@@ -43,7 +54,24 @@ Each preset's and scenario's description and objectives were turned into measura
 | Trade took the land path whenever one existed, however long | Island Realms | Ports ship by sea, over water only, when the voyage is cheaper | `explorers.test.ts` |
 | Island Realms started before currency; Space Race's colony goal needed era-14 tech centuries away | Islands, Space Race | Start in era 3 and era 13 | `promises.test.ts` |
 
-*(Pending: the final audit table on the final code.)*
+**Final audit on the final code** (`docs/data/round10/mode-audit.txt`). Each promise was checked in 3 worlds:
+
+| Mode | Promises (met in 3 worlds) | Before the fixes |
+|---|---|---|
+| Primitive Earth | bands only at start 3/3 · first village 3/3 | same |
+| Age of Kingdoms | 5+ nations with towns, Bronze–Iron era 3/3 · temples 3/3 · a war within 100 years 3/3 | kingdoms 2/3 |
+| Industrializing World | Renaissance-era start 3/3 · reaches industry 3/3 · coal-rich industrialise first 2/3 | start era 1/3 · coal 0/3 |
+| Modern Geopolitics | atomic-age start 3/3 · alliances 3/3 · tense borders 3/3 | atomic 0/3 · alliances 1/3 |
+| After the Collapse | ruins 3/3 · lost knowledge 3/3 · relearned 3/3 · 6+ small nations 3/3 | same |
+| Alien Planet | alien biomes 3/3 · alien wildlife 3/3 · several species 3/3 | same |
+| Complete Randomization | runs 150 years 3/3 | same |
+| Cradles of Civilization | river starts 3/3 · agriculture 3/3 · writing 3/3 · a city of 10,000 3/3 | same |
+| Island Realms | ocean navigation 3/3 · a sea trade route **3/3** | sea trade 0/3 |
+| The Long Standoff | an international organization founded during play **1/3** · 100 years without a nuclear strike 3/3 · a crisis 3/3 | organization 0/3 (unreachable) |
+| Space Race | a station 3/3 · an off-world colony **2/3** | colony 0/3 (unreachable) |
+| Realms of Legend | four peoples 3/3 · monsters 3/3 · a monster slain **1/3** | slain 0/3 (impossible) |
+
+**No mode was removed:** each one delivers its promise and plays differently from its neighbours. Scenario objectives are optional and never change the rules. The owner chose to leave the three that are met only sometimes (1/3–2/3) as honestly uncertain: they are reachable now, and they were impossible before.
 
 ### Balance against round 9 (`tools/balance-compare.mjs docs/data/round9 final- docs/data/round10 final-`)
 

@@ -7,18 +7,20 @@ This report tracks completion against the requirements (R-IDs from [REQUIREMENTS
 - **Experimental:** works, but balance or behavior is not yet validated.
 - **Missing:** not implemented.
 
-Last verified 2026-11-19 (round 9):
+Last verified 2026-11-24 (round 10):
 
 | Check | Result |
 |---|---|
 | Typecheck | `tsc` 7.0.2: exit 0 |
-| Unit tests | `npm test` (Vitest 5.1.1): **623 tests** (42 files). The round-8 emissions counterfactual was corrected to turn off round 9's clean-power lever too (VALIDATION §R9). |
+| Unit tests | `npm test` (Vitest 5.1.1): **684 tests** (53 files), all passing on the final code (VALIDATION §R10). |
 | Build | `vite build` 8.3.8: exit 0 |
-| E2E | **74/74 on Chromium and 74/74 on WebKit** (Safari's engine), each with iPhone 13 emulation, desktop and Reduce motion. This is emulation, not a physical device. |
+| E2E | **97/97 on Chromium and 96/96 on WebKit** (Safari's engine), each with iPhone 13 emulation, desktop and Reduce motion, plus the Realistic sandbox and a 320-px HUD. This is emulation, not a physical device. |
+| Accessibility | `npm run a11y` (axe-core 4.14.1, WCAG 2.2 A/AA rules, plus scripted keyboard, Escape, reflow and text-spacing checks): **80/80 in Chromium and WebKit**, 0 violations. Automated and scripted checks only: no screen reader and no physical device. |
 | Design floors | 6/6 device profiles; 121 captures with 0 violations |
 | Dependencies | `npm audit`: 0 vulnerabilities; `npm outdated`: none |
 | GitHub Actions | CI (now with a WebKit e2e step), then Pages after a green CI (`workflow_run`); weekly long run (VALIDATION §R7–§R9) |
-| Multi-seed invariants | 20 seeds × 600 years: **20/20** (round-9 code) |
+| Multi-seed invariants | 20 seeds × 600 years: **20/20** (round-10 code) |
+| Game modes | All 12 audited (`scripts/mode-audit.ts`); 6 fixed, none removed (VALIDATION §R10) |
 
 Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is in [PERFORMANCE.md](PERFORMANCE.md) and security in [SECURITY.md](SECURITY.md).
 
@@ -55,6 +57,20 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 | Save determinism with fires (nuclear strike, rain) | Fixed (pre-existing bug) | `fire-determinism.test.ts` |
 | Duplicate league names | Fixed (pre-existing bug) | sports uniqueness test |
 | Final whole-branch review | 1 critical and 3 important findings fixed with tests (close-up cache thrash at large screens, reduce-motion weather, 2×2 access, a doc correction) | VALIDATION §R6 |
+
+## Round 10 (nation count, Realistic sandbox, Slow pace, medium-themed feed, era typography, accessibility, game modes)
+
+| Item | Status | Evidence |
+|---|---|---|
+| Honest nation count (tribes are not nations; singular forms; the line wraps) | Complete | `peoples.test.ts`; e2e at year 0 and 320 px |
+| Realistic: grounded powers, empty start at year 0, Slow pace | Complete | `powerSets.test.ts`, `presets.test.ts`; e2e |
+| Observer (the old hands-off mode) | Complete | `presets.test.ts`; byte-identical to round 9 before the history fixes |
+| Slow pace | Complete; calibrated (VALIDATION §R10) | `pace.test.ts`; `scripts/pace-calibrate.ts` |
+| The feed panel takes its medium; one scroll; the "every sheet grew instead of scrolling" bug fixed | Complete | `mediumTheme.test.ts`; e2e |
+| Era typography (8 mediums, postcards); no generic system fonts | Complete | `fonts.test.ts`; DESIGN-REVIEW §R10 |
+| Nation tabs on phones (swipeable, ARIA), header actions, following a nation or a tribe | Complete | e2e |
+| WCAG 2.2 AA audit, Chromium and WebKit | Complete (automated and scripted) | `run-a11y.mjs`; DESIGN-REVIEW §R10 |
+| Game-mode audit: fixed developed start eras, a diplomatic past, slayable monsters, explorers, sea routes, Island Realms (era 3) and Space Race (era 13) start eras | Complete | `promises.test.ts` and 5 more test files; VALIDATION §R10 |
 
 ## Round 9 (device-labelled saves, close zoom, follow camera, warming, unemployment, WebKit)
 
@@ -122,13 +138,15 @@ Each fix has a regression test. "Mutation" means the test was confirmed to fail 
 
 ## Known issues and next steps (ranked)
 
-1. **Modern unemployment:** 10–13% in the round-9 runs (9–17% in round 8). Elder care helped two worlds, but modern-3 rose from 9% to 13%. Automation still displaces labour faster than services absorb it.
+1. **Modern unemployment:** 5–14% in the round-10 runs (mean 10.8%; round 9: 11.3%). Automation still displaces labour faster than services absorb it.
 2. **City composition:** fixed in round 8 (workshop and school targets capped). Existing districts are retired gradually through redevelopment, so old cities change over decades, not at once.
-3. **Warming is still strong:** 5.4–6.8 °C by year 1,000 in the round-9 runs (5.8–6.7 °C in round 8). Power urgency and the clean-power bonus moved the mean only 0.12 °C, and two worlds warmed more. Grid storage is still not modelled; demand reduction (efficiency) and carbon removal are untried levers.
+3. **Warming is still strong:** 5.7–7.7 °C by year 1,000 in the round-10 runs (mean 6.49 °C; round 9: 6.14). The hottest history (modern-2) lost a quarter of its population against round 9. Grid storage is still not modelled; demand reduction (efficiency) and carbon removal are untried levers.
 4. **No physical-device verification (R13, R15).** WebKit now passes the e2e in emulation (round 9), including the CSP checks, but no real iPhone, iPad or Mac has been tested. Run the protocol in VALIDATION §8 on a device.
 5. **Nuclear use was never observed** in the 20-world endings census (by design it is rare, and deterrence and the taboo work). This means the launch path is exercised only by tests, not by organic history.
 6. **GitHub Pages header limits:** HSTS, frame-ancestors and similar headers need another host or a CDN (SECURITY.md §5).
-7. **Device labels are per browser profile:** clearing site data or using a second browser makes a new "device". There is no cross-device sync (by design: no server).
+7. **Some scenario goals are met only sometimes:** an organization in the Long Standoff (1/3), an off-world colony in the Space Race (2/3) and a slain monster in Realms of Legend (1/3). They are reachable now and were impossible before; the owner chose to keep them uncertain.
+8. **Accessibility is verified by automated and scripted checks only:** no screen reader (VoiceOver, NVDA) and no physical device were used.
+9. **Device labels are per browser profile:** clearing site data or using a second browser makes a new "device". There is no cross-device sync (by design: no server).
 
 ## History
 

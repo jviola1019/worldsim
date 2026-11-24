@@ -280,7 +280,7 @@ async function run(label, ctxOpts) {
     await g.goto(new URL('guide/', url).href);
     await g.waitForTimeout(800);
     const nodes = await g.locator('#mapsvg .node').count();
-    const bars = await g.locator('#chart-unemp rect.r8').count();
+    const bars = await g.locator('#chart-unemp rect.after').count(); // round 10: bars are 'before' and 'after' (latest two rounds)
     check(`${label}: the code guide draws its map and charts with no errors`, nodes > 10 && bars >= 4 && gErr.length === 0, `${nodes} folders, ${bars} bars, ${gErr.length} errors ${gErr.slice(0, 2).join(' | ')}`);
     await g.close();
   }
