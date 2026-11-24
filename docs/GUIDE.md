@@ -322,6 +322,10 @@ flowchart LR
   Stock --> M[National market, yearly<br/>prices, GDP = C+I+G+NX,<br/>taxes, debt, inflation<br/>economy/market.ts]
 ```
 
+- **Exploration and sea trade** (round 10):
+  - **Explorers:** a nation that can sail (naval tier 2 or more) sends explorers from its ports. They reveal coasts and make first contact. Before this round, the explorer existed but nothing launched it.
+  - **Sea routes:** trade partners whose towns are both ports ship by sea whenever the water-only voyage is cheaper than the land detour (shipping costs 0.6 of land per tile). Deep ocean needs naval tier 4.
+- **A diplomatic past** (round 10): worlds that start in era 9 or later begin with friends and rivals already in place. Nations with similar values hold defensive pacts; the most different start cold. From era 10, the largest group of mutual friends has a treaty organization.
 - **Labour:** working-age people are assigned to districts, and each district has jobs. Automation shrinks working hours and staff.
 - **Services:** in industrial eras, market services grow with household goods income. Since round 8 there are also **public-service jobs** (teaching, health care, administration), which grow with welfare and with what the nation spends on schools and health. Since round 9, **elder care** adds care jobs in proportion to the people aged 65 and over (`careWorkersPerElder`), so ageing modern societies employ carers. Whoever is left does informal work or is unemployed.
 - **Jobs** (`economy/occupations.ts`, round 7): the 7 sectors split into **41 named jobs**, from gatherers and smiths to programmers and AI supervisors. The split depends on what each place has and what each nation knows. Nations record the shares every year.
@@ -382,7 +386,16 @@ flowchart LR
 `powers/powers.ts` defines **108 god powers** in 9 groups: terrain, nature, peoples, faith and culture, technology, politics, warfare, disasters, modern and future.
 - **Real changes:** each power changes real state (terrain, people, institutions, technology, relations) and is recorded in `interventions`, so a timeline can be replayed.
 - **Undo:** terrain strokes can be undone (`undo.ts`).
-- **Observer worlds:** the "Realistic" preset turns all powers off.
+- **Power sets** (round 10, `powers/powerSet.ts`): every world has one.
+  - **all** is god mode.
+  - **grounded** is Realistic: real people (humans), real animals, shaping the land and natural disasters, but nothing fantastical and nothing that acts on nations directly.
+  - **none** is Observer.
+
+  The dock lists only the allowed powers, `applyPower` refuses the rest, and old observer saves load as **none**.
+- **Realistic and Observer presets** (`config/laws.ts`):
+  - **Realistic** starts an empty Earth-like world at year 0 with wildlife, the grounded powers and **Slow** pace. The dock tells you to place the first humans.
+  - **Observer** is the old hands-off mode (5 bands, no powers).
+- **Pace** (`sim/pace.ts`): **Slow** multiplies four levers: the bands' chance to settle (which also ramps up over a band's first 60 years on new land), research, construction, and births in settlements. Wandering bands keep their fertility, otherwise they die out. **Standard** leaves every lever at exactly 1, so standard worlds are unchanged.
 
 <img src="images/god-powers.png" alt="The god powers dock" width="560" />
 
@@ -485,6 +498,11 @@ A test, `cacheFreshness.test.ts`, runs every god power and 30-year histories fro
 
 **Follow camera** (round 9, `ui/game/Game.tsx`): the inspector's *Follow* button keeps the camera on a person, army, band, herd, town or nation each frame. Dragging the map stops following; zooming does not. The ★ button adds the selection to Favourites in the game menu. The keys `+` and `-` zoom at the centre of the view.
 
+**Medium-themed feed** (round 10, `ui/mediumTheme.ts`): the news sheet, and a nation's Feed tab, take on the medium of their era.
+- **Each of the 8 mediums has its own palette and its own fonts.** Cave carving, clay tablet, scroll, printed broadsheet, newspaper, broadcast, social app and hologram each have a colour token set and a display face plus a body face. The fonts are bundled; the table is in DESIGN-REVIEW §R10.
+- **Tests guard both.** `mediumTheme.test.ts` proves every colour pair meets WCAG AA. `fonts.test.ts` fails if a font named in the CSS or on the canvas is not bundled.
+- **Posts scroll as one list.** Older posts load when the end comes into view.
+
 **Concept effects** (`sim/conceptFx.ts`): one registry decides what every god power and every event type shows on the map (a quake ring, a meteor that falls and explodes, fireworks for world games). Every entry is either an effect or a written reason for having none, and a test checks the registry covers everything. Under **Reduce motion**, effects become still markers and the screen never flashes.
 
 **Pixel art** (`rendering/art/`): all sprites are defined in code as rows of palette letters. `atlas.ts` rasterizes them into canvases once at start-up, so the game needs no image files.
@@ -563,6 +581,8 @@ flowchart LR
 ```
 
 - `npm run build` runs `tsc` then `vite build`, producing the static site in `dist/`.
+- **Accessibility audit** (round 10, `tests/e2e/run-a11y.mjs`, `npm run a11y`): runs axe-core (WCAG 2.2 A/AA rules) on every screen, sheet and inspector tab, in Chromium and WebKit, at phone and desktop sizes. It also scripts checks of keyboard focus, Escape, reflow at 320 px and text spacing. axe runs only in a test context, so the shipped CSP is unchanged.
+- **Game-mode audit** (round 10, `scripts/mode-audit.ts`): turns each preset's and scenario's description into measurable promises, then runs 3 worlds of each mode. `tests/modes/promises.test.ts` keeps the start-of-world promises checked.
 - **Browser e2e** (`tests/e2e/run-e2e.mjs`): runs on Chromium, and since round 9 also on WebKit, Safari's engine (`BROWSER=webkit`), each with iPhone 13 emulation and a desktop window. This is emulation, not a physical iPhone.
 - **Security on GitHub Actions:**
   - every action is pinned to a full commit hash;

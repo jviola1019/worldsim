@@ -1,4 +1,73 @@
-# Design review (round 6)
+# Design review
+
+## R10. Round 10: medium-themed feed, era typography, accessibility audit (2026-11-24)
+
+**Scope:**
+- the news feed, which now takes on its era's medium;
+- the nation inspector on phones;
+- the HUD's nation count;
+- era typography;
+- a WCAG 2.2 AA audit of every screen.
+
+**Method:**
+- `design-skills:accessibility-audit` (5 layers);
+- `design-skills:design-critique` (Nielsen heuristics, UX laws);
+- `frontend-design` for the type and colour direction.
+
+The evidence comes from the production build in Chromium and WebKit: Playwright emulation of an iPhone 13 and a 1280×800 desktop, plus a 320-px reflow check. **No physical device and no screen reader (VoiceOver, NVDA) were used.** Layer 3 of the audit (screen-reader testing) was therefore limited to what axe checks in the accessibility tree: names, roles, states and labels.
+
+### Accessibility audit (`npm run a11y`, axe-core 4.14.1, WCAG 2.2 A/AA rules)
+
+The first pass in Chromium passed 37 of 78 checks; 41 failed. Every finding was fixed:
+
+| # | Finding | WCAG | Severity | Fix |
+|---|---|---|---|---|
+| 1 | Escape did not close any sheet | 2.1.1 / expected dialog behaviour | High | Escape closes the open sheet (not while typing) |
+| 2 | The viewport blocked pinch-zoom (`user-scalable=no`) | 1.4.4 | High (on every page) | Removed; the map keeps its own gestures (`touch-action: none` on the canvas) |
+| 3 | Scroll areas could not be reached with the keyboard (Statistics, the outlet chips) | 2.1.1 | High | Every sheet body is focusable; the outlet chips wrap |
+| 4 | The feed could not be scrolled with the keyboard in WebKit (Safari does not focus scroll areas) | 2.1.1 | High | A focusable, named region |
+| 5 | Two law sliders had no label | 1.3.1 / 4.1.2 | Critical | `<label for>` |
+| 6 | Meters (stability, skills, adoption…) had no name | 4.1.2 | Serious | `Bar` now requires a label (TypeScript enforces it) |
+| 7 | The History button's visible war count was not part of its name | 2.5.3 | Serious | "History, 3 active wars" |
+| 8 | Phones: the Menu button sat under an open sheet | 2.5.8 | Serious | HUD buttons laid out 3×2 |
+| 9 | Nation tabs: no arrow-key navigation, every tab a Tab stop | ARIA tabs pattern | Moderate | Roving tabindex; arrows, Home and End |
+
+**After the fixes:** 80/80 checks in Chromium and 80/80 in WebKit, with 0 violations at any impact level. The checks cover 30 stops per device, the scripted keyboard, Escape, 320-px reflow and text-spacing checks, and the feed in 4 mediums. All 8 mediums' colours are proven by `tests/ui/mediumTheme.test.ts`: text ≥ 4.5:1, borders and focus ≥ 3:1.
+
+### Design critique
+
+| # | Finding | Principle | Severity | Resolution |
+|---|---|---|---|---|
+| 1 | **The feed did not scroll at all.** `.sheet-body` was a flex child without `min-height: 0`, so every sheet grew instead of scrolling. | H3 user control | 4 | Fixed in the layout (every sheet) |
+| 2 | **The feed was a brown box inside a navy panel.** | Common region, aesthetic integrity | 3 | The whole sheet takes the medium: header, filters, tabs, frame, posts |
+| 3 | **On phones, the nation tabs took three rows** and the Favourites bar a fourth, so the first post was below the fold. | False floor | 3 | One swipeable tab row; Follow and Favourite as header icons |
+| 4 | **On phones, the nation chips took four rows** before the first post. | False floor; Hick's law | 3 | One swipeable chip row |
+| 5 | **Generic Georgia** on the scroll, broadsheet and newspaper themes; the newspaper masthead font was never bundled. | Aesthetic integrity | 3 | Era typography (below) |
+| 6 | **Uncial letterforms** (a "t" that reads as "c") made invented names hard to read. | H2; readability | 3 | Almendra replaces Uncial Antiqua |
+| 7 | **Truncated names** ("Kingdom of Gai…", "Renaissanc…") | H1 | 2 | Titles and stat values wrap |
+| 8 | **"8 / nations"** broke across lines in the HUD; one nation read "1 people"; wandering bands counted as nations | Proximity; H2 | 2 | No-break spaces; an honest nation and tribe count |
+| 9 | **"Older posts"** showed when there were none | H1 | 1 | Shown only when older posts exist; also loads on scroll |
+
+### Era typography
+
+Every face is bundled under the OFL licence (the CSP stays `'self'`). Display faces are used for headings only; body text is a readable face at 16 px with a 1.5 line height.
+
+| Medium | Display | Body |
+|---|---|---|
+| Cave carving | Pixelify Sans | Pixelify Sans |
+| Clay tablet | Cinzel | Alegreya |
+| Scroll | Almendra | Alegreya |
+| Printed broadsheet | IM Fell English | IM Fell English |
+| Newspaper | UnifrakturMaguntia (masthead), Old Standard TT | Old Standard TT |
+| Broadcast | Oswald | Atkinson Hyperlegible |
+| Social app | Atkinson Hyperlegible | Atkinson Hyperlegible |
+| Hologram | Orbitron | Atkinson Hyperlegible |
+
+Postcards and aerial photos letter in their era's face too. The rest of the game keeps its own pixel face (Pixelify Sans) with Atkinson Hyperlegible for reading. A guard test (`tests/ui/fonts.test.ts`) fails if any font named in the CSS or on the canvas is not bundled.
+
+---
+
+## R6. Design review (round 6)
 
 **Date:** 2026-11-19
 
@@ -15,7 +84,7 @@ Each finding cites the principle it rests on: Nielsen's heuristics (H1–H10), F
 
 **Measured before:** across all screens and devices the tool counted 968 text nodes under 12 px (3 distinct elements), 1,415 small touch targets (10 distinct elements) and 253 contrast failures. All of the contrast failures were measurement errors: the era frames use gradient backgrounds, and the first version of the tool ignored them (see D13). The only motion in use was one 0.25 s animation.
 
-## Findings
+### Findings
 
 | ID | Severity | Screen / device | Finding | Principle | Fix | Identity change | Status |
 |---|---|---|---|---|---|---|---|
@@ -33,7 +102,7 @@ Each finding cites the principle it rests on: Nielsen's heuristics (H1–H10), F
 | D12 | Low | Statistics, phones | Chart legend labels are cut off at the chart edge ("World p…"). | H6 | Legend below the chart on narrow screens. | no | Fixed: single-series charts drop the end label (the heading names the series); multi-series labels are fitted with an ellipsis; axis text is 12 px. |
 | D13 | Info | Measurement | The first contrast pass compared dark text on gradient era frames (scroll, broadsheet) with the dark app background behind them. That gave 253 false failures. | — | The tool now reads the first colour of a gradient background. Results are re-measured below. | no | Fixed in the tool (gradient backgrounds, and labels as checkbox targets). |
 
-## Results after the fixes
+### Results after the fixes
 
 Same 106 captures and the same five devices, after the fixes (`node tools/design-capture.mjs`):
 

@@ -68,7 +68,7 @@ Cities follow real-world rates:
 
 ### News in the medium of its time
 
-Every nation has a news feed, and its whole look follows what that nation has invented. It starts as a painted cave wall and moves through clay tablets, a scriptorium with quill and town crier, a printing house, a newspaper front page and a broadcast studio, to a social app with generated platforms, trending topics and people to follow, and finally a holographic feed. Every post retells something that really happened in that world. The authors are real outlets, people and AIs of that nation, and replies take their mood from the nation's measured war weariness, unrest, polarization and misinformation. Platform names, AI systems, hashtags and handles are newly generated in every world.
+Every nation has a news feed, and its whole look follows what that nation has invented. It starts as a painted cave wall and moves through clay tablets, a scriptorium with quill and town crier, a printing house, a newspaper front page and a broadcast studio, to a social app with generated platforms, trending topics and people to follow, and finally a holographic feed. The whole panel becomes that medium, with its own colours and lettering: carved pixels, inscribed capitals, medieval calligraphy, the types of an early printing house, a blackletter masthead, TV captions and a futuristic face. Posts scroll as one list. Every post retells something that really happened in that world. The authors are real outlets, people and AIs of that nation, and replies take their mood from the nation's measured war weariness, unrest, polarization and misinformation. Platform names, AI systems, hashtags and handles are newly generated in every world.
 
 <img src="docs/images/r5-feed-eras.png" width="100%" alt="The feed in five eras: painted cave, printing house, newspaper, social app, holographic feed" />
 
@@ -128,7 +128,12 @@ Every event is recorded with its causes. Charts show population, economy, techno
 
 **108 god powers** come in 9 groups: shape land, plant forests, place peoples, found faiths, grant knowledge, start or end wars, call down disasters and launch the space age. You can also change the **world laws** and edit any person's traits ("divine touch"). Every power and every major event shows its effect where it happens (a quake ring, a meteor that falls and explodes, fireworks for world games), as a still marker if Reduce motion is on.
 
-Prefer to just watch? Choose the **Realistic (observer)** preset. God powers are switched off and history runs entirely on its own, including natural disasters and epidemics.
+Three ways to play:
+- **God mode** (every preset except the two below): every power.
+- **Realistic:** an empty Earth-like world at year 0, with land, plants and wild animals. You place the first humans and real animals, shape the land, and call down natural disasters. Fantasy creatures, sci-fi and hands-on politics are switched off. The pace is **Slow**: in our test worlds the first village came 42–156 years after placing a band, and the first city of 10,000 people about a thousand years later (measurements in [VALIDATION.md](docs/VALIDATION.md) §R10).
+- **Observer:** history runs entirely on its own, with no powers, including natural disasters and epidemics.
+
+The Pace setting (Standard or Slow) is also on the New World screen for any world.
 
 | God powers | Observer mode |
 |---|---|
@@ -243,7 +248,7 @@ The numbered pictures above ([iPhone](docs/images/guide-iphone.png), [desktop](d
 
 The simulation is a game, but it is built to be **internally consistent** and **checked against itself**:
 
-- **Natural history with no player at all.** Four 1,000-year runs with zero god powers on a 128² map (three default worlds and one Realistic world) all went from foragers to farming (years 160–182), the Middle Ages (398–420) and industry (538–599), then to the modern era (662–783) and the atomic and space age (703–892). Three reached the Digital era (763–786). Two default worlds became Spacefaring (973 and 988), and the Realistic world reached the Near Future in year 831. Each run also had 22–41 notable natural disasters, 184–645 deadly epidemics, droughts, and 3–10 °C of emergent warming. The 10 °C case is a known limitation ([STATUS.md](docs/STATUS.md)). Raw output: [`docs/data/round5/`](docs/data/round5/); method: [`scripts/modernization.ts`](scripts/modernization.ts).
+- **Natural history with no player at all.** Four 1,000-year runs with zero god powers on a 128² map (three default worlds and one hands-off world, now the Observer preset) all went from foragers to farming (years 160–182), the Middle Ages (398–420) and industry (538–599), then to the modern era (662–783) and the atomic and space age (703–892). Three reached the Digital era (763–786). Two default worlds became Spacefaring (973 and 988), and the hands-off world reached the Near Future in year 831. Each run also had 22–41 notable natural disasters, 184–645 deadly epidemics, droughts, and 3–10 °C of emergent warming. The 10 °C case is a known limitation ([STATUS.md](docs/STATUS.md)). Raw output: [`docs/data/round5/`](docs/data/round5/); method: [`scripts/modernization.ts`](scripts/modernization.ts).
 - **Nations rise and fall for recorded reasons.** In 10 worlds × 600 years, 77 nations were founded and 13 fell (5 conquests, 5 civil wars, 2 famines, 1 dispersal). Rare catastrophes stay rare: no nuclear use, 8 large eruptions and 8 airbursts across those 6,000 world-years ([`scripts/endings-census.ts`](scripts/endings-census.ts)).
 - **People are never created or lost by accident.** A population ledger accounts for every birth, death, migration, conquest and rounding, exactly, at every moment of the simulation.
 - **The economy adds up.** GDP equals consumption + investment + government + net exports + inventory change, in every nation and every year.
