@@ -26,7 +26,7 @@ for (const seed of seeds) {
     sim.runYears(1);
     const ss = [...sim.w.settlements.values()];
     const maxPop = Math.max(0, ...ss.map((s) => s.pop));
-    if (ss.length && ms.village === undefined) ms.village = y;
+    if (ss.length && ms.village === undefined) { ms.village = y; console.log(`${seed}\tvillage at ${y}`); }
     if (maxPop >= 2000 && ms.town === undefined) ms.town = y;
     if (maxPop >= 10000 && ms.city === undefined) { ms.city = y; break; }
     if (!sim.w.bands.size && !ss.length) { died = y; break; }

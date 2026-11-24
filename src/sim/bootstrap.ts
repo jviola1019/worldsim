@@ -26,7 +26,7 @@ import { TERRAIN, isWaterTerrain } from '../world/terrain';
 import { createCiv, createCulture } from '../civilizations/civ';
 import { foundSettlement } from '../civilizations/settlement';
 import { TECHS } from '../technology/techData';
-import { grantTech, computeCaps, techState } from '../technology/research';
+import { grantTech, computeCaps, techState, eraOf } from '../technology/research';
 import { planConstruction } from '../civilizations/urban';
 import { infrastructureYearly } from '../economy/trade';
 import { GOOD_COUNT, Good } from '../world/resources';
@@ -160,6 +160,19 @@ export function developedCiv(sim: Sim, x: number, y: number, species: SpeciesKey
       civ.techs[t.id].adoption = 0;
       changed = true;
     }
+  }
+  // round 10 (mode audit): the grants above average ~34% of the start era's techs, against the 35% that eraOf
+  // needs, so developed starts came out one era low. Top up with techs whose prerequisites are known (start era
+  // first) until the nation really stands in the promised era.
+  for (let guard = 0; guard < 200 && eraOf(civ) < era; guard++) {
+    const ready = TECHS.filter((t) => t.era <= era && !civ.techs[t.id]?.known && !(t.advancedWeapon && !w.laws.advancedWeapons) && t.prereqs.every((p) => civ.techs[p]?.known));
+    if (!ready.length) break;
+    const now = ready.filter((t) => t.era === era);
+    const t = rng.pick(now.length ? now : ready);
+    const st = techState(civ, t.id);
+    st.known = true;
+    st.year = 0;
+    st.adoption = 1;
   }
   computeCaps(civ);
   // institutions plausible for the era

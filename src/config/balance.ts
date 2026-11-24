@@ -44,6 +44,8 @@ export const BALANCE = {
   /** [S] Max yearly emigration share under distress. */
   maxEmigration: 0.06,
   bandSplitSize: 90,
+  /** [C] Round 10: monthly damage a settlement deals a monster at its gates, per point of defence (garrison + 1% of people). */
+  monsterDamage: 0.5,
   /** [C] Round 10, Slow pace (sim/pace.ts): multipliers on the band settle chance, research, construction and births.
    *  Calibrated to a first village ~100 years and a first city of 10,000 ~1,000 years after placing humans (VALIDATION §R10). */
   slowSettleMult: 0.03,

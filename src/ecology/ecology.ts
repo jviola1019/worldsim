@@ -463,11 +463,14 @@ export function monstersMonthly(sim: Sim): void {
   for (const mo of w.monsters.values()) {
     const def = MONSTERS.find((d) => d.kind === mo.kind);
     if (!def) continue;
+    let fought = false;
     for (const s of w.settlements.values()) {
       if ((s.x - mo.x) ** 2 + (s.y - mo.y) ** 2 > 9) continue;
+      fought = true;
       const civ = w.civs.get(s.civId);
       const defense = (s.garrison + s.pop * 0.01) * (1 + (civ?.caps.landTier ?? 0) * 0.6);
-      mo.hp -= defense * 0.05;
+      // round 10: a town of 2,000 wears a giant down in about two years; a hamlet cannot (was ×0.05, less than regrowth)
+      mo.hp -= defense * BALANCE.monsterDamage;
       const harm = Math.min(s.pop * 0.05, def.harm * sim.rng.range(0.4, 1));
       if (harm > 0.5) {
         const dead = removePeople(sim, s, harm, 'monster attack');
@@ -483,7 +486,7 @@ export function monstersMonthly(sim: Sim): void {
         break;
       }
     }
-    mo.hp = Math.min(def.hp, mo.hp + def.hp * 0.02);
+    if (!fought) mo.hp = Math.min(def.hp, mo.hp + def.hp * 0.02); // round 10: wounds heal only away from a fight
   }
   for (const id of dead) w.monsters.delete(id);
 }

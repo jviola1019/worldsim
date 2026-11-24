@@ -49,7 +49,9 @@ export const SCENARIOS: Scenario[] = [
     apply: (c) => {
       c.gen.landmass = 'archipelago';
       c.gen.oceanCoverage = 0.72;
-      c.settings.startEra = 2;
+      // round 10 (mode audit): era 3, Bronze-age sailors with currency; from era 2 no trade treaty (so no sea
+      // route) was possible for ~100 years, and none formed in 200 years in any audited world
+      c.settings.startEra = 3;
       c.settings.startCivs = 8;
       c.scenario = 'islands';
     },
@@ -76,9 +78,11 @@ export const SCENARIOS: Scenario[] = [
   {
     key: 'space_race',
     name: 'Space Race',
-    description: 'Digital-age nations with rockets on the pad. Who settles another world first?',
+    description: 'Near-future powers with rockets on the pad. Who settles another world first?',
     apply: (c) => {
-      c.settings.startEra = 11;
+      // round 10 (mode audit): era 13. From the Digital era (11) colonies need era-14 technology that took
+      // centuries to reach (era 12 at year 150 in the audit), so the scenario's own goal was out of reach
+      c.settings.startEra = 13;
       c.settings.startCivs = 5;
       c.settings.realism = 'unrestricted';
       c.laws.speculativeTech = true;
