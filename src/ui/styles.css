@@ -221,26 +221,26 @@ img.flag { image-rendering: pixelated; border: 1px solid rgba(0,0,0,.5); box-sha
 .tag-state { background: #c9a227; color: #1b1405; }
 /* carved stone */
 .medium-carving { background: repeating-linear-gradient(135deg, #6d6a64 0 6px, #66635d 6px 12px); border-color: #4a4843; color: #f1ede4; font-family: 'Pixelify Sans', monospace; letter-spacing: .08em; text-shadow: 1px 1px 0 #3b3935; }
-.medium-carving .post-text { text-transform: uppercase; }
+.medium-carving .post-headline { text-transform: uppercase; } /* round 10: body text stays in normal case (readability) */
 /* clay tablet */
-.medium-tablet { background: #b58a5a; border-color: #8a6238; color: #2b1a0b; font-family: Georgia, serif; }
+.medium-tablet { background: #b58a5a; border-color: #8a6238; color: #2b1a0b; font-family: 'Alegreya', serif; }
 /* scroll */
-.medium-scroll { background: linear-gradient(90deg, #d9c49a, #efe0bb 8%, #efe0bb 92%, #d9c49a); border-color: #a88b55; color: #3a2a12; font-family: Georgia, serif; font-style: italic; border-radius: 14px; }
+.medium-scroll { background: linear-gradient(90deg, #d9c49a, #efe0bb 8%, #efe0bb 92%, #d9c49a); border-color: #a88b55; color: #3a2a12; font-family: 'Alegreya', serif; font-style: italic; border-radius: 14px; }
 /* broadsheet */
-.medium-broadsheet { background: #efe6cf; border: 3px double #3b3326; color: #241e14; font-family: 'Times New Roman', Georgia, serif; }
-.medium-broadsheet .post-headline { font-family: 'UnifrakturMaguntia', 'Times New Roman', serif; text-align: center; letter-spacing: .04em; }
+.medium-broadsheet { background: #efe6cf; border: 3px double #3b3326; color: #241e14; font-family: 'IM Fell English', serif; }
+.medium-broadsheet .post-headline { font-family: 'IM Fell English', serif; font-style: italic; text-align: center; letter-spacing: .04em; }
 /* newspaper */
-.medium-newspaper { background: #f3f1ea; border-color: #c9c4b4; color: #151515; font-family: Georgia, 'Times New Roman', serif; }
+.medium-newspaper { background: #f3f1ea; border-color: #c9c4b4; color: #151515; font-family: 'Old Standard TT', serif; }
 .medium-newspaper .post-headline { font-size: 19px; border-bottom: 1px solid #999; padding-bottom: 4px; }
 /* broadcast */
 .medium-broadcast { background: #222a33; border-color: #c94f4f; color: #f3f3f3; }
 .medium-broadcast .post-medium::before { content: '● '; color: #ff5b5b; }
 /* social */
-.medium-social { background: #ffffff; border-color: #d8dde6; color: #161a22; font-family: system-ui, sans-serif; border-radius: 12px; }
+.medium-social { background: #ffffff; border-color: #d8dde6; color: #161a22; font-family: 'Atkinson Hyperlegible', sans-serif; border-radius: 12px; }
 .medium-social .muted { color: #5c6575; }
 .medium-social .post-reply { border-left-color: #d8dde6; }
 /* holo */
-.medium-holo { background: linear-gradient(180deg, rgba(40,220,255,.12), rgba(150,80,255,.12)), #0b1020; border-color: #4fe3ff; color: #d8fbff; box-shadow: 0 0 12px rgba(79,227,255,.35) inset; font-family: system-ui, sans-serif; }
+.medium-holo { background: linear-gradient(180deg, rgba(40,220,255,.12), rgba(150,80,255,.12)), #0b1020; border-color: #4fe3ff; color: #d8fbff; box-shadow: 0 0 12px rgba(79,227,255,.35) inset; font-family: 'Atkinson Hyperlegible', sans-serif; }
 .medium-holo .post-text { text-shadow: 0 0 6px rgba(79,227,255,.7); }
 @media (prefers-reduced-motion: no-preference) {
   .medium-holo { background-image: linear-gradient(180deg, rgba(40,220,255,.12), rgba(150,80,255,.12)), repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 3px); }
@@ -288,19 +288,19 @@ img.flag { image-rendering: pixelated; border: 1px solid rgba(0,0,0,.5); box-sha
 .frame-tablet .frame-logo { background: #c49a62; color: #3a240f; }
 .frame-tablet .frame-side { background: rgba(0,0,0,.2); }
 /* scriptorium + town crier */
-.frame-scroll { background: linear-gradient(180deg, #3a2a1a, #2a1e12); color: #f1e2c0; border-color: #1c140b; font-family: Georgia, serif; }
+.frame-scroll { background: linear-gradient(180deg, #3a2a1a, #2a1e12); color: #f1e2c0; border-color: #1c140b; font-family: 'Alegreya', serif; }
 .frame-scroll .frame-logo { background: #efe0bb; color: #3a2a12; }
 .frame-scroll .frame-sub { font-style: italic; }
 .frame-scroll .frame-side { background: #efe0bb; color: #3a2a12; font-style: italic; }
 /* printing house */
-.frame-broadsheet { background: #2b2620; color: #efe6cf; border-color: #14110d; font-family: 'Times New Roman', Georgia, serif; }
+.frame-broadsheet { background: #2b2620; color: #efe6cf; border-color: #14110d; font-family: 'IM Fell English', serif; }
 .frame-broadsheet .frame-logo { background: #efe6cf; color: #241e14; }
 .frame-broadsheet .frame-side { background: #efe6cf; color: #241e14; border: 3px double #3b3326; }
 /* newspaper front page */
-.frame-newspaper { background: #f3f1ea; color: #151515; border-color: #b9b4a3; font-family: Georgia, 'Times New Roman', serif; }
+.frame-newspaper { background: #f3f1ea; color: #151515; border-color: #b9b4a3; font-family: 'Old Standard TT', serif; }
 .frame-newspaper .frame-head { border-bottom: 3px double #151515; justify-content: center; text-align: center; }
 .frame-newspaper .frame-logo { display: none; }
-.frame-newspaper .frame-title { font-size: 26px; font-family: 'UnifrakturMaguntia', Georgia, serif; }
+.frame-newspaper .frame-title { font-size: 28px; font-family: 'UnifrakturMaguntia', serif; font-weight: 400; }
 .frame-newspaper .frame-side { border-left: 1px solid #999; border-radius: 0; }
 .frame-newspaper .muted { color: #555; }
 @container (min-width: 620px) { .frame-newspaper .frame-body { grid-template-columns: 1fr 180px; } }
@@ -309,14 +309,14 @@ img.flag { image-rendering: pixelated; border: 1px solid rgba(0,0,0,.5); box-sha
 .frame-broadcast .frame-logo { background: #c94f4f; color: #fff; border-radius: 50%; }
 .frame-broadcast .frame-side { background: #1c232d; }
 /* social app */
-.frame-social { background: #f2f4f8; color: #161a22; border-color: #d8dde6; font-family: system-ui, sans-serif; }
+.frame-social { background: #f2f4f8; color: #161a22; border-color: #d8dde6; font-family: 'Atkinson Hyperlegible', sans-serif; }
 .frame-social .frame-head { background: #fff; border-bottom: 1px solid #d8dde6; }
 .frame-social .frame-logo { background: linear-gradient(135deg, #5b7cfa, #b05bfa); color: #fff; border-radius: 10px; }
 .frame-social .frame-side { background: #fff; border: 1px solid #d8dde6; }
 .frame-social .muted { color: #5c6575; }
 @container (min-width: 620px) { .frame-social .frame-body { grid-template-columns: 1fr 190px; } }
 /* holographic interface */
-.frame-holo { background: radial-gradient(ellipse at top, #13254a, #070b17 70%); color: #d8fbff; border-color: #4fe3ff; box-shadow: 0 0 18px rgba(79,227,255,.35); font-family: system-ui, sans-serif; }
+.frame-holo { background: radial-gradient(ellipse at top, #13254a, #070b17 70%); color: #d8fbff; border-color: #4fe3ff; box-shadow: 0 0 18px rgba(79,227,255,.35); font-family: 'Atkinson Hyperlegible', sans-serif; }
 .frame-holo .frame-logo { background: transparent; border: 1px solid #4fe3ff; color: #4fe3ff; text-shadow: 0 0 8px #4fe3ff; }
 .frame-holo .frame-title { text-shadow: 0 0 8px rgba(79,227,255,.7); }
 .frame-holo .frame-side { background: rgba(79,227,255,.08); border: 1px solid rgba(79,227,255,.4); }
@@ -368,14 +368,14 @@ p, li, .footnote { line-height: 1.45; }
 /* round 9: follow and favourite in the inspector */
 
 /* ------------------------------------------------ round 10: medium themes (values = src/ui/mediumTheme.ts) */
-[data-medium="carving"] { --m-surface: #3f342a; --m-ink: #f3e7cf; --m-muted: #d2c0a0; --m-accent: #f0a070; --m-line: #9a8466; --m-chip: #56483a; --m-chipInk: #f3e7cf; --m-focus: #ffd27a; --m-card: #4d4034; --m-cardInk: #f3e7cf; }
-[data-medium="tablet"] { --m-surface: #c7a77a; --m-ink: #2a1a0c; --m-muted: #4e3820; --m-accent: #6b2410; --m-line: #6e5434; --m-chip: #b39066; --m-chipInk: #2a1a0c; --m-focus: #2a1a0c; --m-card: #d6bb92; --m-cardInk: #2a1a0c; }
-[data-medium="scroll"] { --m-surface: #e4d3a0; --m-ink: #2a1c0e; --m-muted: #55432a; --m-accent: #7a2a12; --m-line: #8a7448; --m-chip: #d3bf86; --m-chipInk: #2a1c0e; --m-focus: #2a1c0e; --m-card: #ecdfb4; --m-cardInk: #2a1c0e; }
-[data-medium="broadsheet"] { --m-surface: #efe3c8; --m-ink: #2b2118; --m-muted: #5a4b3a; --m-accent: #8c1c13; --m-line: #8a7a62; --m-chip: #e2d3b2; --m-chipInk: #2b2118; --m-focus: #8c1c13; --m-card: #f6edd8; --m-cardInk: #2b2118; }
-[data-medium="newspaper"] { --m-surface: #e8e6df; --m-ink: #1d1d1b; --m-muted: #4a4a46; --m-accent: #1d1d1b; --m-line: #7d7b74; --m-chip: #d9d6cd; --m-chipInk: #1d1d1b; --m-focus: #1d1d1b; --m-card: #f4f3ee; --m-cardInk: #1d1d1b; }
-[data-medium="broadcast"] { --m-surface: #10233f; --m-ink: #ffffff; --m-muted: #c4d0e4; --m-accent: #f2b544; --m-line: #5f7aa6; --m-chip: #1c3760; --m-chipInk: #ffffff; --m-focus: #f2b544; --m-card: #173057; --m-cardInk: #ffffff; }
-[data-medium="social"] { --m-surface: #f5f7fb; --m-ink: #14213d; --m-muted: #4b5872; --m-accent: #2459d6; --m-line: #7a869c; --m-chip: #e4e9f3; --m-chipInk: #14213d; --m-focus: #2459d6; --m-card: #ffffff; --m-cardInk: #14213d; }
-[data-medium="holo"] { --m-surface: #1a1240; --m-ink: #b8f3ff; --m-muted: #9fc6e0; --m-accent: #ff8ad8; --m-line: #6a5fb0; --m-chip: #2a2160; --m-chipInk: #b8f3ff; --m-focus: #ff8ad8; --m-card: #221a52; --m-cardInk: #b8f3ff; }
+[data-medium="carving"] { --m-surface: #3f342a; --m-ink: #f3e7cf; --m-muted: #d2c0a0; --m-accent: #f0a070; --m-line: #9a8466; --m-chip: #56483a; --m-chipInk: #f3e7cf; --m-focus: #ffd27a; --m-card: #4d4034; --m-cardInk: #f3e7cf; --m-display: 'Pixelify Sans', monospace; --m-body: 'Pixelify Sans', monospace; }
+[data-medium="tablet"] { --m-surface: #c7a77a; --m-ink: #2a1a0c; --m-muted: #4e3820; --m-accent: #6b2410; --m-line: #6e5434; --m-chip: #b39066; --m-chipInk: #2a1a0c; --m-focus: #2a1a0c; --m-card: #d6bb92; --m-cardInk: #2a1a0c; --m-display: 'Cinzel', serif; --m-body: 'Alegreya', serif; }
+[data-medium="scroll"] { --m-surface: #e4d3a0; --m-ink: #2a1c0e; --m-muted: #55432a; --m-accent: #7a2a12; --m-line: #8a7448; --m-chip: #d3bf86; --m-chipInk: #2a1c0e; --m-focus: #2a1c0e; --m-card: #ecdfb4; --m-cardInk: #2a1c0e; --m-display: 'Uncial Antiqua', serif; --m-body: 'Alegreya', serif; }
+[data-medium="broadsheet"] { --m-surface: #efe3c8; --m-ink: #2b2118; --m-muted: #5a4b3a; --m-accent: #8c1c13; --m-line: #8a7a62; --m-chip: #e2d3b2; --m-chipInk: #2b2118; --m-focus: #8c1c13; --m-card: #f6edd8; --m-cardInk: #2b2118; --m-display: 'IM Fell English', serif; --m-body: 'IM Fell English', serif; }
+[data-medium="newspaper"] { --m-surface: #e8e6df; --m-ink: #1d1d1b; --m-muted: #4a4a46; --m-accent: #1d1d1b; --m-line: #7d7b74; --m-chip: #d9d6cd; --m-chipInk: #1d1d1b; --m-focus: #1d1d1b; --m-card: #f4f3ee; --m-cardInk: #1d1d1b; --m-display: 'Old Standard TT', serif; --m-body: 'Old Standard TT', serif; }
+[data-medium="broadcast"] { --m-surface: #10233f; --m-ink: #ffffff; --m-muted: #c4d0e4; --m-accent: #f2b544; --m-line: #5f7aa6; --m-chip: #1c3760; --m-chipInk: #ffffff; --m-focus: #f2b544; --m-card: #173057; --m-cardInk: #ffffff; --m-display: 'Oswald', sans-serif; --m-body: 'Atkinson Hyperlegible', sans-serif; }
+[data-medium="social"] { --m-surface: #f5f7fb; --m-ink: #14213d; --m-muted: #4b5872; --m-accent: #2459d6; --m-line: #7a869c; --m-chip: #e4e9f3; --m-chipInk: #14213d; --m-focus: #2459d6; --m-card: #ffffff; --m-cardInk: #14213d; --m-display: 'Atkinson Hyperlegible', sans-serif; --m-body: 'Atkinson Hyperlegible', sans-serif; }
+[data-medium="holo"] { --m-surface: #1a1240; --m-ink: #b8f3ff; --m-muted: #9fc6e0; --m-accent: #ff8ad8; --m-line: #6a5fb0; --m-chip: #2a2160; --m-chipInk: #b8f3ff; --m-focus: #ff8ad8; --m-card: #221a52; --m-cardInk: #b8f3ff; --m-display: 'Orbitron', sans-serif; --m-body: 'Atkinson Hyperlegible', sans-serif; }
 
 /* round 10: the whole panel takes on its medium (sheet, header, filters, frame, posts, side lists) */
 .sheet[data-medium] { background-color: var(--m-surface); color: var(--m-ink); border-color: var(--m-line); }
@@ -399,18 +399,16 @@ p, li, .footnote { line-height: 1.45; }
 .feed-end { height: 1px; }
 /* surface textures (kept within a few percent of the base colour, so the tested contrast holds) */
 .sheet[data-medium="carving"] { background-image: radial-gradient(circle at 20% 30%, #463a2f 0 2px, transparent 3px), radial-gradient(circle at 70% 80%, #3a3027 0 2px, transparent 3px); background-size: 38px 31px, 47px 43px; }
-.sheet[data-medium="carving"] .sheet-head h2, .sheet[data-medium="carving"] .frame-title { font-family: 'Pixelify Sans', monospace; letter-spacing: .06em; }
+.sheet[data-medium="carving"] .sheet-head h2, .sheet[data-medium="carving"] .frame-title { letter-spacing: .06em; }
 .sheet[data-medium="tablet"] { background-image: repeating-linear-gradient(0deg, transparent 0 22px, #bf9f72 22px 24px); }
 .sheet[data-medium="tablet"] .post { letter-spacing: .02em; }
 .sheet[data-medium="scroll"] { background-image: repeating-linear-gradient(90deg, transparent 0 5px, #dccb97 5px 6px), repeating-linear-gradient(0deg, transparent 0 9px, #e9d9a8 9px 10px); }
-.sheet[data-medium="scroll"], .sheet[data-medium="broadsheet"], .sheet[data-medium="newspaper"] { font-family: Georgia, 'Times New Roman', serif; }
 .sheet[data-medium="broadsheet"] .post { border-style: double; border-width: 3px; }
 .sheet[data-medium="newspaper"] .post { border-radius: 0; border-width: 0 0 1px; }
 .sheet[data-medium="broadcast"] { background-image: repeating-linear-gradient(0deg, transparent 0 2px, #132845 2px 3px); }
 .sheet[data-medium="broadcast"] .post { border-left: 6px solid var(--m-accent); }
 .sheet[data-medium="social"] .post { border-radius: 12px; }
 .sheet[data-medium="holo"] { background-image: linear-gradient(#1f1749 1px, transparent 1px), linear-gradient(90deg, #1f1749 1px, transparent 1px); background-size: 24px 24px; }
-.sheet[data-medium="holo"] .sheet-head h2, .sheet[data-medium="holo"] .frame-title { font-family: 'Pixelify Sans', monospace; }
 .sheet[data-medium] .sheet-head .sub, .sheet[data-medium] .sub { color: var(--m-muted); }
 
 /* round 10: the nation's tabs on one swipeable row (ARIA tabs), with edge fades */
@@ -421,3 +419,21 @@ p, li, .footnote { line-height: 1.45; }
 .icon-btn[aria-pressed=true] { border-color: var(--brass); box-shadow: inset 0 0 0 1px var(--brass); }
 .sheet[data-medium] .icon-btn[aria-pressed=true] { border-color: var(--m-accent); box-shadow: inset 0 0 0 1px var(--m-accent); }
 .tabs.swipe button:focus-visible { outline-offset: -4px; } /* the scrolling row would clip an outside outline */
+
+/* round 10, Task 11: era typography. Display faces for headings only; a readable body face for everything you read. */
+.sheet[data-medium], .sheet[data-medium] p, .sheet[data-medium] li, .sheet[data-medium] .muted, .sheet[data-medium] .post, .sheet[data-medium] .filters button, .sheet[data-medium] .tabs button, .sheet[data-medium] .frame-chip, .sheet[data-medium] .frame-side { font-family: var(--m-body); }
+.sheet[data-medium] .sheet-head h2, .sheet[data-medium] .frame-title, .sheet[data-medium] .post-headline, .sheet[data-medium] .frame-side h4 { font-family: var(--m-display); font-weight: 600; letter-spacing: .01em; }
+.sheet[data-medium] .post-text { font-size: 16px; line-height: 1.5; }
+.sheet[data-medium] .sheet-head h2 { font-size: 21px; }
+.sheet[data-medium="scroll"] .sheet-head h2, .sheet[data-medium="scroll"] .frame-title, .sheet[data-medium="scroll"] .post-headline { font-weight: 400; letter-spacing: .02em; }
+.sheet[data-medium="newspaper"] .frame-title { font-family: 'UnifrakturMaguntia', serif; font-weight: 400; font-size: 30px; }
+.sheet[data-medium="newspaper"] .post-headline { font-weight: 700; }
+.sheet[data-medium="broadcast"] .sheet-head h2, .sheet[data-medium="broadcast"] .frame-title, .sheet[data-medium="broadcast"] .post-headline { text-transform: uppercase; letter-spacing: .04em; font-weight: 500; }
+.sheet[data-medium="holo"] .sheet-head h2, .sheet[data-medium="holo"] .frame-title { letter-spacing: .06em; font-size: 18px; }
+.sheet[data-medium="tablet"] .sheet-head h2, .sheet[data-medium="tablet"] .frame-title { letter-spacing: .05em; }
+
+/* round 10: names are read in full. Sheet titles wrap to two lines instead of '…'; stat values wrap. */
+.sheet-head h2 { white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.15; }
+.stat-tile .v { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; }
+.sheet[data-medium] .sheet-head h2 { font-size: 19px; }
+.sheet[data-medium="scroll"] .post-text, .sheet[data-medium="tablet"] .post-text { font-style: normal; }

@@ -266,14 +266,15 @@ export function drawPostcard(canvas: HTMLCanvasElement, snap: CitySnapshot): voi
   // frame line, caption and stamp
   ctx.strokeStyle = '#2b2620'; ctx.lineWidth = 1; ctx.strokeRect(px + 0.5, py + 0.5, pw - 1, ph - 1);
   ctx.fillStyle = '#2b2620';
-  ctx.font = snap.tier <= 3 ? 'italic 18px Georgia, serif' : snap.tier <= 5 ? 'bold 18px Georgia, serif' : 'bold 18px system-ui, sans-serif';
+  // round 10: the postcard's lettering follows its era (manuscript, then letterpress, then modern print)
+  ctx.font = snap.tier <= 3 ? '19px "Uncial Antiqua", serif' : snap.tier <= 5 ? 'bold 18px "Old Standard TT", serif' : '500 19px "Oswald", sans-serif';
   ctx.fillText(`Greetings from ${snap.name}!`, 14, H - 26);
-  ctx.font = '11px system-ui, sans-serif';
+  ctx.font = '11px "Atkinson Hyperlegible", sans-serif';
   ctx.fillText(`${snap.civName} · year ${snap.year} · ${snap.pop.toLocaleString('en-US')} people`, 14, H - 10);
   ctx.fillStyle = '#fff'; ctx.fillRect(W - 58, H - 46, 46, 38);
   ctx.strokeStyle = '#a33'; ctx.setLineDash([2, 2]); ctx.strokeRect(W - 58.5, H - 46.5, 47, 39); ctx.setLineDash([]);
   ctx.drawImage(flagCanvas({ color: snap.color, emblem: snap.emblem }), W - 53, H - 42, 36, 24);
-  ctx.fillStyle = '#a33'; ctx.font = 'bold 9px system-ui, sans-serif'; ctx.fillText(String(snap.year), W - 50, H - 11);
+  ctx.fillStyle = '#a33'; ctx.font = 'bold 9px "Atkinson Hyperlegible", sans-serif'; ctx.fillText(String(snap.year), W - 50, H - 11);
 }
 
 export type AerialStyle = 'survey' | 'film-bw' | 'film' | 'satellite';
@@ -343,7 +344,16 @@ export function drawAerial(canvas: HTMLCanvasElement, sim: Sim, atlas: Atlas, s:
     for (let g = 0; g < sizePx; g += 40) { ctx.beginPath(); ctx.moveTo(g, 0); ctx.lineTo(g, sizePx); ctx.moveTo(0, g); ctx.lineTo(sizePx, g); ctx.stroke(); }
   }
   ctx.fillStyle = style === 'survey' ? '#3a2410' : '#ffffff';
-  ctx.font = style === 'survey' ? 'italic 12px Georgia, serif' : '11px system-ui, monospace';
+  ctx.font = style === 'survey' ? 'italic 13px "IM Fell English", serif' : style === 'satellite' ? '11px "Pixelify Sans", monospace' : '11px "Atkinson Hyperlegible", sans-serif';
   const label = { survey: `Survey of ${s.name}, year ${sim.year}`, 'film-bw': `Aerial photograph · ${s.name} · ${sim.year}`, film: `Aerial photograph · ${s.name} · ${sim.year}`, satellite: `SAT ${s.name.toUpperCase()} · Y${sim.year} · ${s.x},${s.y}` }[style];
   ctx.fillText(label, 8, sizePx - 8);
+}
+
+/** Round 10: the faces the photos letter with. Canvas text does not wait for web fonts, so callers await this
+ *  once before drawing (it resolves at once when the faces are already loaded, and never rejects). */
+export const PHOTO_FONTS = ['19px "Uncial Antiqua"', 'bold 18px "Old Standard TT"', '500 19px "Oswald"', '11px "Atkinson Hyperlegible"', 'italic 13px "IM Fell English"', '11px "Pixelify Sans"'];
+export function photoFontsReady(): Promise<unknown> {
+  const fonts = typeof document !== 'undefined' ? document.fonts : undefined;
+  if (!fonts?.load) return Promise.resolve();
+  return Promise.all(PHOTO_FONTS.map((f) => fonts.load(f).catch(() => null)));
 }

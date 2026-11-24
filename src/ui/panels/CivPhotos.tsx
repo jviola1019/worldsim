@@ -3,7 +3,7 @@ import type { Simulation } from '../../sim/simulation';
 import type { Civ } from '../../sim/types';
 import { getAtlas } from '../shared';
 import { albumCities, snapshotCity, type CitySnapshot } from '../../history/album';
-import { drawAerial, drawPostcard, aerialStyle } from '../../rendering/photos';
+import { drawAerial, drawPostcard, aerialStyle, photoFontsReady } from '../../rendering/photos';
 
 /** Save a canvas as a PNG file (generated locally; nothing leaves the device). */
 function savePng(canvas: HTMLCanvasElement | null, name: string): void {
@@ -21,7 +21,8 @@ function savePng(canvas: HTMLCanvasElement | null, name: string): void {
 
 function Postcard({ snap, label }: { snap: CitySnapshot; label?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => { if (ref.current) drawPostcard(ref.current, snap); }, [snap]);
+  // draw now, and again once the era's lettering has loaded (canvas text does not wait for web fonts)
+  useEffect(() => { if (ref.current) drawPostcard(ref.current, snap); let live = true; photoFontsReady().then(() => { if (live && ref.current) drawPostcard(ref.current, snap); }); return () => { live = false; }; }, [snap]);
   return (
     <figure class="photo">
       <canvas ref={ref} class="postcard" role="img" aria-label={`Postcard of ${snap.name}, year ${snap.year}`} />
@@ -48,6 +49,9 @@ export function CityPictures({ sim, civ }: { sim: Simulation; civ: Civ }) {
     if (!s || !aerial.current) return;
     const style = aerialStyle(civ.era, (civ.techs['flight']?.adoption ?? 0) >= 0.3, (civ.techs['satellites']?.adoption ?? 0) >= 0.3);
     drawAerial(aerial.current, sim, getAtlas(), s, style);
+    let live = true;
+    photoFontsReady().then(() => { if (live && aerial.current) drawAerial(aerial.current, sim, getAtlas(), s, style); });
+    return () => { live = false; };
   }, [s?.id, sim.year]);
   if (!s || !snap) return null;
   return (

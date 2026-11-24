@@ -17,3 +17,15 @@ export const MEDIUM_THEME: Record<Medium, Record<MediumToken, string>> = {
   social: { surface: '#f5f7fb', ink: '#14213d', muted: '#4b5872', accent: '#2459d6', line: '#7a869c', chip: '#e4e9f3', chipInk: '#14213d', focus: '#2459d6', card: '#ffffff', cardInk: '#14213d' },
   holo: { surface: '#1a1240', ink: '#b8f3ff', muted: '#9fc6e0', accent: '#ff8ad8', line: '#6a5fb0', chip: '#2a2160', chipInk: '#b8f3ff', focus: '#ff8ad8', card: '#221a52', cardInk: '#b8f3ff' },
 };
+
+/** Round 10, Task 11: each medium's display face (headings, masthead) and readable body face. All bundled (main.tsx). */
+export const MEDIUM_FONTS: Record<Medium, { display: string; body: string }> = {
+  carving: { display: "'Pixelify Sans', monospace", body: "'Pixelify Sans', monospace" },
+  tablet: { display: "'Cinzel', serif", body: "'Alegreya', serif" },
+  scroll: { display: "'Uncial Antiqua', serif", body: "'Alegreya', serif" },
+  broadsheet: { display: "'IM Fell English', serif", body: "'IM Fell English', serif" },
+  newspaper: { display: "'Old Standard TT', serif", body: "'Old Standard TT', serif" },
+  broadcast: { display: "'Oswald', sans-serif", body: "'Atkinson Hyperlegible', sans-serif" },
+  social: { display: "'Atkinson Hyperlegible', sans-serif", body: "'Atkinson Hyperlegible', sans-serif" },
+  holo: { display: "'Orbitron', sans-serif", body: "'Atkinson Hyperlegible', sans-serif" },
+};

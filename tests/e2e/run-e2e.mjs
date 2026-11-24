@@ -44,7 +44,7 @@ async function run(label, ctxOpts) {
   // round 10: an honest count, wandering bands are tribes, not nations
   const hud0 = (await page.locator('.world-card').innerText()).replace(/\n/g, ' | ');
   // a band may already have settled in the first months, so a nation is fine; most peoples still wander as tribes
-  const m0 = hud0.match(/(\d+) nations?/), t0 = hud0.match(/(\d+) tribes?/);
+  const m0 = hud0.match(/(\d+)\s+nations?/), t0 = hud0.match(/(\d+)\s+tribes?/);
   check(`${label}: HUD counts tribes at year 0`, !!t0 && Number(t0[1]) > Number(m0?.[1] ?? 0), hud0);
   const yearOf = async () => Number((await page.locator('.world-card .year').innerText()).replace(/\D/g, ''));
   const y0 = await yearOf();

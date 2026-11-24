@@ -24,8 +24,16 @@
     "a11y": "node tests/e2e/run-a11y.mjs"
   },
   "dependencies": {
+    "@fontsource/alegreya": "5.3.0",
     "@fontsource/atkinson-hyperlegible": "5.3.0",
+    "@fontsource/cinzel": "5.3.0",
+    "@fontsource/im-fell-english": "5.3.0",
+    "@fontsource/old-standard-tt": "5.3.0",
+    "@fontsource/orbitron": "5.3.0",
+    "@fontsource/oswald": "5.3.0",
     "@fontsource/pixelify-sans": "5.3.0",
+    "@fontsource/uncial-antiqua": "5.3.0",
+    "@fontsource/unifrakturmaguntia": "5.3.0",
     "preact": "11.2.0"
   },
   "devDependencies": {

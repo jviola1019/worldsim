@@ -1,16 +1,16 @@
 {
- "generated": "2026-11-20",
+ "generated": "2026-11-24",
  "totals": {
   "srcFiles": 146,
-  "srcLines": 42529,
-  "testFiles": 47,
-  "testCases": 347
+  "srcLines": 42570,
+  "testFiles": 48,
+  "testCases": 350
  },
  "folders": [
   {
    "name": "rendering",
    "files": 30,
-   "lines": 18548,
+   "lines": 18558,
    "deps": {
     "sim": 13,
     "world": 10,
@@ -26,7 +26,7 @@
   {
    "name": "ui",
    "files": 24,
-   "lines": 3132,
+   "lines": 3148,
    "deps": {
     "sim": 37,
     "persistence": 7,
@@ -80,7 +80,7 @@
   {
    "name": "sim",
    "files": 11,
-   "lines": 2439,
+   "lines": 2441,
    "deps": {
     "civilizations": 18,
     "economy": 7,
@@ -316,7 +316,7 @@
   {
    "name": "(root)",
    "files": 1,
-   "lines": 24,
+   "lines": 37,
    "deps": {
     "ui": 1,
     "security": 1
@@ -563,7 +563,7 @@
   {
    "path": "src/main.tsx",
    "folder": "(root)",
-   "lines": 24,
+   "lines": 37,
    "about": ""
   },
   {
@@ -881,7 +881,7 @@
   {
    "path": "src/rendering/photos.ts",
    "folder": "rendering",
-   "lines": 350,
+   "lines": 360,
    "about": "City pictures. POSTCARD: a street-level skyline drawn ONLY from a layout record (history/album.ts): every column of the city from west to east, its tallest building behind and its nearest building in front, in the style of the era the building was built in (th"
   },
   {
@@ -965,7 +965,7 @@
   {
    "path": "src/sim/peoples.ts",
    "folder": "sim",
-   "lines": 32,
+   "lines": 34,
    "about": "Round 10: who lives in the world, counted honestly."
   },
   {
@@ -1061,7 +1061,7 @@
   {
    "path": "src/ui/mediumTheme.ts",
    "folder": "ui",
-   "lines": 20,
+   "lines": 32,
    "about": "Round 10: the colours of each news medium."
   },
   {
@@ -1073,7 +1073,7 @@
   {
    "path": "src/ui/panels/CivPhotos.tsx",
    "folder": "ui",
-   "lines": 85,
+   "lines": 89,
    "about": ""
   },
   {
@@ -1414,6 +1414,11 @@
    "path": "tests/ui/flag-input.test.ts",
    "cases": 7,
    "about": ""
+  },
+  {
+   "path": "tests/ui/fonts.test.ts",
+   "cases": 3,
+   "about": "Round 10, Task 11: era typography."
   },
   {
    "path": "tests/ui/guide.test.ts",

@@ -5,6 +5,19 @@ import '@fontsource/pixelify-sans/400.css';
 import '@fontsource/pixelify-sans/600.css';
 import '@fontsource/atkinson-hyperlegible/400.css';
 import '@fontsource/atkinson-hyperlegible/700.css';
+// round 10: era typography for the news mediums and postcards (OFL, bundled; a browser downloads a face only when a medium uses it)
+import '@fontsource/cinzel/600.css';
+import '@fontsource/uncial-antiqua/400.css';
+import '@fontsource/im-fell-english/400.css';
+import '@fontsource/im-fell-english/400-italic.css';
+import '@fontsource/unifrakturmaguntia/400.css';
+import '@fontsource/old-standard-tt/400.css';
+import '@fontsource/old-standard-tt/700.css';
+import '@fontsource/oswald/500.css';
+import '@fontsource/orbitron/600.css';
+import '@fontsource/alegreya/400.css';
+import '@fontsource/alegreya/400-italic.css';
+import '@fontsource/alegreya/700.css';
 import './ui/styles.css';
 
 const root = document.getElementById('app')!;
