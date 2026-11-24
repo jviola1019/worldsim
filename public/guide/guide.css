@@ -57,7 +57,7 @@ h2 { margin: 40px 0 8px; font-size: 24px; }
 figure { margin: 0; }
 figcaption { font-weight: 600; margin-bottom: 8px; }
 .chart text { fill: var(--muted); font-size: 12px; }
-.chart .r7 { fill: var(--r7); } .chart .r8 { fill: var(--r8); }
+.chart .before { fill: var(--r7); } .chart .after { fill: var(--r8); }
 .chart .val { fill: var(--ink); font-size: 12px; }
 .chart .axis { stroke: var(--line); }
 .search { display: block; margin: 8px 0 12px; }

@@ -5,7 +5,7 @@
 // food short and warming at year 1,000. Then the means across worlds.
 import { readFileSync, existsSync, writeFileSync } from 'node:fs';
 
-const [bDir, bPre, nDir, nPre, jsonOut] = process.argv.slice(2); // optional 5th argument: write the per-world figures as JSON
+const [bDir, bPre, nDir, nPre, jsonOut, beforeLabel, afterLabel] = process.argv.slice(2); // optional: JSON out, then the two round labels
 const WORLDS = ['modern-1', 'modern-2', 'modern-3', 'realistic-1'];
 
 function parse(file) {
@@ -50,6 +50,7 @@ for (const r of rows) {
 const mean = (k, side) => rows.reduce((a, r) => a + r[side][k], 0) / Math.max(1, rows.length);
 console.log(`\nMeans over ${rows.length} worlds: unemployment ${mean('unemp', 'b').toFixed(1)}% → ${mean('unemp', 'n').toFixed(1)}%, warming ${mean('warm', 'b').toFixed(2)} → ${mean('warm', 'n').toFixed(2)} °C`);
 if (jsonOut) {
-  const worlds = rows.map((r) => ({ world: r.w, r7: { unemp: Math.round(r.b.unemp * 10) / 10, warm: r.b.warm }, r8: { unemp: Math.round(r.n.unemp * 10) / 10, warm: r.n.warm }, worstShift: r.worst }));
-  writeFileSync(jsonOut, JSON.stringify({ note: `Measured with scripts/modernization.ts (4 natural histories, 1,000 years each, 128², no god powers); compared by tools/balance-compare.mjs. Milestone years shift by at most ${Math.max(...rows.map((r) => Math.abs(r.worst[1]))).toFixed(1)}%.`, worlds }, null, 1));
+  const worlds = rows.map((r) => ({ world: r.w, before: { unemp: Math.round(r.b.unemp * 10) / 10, warm: r.b.warm }, after: { unemp: Math.round(r.n.unemp * 10) / 10, warm: r.n.warm }, worstShift: r.worst }));
+  const labels = { before: beforeLabel ?? 'before', after: afterLabel ?? 'after' };
+  writeFileSync(jsonOut, JSON.stringify({ labels, note: `Measured with scripts/modernization.ts (4 natural histories, 1,000 years each, 128², no god powers); compared by tools/balance-compare.mjs. Milestone years shift by at most ${Math.max(...rows.map((r) => Math.abs(r.worst[1]))).toFixed(1)}%.`, worlds }, null, 1));
 }

@@ -182,31 +182,31 @@ function timeline() {
   show(0);
 }
 
-/** Paired bars: round 7 against round 8, per world. */
-function bars(svgId, rows, key, unit) {
+/** Paired bars: the round before against the latest round, per world (labels come with the data). */
+function bars(svgId, rows, key, unit, labels) {
   const svg = $(svgId);
   svg.classList.add('chart');
   const W = 340, H = 220, L = 34, B = 30, T = 20;
-  const max = Math.max(...rows.flatMap((r) => [r.r7[key], r.r8[key]])) * 1.15;
+  const max = Math.max(...rows.flatMap((r) => [r.before[key], r.after[key]])) * 1.15;
   const y = (v) => H - B - (v / max) * (H - B - T);
   svg.append(el('svg:line', { x1: L, y1: H - B, x2: W - 6, y2: H - B, class: 'axis' }));
   const gw = (W - L - 10) / rows.length;
   rows.forEach((r, k) => {
     const x0 = L + k * gw + 8;
-    for (const [j, side] of [[0, 'r7'], [1, 'r8']]) {
+    for (const [j, side] of [[0, 'before'], [1, 'after']]) {
       const v = r[side][key];
       const x = x0 + j * ((gw - 16) / 2);
       const w = (gw - 20) / 2;
       const rect = el('svg:rect', { x, y: y(v), width: w, height: H - B - y(v), class: side, rx: 3 });
-      rect.append(el('svg:title', {}, `${r.world}, round ${side === 'r7' ? 7 : 8}: ${v}${unit}`));
+      rect.append(el('svg:title', {}, `${r.world}, ${labels[side]}: ${v}${unit}`));
       svg.append(rect);
       svg.append(el('svg:text', { x: x + w / 2, y: y(v) - 4, 'text-anchor': 'middle', class: 'val' }, `${Math.round(v * 10) / 10}${unit}`));
     }
     svg.append(el('svg:text', { x: x0 + (gw - 16) / 2, y: H - 10, 'text-anchor': 'middle' }, r.world));
   });
   const lg = el('svg:g');
-  lg.append(el('svg:rect', { x: L, y: 2, width: 10, height: 10, class: 'r7' }), el('svg:text', { x: L + 14, y: 11 }, 'round 7'));
-  lg.append(el('svg:rect', { x: L + 80, y: 2, width: 10, height: 10, class: 'r8' }), el('svg:text', { x: L + 94, y: 11 }, 'round 8'));
+  lg.append(el('svg:rect', { x: L, y: 2, width: 10, height: 10, class: 'before' }), el('svg:text', { x: L + 14, y: 11 }, labels.before));
+  lg.append(el('svg:rect', { x: L + 80, y: 2, width: 10, height: 10, class: 'after' }), el('svg:text', { x: L + 94, y: 11 }, labels.after));
   svg.append(lg);
 }
 
@@ -241,8 +241,8 @@ function fileList(f) {
   timeline();
   try {
     const b = await load('balance.json');
-    bars('chart-unemp', b.worlds, 'unemp', '%');
-    bars('chart-warm', b.worlds, 'warm', '°');
+    bars('chart-unemp', b.worlds, 'unemp', '%', b.labels);
+    bars('chart-warm', b.worlds, 'warm', '°', b.labels);
     $('balnote').textContent = b.note;
   } catch (e) {
     $('balnote').textContent = `Could not load balance.json (${e.message}).`;

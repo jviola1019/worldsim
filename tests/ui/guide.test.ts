@@ -28,9 +28,12 @@ describe('the code guide page', () => {
     for (const f of src) expect(listed.has(f), f).toBe(true);
   });
 
-  it('the balance chart data covers the four natural histories with both rounds', () => {
+  it('the balance chart data covers the four natural histories, the latest round against the one before', () => {
     const b = JSON.parse(readFileSync('public/guide/balance.json', 'utf8'));
+    expect(b.labels).toEqual({ before: 'round 9', after: 'round 10' }); // round 10: was stuck at rounds 7 and 8
     expect(b.worlds.map((w: { world: string }) => w.world)).toEqual(['modern-1', 'modern-2', 'modern-3', 'realistic-1']);
-    for (const w of b.worlds) for (const r of [w.r7, w.r8]) { expect(Number.isFinite(r.unemp)).toBe(true); expect(Number.isFinite(r.warm)).toBe(true); }
+    for (const w of b.worlds) for (const r of [w.before, w.after]) { expect(Number.isFinite(r.unemp)).toBe(true); expect(Number.isFinite(r.warm)).toBe(true); }
+    const html = readFileSync('public/guide/index.html', 'utf8');
+    expect(html).not.toMatch(/round 7 against round 8/);
   });
 });

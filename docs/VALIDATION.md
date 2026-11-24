@@ -6,6 +6,62 @@
 | Environment | Cloud container: 4 vCPU Intel Xeon @ 2.10 GHz, 15 GB RAM, Node 22.23.4, Playwright 1.63 with Chromium (and, since round 9, WebKit; no Firefox), Linux. **Not** a phone. |
 | Commands | `npm ci`, `npm run typecheck`, `npm test`, `npm run build`, `npm run e2e`, `node tools/viewports.mjs`, `npm run bench -- <size> <years>`, `npm run stats -- <seeds> <years> <size>`. Probe scripts are listed under each section. |
 
+## R10. Round 10: honest nation count, Realistic sandbox, Slow pace, medium-themed feed, accessibility, game-mode audit (2026-11-24)
+
+**Environment:** the same cloud container: Chromium and WebKit through Playwright, **not** a phone and **not** a screen reader. Plan and spec: [`superpowers/plans/2026-11-20-round10.md`](superpowers/plans/2026-11-20-round10.md). Raw outputs: [`docs/data/round10/`](data/round10/). Design and accessibility findings: [DESIGN-REVIEW §R10](DESIGN-REVIEW.md).
+
+### Gate
+
+*(Pending: the final gate runs after the measurement batch.)*
+
+### Nation count
+
+The top-left card counted wandering bands as nations: year 0 of a primitive world read "5 nations", and one nation read "1 people".
+- A nation now needs at least one settlement; a people that only wanders is a **tribe**.
+- The HUD, the Nations list and Statistics all use one helper, `countPeoples`.
+- Numbers stay with their word when the line wraps.
+- **Tests:** `peoples.test.ts`, plus e2e checks of the HUD at year 0 and at 320 px.
+
+### Realistic, Observer and Pace
+
+- **Realistic** is now a grounded sandbox. It starts with an empty Earth-like world at year 0, with wildlife. You can place humans, place real animals, shape the land and trigger natural disasters, and every other power is refused (`powerSets.test.ts`). It runs at Slow pace.
+- **Observer** keeps the old hands-off Realistic exactly. Before the history-level fixes below, its 1,000-year run reproduced round 9 byte for byte.
+- **Slow pace** places a band of 24 humans next to fresh water on an empty 128² world (`scripts/pace-calibrate.ts`, 5 seeds, final code):
+
+*(Pending: three of five worlds are still running; finished so far: first village at years 42–156 in all five, first city at years 860 and 1,023.)*
+
+### Game-mode audit (`scripts/mode-audit.ts`, 3 worlds per mode, 128²)
+
+Each preset's and scenario's description and objectives were turned into measurable promises. Six modes failed at first. Each cause was measured before it was fixed (`systematic-debugging`; diagnostics in the round ledger):
+
+| Cause | Modes affected | Fix | Test |
+|---|---|---|---|
+| Developed starts came out one era low: start-era techs were granted at about 34%, against the 35% era threshold | Kingdoms, Industrializing, Modern | Top up with techs whose prerequisites are known | `startEra.test.ts` |
+| Atomic-age worlds began with no diplomatic past: every pair neutral, so no alliance or organization in 100 years | Modern, Standoff | Like-minded nations start friendly with defensive pacts, the most different cold; an organization from era 10. The Standoff goal counts only organizations founded during play | `startDiplomacy.test.ts` |
+| Monsters regained 2% of their health a month even while fighting, more than any town dealt | Realms of Legend | Healing only away from a fight; damage = defence × 0.5 | `monsters.test.ts` |
+| The explorer agent existed, but nothing launched one, so nations across water never met | Island Realms | Sailing nations explore by sea | `explorers.test.ts` |
+| Trade took the land path whenever one existed, however long | Island Realms | Ports ship by sea, over water only, when the voyage is cheaper | `explorers.test.ts` |
+| Island Realms started before currency; Space Race's colony goal needed era-14 tech centuries away | Islands, Space Race | Start in era 3 and era 13 | `promises.test.ts` |
+
+*(Pending: the final audit table on the final code.)*
+
+### Balance against round 9 (`tools/balance-compare.mjs docs/data/round9 final- docs/data/round10 final-`)
+
+The fixes above change history in every world: explorers create contact, ports ship by sea, and modern starts have a diplomatic past. The owner decided to accept the shift and document it, and to re-tune only if something became unrealistic. Nothing did: food is never short.
+
+| World | Milestones in both | Worst shift | Unemployment 700–1,000 | Food short | Warming (y1000) | Population (y1000) |
+|---|---|---|---|---|---|---|
+| modern-1 | 12 (Spacefaring no longer reached by y1000) | Near Future +9.4% | 10% → 11% | 0% → 0% | 6.75 → 5.66 °C | 5.26M → 4.71M (−10%) |
+| modern-2 | 11 (Advanced Future no longer reached) | Near Future +10.2% | 10% → 5% | 0% → 0% | 6.60 → 7.66 °C | 5.08M → 3.80M (−25%) |
+| modern-3 | 11 | Digital −13.1% | 13% → 13% | 0% → 0% | 5.87 → 5.76 °C | 3.08M → 2.67M (−13%) |
+| realistic-1 (Observer) | 12 | Iron & Classical −6.3% | 12% → 14% | 0% → 0% | 5.35 → 6.90 °C | 5.70M → 6.18M (+8%) |
+
+**Means:** unemployment 11.3% → 10.8%; warming 6.14 → 6.49 °C.
+
+**About modern-2's −25%:** it ran hotter (7.66 °C; 38 sea-level events against 22; disaster deaths 233k against 125k; 31% more drought). Its leading nation peaked at 1.36M around year 800 and fell to 0.94M as modern fertility declined. Food was never short. This is a harsher history, not a broken one.
+
+*(Pending: 20 seeds × 600 years.)*
+
 ## R9. Round 9: device-labelled saves, WorldBox-style close zoom, follow camera, warming, unemployment, WebKit (2026-11-19)
 
 Environment: the same cloud container. Since this round it also has **WebKit** (Playwright's build of Safari's engine), installed for the e2e. This is still emulation, **not** a physical iPhone or Mac. Plan: [`superpowers/plans/2026-11-19-round9.md`](superpowers/plans/2026-11-19-round9.md). Raw outputs are in [`docs/data/round9/`](data/round9/).
