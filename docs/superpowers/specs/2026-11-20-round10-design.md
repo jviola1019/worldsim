@@ -188,3 +188,30 @@ These would make the round a failure even if everything technically works:
 - Standard-pace modernization outputs identical to round 9. Slow calibration table recorded in VALIDATION §R10.
 - The game-mode audit table completed. Every remaining mode has its promise test, and removals are documented.
 - Code review of the whole diff, with findings fixed. Then the docs (VALIDATION, STATUS, GUIDE, README, SECURITY for the new dependency), push, and the standing to-dos: Actions, Pages, live site and packages.
+
+## Addendum (2026-11-24): era typography (user request)
+
+**Request:** "Change that font too, it looks generic, for the 'Kingdom of Khuith' panel along with anywhere else it is. Make it fit the theme." The user also asked for fitting themes, different fonts, good spacing and readability.
+
+**Finding:** three groups of text fall back to generic system fonts.
+- **Georgia:** the scroll, broadsheet and newspaper sheets (heading, tabs, posts), and the canvas postcards and aerial photos.
+- **The system font:** the social and hologram mediums.
+- **A missing blackletter:** the newspaper masthead names `UnifrakturMaguntia`, which was never bundled, so it falls back to Georgia too.
+
+**Design (my call):** each medium gets a display face for headings and a readable body face. All fonts are OFL @fontsource packages bundled by Vite (the CSP stays `'self'`). They are declared in CSS, so a browser downloads a font only when a medium actually uses it.
+
+| Medium | Display (headings, masthead, tabs) | Body (posts, lists) | Why |
+|---|---|---|---|
+| carving | Pixelify Sans (game face) | Pixelify Sans | scratched pixel marks |
+| tablet | Cinzel (inscriptional capitals) | Alegreya | carved inscription; calligraphic, very legible body |
+| scroll | Uncial Antiqua (manuscript uncials) | Alegreya | medieval scriptorium |
+| broadsheet | IM Fell English (17th-century Fell types) | IM Fell English | the early printing house |
+| newspaper | UnifrakturMaguntia, masthead only; Old Standard TT for headlines | Old Standard TT | the 19th-century front page |
+| broadcast | Oswald (condensed lower-third caps) | Atkinson Hyperlegible | TV graphics |
+| social | Atkinson Hyperlegible | Atkinson Hyperlegible | the app UI |
+| holo | Orbitron (sparingly, headings) | Atkinson Hyperlegible | the future interface |
+
+**Rules:**
+- Decorative faces are used for headings only. Body text uses a readable face at 15–16 px with line-height ≥ 1.45.
+- Canvas text (postcards, aerial photos) uses the era's face and waits for it to load before drawing.
+- **Guard test:** every family named in CSS or canvas code is either bundled (imported in `main.tsx`) or a generic fallback. This stops a never-bundled font from coming back unnoticed.
