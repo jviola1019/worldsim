@@ -60,7 +60,10 @@ The fixes above change history in every world: explorers create contact, ports s
 
 **About modern-2's −25%:** it ran hotter (7.66 °C; 38 sea-level events against 22; disaster deaths 233k against 125k; 31% more drought). Its leading nation peaked at 1.36M around year 800 and fell to 0.94M as modern fertility declined. Food was never short. This is a harsher history, not a broken one.
 
-*(Pending: 20 seeds × 600 years.)*
+**20 seeds × 600 years** (`docs/data/round10/multi-seed-20x600.txt`):
+- the population ledger, finite values and the GDP identity hold in **20/20**;
+- medians, round 9 → round 10: surviving nations 6 → 8, wars 70 → 81, population 1.27M → 1.35M, highest era 7 → 7. More contact between peoples means more nations meet, trade and fight;
+- speed: median 25 → 32 ms per year. Both rounds shared the CPU with other simulations (here 3 calibration runs and 4 history runs), so the timing comparison is rough. Exploration adds one sea pathfind per voyage.
 
 ## R9. Round 9: device-labelled saves, WorldBox-style close zoom, follow camera, warming, unemployment, WebKit (2026-11-19)
 

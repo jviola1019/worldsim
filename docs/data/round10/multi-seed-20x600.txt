@@ -4,3 +4,35 @@
 {"seed":3,"maxEra":7,"agriYear":178,"alive":9,"fallen":7,"wars":105,"warsEnded":105,"annexEvents":14,"religions":27,"pop":1322644,"notables":815,"msPerYear":33.6,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
 {"seed":4,"maxEra":7,"agriYear":170,"alive":6,"fallen":0,"wars":50,"warsEnded":49,"annexEvents":0,"religions":19,"pop":1378603,"notables":574,"msPerYear":27.5,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
 {"seed":5,"maxEra":7,"agriYear":192,"alive":8,"fallen":4,"wars":47,"warsEnded":47,"annexEvents":6,"religions":11,"pop":1410298,"notables":533,"msPerYear":26.3,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":6,"maxEra":7,"agriYear":163,"alive":5,"fallen":4,"wars":94,"warsEnded":94,"annexEvents":7,"religions":15,"pop":1469414,"notables":665,"msPerYear":32.1,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":7,"maxEra":7,"agriYear":181,"alive":7,"fallen":2,"wars":75,"warsEnded":75,"annexEvents":4,"religions":22,"pop":973990,"notables":669,"msPerYear":36.4,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":8,"maxEra":7,"agriYear":181,"alive":5,"fallen":1,"wars":79,"warsEnded":79,"annexEvents":2,"religions":16,"pop":1383397,"notables":679,"msPerYear":32.4,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":9,"maxEra":7,"agriYear":188,"alive":7,"fallen":1,"wars":89,"warsEnded":88,"annexEvents":2,"religions":17,"pop":1577157,"notables":617,"msPerYear":27.7,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":10,"maxEra":7,"agriYear":190,"alive":7,"fallen":2,"wars":71,"warsEnded":71,"annexEvents":4,"religions":16,"pop":1684206,"notables":636,"msPerYear":31.4,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":11,"maxEra":7,"agriYear":192,"alive":8,"fallen":0,"wars":104,"warsEnded":104,"annexEvents":0,"religions":15,"pop":1354680,"notables":696,"msPerYear":29.7,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":12,"maxEra":7,"agriYear":163,"alive":6,"fallen":2,"wars":53,"warsEnded":53,"annexEvents":3,"religions":12,"pop":1278613,"notables":571,"msPerYear":31.8,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":13,"maxEra":7,"agriYear":163,"alive":10,"fallen":0,"wars":75,"warsEnded":75,"annexEvents":0,"religions":11,"pop":1366250,"notables":721,"msPerYear":31.9,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":14,"maxEra":7,"agriYear":173,"alive":9,"fallen":12,"wars":89,"warsEnded":86,"annexEvents":23,"religions":29,"pop":1043649,"notables":753,"msPerYear":31.9,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":15,"maxEra":6,"agriYear":178,"alive":6,"fallen":2,"wars":68,"warsEnded":68,"annexEvents":4,"religions":25,"pop":584363,"notables":602,"msPerYear":25.2,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":16,"maxEra":6,"agriYear":181,"alive":8,"fallen":7,"wars":95,"warsEnded":95,"annexEvents":13,"religions":11,"pop":1028829,"notables":645,"msPerYear":28.2,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":17,"maxEra":7,"agriYear":192,"alive":5,"fallen":1,"wars":82,"warsEnded":81,"annexEvents":2,"religions":15,"pop":1749853,"notables":640,"msPerYear":32,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":18,"maxEra":7,"agriYear":154,"alive":9,"fallen":2,"wars":61,"warsEnded":61,"annexEvents":4,"religions":11,"pop":1332896,"notables":682,"msPerYear":39.3,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+{"seed":19,"maxEra":6,"agriYear":181,"alive":9,"fallen":6,"wars":81,"warsEnded":80,"annexEvents":12,"religions":18,"pop":945515,"notables":686,"msPerYear":30.5,"ledgerOk":1,"finiteOk":1,"gdpOk":1}
+
+metric          min      median   max
+maxEra                6        7        7
+agriYear            149      178      192
+alive                 5        8       10
+fallen                0        2       12
+wars                 47       81      105
+warsEnded            47       80      105
+annexEvents           0        4       23
+religions            11       16       33
+pop              584363  1354680  1749853
+notables            533      670      815
+msPerYear          25.2     31.9       43
+ledgerOk              1        1        1
+finiteOk              1        1        1
+gdpOk                 1        1        1
+
+highest era per seed: Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Early Industrial, Renaissance & Exploration, Renaissance & Exploration, Early Industrial, Early Industrial, Renaissance & Exploration
