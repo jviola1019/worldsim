@@ -9,7 +9,18 @@
 - Docs must be honest: no invented benchmarks or test runs, and emulation is not physical-device testing.
 
 ## Current plan
-Round 9 is **done** (2026-11-19): device-labelled saves (`persistence/device.ts`), WorldBox-style close zoom (`rendering/closeup.ts`), follow camera and favourites, power urgency and clean-power bonus, elder-care jobs, and WebKit e2e (`BROWSER=webkit npm run e2e`; also in CI). Plan: `docs/superpowers/plans/2026-11-19-round9.md`. Results: `docs/VALIDATION.md` §R9; data in `docs/data/round9/`.
+Round 10 (2026-11-20 to 24) covers:
+- **Honest nation count** (`sim/peoples.ts`): bands are tribes; a nation needs a settlement.
+- **Realistic grounded sandbox:** power sets in `powers/powerSet.ts`; empty start; Slow pace in `sim/pace.ts`.
+- **Observer preset:** the old hands-off mode.
+- **Medium-themed feed:** `ui/mediumTheme.ts`, with era fonts and one scroll.
+- **Swipeable nation tabs.**
+- **Accessibility audit:** `npm run a11y`, axe-core, also in CI.
+- **Game-mode audit:** `scripts/mode-audit.ts`. Its fixes: developed starts in the right era, monsters slayable, explorers, sea routes, a diplomatic past, Islands era 3 and Space Race era 13.
+
+Plan: `docs/superpowers/plans/2026-11-20-round10.md` (spec in `docs/superpowers/specs/`). Ledger: `.superpowers/sdd/2026-11-20-round10/progress.md` (git-ignored; read it first after a restart). Results: VALIDATION §R10 and DESIGN-REVIEW §R10.
+
+Round 9 (done, 2026-11-19): device-labelled saves (`persistence/device.ts`), WorldBox-style close zoom (`rendering/closeup.ts`), follow camera and favourites, power urgency and clean-power bonus, elder-care jobs, and WebKit e2e (`BROWSER=webkit npm run e2e`; also in CI). Plan: `docs/superpowers/plans/2026-11-19-round9.md`. Results: `docs/VALIDATION.md` §R9; data in `docs/data/round9/`.
 
 Round 8 (also done) covered:
 - public-service jobs;
