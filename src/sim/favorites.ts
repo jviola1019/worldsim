@@ -30,7 +30,14 @@ export function toggleFavorite(w: WorldState, kind: Favorite['kind'], id: number
 export function favoritePosition(w: WorldState, f: Favorite): { x: number; y: number } | null {
   switch (f.kind) {
     case 'settlement': { const s = w.settlements.get(f.id); return s ? { x: s.x, y: s.y } : null; }
-    case 'civ': { const c = w.civs.get(f.id); const s = c?.alive ? w.settlements.get(c.capital) : undefined; return s ? { x: s.x, y: s.y } : null; }
+    case 'civ': {
+      const c = w.civs.get(f.id);
+      if (!c?.alive) return null;
+      const s = w.settlements.get(c.capital);
+      if (s) return { x: s.x, y: s.y };
+      const b = c.bands.length ? w.bands.get(c.bands[0]) : undefined; // round 10: a tribe is followed at its band
+      return b ? { x: Math.floor(b.x), y: Math.floor(b.y) } : null;
+    }
     case 'army': { const a = w.armies.get(f.id); return a ? { x: a.x, y: a.y } : null; }
     case 'band': { const b = w.bands.get(f.id); return b ? { x: b.x, y: b.y } : null; }
     case 'herd': { const h = w.herds.get(f.id); return h ? { x: h.x, y: h.y } : null; }

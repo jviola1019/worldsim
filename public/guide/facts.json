@@ -2,9 +2,9 @@
  "generated": "2026-11-24",
  "totals": {
   "srcFiles": 146,
-  "srcLines": 42678,
+  "srcLines": 42726,
   "testFiles": 53,
-  "testCases": 361
+  "testCases": 366
  },
  "folders": [
   {
@@ -67,7 +67,7 @@
   {
    "name": "sim",
    "files": 11,
-   "lines": 2538,
+   "lines": 2554,
    "deps": {
     "culture": 5,
     "population": 9,
@@ -77,7 +77,7 @@
     "technology": 9,
     "config": 6,
     "ecology": 4,
-    "world": 11,
+    "world": 12,
     "history": 5,
     "core": 9,
     "military": 2,
@@ -89,7 +89,7 @@
   {
    "name": "world",
    "files": 8,
-   "lines": 2468,
+   "lines": 2490,
    "deps": {
     "sim": 7,
     "core": 12,
@@ -120,7 +120,7 @@
   {
    "name": "economy",
    "files": 6,
-   "lines": 1523,
+   "lines": 1532,
    "deps": {
     "sim": 12,
     "world": 7,
@@ -316,7 +316,7 @@
   {
    "name": "(root)",
    "files": 1,
-   "lines": 37,
+   "lines": 38,
    "deps": {
     "ui": 1,
     "security": 1
@@ -497,7 +497,7 @@
   {
    "path": "src/economy/trade.ts",
    "folder": "economy",
-   "lines": 236,
+   "lines": 245,
    "about": "Transport networks & trade (yearly)."
   },
   {
@@ -563,7 +563,7 @@
   {
    "path": "src/main.tsx",
    "folder": "(root)",
-   "lines": 37,
+   "lines": 38,
    "about": ""
   },
   {
@@ -923,13 +923,13 @@
   {
    "path": "src/sim/bootstrap.ts",
    "folder": "sim",
-   "lines": 403,
+   "lines": 410,
    "about": "Seeding a new world: wildlife, optional fantasy monsters, and starting peoples."
   },
   {
    "path": "src/sim/civYearly.ts",
    "folder": "sim",
-   "lines": 249,
+   "lines": 251,
    "about": "The yearly cycle of a civilization: census, research & adoption, national economy, politics, diplomacy, military, infrastructure, space, expansion and domestication."
   },
   {
@@ -947,7 +947,7 @@
   {
    "path": "src/sim/favorites.ts",
    "folder": "sim",
-   "lines": 54,
+   "lines": 61,
    "about": "Round 9: the player's favourites (places, nations, people, armies, bands, herds), kept with the world in meta.favorites so they travel with the save."
   },
   {
@@ -1181,7 +1181,7 @@
   {
    "path": "src/world/pathfinding.ts",
    "folder": "world",
-   "lines": 114,
+   "lines": 136,
    "about": "A* pathfinding on the tile grid."
   },
   {
@@ -1322,7 +1322,7 @@
   },
   {
    "path": "tests/persistence/device.test.ts",
-   "cases": 7,
+   "cases": 8,
    "about": "Round 9: saves are accounted to the device that made them."
   },
   {
@@ -1337,7 +1337,7 @@
   },
   {
    "path": "tests/politics/startDiplomacy.test.ts",
-   "cases": 2,
+   "cases": 4,
    "about": "Round 10 (mode audit): developed worlds start with a diplomatic past."
   },
   {
@@ -1347,7 +1347,7 @@
   },
   {
    "path": "tests/population/explorers.test.ts",
-   "cases": 2,
+   "cases": 4,
    "about": "Round 10 (mode audit): seafaring nations send explorers."
   },
   {

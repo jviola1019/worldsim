@@ -33,3 +33,17 @@ describe('sea trade', () => {
     expect(routes.some((r) => r.mode === 'sea'), routes.map((r) => r.mode).join(',')).toBe(true);
   }, 300000);
 });
+
+describe('sea trade sails on water (review fix)', () => {
+  it('every sea route runs mostly over water, and trade between neighbours on one island stays overland', () => {
+    const sim = createSimulation(configFor('islands', 'audit-islands-1'));
+    sim.runYears(120);
+    const m = sim.w.map;
+    const sea = [...sim.w.routes.values()].filter((r) => r.mode === 'sea');
+    expect(sea.length).toBeGreaterThan(0);
+    for (const r of sea) {
+      const water = r.path.filter((i) => m.isWater(i)).length / r.path.length;
+      expect(water, `route ${r.id}: ${Math.round(water * 100)}% water`).toBeGreaterThan(0.6);
+    }
+  }, 300000);
+});

@@ -17,7 +17,7 @@
  */
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement, TradeRoute } from '../sim/types';
-import { findPath } from '../world/pathfinding';
+import { findPath, voyagePath } from '../world/pathfinding';
 import { GOOD_COUNT, Good, GOODS } from '../world/resources';
 import { clamp, saturate } from '../core/math';
 import { markTile } from '../sim/context';
@@ -152,7 +152,8 @@ export function tradeYearly(sim: Sim): Map<number, { exp: number; imp: number }>
     if (sea) {
       // round 10 (mode audit): ports ship by sea whenever the voyage is cheaper than the land detour (shipping
       // costs SEA_COST of land per tile, as in the route cost below), not only when no land path exists
-      const voyage = findPath(m, m.idx(sa.x, sa.y), m.idx(sb.x, sb.y), { mode: 'any', maxNodes: 20000, deepOk: Math.min(a.caps.navalTier, b.caps.navalTier) >= 4 });
+      // a real voyage: water only, between the two ports (deep ocean needs naval tier 4)
+      const voyage = voyagePath(m, m.idx(sa.x, sa.y), m.idx(sb.x, sb.y), Math.min(a.caps.navalTier, b.caps.navalTier) >= 4);
       if (voyage && (!path || voyage.length * SEA_COST < path.length)) {
         path = voyage;
         mode = 'sea';

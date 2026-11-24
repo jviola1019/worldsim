@@ -3,6 +3,7 @@
  * economy, politics, diplomacy, military, infrastructure, space, expansion
  * and domestication. Order is fixed for determinism.
  */
+import { voyagePath } from '../world/pathfinding';
 import { BALANCE } from '../config/balance';
 import type { Sim } from './context';
 import type { Civ, Settlement } from './types';
@@ -69,8 +70,8 @@ export function civYearly(sim: Sim, civ: Civ): void {
   researchYearly(sim, civ);
   civEconomyYearly(sim, civ, civ.tradeExp ?? 0, civ.tradeImp ?? 0);
   politicsYearly(sim, civ);
-  exploreYearly(sim, civ);
   if (!civ.alive) return;
+  exploreYearly(sim, civ);
   diplomacyYearly(sim, civ);
   militaryYearly(sim, civ);
   if (!civ.alive) return;
@@ -243,6 +244,7 @@ function exploreYearly(sim: Sim, civ: Civ): void {
     const y = clamp(Math.round(s.y + Math.sin(ang) * r), 1, m.h - 2);
     const i = m.idx(x, y);
     if (!m.isLand(i) || !m.isCoastal(i) || isKnown(sim, civ.id, i)) continue;
-    if (spawnAgent(sim, 'explorer', civ.id, s.x, s.y, x, y, { sea: true, from: s.id })) return;
+    const path = voyagePath(m, m.idx(s.x, s.y), i, civ.caps.navalTier >= 4, 12000); // over water; deep ocean needs naval tier 4
+    if (path && spawnAgent(sim, 'explorer', civ.id, s.x, s.y, x, y, { path, from: s.id })) return;
   }
 }

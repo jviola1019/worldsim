@@ -81,3 +81,12 @@ describe('saves carry their device history', () => {
     expect(groups[0].slots.map((s) => s.slot)).toEqual(['b', 'c']); // saves from before device labels were made here
   });
 });
+
+describe('following a tribe (review fix)', () => {
+  it('a nation with no settlements yet is followed at its band', () => {
+    const sim = makeSim('fav-tribe', 48, (c) => { c.settings.startEra = 1; c.settings.startCivs = 2; });
+    const civ = [...sim.w.civs.values()].find((c) => c.alive && !c.settlements.length && c.bands.length)!;
+    const band = sim.w.bands.get(civ.bands[0])!;
+    expect(favoritePosition(sim.w, { kind: 'civ', id: civ.id, label: civ.name })).toEqual({ x: Math.floor(band.x), y: Math.floor(band.y) });
+  });
+});

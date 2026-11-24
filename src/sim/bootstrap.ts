@@ -9,7 +9,7 @@
 import { makeName } from '../culture/language';
 import { phonOfCulture } from '../population/persons';
 import { makeTreaty } from '../politics/diplomacy';
-import { ensureRelation } from '../civilizations/knowledge';
+import { ensureRelation, getRelation } from '../civilizations/knowledge';
 import type { IntlOrg } from './types';
 import { eraToTier } from '../civilizations/buildingTypes';
 import { BUILDINGS } from '../civilizations/buildings';
@@ -394,9 +394,16 @@ function seedDiplomaticPast(sim: Sim): void {
   const hub = [...friends.entries()].sort((x, y) => y[1].length - x[1].length)[0];
   if (!hub || hub[1].length < 2) return;
   const founder = w.civs.get(hub[0])!;
+  // members must not be cold to anyone already in (a hub's friends can dislike each other)
+  const members = [founder.id];
+  for (const id of hub[1]) {
+    if (members.length >= 7) break;
+    if (members.every((m) => (getRelation(sim, m, id)?.opinion ?? 0) > -20)) members.push(id);
+  }
+  if (members.length < 3) return;
   const phon = phonOfCulture(sim, founder.cultureId);
   const word = phon ? makeName(rng, phon, 'word') : 'Concord';
-  const org: IntlOrg = { id: ++w.ids.org, name: `${word} ${rng.pick(['Treaty Organization', 'Pact', 'Alliance', 'Compact'])}`, kind: 'alliance', founded: w.meta.startYear, founder: founder.id, members: [founder.id, ...hub[1].slice(0, 6)] };
+  const org: IntlOrg = { id: ++w.ids.org, name: `${word} ${rng.pick(['Treaty Organization', 'Pact', 'Alliance', 'Compact'])}`, kind: 'alliance', founded: w.meta.startYear, founder: founder.id, members };
   w.orgs.set(org.id, org);
   logEvent(sim, { type: 'org_founded', cat: 'diplomacy', title: `The ${org.name} binds ${org.members.length} nations in mutual defence`, civs: org.members, importance: 3 });
 }

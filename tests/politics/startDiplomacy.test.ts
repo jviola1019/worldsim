@@ -29,3 +29,27 @@ describe('developed starts have a diplomatic past', () => {
     expect(sim.w.orgs.size).toBe(0);
   });
 });
+
+describe('scenario objectives are not pre-completed (review fix)', () => {
+  it('The Long Standoff: the start-of-world treaty organization does not count as "an organization is founded"', async () => {
+    const { configFor } = await import('../../scripts/mode-audit');
+    const { createSimulation } = await import('../../src/sim/bootstrap');
+    const { scenarioObjectives } = await import('../../src/scenarios/scenarios');
+    const org = scenarioObjectives('standoff').find((o) => o.id === 'org')!;
+    expect(org.check(createSimulation(configFor('standoff', 'audit-standoff-0')))).toBe(false); // nothing done at year 0
+    const bloc = makeSim('dip-a', 128, (c) => { c.settings.startEra = 10; c.settings.startCivs = 8; });
+    expect(bloc.w.orgs.size).toBeGreaterThan(0); // a world that starts with a seeded bloc
+    expect(org.check(bloc)).toBe(false); // …which is not "founded" during play
+  });
+
+  it('the seeded organization binds only nations that are not cold to one another', () => {
+    for (const seed of ['dip-a', 'dip-b', 'dip-d']) {
+      const sim = makeSim(seed, 128, (c) => { c.settings.startEra = 10; c.settings.startCivs = 8; });
+      for (const o of sim.w.orgs.values()) for (const a of o.members) for (const b of o.members) {
+        if (a >= b) continue;
+        const r = [...sim.w.relations.values()].find((x) => (x.a === a && x.b === b) || (x.a === b && x.b === a));
+        expect(r ? r.opinion : 0, `${seed}: ${a}-${b}`).toBeGreaterThan(-20);
+      }
+    }
+  });
+});

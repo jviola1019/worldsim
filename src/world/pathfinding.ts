@@ -111,3 +111,25 @@ export function pathCost(map: TileMap, path: number[], o: PathOpts): number {
   for (let k = 1; k < path.length; k++) c += tileCost(map, path[k], o);
   return c;
 }
+
+/** Round 10: the nearest water tile within 2 tiles of (x, y), where a port's ships leave from; -1 if none. */
+export function portTile(map: TileMap, x: number, y: number): number {
+  let best = -1, bd = 99;
+  for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+    const px = x + dx, py = y + dy;
+    if (!map.inBounds(px, py)) continue;
+    const i = map.idx(px, py);
+    const d = dx * dx + dy * dy;
+    if (map.isWater(i) && d < bd) { bd = d; best = i; }
+  }
+  return best;
+}
+
+/** Round 10: a ship's path between two coastal land tiles: over water only (deep ocean needs deepOk), with the
+ *  two shore tiles at its ends; null if no voyage exists. */
+export function voyagePath(map: TileMap, from: number, to: number, deepOk: boolean, maxNodes = 20000): number[] | null {
+  const a = portTile(map, map.xOf(from), map.yOf(from)), b = portTile(map, map.xOf(to), map.yOf(to));
+  if (a < 0 || b < 0) return null;
+  const sea = findPath(map, a, b, { mode: 'sea', maxNodes, deepOk });
+  return sea ? [from, ...sea, to] : null;
+}
