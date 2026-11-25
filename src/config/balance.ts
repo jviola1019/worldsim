@@ -77,6 +77,8 @@ export const BALANCE = {
   slowSettleDelayYears: 30,
   /** [C] Slow pace: after the delay, a band's settle chance ramps up linearly over N years (removes year-14 villages; VALIDATION §R10). */
   slowSettleRampYears: 60,
+  /** [C] Slow pace, population pressure: each crowding point (another band within 6 tiles; a village within 5 counts 2) raises the settle chance by this fraction. Without it bands kept splitting and one world held 83,000 individual foragers by year 400, more than a save can hold (VALIDATION §R10 addendum). */
+  slowPressureSettle: 0.5,
 
   // ---------------- demography (bands)
   /** [S] Members below which a band dissolves into its neighbours. */

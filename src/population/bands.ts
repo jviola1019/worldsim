@@ -125,6 +125,18 @@ function crowding(sim: Sim, b: Band, x: number, y: number): number {
   return c;
 }
 
+/**
+ * The pace part of a band's settle chance (exactly 1 at Standard pace). Slow pace: rarer settling (paceMult), none in
+ * the lineage's first slowSettleDelayYears on new land, then a linear ramp; round 10 addendum: population pressure,
+ * so crowding by other bands and villages nearby raises it (as foraging land fills, settling becomes the better choice).
+ */
+export function slowSettleFactor(sim: Sim, b: Band): number {
+  const st = sim.w.meta.settings;
+  if (st.pace !== 'slow') return 1;
+  const ramp = clamp((sim.year - b.founded - BALANCE.slowSettleDelayYears) / BALANCE.slowSettleRampYears, 0, 1);
+  return paceMult(st, 'settle') * ramp * (1 + BALANCE.slowPressureSettle * crowding(sim, b, b.x, b.y));
+}
+
 const qScratch = new Float64Array(17);
 
 /** Monthly band life (staggered by band id). */
@@ -172,11 +184,9 @@ function bandYearly(sim: Sim, b: Band, civ: Civ, cap: number, size: number): voi
   // settle: farmers put down roots where there is water to drink and irrigate (a river or lake, or a
   // coast to fish); dry spots are passed over while the band keeps moving toward water
   const water = m.hasFreshWater(i) ? 1 : m.isCoastal(i) ? 0.7 : 0.15;
-  // round 10, Slow pace: rarer settling, and only after the band has learned the land for a while
-  // round 10 addendum: no permanent camp in a band's first slowSettleDelayYears on new land, then a linear ramp (a lucky
-  // draw let a pace-b band settle at year 27 after the new wildlife changed its history)
-  const ramp = w.meta.settings.pace === 'slow' ? clamp((sim.year - b.founded - BALANCE.slowSettleDelayYears) / BALANCE.slowSettleRampYears, 0, 1) : 1;
-  const pSettle = ((0.03 + 0.15 * richness) * (0.5 + 0.5 * water) + (civ.caps.farming > 0 ? 0.5 * water : 0)) * paceMult(w.meta.settings, 'settle') * ramp;
+  // round 10, Slow pace: rarer settling, only after the band has learned the land, and more likely as the land fills
+  // (slowSettleFactor; a lucky draw let a pace-b band settle at year 27 before the delay existed)
+  const pSettle = ((0.03 + 0.15 * richness) * (0.5 + 0.5 * water) + (civ.caps.farming > 0 ? 0.5 * water : 0)) * slowSettleFactor(sim, b);
   if (size >= 12 && !m.settle[i] && !isWaterTerrain(m.terrain[i]) && TERRAIN[m.terrain[i]].buildable && rng.float() < pSettle) {
     const s = foundSettlement(sim, civ, Math.floor(b.x), Math.floor(b.y), { members: b.members, species: b.species, cultureId: b.cultureId, religionId: b.religionId, cause: civ.caps.farming > 0 ? 'Agriculture made permanent settlement possible' : 'Rich foraging grounds encouraged a permanent camp' });
     s.food = b.food;
@@ -204,7 +214,7 @@ function bandYearly(sim: Sim, b: Band, civ: Civ, cap: number, size: number): voi
       culture.originCiv = target.id;
     }
     transfer(sim, civ.id, target.id, leaving.length);
-    const nb: Band = { ...b, id: ++w.ids.band, civId: target.id, members: leaving, food: b.food * 0.4, tx: tx + 0.5, ty: ty + 0.5, cultureId: target.cultureId, languageId: target.languageId, founded: sim.year };
+    const nb: Band = { ...b, id: ++w.ids.band, civId: target.id, members: leaving, food: b.food * 0.4, tx: tx + 0.5, ty: ty + 0.5, cultureId: target.cultureId, languageId: target.languageId, founded: b.founded }; // round 10 addendum: keeps the lineage's arrival year (each split used to restart the Slow settle delay, so fast-splitting bands never settled)
     b.food *= 0.6;
     w.bands.set(nb.id, nb);
     target.bands.push(nb.id);
