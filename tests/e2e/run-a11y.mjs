@@ -22,6 +22,9 @@ const minor = [];
 const check = (name, ok, info = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${info ? ' — ' + info : ''}`); };
 
 async function audit(page, label) {
+  // measure the settled page: an entrance animation (sheets fade in over 200 ms) would read as low contrast
+  // on a slower machine (seen on CI: the Laws sheet was audited mid-fade)
+  await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => null))));
   await page.evaluate(AXE);
   const r = await page.evaluate((tags) => window.axe.run(document, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] }), TAGS);
   const bad = r.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
