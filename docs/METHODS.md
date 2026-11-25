@@ -14,6 +14,7 @@ EPOCH is a **stylized simulation, not a forecasting model**. Its experiments est
 | **Same seed and settings, same history** | Only `sim.rng` (a seeded PRNG whose state is saved) may influence history. Rendering uses a stateless hash (`hash3`); `Math.random` is confined to cosmetic UI code. | `tests/sim/determinism*.test.ts`; static guard in `tests/security/hardening.test.ts` |
 | **A loaded save continues the identical history** | The full state, including the RNG state, is serialized (`persistence/serialize.ts`) | Save/reload round-trip tests (e.g. `tests/sim/pace.test.ts`) |
 | **Standard settings are unchanged by optional features** | Optional levers are applied as `x * 1` on the standard path, with no extra random draws (e.g. `paceMult` returns exactly 1) | `pace.test.ts` (standard = 1); byte-identical balance-run diffs when a change claims to be neutral |
+| **An interrupted long run resumes identically** (round 10 addendum) | `scripts/lib/checkpoint.ts` saves the world through the save format (RNG synced first, written atomically) every 100 years; `pace-calibrate`, `modernization` and `events-audit` resume from it | `tests/scripts/checkpoint.test.ts`; resumed and uninterrupted outputs compared byte for byte |
 | **Invariants hold every year** | The population ledger balances (births − deaths ± migration); every state value is finite; GDP = C + I + G + NX | `scripts/multi-seed.ts` (fields `ledgerOk`, `finiteOk`, `gdpOk`); unit tests |
 
 **Provenance:** each round's raw outputs live in `docs/data/roundN/`, written by the scripts below at the commit recorded in that round's VALIDATION section. The session ledger records the exact commit of each measurement batch.
@@ -55,7 +56,19 @@ A calibrated value is fitted to **the simulation's own behaviour**, not to real-
 ### 2.5 Promise audits (product claims)
 `scripts/mode-audit.ts` turns each game mode's description and objectives into measurable promises and runs **3 worlds per mode** to its horizon. A failure triggers root-cause analysis (instrumented probes, recorded in the ledger) before any fix. `tests/modes/promises.test.ts` keeps the start-of-world promises under test.
 
-### 2.6 Interface measurements
+### 2.6 Life audit (round 10 addendum: placed life reproduces where it could live)
+`npx tsx scripts/life-audit.ts 3 100 96` places, by hand:
+- one band of 24 humans in every land biome on the map;
+- every real animal once in its home biome and once at a hostile site (temperature at least 8 °C outside its range, in a biome it does not live in).
+
+Three seeds, 100 years each. Each drop goes on land that is naturally that biome, so its climate comes with it. The worlds are otherwise empty, so the counts measure only what was placed. Predators are the exception: they are dropped into the same map **with** its natural wildlife, at the home tile with the most prey of their realm, because a predator in an empty world starves anywhere.
+
+**Expectations are written in the script header before any run.** The one revision after the first run is stated there: "moved" (walking off a harsh drop site) counts as a realistic outcome. The growth expectations were not changed. Verdicts: grows (×1.25 or more), holds, declines (under ×0.8), dies, or moved. Data: `docs/data/round10/life-audit.txt`.
+
+### 2.7 Events audit (round 10 addendum: every technically possible event)
+`npx tsx scripts/events-audit.ts 6 300 96 11` runs six developed worlds under Realistic rules: the Realistic preset, starting in era 11 with six nations. It counts every event type, natural disaster, logged catastrophe and civ ending. Realistic endings that never occurred are listed as "possible, not observed"; that is not evidence they cannot happen. Fictional endings must be absent. Disaster counts are per world-year. They are compared with whole-Earth frequencies only as orders of magnitude ([research notes](data/round10/research-notes.md) §3), because a world map is a continent-scale region and the regional-disaster rate is stylized. Data: `docs/data/round10/events-audit.txt`.
+
+### 2.8 Interface measurements
 - **Accessibility:** `npm run a11y`. axe-core with the WCAG 2.2 A/AA rules runs on the settled page, after entrance animations finish, in Chromium and WebKit. It adds scripted checks of keyboard focus, Escape, reflow at 320 px and text spacing. The colour tokens are verified arithmetically by `tests/ui/mediumTheme.test.ts`.
 - **Design floors:** `tools/viewports.mjs` and `tools/design-capture.mjs` check text size, touch targets and contrast.
 
@@ -71,7 +84,7 @@ A calibrated value is fitted to **the simulation's own behaviour**, not to real-
 
 | Area | What is modelled | What is not |
 |---|---|---|
-| Wildlife | Predator–prey dynamics (Lotka–Volterra style); people hunt animals | Wild animals attacking people (worldwide this is small next to disease, famine and war) |
+| Wildlife | Predator–prey dynamics (Lotka–Volterra style; round 10 addendum: capped, sustainable predation, packs hunt over 5 tiles); people hunt animals | Wild animals attacking people (worldwide this is small next to disease, famine and war); ambush predation (crocodiles chase like wolves, and fail in the life audit); herd counts are population units, not headcounts, so predator-to-prey ratios are stylized |
 | "Monsters" | Fantasy creatures and god-only horrors, only where fantasy or god mode allows | Real-world equivalents are modelled as other systems: dangerous wildlife (above), rogue AI (the "AI takeover" ending), nuclear war (blast, fallout, radiation sickness, nuclear winter). **Mutants are not modelled**: radiation causes illness, not new creatures |
 | Climate | CO₂, lagged warming, sea level, a finite feedback store, policy response | Grid storage; efficiency-driven demand reduction; carbon removal |
 | Economy | Physical goods, labour, prices, GDP identity, automation, public jobs | Finance and credit cycles beyond debt and inflation |
@@ -87,6 +100,8 @@ A calibrated value is fitted to **the simulation's own behaviour**, not to real-
    npx tsx scripts/multi-seed.ts 20 600 96
    npx tsx scripts/pace-calibrate.ts 1600 slow
    npx tsx scripts/mode-audit.ts all 3
+   npx tsx scripts/life-audit.ts 3 100 96
+   CHECKPOINT=<dir> npx tsx scripts/events-audit.ts 6 300 96 11
    node tools/balance-compare.mjs docs/data/<prev> final- <your output dir> final-
    ```
 3. Outputs should match `docs/data/roundN/` byte for byte, apart from the wall-clock seconds on each file's first line.

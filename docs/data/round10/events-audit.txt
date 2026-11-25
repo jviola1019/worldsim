@@ -1,0 +1,91 @@
+events audit · 6 worlds × 300 years · 96² · Realistic rules from era 11 (Digital) with 6 nations
+  events-0: highest era Digital · nations alive 6 · monsters 0 · events 3371
+  events-1: highest era Digital · nations alive 5 · monsters 0 · events 2606
+  events-2: highest era Digital · nations alive 6 · monsters 0 · events 3061
+  events-3: highest era Digital · nations alive 6 · monsters 0 · events 2866
+  events-4: highest era Digital · nations alive 5 · monsters 0 · events 2636
+  events-5: highest era Digital · nations alive 5 · monsters 0 · events 2770
+
+natural disasters (no human cause), by kind:
+  An earthquake struck             54   0.0300 per world-year
+  A storm struck                   42   0.0233 per world-year
+
+catastrophes logged (world/endings log; the log keeps the last 200 per world):
+  geomagnetic_storm                31   0.0172 per world-year
+  vei7                              1   0.0006 per world-year
+  airburst                          1   0.0006 per world-year
+
+how nations ended:
+  conquest                          3   0.0017 per world-year
+
+fictional endings: none
+realistic endings that did not occur in these worlds (possible, not observed): civil_war, union, assimilation, fragmentation, economic_collapse, war, nuclear_war, nuclear_winter, famine, ecological_collapse, climate_runaway, pandemic, engineered_pandemic, infertility, demographic_collapse, asteroid, supervolcano, cosmic, disaster, ai_takeover, grey_goo, dispersal
+
+all event types:
+  sports_champion                3454   1.9189 per world-year
+  sports_cup                     2183   1.2128 per world-year
+  election                       2030   1.1278 per world-year
+  leader                         1174   0.6522 per world-year
+  notable_death                  1136   0.6311 per world-year
+  outlet_founded                  815   0.4528 per world-year
+  treaty_trade                    727   0.4039 per world-year
+  construction                    697   0.3872 per world-year
+  mission_start                   467   0.2594 per world-year
+  outlet_closed                   453   0.2517 per world-year
+  world_games                     444   0.2467 per world-year
+  treaty_arms_control             366   0.2033 per world-year
+  treaty_visitors                 361   0.2006 per world-year
+  mission_failed                  312   0.1733 per world-year
+  ai_launched                     306   0.1700 per world-year
+  online_protest                  276   0.1533 per world-year
+  tech                            199   0.1106 per world-year
+  battle                          194   0.1078 per world-year
+  tech_first                      133   0.0739 per world-year
+  mission_success                 123   0.0683 per world-year
+  government_change               105   0.0583 per world-year
+  league_founded                   99   0.0550 per world-year
+  disaster                         98   0.0544 per world-year
+  ruler_death                      90   0.0500 per world-year
+  trade_disrupted                  81   0.0450 per world-year
+  trade_route                      74   0.0411 per world-year
+  ai_incident                      62   0.0344 per world-year
+  ultimatum                        60   0.0333 per world-year
+  exploration                      59   0.0328 per world-year
+  subspecies                       59   0.0328 per world-year
+  ethos_change                     55   0.0306 per world-year
+  war_declared                     51   0.0283 per world-year
+  peace                            51   0.0283 per world-year
+  sea_level                        45   0.0250 per world-year
+  religion_extinct                 39   0.0217 per world-year
+  settlement_founded               38   0.0211 per world-year
+  cyberattack                      37   0.0206 per world-year
+  geomagnetic_storm                31   0.0172 per world-year
+  schism                           31   0.0172 per world-year
+  weapon_first                     29   0.0161 per world-year
+  space_crewed                     28   0.0156 per world-year
+  nuclear_state                    27   0.0150 per world-year
+  religion_founded                 26   0.0144 per world-year
+  domestication                    25   0.0139 per world-year
+  space_first_launch               21   0.0117 per world-year
+  space_satellite                  21   0.0117 per world-year
+  financial_crisis                 20   0.0111 per world-year
+  space_station                    19   0.0106 per world-year
+  state_religion                   12   0.0067 per world-year
+  tech_lead                        10   0.0056 per world-year
+  deposit_exhausted                 7   0.0039 per world-year
+  famine                            6   0.0033 per world-year
+  org_join                          6   0.0033 per world-year
+  climate_tipping                   6   0.0033 per world-year
+  siege                             6   0.0033 per world-year
+  secularization                    4   0.0022 per world-year
+  independence                      3   0.0017 per world-year
+  civ_fell                          3   0.0017 per world-year
+  royal_marriage                    3   0.0017 per world-year
+  chemical_attack                   2   0.0011 per world-year
+  chemical_ban                      2   0.0011 per world-year
+  leapfrog                          2   0.0011 per world-year
+  culture_diverged                  2   0.0011 per world-year
+  succession_crisis                 2   0.0011 per world-year
+  great_eruption                    1   0.0006 per world-year
+  org_founded                       1   0.0006 per world-year
+  culture_blend                     1   0.0006 per world-year

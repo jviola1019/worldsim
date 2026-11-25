@@ -5,6 +5,11 @@
  *   npx tsx scripts/mode-audit.ts [modes=all] [seeds=3]       (modes: comma-separated keys)
  * Results: docs/data/round10/mode-audit.txt and VALIDATION §R10.
  */
+import { POWERS, POWER_BY_ID, applyPower } from '../src/powers/powers';
+import { powerAllowed } from '../src/powers/powerSet';
+import { TECHS } from '../src/technology/techData';
+import { techPermitted } from '../src/technology/research';
+import { SPECIES_BY_KEY } from '../src/ecology/species';
 import { defaultConfig, PRESETS, randomizeConfig, type WorldConfig } from '../src/config/laws';
 import { SCENARIOS } from '../src/scenarios/scenarios';
 import { createSimulation } from '../src/sim/bootstrap';
@@ -15,7 +20,7 @@ import { Deposit } from '../src/world/resources';
 import { countPeoples } from '../src/sim/peoples';
 
 export interface Promise { id: string; text: string; at: 'start' | 'horizon' | 'any'; check: (sim: Simulation, start: Snapshot) => boolean }
-export interface ModeSpec { key: string; kind: 'preset' | 'scenario'; horizon: number; promises: Promise[] }
+export interface ModeSpec { key: string; kind: 'preset' | 'scenario'; horizon: number; promises: Promise[]; /** Round 10 addendum: what the player does first (Realistic: drop people and animals by hand). */ setup?: (sim: Simulation) => void }
 export interface Snapshot { nations: number; tribes: number; maxEra: number; minEra: number; ruins: number; known: Map<number, Set<string>>; coal: Map<number, number> }
 
 const alive = (sim: Simulation) => [...sim.w.civs.values()].filter((c) => c.alive);
@@ -45,7 +50,46 @@ function spearman(xs: number[], ys: number[]): number {
   return 1 - (6 * d2) / (n * (n * n - 1));
 }
 
+/** No monsters, horrors, alien wildlife, fantasy peoples or exotic matter. */
+function noFiction(sim: Simulation): boolean {
+  const w = sim.w;
+  if (w.monsters.size) return false;
+  if ([...w.settlements.values()].some((x) => x.horror)) return false;
+  if ([...w.herds.values()].some((h) => SPECIES_BY_KEY[h.species]?.alien)) return false;
+  if ([...w.civs.values()].some((c) => c.species !== 'human')) return false;
+  for (let i = 0; i < w.map.n; i++) if (w.map.dep[i] === Deposit.EXOTIC) return false;
+  return true;
+}
+
+/** The player's first moves in Realistic: a band of humans by fresh water, then deer, horses and wolves nearby. */
+function dropLife(sim: Simulation): void {
+  const m = sim.w.map;
+  const ctx = { selectedCiv: 0 };
+  for (let i = 0; i < m.n; i += 7) {
+    const x = m.xOf(i), y = m.yOf(i);
+    if (!m.hasFreshWater(i) || m.isWater(i) || x < 20 || y < 20 || x > m.w - 20 || y > m.h - 20) continue;
+    if (applyPower(sim, 'spawn_human', x, y, 1, ctx) !== null) continue;
+    for (const [k, dx] of [['animal_deer', 3], ['animal_horse', -3], ['animal_wolf', 5]] as const) applyPower(sim, k, x + dx, y + 2, 1, ctx);
+    return;
+  }
+}
+
 export const MODES: ModeSpec[] = [
+  // round 10 addendum: Realistic (empty real Earth, you drop people and animals, everything science-based, nothing
+  // fictional) and Observer (the old hands-off Realistic: no powers at all)
+  { key: 'realistic', kind: 'preset', horizon: 250, setup: dropLife, promises: [
+    { id: 'empty', text: 'starts empty at year 0, with wildlife and no people', at: 'start', check: (s) => s.year === 0 && s.w.civs.size === 0 && s.w.herds.size > 0 },
+    { id: 'life_only', text: 'you can place humans and animals, and nothing else', at: 'start', check: (s) => powerAllowed(s.w.meta.settings, POWER_BY_ID.spawn_human) && powerAllowed(s.w.meta.settings, POWER_BY_ID.animal_elephant) && !['raise', 'river', 'dis_fire', 'asteroid', 'nuke', 'monster', 'tech_grant'].some((id) => powerAllowed(s.w.meta.settings, POWER_BY_ID[id])) },
+    { id: 'tech', text: 'every science-based technology is possible', at: 'start', check: (s) => TECHS.every((t) => techPermitted(s, t)) },
+    { id: 'village', text: 'the people you placed settle a village', at: 'any', check: (s) => s.w.settlements.size > 0 },
+    { id: 'real', text: 'nothing fictional ever appears', at: 'horizon', check: (s) => noFiction(s) },
+  ] },
+  { key: 'observer', kind: 'preset', horizon: 150, promises: [
+    { id: 'peoples', text: 'five peoples at the start, left to themselves', at: 'start', check: (s, st) => st.tribes + st.nations >= 5 },
+    { id: 'no_powers', text: 'no powers at all', at: 'start', check: (s) => !POWERS.some((p) => powerAllowed(s.w.meta.settings, p)) },
+    { id: 'village', text: 'villages appear', at: 'horizon', check: (s) => s.w.settlements.size > 0 },
+    { id: 'real', text: 'nothing fictional ever appears', at: 'horizon', check: (s) => noFiction(s) },
+  ] },
   { key: 'primitive', kind: 'preset', horizon: 150, promises: [
     { id: 'bands', text: 'starts with wandering bands only (no towns)', at: 'start', check: (_s, st) => st.nations === 0 && st.tribes > 0 },
     { id: 'village', text: 'a first village appears', at: 'horizon', check: (s) => s.w.settlements.size > 0 },
@@ -132,8 +176,10 @@ export function configFor(key: string, seed: string): WorldConfig {
 export function auditMode(spec: ModeSpec, seed: string) {
   const sim = createSimulation(configFor(spec.key, seed));
   const st = snapshot(sim);
-  const met: Record<string, boolean> = {};
-  for (const p of spec.promises) if (p.at === 'start') met[p.id] = p.check(sim, st);
+  const startMet: Record<string, boolean> = {};
+  for (const p of spec.promises) if (p.at === 'start') startMet[p.id] = p.check(sim, st);
+  spec.setup?.(sim);
+  const met: Record<string, boolean> = { ...startMet };
   for (let y = 1; y <= spec.horizon; y++) {
     sim.runYears(1);
     for (const p of spec.promises) if (p.at === 'any' && !met[p.id] && p.check(sim, st)) met[p.id] = true;

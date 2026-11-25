@@ -167,7 +167,7 @@ Each entry gives the mechanism, its assumption, its evidence class (see [PARAMET
   - **Mechanism:** a people with at least one settlement counts as a nation; a people of wandering bands only counts as a tribe.
   - **Note:** this is a definition, not a parameter.
 - **Slow pace** [C].
-  - **Mechanism:** four multipliers (settle, research, build, births in settlements) plus a 60-year settle ramp.
+  - **Mechanism:** four multipliers (settle, research, build, births in settlements). Round 10 addendum: a band makes no permanent camp in its first 30 years on new land, then its settle chance ramps up over 60 years.
   - **Calibration target:** a first village around year 100 and a first city of 10,000 around year 1,000 after a band of 24 is placed beside fresh water.
   - **Assumption:** settling waits until people know the land, and early settled growth is slower than standard play.
   - **Limit:** calibrated to the simulation's own milestones, not to archaeological dates. Real sedentism took millennia, so Slow is still compressed.
@@ -187,6 +187,23 @@ Each entry gives the mechanism, its assumption, its evidence class (see [PARAMET
   - **Limit:** no ports-of-call network and no piracy.
 - **Monsters** (fantasy worlds only) [C].
   - **Mechanism:** a settlement deals 0.5 × defence a month to a monster at its gates (defence = garrison + 1% of people). Monsters heal only away from a fight.
+- **Realistic: real world only (addendum).**
+  - **Mechanism:** Realistic and Observer worlds can never hold fantasy peoples, monsters, god-only horrors, alien land or wildlife, or exotic matter. This is enforced when the world is created and when a save loads.
+  - **Technology:** every science-based technology is allowed in Realistic, era 15 included (superhuman AI, molecular manufacturing, megastructures, terraforming, mind uploading, antimatter drives). Whether each is achievable in reality is uncertain, but none is supernatural.
+  - **Events:** every catastrophe and ending marked realistic is driven by world laws, which Realistic opens. That covers natural disasters at natural rates, pandemics, engineered pandemics, nuclear, chemical and biological war, AI takeover and runaway nanotechnology. Only the four fictional endings (monsters, zombies, ghouls, the Blight) never happen.
+  - **The player:** places only humans and real animals; nature and history do the rest.
+- **Species (addendum)** [E where sourced, else S].
+  - **Mechanism:** 24 real species. New this round: elephants (savanna and jungle), water buffalo (swamp), llamas (mountains; can be domesticated), seals (cold coasts).
+  - **Evidence:** maximum growth rates are set from sourced ranges where a source exists: elephant 0.07, buffalo 0.12, seals 0.10 ([research notes](data/round10/research-notes.md) §1). Others are stylized, with a plausible ordering (small, fast breeders highest).
+  - **Habitat:** home biomes count in full and other biomes at a quarter, scaled down outside the species' temperature range. Sea animals follow the same rule in water (addendum; it used to be all-or-nothing, so whales bled out in shallow water).
+- **Predators and prey (addendum)** [S].
+  - **Mechanism:** a pack hunts every herbivore herd within 5 tiles. In a month it takes at most 2% of a herd, and never more than that prey species' own monthly growth, so slow breeders are not hunted down. It needs 0.3 prey units per predator a month to be fully fed, and heads for the richest prey in country it can live in. Seeded predators start within reach of prey.
+  - **Assumption:** predators take a minority of their prey each year, and packs follow prey.
+  - **Limit:** herd counts are population units, not headcounts, so the predator-to-prey ratio (about 1 to 15) is stylized; real wolf-to-deer ratios are near 1 to 100 or lower. There is no ambush predation: crocodiles chase like wolves and mostly fail in the life audit. Predators stay rare in natural worlds.
+- **Fuel for power plants (addendum).**
+  - **Mechanism:** power buildings are staffed first and burn fuel after the month's mining, ahead of industry. They used to draw fuel before the mines produced it, so a nation could own dozens of idle fossil plants while mining coal.
+  - **Effect:** industrial energy supply, energy use and emissions now follow the plants that exist. The clean-power and electric-steel levers cut emissions in every audited warmed world over 3 years (5–38%).
+- **Start sites (addendum).** People begin beside a river, lake or sea. A dry site is taken only when the map has no wet land left (dry sites used to be accepted 30% of the time).
 - **Explicitly not modelled, and why.**
   - **Wild animals attacking people:** predators hunt herds; people hunt animals. Wild-animal deaths are small worldwide next to disease, famine and war.
   - **Mutants:** radiation causes illness, cancer and birth defects, which the fallout model represents as deaths and sickness, not new creatures.

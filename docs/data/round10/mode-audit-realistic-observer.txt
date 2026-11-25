@@ -1,0 +1,19 @@
+
+## realistic (preset, 250 years, 3 seeds)
+  empty      3/3  starts empty at year 0, with wildlife and no people
+  life_only  3/3  you can place humans and animals, and nothing else
+  tech       3/3  every science-based technology is possible
+  village    3/3  the people you placed settle a village
+  real       3/3  nothing fictional ever appears
+  seed 0: {"era":1,"nations":1,"tribes":0,"wars":0,"settlements":2,"pop":141,"year":250}
+  seed 1: {"era":1,"nations":5,"tribes":10,"wars":0,"settlements":6,"pop":3218,"year":250}
+  seed 2: {"era":1,"nations":1,"tribes":0,"wars":0,"settlements":1,"pop":25,"year":250}
+
+## observer (preset, 150 years, 3 seeds)
+  peoples    3/3  five peoples at the start, left to themselves
+  no_powers  3/3  no powers at all
+  village    3/3  villages appear
+  real       3/3  nothing fictional ever appears
+  seed 0: {"era":1,"nations":5,"tribes":0,"wars":0,"settlements":25,"pop":2653,"year":150}
+  seed 1: {"era":1,"nations":5,"tribes":0,"wars":0,"settlements":28,"pop":2417,"year":150}
+  seed 2: {"era":1,"nations":5,"tribes":0,"wars":0,"settlements":22,"pop":2386,"year":150}

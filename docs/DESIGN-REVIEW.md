@@ -67,6 +67,37 @@ Postcards and aerial photos letter in their era's face too. The rest of the game
 
 ---
 
+### Addendum (2026-11-25): the placing hand, new animals and the Realistic dock
+
+Skills used: interaction-design (trigger, rules, feedback, loops), frontend-design (pixel art), ux-copy. Captured with `node tools/hand-capture.mjs` (Chromium, 2×, emulation) and inspected by eye.
+
+**The hand (a microinteraction).**
+- **Trigger:** a tap with Humans or any animal tool. On desktop an open hand hovers over the tile under the mouse as a preview, replacing the old ring.
+- **Rules:** the placement happens on the tap. The hand is feedback only and never blocks input. A refused drop (fish on land, deer in the sea) plays no hand, and the toast says why. At most 3 hands play in one place.
+- **Feedback:** about 0.9 s.
+  1. The closed hand descends with an ease-out.
+  2. It opens, and three copies of the real sprite fall with an ease-in, as if by gravity.
+  3. They land in a dust puff.
+  4. The hand lifts and fades.
+- **Reduce motion:** one still frame (the open hand over the landed sprites); e2e checks both.
+
+**What the captures changed.**
+- The first capture showed the hover hand and the dropping hand at once, which read as clutter. The hover hand now hides while a drop plays within 2 tiles.
+- The elephant's trunk was too faint against its outline at 10×, so it now reaches the ground with a curl.
+
+**New animals.** Elephant, water buffalo, llama and seal are drawn in the existing walker style and palette. Each is checked against its nearest neighbour so it reads differently at map scale:
+- the grey elephant against the brown mammoth;
+- the llama's upright neck and no hump against the camel;
+- the low dark buffalo with crescent horns against the bison;
+- the slate seal with a pale belly against the fish.
+
+**Realistic dock.**
+- Only Peoples and Nature (24 animals) appear.
+- The note reads "Realistic: drop in people and animals. Nature does the rest."
+- On the New World screen the Fantasy toggle is disabled, with a reason linked by `aria-describedby`.
+
+Accessibility results for these screens are in VALIDATION §R10 (addendum).
+
 ## R6. Design review (round 6)
 
 **Date:** 2026-11-19

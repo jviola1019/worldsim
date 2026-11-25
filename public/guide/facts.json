@@ -2,15 +2,15 @@
  "generated": "2026-11-25",
  "totals": {
   "srcFiles": 146,
-  "srcLines": 42785,
-  "testFiles": 54,
-  "testCases": 370
+  "srcLines": 43052,
+  "testFiles": 62,
+  "testCases": 402
  },
  "folders": [
   {
    "name": "rendering",
    "files": 30,
-   "lines": 18558,
+   "lines": 18684,
    "deps": {
     "sim": 13,
     "world": 10,
@@ -26,13 +26,13 @@
   {
    "name": "ui",
    "files": 24,
-   "lines": 3148,
+   "lines": 3155,
    "deps": {
     "sim": 37,
     "persistence": 7,
     "config": 5,
     "core": 3,
-    "powers": 6,
+    "powers": 8,
     "rendering": 11,
     "history": 7,
     "scenarios": 3,
@@ -67,8 +67,9 @@
   {
    "name": "sim",
    "files": 11,
-   "lines": 2550,
+   "lines": 2591,
    "deps": {
+    "powers": 3,
     "culture": 5,
     "population": 9,
     "politics": 7,
@@ -82,8 +83,7 @@
     "core": 9,
     "military": 2,
     "future": 3,
-    "media": 1,
-    "powers": 1
+    "media": 1
    }
   },
   {
@@ -102,7 +102,7 @@
   {
    "name": "population",
    "files": 9,
-   "lines": 1620,
+   "lines": 1622,
    "deps": {
     "sim": 17,
     "world": 3,
@@ -120,7 +120,7 @@
   {
    "name": "economy",
    "files": 6,
-   "lines": 1532,
+   "lines": 1536,
    "deps": {
     "sim": 12,
     "world": 7,
@@ -154,7 +154,7 @@
   {
    "name": "powers",
    "files": 4,
-   "lines": 1205,
+   "lines": 1255,
    "deps": {
     "sim": 11,
     "core": 2,
@@ -162,7 +162,8 @@
     "history": 2,
     "civilizations": 6,
     "world": 10,
-    "ecology": 2,
+    "config": 1,
+    "ecology": 3,
     "culture": 1,
     "technology": 2,
     "politics": 3,
@@ -190,7 +191,7 @@
   {
    "name": "technology",
    "files": 4,
-   "lines": 1055,
+   "lines": 1056,
    "deps": {
     "sim": 5,
     "core": 2,
@@ -233,18 +234,20 @@
   {
    "name": "persistence",
    "files": 4,
-   "lines": 639,
+   "lines": 641,
    "deps": {
     "sim": 4,
     "config": 3,
+    "powers": 1,
     "world": 2
    }
   },
   {
    "name": "ecology",
    "files": 2,
-   "lines": 581,
+   "lines": 605,
    "deps": {
+    "powers": 1,
     "population": 2,
     "sim": 4,
     "world": 3,
@@ -263,7 +266,7 @@
   {
    "name": "config",
    "files": 2,
-   "lines": 537,
+   "lines": 547,
    "deps": {
     "sim": 1,
     "world": 3
@@ -395,13 +398,13 @@
   {
    "path": "src/config/balance.ts",
    "folder": "config",
-   "lines": 293,
+   "lines": 302,
    "about": "Balance parameters. Every gameplay coefficient lives here (not scattered as magic numbers) so it can be tuned, tested for sensitivity and adjusted at runtime from the developer panel."
   },
   {
    "path": "src/config/laws.ts",
    "folder": "config",
-   "lines": 244,
+   "lines": 245,
    "about": ""
   },
   {
@@ -467,13 +470,13 @@
   {
    "path": "src/ecology/ecology.ts",
    "folder": "ecology",
-   "lines": 493,
+   "lines": 512,
    "about": "Ecosystems: vegetation regrowth, animal herds (movement, grazing, logistic growth limited by local vegetation, predation, starvation, climate stress), human hunting, extinction, slow evolution into subspecies, and optional fantasy monsters."
   },
   {
    "path": "src/ecology/species.ts",
    "folder": "ecology",
-   "lines": 88,
+   "lines": 93,
    "about": "Animal species. Habitat suitability, diet and growth parameters are stylized; predator–prey coupling follows Lotka–Volterra-style dynamics (prey growth limited by vegetation, predators by prey encounters)."
   },
   {
@@ -491,7 +494,7 @@
   {
    "path": "src/economy/production.ts",
    "folder": "economy",
-   "lines": 798,
+   "lines": 802,
    "about": "Settlement economy (monthly): labour allocation, food, materials, industry, energy, services and household consumption — all in physical units that flow through the settlement's food store and the civilization's national market stock."
   },
   {
@@ -617,7 +620,7 @@
   {
    "path": "src/persistence/serialize.ts",
    "folder": "persistence",
-   "lines": 342,
+   "lines": 344,
    "about": "World serialization (save format v1)."
   },
   {
@@ -653,7 +656,7 @@
   {
    "path": "src/population/bands.ts",
    "folder": "population",
-   "lines": 243,
+   "lines": 245,
    "about": "Nomadic bands (individual-level hunter-gatherer groups)."
   },
   {
@@ -707,13 +710,13 @@
   {
    "path": "src/powers/powers.ts",
    "folder": "powers",
-   "lines": 925,
+   "lines": 943,
    "about": "God powers. Every power mutates simulation state (terrain, climate, people, institutions, technology, relations...) — never just a label — and is recorded in WorldState.interventions so a timeline can be reproduced."
   },
   {
    "path": "src/powers/powerSet.ts",
    "folder": "powers",
-   "lines": 21,
+   "lines": 53,
    "about": "Round 10: which god powers a world allows."
   },
   {
@@ -725,7 +728,7 @@
   {
    "path": "src/rendering/art/animals.ts",
    "folder": "rendering",
-   "lines": 479,
+   "lines": 532,
    "about": "Wild/domestic animals and fantasy monsters (ani.*, mon.*) Side view facing RIGHT (the renderer mirrors for leftward motion); flying creatures likewise."
   },
   {
@@ -767,7 +770,7 @@
   {
    "path": "src/rendering/art/effects.ts",
    "folder": "rendering",
-   "lines": 786,
+   "lines": 797,
    "about": "Fire, smoke, explosions, weather, divine/disaster effects (fx.*)"
   },
   {
@@ -893,7 +896,7 @@
   {
    "path": "src/rendering/renderer.ts",
    "folder": "rendering",
-   "lines": 905,
+   "lines": 967,
    "about": "Frame renderer. Draws (back to front): cached world chunks (or the far-zoom overview), the overlay, animated tiles (volcanoes, fires, smoke, windmills), living things and agents, traffic derived from real infrastructure and trade, effects, labels, selection an"
   },
   {
@@ -923,7 +926,7 @@
   {
    "path": "src/sim/bootstrap.ts",
    "folder": "sim",
-   "lines": 406,
+   "lines": 440,
    "about": "Seeding a new world: wildlife, optional fantasy monsters, and starting peoples."
   },
   {
@@ -935,13 +938,13 @@
   {
    "path": "src/sim/conceptFx.ts",
    "folder": "sim",
-   "lines": 228,
+   "lines": 229,
    "about": "Round 7: the one place that decides what every concept shows on the map."
   },
   {
    "path": "src/sim/context.ts",
    "folder": "sim",
-   "lines": 121,
+   "lines": 125,
    "about": "Sim: the runtime context passed to every system function."
   },
   {
@@ -983,7 +986,7 @@
   {
    "path": "src/sim/world.ts",
    "folder": "sim",
-   "lines": 69,
+   "lines": 71,
    "about": "World state creation."
   },
   {
@@ -995,7 +998,7 @@
   {
    "path": "src/technology/research.ts",
    "folder": "technology",
-   "lines": 515,
+   "lines": 516,
    "about": "Technology runtime: research, discovery, adoption, diffusion, loss."
   },
   {
@@ -1037,7 +1040,7 @@
   {
    "path": "src/ui/game/Game.tsx",
    "folder": "ui",
-   "lines": 340,
+   "lines": 342,
    "about": ""
   },
   {
@@ -1127,7 +1130,7 @@
   {
    "path": "src/ui/screens/NewWorldScreen.tsx",
    "folder": "ui",
-   "lines": 184,
+   "lines": 187,
    "about": ""
   },
   {
@@ -1151,7 +1154,7 @@
   {
    "path": "src/ui/worldFactory.ts",
    "folder": "ui",
-   "lines": 56,
+   "lines": 58,
    "about": "Create a simulation, generating geography in a Web Worker when available."
   },
   {
@@ -1261,14 +1264,34 @@
    "about": "Round 10 (mode audit): \"Realms of Legend\" promises a monster can be slain by a settlement."
   },
   {
+   "path": "tests/ecology/placedLife.test.ts",
+   "cases": 4,
+   "about": "Round 10 addendum (life audit): placed people and animals reproduce where they could live."
+  },
+  {
+   "path": "tests/ecology/predation.test.ts",
+   "cases": 8,
+   "about": "Round 10 addendum (life audit): predators coexist with their prey."
+  },
+  {
    "path": "tests/ecology/refugia.test.ts",
    "cases": 1,
    "about": ""
   },
   {
+   "path": "tests/ecology/species.test.ts",
+   "cases": 4,
+   "about": "Round 10 addendum: more real animals, every real species placeable by hand, growth rates checked against docs/data/round10/research-notes.md (sourced ranges where a source exists; stylized otherwise)."
+  },
+  {
    "path": "tests/economy/employment.test.ts",
    "cases": 4,
    "about": ""
+  },
+  {
+   "path": "tests/economy/fuelOrder.test.ts",
+   "cases": 1,
+   "about": "Integration scenarios #3, #5, #8 and #10 from the original specification (\"Integration tests\": 3 education → technology, 5 electricity → dependent industries, 8 trade interruption → dependent cities, 10 advanced technology gated by prerequisites / credible tra"
   },
   {
    "path": "tests/economy/modern.test.ts",
@@ -1326,6 +1349,11 @@
    "about": "Round 10, Task 9: every kept game mode keeps the promises its description makes (the cheap, start-of-world ones; the long ones are measured by scripts/mode-audit.ts and recorded in VALIDATION §R10)."
   },
   {
+   "path": "tests/modes/realEvents.test.ts",
+   "cases": 3,
+   "about": "Round 10 addendum (owner): \"realistic mode should include all technically possible scenarios and events\" and nothing that is not."
+  },
+  {
    "path": "tests/persistence/device.test.ts",
    "cases": 8,
    "about": "Round 9: saves are accounted to the device that made them."
@@ -1362,8 +1390,13 @@
   },
   {
    "path": "tests/powers/powerSets.test.ts",
-   "cases": 7,
+   "cases": 8,
    "about": "Round 10: worlds have a power set."
+  },
+  {
+   "path": "tests/powers/realWorld.test.ts",
+   "cases": 4,
+   "about": "Round 10 addendum: Realistic and Observer worlds contain only what could exist in the real world: no fantasy peoples or monsters, no god-only horrors, no alien land or wildlife, no exotic matter."
   },
   {
    "path": "tests/rendering/cacheFreshness.test.ts",
@@ -1391,6 +1424,11 @@
    "about": "Round 9: WorldBox-style close zoom and the round-9 simulation changes (elder care, power urgency)."
   },
   {
+   "path": "tests/rendering/hand.test.ts",
+   "cases": 4,
+   "about": "Round 10 addendum: a WorldBox-style pixel hand drops placed people and animals onto the map."
+  },
+  {
    "path": "tests/rendering/palette.test.ts",
    "cases": 4,
    "about": "Round 6: nation colour on buildings becomes an accent (muted), so cities are not one flat hue."
@@ -1404,6 +1442,11 @@
    "path": "tests/rendering/sprites.test.ts",
    "cases": 18,
    "about": ""
+  },
+  {
+   "path": "tests/scripts/checkpoint.test.ts",
+   "cases": 2,
+   "about": "Round 10 addendum: long scripts checkpoint every 100 years so a container restart cannot lose a run."
   },
   {
    "path": "tests/security/hardening.test.ts",
@@ -1472,7 +1515,7 @@
   },
   {
    "path": "tests/world/presets.test.ts",
-   "cases": 18,
+   "cases": 19,
    "about": "Map shape presets (src/world/mapShapes.ts): every shape at two sizes and two seeds must generate, hit its land range, show its signature geometry and let civilizations start."
   },
   {
@@ -1488,13 +1531,28 @@
    "about": "How often each ending and catastrophe actually happens in natural worlds (no god powers)."
   },
   {
+   "path": "scripts/events-audit.ts",
+   "lines": 89,
+   "about": "Round 10 addendum: events audit."
+  },
+  {
+   "path": "scripts/lib/checkpoint.ts",
+   "lines": 28,
+   "about": "Round 10 addendum: resumable long runs."
+  },
+  {
+   "path": "scripts/life-audit.ts",
+   "lines": 154,
+   "about": "Round 10 addendum: life audit."
+  },
+  {
    "path": "scripts/mode-audit.ts",
-   "lines": 162,
+   "lines": 208,
    "about": "Round 10: game-mode audit."
   },
   {
    "path": "scripts/modernization.ts",
-   "lines": 60,
+   "lines": 67,
    "about": "Natural-history run with NO god powers: does civilization modernize on its own, and do natural hazards happen during ordinary ticks?"
   },
   {
@@ -1504,8 +1562,18 @@
   },
   {
    "path": "scripts/pace-calibrate.ts",
-   "lines": 38,
+   "lines": 45,
    "about": "Round 10: pace calibration."
+  },
+  {
+   "path": "scripts/probe/modernpace.ts",
+   "lines": 17,
+   "about": ""
+  },
+  {
+   "path": "scripts/probe/natdrop.ts",
+   "lines": 25,
+   "about": ""
   },
   {
    "path": "scripts/run-sim.ts",
@@ -1551,6 +1619,11 @@
    "path": "tools/guide.mjs",
    "lines": 61,
    "about": "Annotated \"what's on the screen\" guide images: numbered callouts drawn over the live game at the real positions of each control (Chromium; desktop + iPhone 13 emulation)."
+  },
+  {
+   "path": "tools/hand-capture.mjs",
+   "lines": 47,
+   "about": "Round 10 addendum: capture the placing hand for the design review (descend, open and drop, landed), at 2x."
   },
   {
    "path": "tools/make-icons.ts",
