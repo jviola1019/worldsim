@@ -14,7 +14,9 @@
  *   species, with temperature at least 8 °C outside the species' range and a biome it does not live in).
  *   Predators are dropped into the same map WITH its natural wildlife, at the home-biome tile with the most
  *   prey of their realm (land or sea) within 8 tiles (a predator in an empty world starves anywhere); natural
- *   herds of the same species are subtracted.
+ *   herds of the same species are removed before the drop, so the count is the placed herd and its offspring.
+ *   (Revision 3, task 5 of the 2026-11-25 plan: the count used to subtract the natural herds' starting size, so
+ *   when natural seals died out the placed seals read as 0 while 22 to 38 of them were alive.)
  * - Verdict at the horizon, against the start: grows ≥ ×1.25 · holds ×0.8–1.25 · declines < ×0.8 · dies 0;
  *   "moved" when most survivors ended away from a harsh drop site (people and animals walk off a bad spot
  *   when they can, which is itself the realistic outcome).
@@ -138,9 +140,10 @@ for (let k = 0; k < SEEDS; k++) {
       if (site < 0) { rows.push(`n/a     ${sp.key.padEnd(14)} ${where.padEnd(22)} ${seed} (no such site on the map)`); continue; }
       const sim = clone(world);
       const x = m.xOf(site), y = m.yOf(site);
-      const before = animals(sim, sp.key); // natural herds of the same species (rare for predators) are not counted
+      // natural herds of the same species (seals, the odd crocodile) leave the clone, so only the placed lineage is counted
+      for (const h of [...sim.w.herds.values()]) if (h.species === sp.key) sim.w.herds.delete(h.id);
       if (!spawnHerd(sim, sp.key, x, y)) continue;
-      const series = runSeries(sim, () => Math.max(0, animals(sim, sp.key) - before));
+      const series = runSeries(sim, () => animals(sim, sp.key));
       let near = 0, all = 0;
       for (const h of sim.w.herds.values()) if (h.species === sp.key) { all += h.count; if (Math.hypot(h.x - x, h.y - y) <= 4) near += h.count; }
       record(sp.key, `${where} (${TERRAIN[m.terrain[site]].key.toLowerCase()} ${Math.round(m.temp[site])}°C)`, seed, series, expect, all > 0 ? near / all : 1);
