@@ -1,0 +1,63 @@
+# Slow-pace calibration on 563a06d: npx tsx scripts/pace-calibrate.ts 1600 slow pace-<seed> (CHECKPOINT set; no resumes needed)
+pace-a	year 100: largest settlement 0 · bands 2 · person records 151
+pace-a	village at 132
+pace-a	year 200: largest settlement 138 · bands 7 · person records 1004
+pace-a	year 300: largest settlement 234 · bands 15 · person records 3276
+pace-a	year 400: largest settlement 459 · bands 23 · person records 5057
+pace-a	year 500: largest settlement 808 · bands 17 · person records 6178
+pace-a	year 600: largest settlement 1789 · bands 21 · person records 6398
+pace-a	town at 616
+pace-a	year 700: largest settlement 3593 · bands 23 · person records 7125
+pace-a	year 800: largest settlement 7517 · bands 28 · person records 8927
+pace-a	slow	village 132	town 616	city 829	died -	era 4	year 829
+pace-b	village at 58
+pace-b	year 100: largest settlement 49 · bands 0 · person records 58
+pace-b	year 200: largest settlement 75 · bands 0 · person records 86
+pace-b	year 300: largest settlement 132 · bands 0 · person records 148
+pace-b	year 400: largest settlement 177 · bands 0 · person records 69
+pace-b	year 500: largest settlement 241 · bands 0 · person records 133
+pace-b	year 600: largest settlement 432 · bands 0 · person records 315
+pace-b	year 700: largest settlement 917 · bands 0 · person records 373
+pace-b	year 800: largest settlement 1945 · bands 0 · person records 113
+pace-b	town at 804
+pace-b	year 900: largest settlement 3801 · bands 0 · person records 423
+pace-b	year 1000: largest settlement 7927 · bands 0 · person records 260
+pace-b	slow	village 58	town 804	city 1035	died -	era 3	year 1035
+pace-c	village at 61
+pace-c	year 100: largest settlement 86 · bands 2 · person records 218
+pace-c	year 200: largest settlement 115 · bands 3 · person records 680
+pace-c	year 300: largest settlement 193 · bands 10 · person records 1818
+pace-c	year 400: largest settlement 287 · bands 8 · person records 2998
+pace-c	year 500: largest settlement 453 · bands 5 · person records 4547
+pace-c	year 600: largest settlement 820 · bands 8 · person records 4337
+pace-c	year 700: largest settlement 1455 · bands 14 · person records 5144
+pace-c	town at 743
+pace-c	year 800: largest settlement 2883 · bands 9 · person records 4106
+pace-c	year 900: largest settlement 4655 · bands 4 · person records 4378
+pace-c	year 1000: largest settlement 6168 · bands 0 · person records 2992
+pace-c	slow	village 61	town 743	city 1056	died -	era 5	year 1056
+pace-d	year 100: largest settlement 0 · bands 2 · person records 137
+pace-d	village at 147
+pace-d	year 200: largest settlement 173 · bands 0 · person records 452
+pace-d	year 300: largest settlement 337 · bands 0 · person records 226
+pace-d	year 400: largest settlement 470 · bands 0 · person records 471
+pace-d	year 500: largest settlement 913 · bands 0 · person records 644
+pace-d	year 600: largest settlement 1796 · bands 0 · person records 662
+pace-d	town at 612
+pace-d	year 700: largest settlement 3296 · bands 0 · person records 721
+pace-d	year 800: largest settlement 6496 · bands 0 · person records 479
+pace-d	year 900: largest settlement 6600 · bands 0 · person records 427
+pace-d	slow	village 147	town 612	city 954	died -	era 3	year 954
+pace-e	year 100: largest settlement 0 · bands 1 · person records 82
+pace-e	village at 139
+pace-e	year 200: largest settlement 116 · bands 0 · person records 218
+pace-e	year 300: largest settlement 171 · bands 0 · person records 264
+pace-e	year 400: largest settlement 249 · bands 0 · person records 380
+pace-e	year 500: largest settlement 400 · bands 0 · person records 443
+pace-e	year 600: largest settlement 558 · bands 0 · person records 308
+pace-e	year 700: largest settlement 913 · bands 0 · person records 571
+pace-e	year 800: largest settlement 1894 · bands 0 · person records 522
+pace-e	town at 808
+pace-e	year 900: largest settlement 3314 · bands 0 · person records 418
+pace-e	year 1000: largest settlement 6488 · bands 0 · person records 308
+pace-e	slow	village 139	town 808	city 1056	died -	era 3	year 1056

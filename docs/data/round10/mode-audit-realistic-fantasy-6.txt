@@ -6,11 +6,11 @@
   village    5/6  the people you placed settle a village
   real       6/6  nothing fictional ever appears
   seed 0: {"era":0,"nations":0,"tribes":0,"wars":0,"settlements":0,"pop":0,"year":250}
-  seed 1: {"era":1,"nations":6,"tribes":0,"wars":8,"settlements":13,"pop":990,"year":250}
-  seed 2: {"era":1,"nations":2,"tribes":4,"wars":1,"settlements":16,"pop":3764,"year":250}
-  seed 3: {"era":1,"nations":2,"tribes":0,"wars":1,"settlements":11,"pop":1624,"year":250}
-  seed 4: {"era":1,"nations":2,"tribes":3,"wars":0,"settlements":7,"pop":1417,"year":250}
-  seed 5: {"era":1,"nations":11,"tribes":8,"wars":12,"settlements":21,"pop":4548,"year":250}
+  seed 1: {"era":1,"nations":9,"tribes":3,"wars":10,"settlements":15,"pop":1711,"year":250}
+  seed 2: {"era":1,"nations":3,"tribes":4,"wars":1,"settlements":10,"pop":4264,"year":250}
+  seed 3: {"era":1,"nations":1,"tribes":0,"wars":0,"settlements":7,"pop":913,"year":250}
+  seed 4: {"era":1,"nations":2,"tribes":3,"wars":1,"settlements":6,"pop":1329,"year":250}
+  seed 5: {"era":1,"nations":2,"tribes":0,"wars":3,"settlements":14,"pop":2287,"year":250}
 
 ## fantasy (scenario, 200 years, 6 seeds)
   peoples    6/6  four peoples share the land

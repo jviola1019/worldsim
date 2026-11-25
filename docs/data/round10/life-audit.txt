@@ -7,7 +7,7 @@ MEETS   humans         taiga                      life-0       24     34     43 
 MEETS   humans         jungle                     life-0       24     36     52    174  grows    stayed   0%  expected grows
 n/a     humans         swamp                  life-0 (no patch of this biome on the map)
 n/a     humans         hills                  life-0 (no patch of this biome on the map)
-MEETS   humans         beach                      life-0       24     46     70    207  grows    stayed   0%  expected grows
+MEETS   humans         beach                      life-0       24     46     70    206  grows    stayed   0%  expected grows
 MEETS   humans         tundra                     life-0       24     38     58    139  moved    stayed   0%  expected holds-or-declines
 MEETS   humans         desert                     life-0       24     48     77    225  moved    stayed   0%  expected fails
 MEETS   humans         mountain                   life-0       24     35     43     95  moved    stayed   0%  expected fails
@@ -72,7 +72,7 @@ MEETS   humans         hills                      life-1       24     31     31 
 n/a     humans         beach                  life-1 (no patch of this biome on the map)
 MEETS   humans         tundra                     life-1       24     38     49     45  moved    stayed   0%  expected holds-or-declines
 MEETS   humans         desert                     life-1       24     30     47    130  moved    stayed   0%  expected fails
-MEETS   humans         mountain                   life-1       24     44     80    261  moved    stayed  21%  expected fails
+MEETS   humans         mountain                   life-1       24     44     80    269  moved    stayed   0%  expected fails
 MEETS   humans         snow                       life-1       24     44     76    253  moved    stayed   0%  expected fails
 n/a     humans         glacier                life-1 (no patch of this biome on the map)
 MEETS   deer           home (forest 15°C)         life-1       15     83    186    206  grows    stayed  38%  expected home
@@ -124,18 +124,18 @@ n/a     llama          hostile                life-1 (no such site on the map)
 MISSES  seal           home (ocean 16°C)          life-1       30     29     30     22  declines stayed   0%  expected home
 MEETS   seal           hostile (deep 26°C)        life-1       30      0      0      0  dies     stayed   0%  expected hostile
 MEETS   humans         grass                      life-2       24     28     40    125  grows    stayed  58%  expected grows
-MEETS   humans         steppe                     life-2       24     51     94    290  grows    stayed   0%  expected grows
+MEETS   humans         steppe                     life-2       24     51     94    284  grows    stayed   0%  expected grows
 n/a     humans         savanna                life-2 (no patch of this biome on the map)
 MEETS   humans         forest                     life-2       24     40     61    181  grows    stayed  62%  expected grows
-MEETS   humans         taiga                      life-2       24     43     68    197  grows    stayed   0%  expected grows
+MEETS   humans         taiga                      life-2       24     43     68    196  grows    stayed   0%  expected grows
 MEETS   humans         jungle                     life-2       24     41     99    222  grows    stayed  62%  expected grows
 n/a     humans         swamp                  life-2 (no patch of this biome on the map)
 MEETS   humans         hills                      life-2       24     43     65    164  grows    stayed   0%  expected grows
 n/a     humans         beach                  life-2 (no patch of this biome on the map)
 MEETS   humans         tundra                     life-2       24     39     59    196  moved    stayed   0%  expected holds-or-declines
-MEETS   humans         desert                     life-2       24     50     72    171  moved    stayed   0%  expected fails
+MEETS   humans         desert                     life-2       24     50     72    173  moved    stayed   0%  expected fails
 MEETS   humans         mountain                   life-2       24     48     66    169  moved    stayed   0%  expected fails
-MEETS   humans         snow                       life-2       24     46     75    201  moved    stayed   0%  expected fails
+MEETS   humans         snow                       life-2       24     46     75    192  moved    stayed   0%  expected fails
 n/a     humans         glacier                life-2 (no patch of this biome on the map)
 MEETS   deer           home (forest 9°C)          life-2       21    136    297    406  grows    stayed  23%  expected home
 MEETS   deer           hostile (mountain -30°C)   life-2       21     15     55    366  moved    stayed   0%  expected hostile

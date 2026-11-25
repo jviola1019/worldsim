@@ -181,7 +181,7 @@ Six developed worlds under Realistic rules, 300 years each, starting in era 11.
 
   - Later milestones are within about ±10%.
   - Shifts beyond ±15% occur only in early eras: modern-2 Bronze +20%; realistic-1 Bronze +17% and Iron +15%. They close by the Medieval era. They are consistent with this round's early-history changes, but not causally traced.
-  - These Standard-pace runs predate the pace fix (94d3960), which changes only Slow pace.
+  - These runs use Standard pace (the default and Observer presets). The two pace fixes (94d3960 and 563a06d) change only Slow pace; after 563a06d, a default and an Observer world were byte-identical over 250 years.
 - **20 seeds × 600 years** (`multi-seed2-20x600.txt`):
   - ledger, finite values and GDP identity hold in **20/20**;
   - medians: 8 nations alive, 93 wars, population 1.25M, era 7 everywhere;
@@ -190,7 +190,8 @@ Six developed worlds under Realistic rules, 300 years each, starting in era 11.
 #### Gate on the final code
 **Unit tests:**
 - 751/751 before the pace fix.
-- 753/753 (63 files) on the final code, after the pace fix (94d3960).
+- 753/753 (63 files) after the first pace fix (94d3960).
+- 754/754 (63 files) on the final code, after the second pace fix (563a06d).
 
 **Browsers:**
 - e2e: 106/106 in Chromium and in WebKit.
@@ -201,8 +202,22 @@ All browser testing is emulation (iPhone 13 and desktop), not a physical device 
 
 **Dependencies:** `npm outdated` reports none; `npm audit` reports 0 vulnerabilities.
 
-#### Slow pace (`scripts/pace-calibrate.ts 1600 slow`, five seeds, the final code)
-*In progress:* the five seeds are re-running on 563a06d, after the second save-size fix above. The earlier results on 94d3960 (pace-b village 58, town 804, city 1,035; pace-d 147, 615, 864; pace-e 139, 808, 1,056) were superseded because two seeds could not finish: their saves outgrew the format. The full table will replace this note.
+#### Slow pace (`scripts/pace-calibrate.ts 1600 slow`, five seeds, the final code 563a06d)
+Target (METHODS §2.4): a first village after about 100 years (every seed within 40–250) and a first city of 10,000 after about 1,000 years (600–1,600), with no band dying out. Measured on 563a06d (`docs/data/round10/pace-final.txt`), one band of 24 humans placed beside fresh water on an empty 128² world:
+
+| Seed | First village | Town of 2,000 | City of 10,000 | Era at the city | Most bands at a century mark | Most person records |
+|---|---|---|---|---|---|---|
+| pace-a | 132 | 616 | 829 | 4 | 28 (year 800) | 8,927 |
+| pace-b | 58 | 804 | 1,035 | 3 | 0 | 423 |
+| pace-c | 61 | 743 | 1,056 | 5 | 14 (year 700) | 5,144 |
+| pace-d | 147 | 612 | 954 | 3 | 2 | 721 |
+| pace-e | 139 | 808 | 1,056 | 3 | 1 | 571 |
+
+- Every seed meets both targets: villages in years 58–147 (median 132) and cities in years 829–1,056 (median 1,035). No band died out.
+- Saves stay small. The largest checkpoint was 16 MB (pace-a, year 800). Before 563a06d, pace-a's year-700 save could not be encoded, and pace-c's year-800 save was 488 MB.
+- After the fix, pace-b and pace-e follow the same course as their 94d3960 runs, with the same milestones and the same largest settlement at every century mark: their bands had all settled before they could reach a village's land. pace-d's city came 90 years later (954 against 864).
+- Five seeds is a small sample (METHODS §3): these are checks on the target, not estimates of a distribution.
+- Life audit on 563a06d: 141/153, with the same verdict in every case. Only some head counts at year 100 changed, by a few people (`life-audit.txt`). Realistic (6 worlds): every promise is unchanged, and the village promise is met in 5/6. Realms of Legend: a monster is slain in 2/6 (`mode-audit-realistic-fantasy-6.txt`).
 
 #### GitHub Actions and the live site (round 10)
 Checked on 2026-11-25 through the GitHub Actions API (branch `claude/epoch-civilizations-unbound-dap8pc`). Every CI run from #84 to #88 (the last, on 954f0fc) passed: types, unit tests, build, e2e and a11y in Chromium and WebKit. Each failure in this addendum had a known cause, fixed in a later commit:

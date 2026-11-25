@@ -137,7 +137,7 @@ Three ways to play:
 
   Nothing fictional can ever appear: no monsters, ghosts, zombies, fantasy peoples or alien land. Land tools and disasters are god-mode powers. People and animals breed where they could really live, and leave harsh land if they can (life audit in [VALIDATION.md](docs/VALIDATION.md) §R10).
 
-  The pace is **Slow**: people take generations to settle and centuries to build cities (calibration in [VALIDATION.md](docs/VALIDATION.md) §R10).
+  The pace is **Slow**: people take generations to settle and centuries to build cities. On five test worlds, a placed band founded its first village in years 58–147 and the first city of 10,000 stood in years 829–1,056 (calibration in [VALIDATION.md](docs/VALIDATION.md) §R10).
 - **Observer:** history runs entirely on its own, with no powers. Natural disasters and epidemics still happen, and nothing fictional can appear.
 
 The Pace setting (Standard or Slow) is also on the New World screen for any world.
