@@ -75,7 +75,6 @@ export function seedLife(sim: Sim): void {
     // round 10 addendum: test the habitat itself (predators are weighted 0.25, so 'weight > 0.3' never seeded one)
     if (pick >= 0 && habitat(sim, candidates[pick], i) > 0.3) spawnHerd(sim, candidates[pick].key, m.xOf(i), m.yOf(i));
   }
-  settlePredators(sim);
   let water = 0;
   for (let i = 0; i < m.n; i++) if (m.isWater(i)) water++;
   const fish = Math.round((water / 300) * st.biodiversity);
@@ -86,6 +85,7 @@ export function seedLife(sim: Sim): void {
     const kind = m.terrain[i] === 0 && sim.rng.chance(0.3) ? 'whale' : m.temp[i] < 6 && m.terrain[i] !== 0 && !st.alien && sim.rng.chance(0.3) ? 'seal' : 'fish';
     spawnHerd(sim, kind, m.xOf(i), m.yOf(i));
   }
+  settlePredators(sim); // after the sea animals, so seals are checked against fish too
   if ((w.laws.fantasyCreatures || st.fantasy) && !realWorld(st)) {
     for (let k = 0; k < Math.round(land / 4000) + 2; k++) {
       const def = sim.rng.pick(MONSTERS);
@@ -128,19 +128,21 @@ export function seedLife(sim: Sim): void {
 }
 
 /**
- * Round 10 addendum (life audit): a land predator seeded where no prey is within its 12-tile search moves to the
+ * Round 10 addendum (life audit): a predator seeded where no edible prey of its realm is within its 12-tile search moves to the
  * nearest herbivore herd standing in country it can live in, or is not kept. Wildlife starts sparse, so packs
  * placed far from prey starved before the prey spread. Uses no random draws.
  */
 function settlePredators(sim: Sim): void {
   const w = sim.w;
   const m = w.map;
-  const herbivores = [...w.herds.values()].filter((o) => SPECIES_BY_KEY[o.species]?.diet === 'herbivore');
+  // edible prey only: not birds (almost no food), and of the predator's own realm (review fix)
+  const edible = [...w.herds.values()].filter((o) => { const q = SPECIES_BY_KEY[o.species]; return q?.diet === 'herbivore' && !q.flying && q.meat >= 0.01; });
   for (const h of [...w.herds.values()]) {
     const sp = SPECIES_BY_KEY[h.species];
-    if (!sp || sp.diet !== 'predator' || sp.aquatic) continue;
-    if (herbivores.some((o) => Math.hypot(o.x - h.x, o.y - h.y) <= 12)) continue;
-    const home = herbivores
+    if (!sp || sp.diet !== 'predator') continue;
+    const mine = edible.filter((o) => !!SPECIES_BY_KEY[o.species].aquatic === !!sp.aquatic);
+    if (mine.some((o) => Math.hypot(o.x - h.x, o.y - h.y) <= 12)) continue;
+    const home = mine
       .filter((o) => habitat(sim, sp, Math.floor(o.y) * m.w + Math.floor(o.x)) >= 0.3)
       .sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y) || a.id - b.id)[0];
     if (home) {

@@ -87,7 +87,7 @@ export const PRESETS: Preset[] = [
   {
     key: 'realistic',
     name: 'Realistic',
-    description: 'An empty Earth-like world at year 0, with land, plants and wild animals. Drop in the first humans and animals and watch people take generations to settle and centuries to build cities. Nature and history do the rest, with everything that could really happen, from droughts to AI and nuclear war, and nothing that could not.',
+    description: 'An empty Earth-like world at year 0, with land, plants and wild animals. Drop in the first humans and animals and watch people take generations to settle and centuries to build cities. Nature and history do the rest: everything science allows, from droughts to AI and nuclear war, and nothing supernatural.',
     apply: (c) => {
       c.settings.startEra = 1;
       c.settings.startCivs = 0; // you place the first humans

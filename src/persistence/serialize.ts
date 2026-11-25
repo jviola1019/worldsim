@@ -9,7 +9,7 @@
  * A CRC32 checksum of the uncompressed payload is stored in the outer frame
  * so corrupted or truncated saves are detected instead of loaded.
  */
-import { stripFiction } from '../powers/powerSet';
+import { reconcileRealWorld } from '../powers/powerSet';
 import { validDevices } from './device';
 import { validFavorites } from '../sim/favorites';
 import type { WorldState } from '../sim/types';
@@ -231,7 +231,7 @@ function decodeChecked(bytes: Uint8Array): WorldState {
   for (const [k, list] of [['outlet', 'outlets'], ['ai', 'ais'], ['league', 'leagues']] as const) {
     if (!isInt(w.ids[k])) w.ids[k] = Math.max(0, ...[...w[list].keys()].filter((id: unknown) => isInt(id)));
   }
-  stripFiction(w as WorldState); // round 10 addendum: a Realistic or Observer save never brings fiction with it
+  reconcileRealWorld(w as WorldState); // round 10 addendum: a save holding fiction never counts as Realistic or Observer
   return w as WorldState;
 }
 

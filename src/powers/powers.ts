@@ -903,8 +903,6 @@ function relationsBrush(sim: Sim, x: number, y: number, r: number, delta: number
   return null;
 }
 
-/** Round 10: literal powers allowed in Realistic worlds (the factories above tag their own). */
-
 export const POWER_BY_ID: Record<string, PowerDef> = Object.fromEntries(POWERS.map((p) => [p.id, p]));
 
 /** Round 10 addendum: powers that place life by hand (the placing hand plays for these). */

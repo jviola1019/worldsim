@@ -4,6 +4,8 @@
  * - one pack could remove 18% of a prey herd every month (about 90% a year), so packs ate their prey and then starved.
  */
 import { describe, it, expect } from 'vitest';
+import { Simulation } from '../../src/sim/simulation';
+import { encodeWorld, decodeWorld } from '../../src/persistence/serialize';
 import { defaultConfig, PRESETS } from '../../src/config/laws';
 import { createSimulation } from '../../src/sim/bootstrap';
 import { spawnHerd, habitat, pickTarget } from '../../src/ecology/ecology';
@@ -49,7 +51,8 @@ describe('predators', () => {
       for (const h of sim.w.herds.values()) {
         const sp = SPECIES_BY_KEY[h.species];
         if (sp.diet !== 'predator') continue;
-        const prey = [...sim.w.herds.values()].some((o) => SPECIES_BY_KEY[o.species].diet === 'herbivore' && Math.hypot(o.x - h.x, o.y - h.y) <= 12);
+        // edible prey of its own realm: not birds (almost no food), not sea animals for a land predator (review fix)
+        const prey = [...sim.w.herds.values()].some((o) => { const q = SPECIES_BY_KEY[o.species]; return q.diet === 'herbivore' && !q.flying && q.meat >= 0.01 && !!q.aquatic === !!sp.aquatic && Math.hypot(o.x - h.x, o.y - h.y) <= 12; });
         expect(prey, `${seed} ${h.species}`).toBe(true);
         expect(habitat(sim, sp, Math.floor(h.y) * m.w + Math.floor(h.x)), `${seed} ${h.species}`).toBeGreaterThanOrEqual(0.2);
       }
@@ -126,5 +129,34 @@ describe('predators stay in country they can live in (life audit)', () => {
     m.terrain[coldTile] = T.MOUNTAIN; m.temp[coldTile] = -10;
     pickTarget(sim, cat);
     expect(Math.hypot(cat.tx - deer.x, cat.ty - deer.y)).toBeGreaterThan(0.5);
+  });
+});
+
+describe('predators hunt in their own realm (review fix)', () => {
+  it('wolves on a coast do not eat fish, and seals do not take deer from the beach', () => {
+    const base = world('pred-realm', true);
+    const m = base.w.map;
+    const coast = site(base, (j) => !m.isWater(j) && m.isCoastal(j) && m.temp[j] > 0 && m.temp[j] < 15);
+    let sea = -1;
+    m.forRadius(m.xOf(coast), m.yOf(coast), 2, (j) => { if (sea < 0 && m.isWater(j)) sea = j; });
+    const far = site(base, (j) => !m.isWater(j) && Math.hypot(m.xOf(j) - m.xOf(coast), m.yOf(j) - m.yOf(coast)) > 30);
+    let farSea = -1;
+    for (let j = 0; j < m.n && farSea < 0; j++) if (m.isWater(j) && Math.hypot(m.xOf(j) - m.xOf(coast), m.yOf(j) - m.yOf(coast)) > 30) farSea = j;
+    const run = (near: boolean) => {
+      base.syncRng();
+      const sim = new Simulation(decodeWorld(encodeWorld(base.w)));
+      const fish = spawnHerd(sim, 'fish', m.xOf(sea), m.yOf(sea), 200)!;
+      const deer = spawnHerd(sim, 'deer', m.xOf(coast), m.yOf(coast), 30)!;
+      // the same predators, with the same random draws: beside the prey, or far away (the control)
+      spawnHerd(sim, 'wolf', near ? m.xOf(coast) : m.xOf(far), near ? m.yOf(coast) : m.yOf(far), 8);
+      spawnHerd(sim, 'seal', near ? m.xOf(sea) : m.xOf(farSea), near ? m.yOf(sea) : m.yOf(farSea), 16);
+      sim.runTicks(10);
+      return { fish: sim.w.herds.get(fish.id)?.count ?? 0, deer: sim.w.herds.get(deer.id)?.count ?? 0 };
+    };
+    const control = run(false), hunted = run(true);
+    // each prey herd loses at most one hunter's monthly cap (plus that month's growth on it): seals take fish, wolves
+    // take deer, nobody crosses over (before the fix wolves also took fish: about twice the loss)
+    expect(control.fish - hunted.fish).toBeLessThanOrEqual(200 * BALANCE.predationCap * (1 + SPECIES_BY_KEY.fish.growth / 12));
+    expect(control.deer - hunted.deer).toBeLessThanOrEqual(30 * BALANCE.predationCap * (1 + SPECIES_BY_KEY.deer.growth / 12));
   });
 });

@@ -24,14 +24,15 @@ describe('explorers', () => {
   }, 120000);
 });
 
-// round 10 addendum: 160 years (was 120). After this round's history changes this audit world's first sea route
-// came at year 137 (audit worlds 0, 2, 3: years 57, 121, 58; Island Realms sea trade 4/5 within its 200-year horizon)
+// round 10 addendum: the scenario's own 200-year horizon (was 120). After this round's history changes this audit
+// world's first sea route came at year 166 (audit worlds 0, 2, 3: years 99, 158, 148; world 4: none; Island Realms sea
+// trade 4/5 within its horizon)
 describe('sea trade', () => {
   let sim: ReturnType<typeof createSimulation>;
   beforeAll(() => {
     sim = createSimulation(configFor('islands', 'audit-islands-1'));
-    sim.runYears(160);
-  }, 400000);
+    sim.runYears(200);
+  }, 500000);
 
   it('coastal partners ship by sea when the voyage is cheaper than the land detour (Island Realms)', () => {
     const routes = [...sim.w.routes.values()];

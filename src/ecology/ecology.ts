@@ -224,7 +224,11 @@ export function herdsMonthly(sim: Sim): void {
     const hab = habitat(sim, sp, i);
     let fed = 1;
     if (sp.diet === 'predator' || sp.diet === 'omnivore') {
-      const prey = herdsNear(sim, h.x, h.y, sp.diet === 'predator' ? BALANCE.huntReach : 2.5).filter((o) => o !== h && SPECIES_BY_KEY[o.species]?.diet === 'herbivore' && o.owner === 0);
+      // prey of the hunter's own realm (review fix: wolves lived off fish shoals and seals took deer from beaches), not birds
+      const prey = herdsNear(sim, h.x, h.y, sp.diet === 'predator' ? BALANCE.huntReach : 2.5).filter((o) => {
+        const q = SPECIES_BY_KEY[o.species];
+        return o !== h && o.owner === 0 && q?.diet === 'herbivore' && !q.flying && !!q.aquatic === !!sp.aquatic;
+      });
       if (prey.length) {
         // round 10 addendum: a pack hunts every prey herd in reach, taking at most predationCap of each in a month
         const need = Math.max(0.5, h.count * BALANCE.preyPerPredator);

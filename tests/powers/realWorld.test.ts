@@ -65,24 +65,36 @@ describe('real-world lock', () => {
     }
   }
 
-  it('a forged Realistic save that contains fiction loads clean', () => {
+  it('a save that claims to be Realistic but holds fiction loads as a god-mode world, intact (review fix)', () => {
     const c = defaultConfig();
     c.name = 'Forged';
     c.gen.seed = 'forged-1';
     c.gen.width = 64;
     c.gen.height = 64;
     SCENARIOS.find((s) => s.key === 'fantasy')!.apply(c);
+    c.settings.startCivs = 6;
     const sim = createSimulation(c);
     expect(sim.w.monsters.size).toBeGreaterThan(0); // the fantasy world really has monsters
+    expect([...sim.w.civs.values()].some((x) => x.species !== 'human')).toBe(true); // and fantasy peoples
+    const monsters = sim.w.monsters.size;
     sim.w.meta.settings.powerSet = 'grounded'; // forge: claim to be Realistic
     sim.syncRng();
     const w = decodeWorld(encodeWorld(sim.w));
-    expect(w.monsters.size).toBe(0);
-    expect([...w.herds.values()].some((h) => SPECIES_BY_KEY[h.species]?.alien)).toBe(false);
-    expect(w.laws.fantasyCreatures).toBe(false);
-    expect(w.laws.horrors ?? false).toBe(false);
-    expect(w.meta.settings.fantasy).toBe(false);
-    expect(w.meta.settings.alien).toBe(false);
+    expect(realWorld(w.meta.settings)).toBe(false); // it is not a Realistic world, whatever it claims
+    expect(w.monsters.size).toBe(monsters); // nothing is destroyed
+    expect(fiction(w).length).toBeGreaterThan(0);
+  });
+
+  it('a clean Realistic save stays Realistic', () => {
+    const c = defaultConfig();
+    c.name = 'Clean'; c.gen.seed = 'clean-1'; c.gen.width = 64; c.gen.height = 64;
+    PRESETS.find((p) => p.key === 'realistic')!.apply(c);
+    const sim = createSimulation(c);
+    sim.runYears(5);
+    sim.syncRng();
+    const w = decodeWorld(encodeWorld(sim.w));
+    expect(realWorld(w.meta.settings)).toBe(true);
+    expect(fiction(w)).toEqual([]);
   });
 
   it('normalizeReal is idempotent and leaves god mode alone', () => {
