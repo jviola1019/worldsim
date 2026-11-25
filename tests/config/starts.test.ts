@@ -4,6 +4,8 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { PRESETS, START_VARIANTS, MAX_START_ERA, clampStartEra, eraPeopleDefault, presetByKey, defaultConfig, randomizeConfig } from '../../src/config/laws';
 import { SCENARIOS } from '../../src/scenarios/scenarios';
+import { makeSim } from '../helpers';
+import { TECH_BY_ID } from '../../src/technology/techData';
 import { createSimulation } from '../../src/sim/bootstrap';
 
 afterEach(() => vi.restoreAllMocks());
@@ -72,5 +74,20 @@ describe('starts', () => {
   it('Space Race starts at era 10', () => {
     const c = defaultConfig(); SCENARIOS.find((s) => s.key === 'space_race')!.apply(c);
     expect(c.settings.startEra).toBe(10);
+  });
+
+  it('makeSim above the cap hands out the era technologies the late-game tests rely on', () => {
+    const sim = makeSim('starts-dev', 64, (c) => { c.settings.startEra = 12; });
+    expect(sim.w.meta.settings.startEra).toBe(10);
+    for (const civ of [...sim.w.civs.values()].filter((c) => c.alive)) {
+      expect(civ.era, civ.name).toBeGreaterThanOrEqual(11);
+      const digital = Object.keys(civ.techs).filter((id) => civ.techs[id].known && (TECH_BY_ID.get(id)?.era ?? 0) >= 11);
+      expect(digital.length, civ.name).toBeGreaterThan(0);
+    }
+  });
+
+  it('developTo respects the world rules (no speculative tech when it is off)', () => {
+    const sim = makeSim('starts-rules', 64, (c) => { c.settings.startEra = 12; c.settings.realism = 'plausible'; c.laws.speculativeTech = false; });
+    for (const civ of sim.w.civs.values()) for (const id of Object.keys(civ.techs)) if (civ.techs[id].known) expect(TECH_BY_ID.get(id)?.realism, id).not.toBe('speculative');
   });
 });
