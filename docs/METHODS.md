@@ -84,7 +84,7 @@ Three seeds, 100 years each. Each drop goes on land that is naturally that biome
 
 | Area | What is modelled | What is not |
 |---|---|---|
-| Wildlife | Predator–prey dynamics (Lotka–Volterra style; round 10 addendum: capped, sustainable predation, packs hunt over 5 tiles); people hunt animals | Wild animals attacking people (worldwide this is small next to disease, famine and war); ambush predation (crocodiles chase like wolves, and fail in the life audit); herd counts are population units, not headcounts, so predator-to-prey ratios are stylized |
+| Wildlife | Predator–prey dynamics (Lotka–Volterra style; round 10 addendum: capped, sustainable predation, packs hunt over 5 tiles); people hunt animals | Wild animals attacking people (worldwide this is small next to disease, famine and war); ambush predation and packs ranging between prey herds (hand-placed packs die out in the life audit); herd counts are population units, not headcounts, so predator-to-prey ratios are stylized |
 | "Monsters" | Fantasy creatures and god-only horrors, only where fantasy or god mode allows | Real-world equivalents are modelled as other systems: dangerous wildlife (above), rogue AI (the "AI takeover" ending), nuclear war (blast, fallout, radiation sickness, nuclear winter). **Mutants are not modelled**: radiation causes illness, not new creatures |
 | Climate | CO₂, lagged warming, sea level, a finite feedback store, policy response | Grid storage; efficiency-driven demand reduction; carbon removal |
 | Economy | Physical goods, labour, prices, GDP identity, automation, public jobs | Finance and credit cycles beyond debt and inflation |

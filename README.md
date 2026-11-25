@@ -130,8 +130,15 @@ Every event is recorded with its causes. Charts show population, economy, techno
 
 Three ways to play:
 - **God mode** (every preset except the two below): every power.
-- **Realistic:** an empty Earth-like world at year 0, with land, plants and wild animals. You place the first humans and real animals, shape the land, and call down natural disasters. Fantasy creatures, sci-fi and hands-on politics are switched off. The pace is **Slow**: in our test worlds the first village came 42–156 years after placing a band, and the first city of 10,000 people about a thousand years later (measurements in [VALIDATION.md](docs/VALIDATION.md) §R10).
-- **Observer:** history runs entirely on its own, with no powers, including natural disasters and epidemics.
+- **Realistic:** an empty Earth-like world at year 0, with land, plants and wild animals. You drop in the first humans and any of 24 real animals (elephants, water buffalo, llamas and seals among them) with a pixel hand, as in WorldBox. Everything else happens on its own:
+  - natural disasters at natural rates;
+  - every science-based technology, era 15 included (AI, holograms, future weapons);
+  - wars, nuclear weapons, pandemics, AI takeover and the rest of the realistic endings.
+
+  Nothing fictional can ever appear: no monsters, ghosts, zombies, fantasy peoples or alien land. Land tools and disasters are god-mode powers. People and animals breed where they could really live, and leave harsh land if they can (life audit in [VALIDATION.md](docs/VALIDATION.md) §R10).
+
+  The pace is **Slow**: people take generations to settle and centuries to build cities (calibration in [VALIDATION.md](docs/VALIDATION.md) §R10).
+- **Observer:** history runs entirely on its own, with no powers. Natural disasters and epidemics still happen, and nothing fictional can appear.
 
 The Pace setting (Standard or Slow) is also on the New World screen for any world.
 
