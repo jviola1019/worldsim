@@ -122,6 +122,7 @@ Plan: [`superpowers/plans/2026-11-25-realistic-life-hand.md`](superpowers/plans/
 | Map-shape test | Every start could land inland by chance (dry sites were accepted 30% of the time) | People begin by a river, lake or sea | `presets.test.ts` (start sites) |
 | Pace test | A lucky draw settled a Slow band at year 27 | No permanent camp in a lineage's first 30 years on new land | `pace.test.ts` |
 | **Checkpointed pace run** | **A save failed** (`Invalid string length`): each band split restarted that delay. One world held 1,272 bands and 83,344 individual foragers by year 400 | Daughter bands keep their arrival year; population pressure raises Slow settling (`slowPressureSettle`, [C]). That world at year 500: 24 bands, 4,183 person records, 5.3 MB | `pace.test.ts` |
+| **Checkpointed pace run, again** | **A save failed** at year 700 on another seed, and a year-800 save reached 488 MB. In the checkpoints, 96–99% of bands stood on land a village already claims, where a band may not found a village. They foraged and split there for ever: 2,736 bands and 182,911 person records at year 600 (pace-a), 13,420 bands and 794,595 records at year 800 (pace-c). Standard pace never reaches this state: every band settles before year 100 | Slow pace: on the same settle draw, a band on a village's land joins that village (any nation's), booked as a transfer. Standard histories are byte-identical (default and Observer worlds, 250 years). The year-500 figures in the row above came before this second fix | `pace.test.ts` (fails without the fix) |
 | CI #73, #75, #77 | Person-inspector chips were about 22 px tall on desktop (WCAG 2.5.8) | 24 px on every pointer | `tests/ui/targetSize.test.ts` |
 | CI #68 | The a11y audit waited on infinite animations (broadcast feed) until the 30-minute timeout | Finite animations only, capped at 3 s | CI green from #76 |
 | CI #83 | The hand-motion e2e check sampled only twice and flaked on WebKit | Five samples | e2e |
@@ -201,7 +202,7 @@ All browser testing is emulation (iPhone 13 and desktop), not a physical device 
 **Dependencies:** `npm outdated` reports none; `npm audit` reports 0 vulnerabilities.
 
 #### Slow pace (`scripts/pace-calibrate.ts 1600 slow`, five seeds, the final code)
-*In progress:* the five seeds are re-running on the final code. Finished so far: pace-b (village at year 58, town at 804, city at 1,035) and pace-e (village at 139, town at 808, city at 1,056). The full table will replace this note.
+*In progress:* the five seeds are re-running on 563a06d, after the second save-size fix above. The earlier results on 94d3960 (pace-b village 58, town 804, city 1,035; pace-d 147, 615, 864; pace-e 139, 808, 1,056) were superseded because two seeds could not finish: their saves outgrew the format. The full table will replace this note.
 
 #### GitHub Actions and the live site (round 10)
 Checked on 2026-11-25 through the GitHub Actions API (branch `claude/epoch-civilizations-unbound-dap8pc`). Every CI run from #84 to #88 (the last, on 954f0fc) passed: types, unit tests, build, e2e and a11y in Chromium and WebKit. Each failure in this addendum had a known cause, fixed in a later commit:

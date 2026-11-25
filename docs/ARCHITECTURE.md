@@ -149,7 +149,7 @@ World, on day 0 (`sim/simulation.ts`): statistics → trade → species census �
 | Contract | Where | Test |
 |---|---|---|
 | **Power sets:** a world allows `all`, `grounded` or `none` powers. Old saves with `observer: true` load as `none` | `powers/powerSet.ts`, `applyPower` | `tests/powers/powerSets.test.ts` |
-| **Pace:** `paceMult(settings, lever)` is exactly 1 unless `pace === 'slow'`; no RNG draws are added | `sim/pace.ts` (levers in `bands.ts`, `research.ts`, `urban.ts`, `settlement.ts`) | `tests/sim/pace.test.ts` |
+| **Pace:** `paceMult(settings, lever)` is exactly 1 unless `pace === 'slow'`. Standard pace adds no RNG draws; the one Slow-only draw is the band joining a village whose land it camps on (`joinSettlement`, round 10 addendum) | `sim/pace.ts` (levers in `bands.ts`, `research.ts`, `urban.ts`, `settlement.ts`) | `tests/sim/pace.test.ts` |
 | **New save fields** (`settings.powerSet`, `settings.pace`) are optional and validated on decode; an unknown value refuses the file | `persistence/serialize.ts` | `powerSets.test.ts`, `pace.test.ts` |
 | **Developed starts** reach the promised era (prerequisite-ready top-up) | `sim/bootstrap.ts` `developedCiv` | `tests/sim/startEra.test.ts` |
 | **Diplomatic past** for era ≥ 9 starts: full contact, two blocs (friends with defensive pacts inside, cold across), and a treaty organization from era 10 except in the Long Standoff | `sim/bootstrap.ts` `seedDiplomaticPast` | `tests/politics/startDiplomacy.test.ts` |
