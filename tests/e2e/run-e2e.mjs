@@ -387,15 +387,16 @@ async function dropHand(page, label, reduced = false) {
     fx = (await canvas.getAttribute('data-fx')) ?? '';
     if (fx.includes('fx.hand')) break outer;
   }
-  const m1 = (await canvas.getAttribute('data-fx-motion')) ?? '';
-  await page.waitForTimeout(200);
-  const m2 = (await canvas.getAttribute('data-fx-motion')) ?? '';
-  await page.waitForTimeout(1200);
+  // several samples while the hand plays: a slow runner can skip frames between two samples (CI #83, WebKit)
+  const samples = [];
+  for (let k = 0; k < 5; k++) { samples.push((await canvas.getAttribute('data-fx-motion')) ?? ''); await page.waitForTimeout(120); }
+  const m1 = samples[0], m2 = samples.find((x) => x !== m1) ?? samples[samples.length - 1];
+  await page.waitForTimeout(800);
   const later = (await canvas.getAttribute('data-fx')) ?? '';
   const hud = await page.locator('.world-card').innerText();
   check(`${label}: dropping humans plays the hand, which then ends`, fx.includes('fx.hand') && !later.includes('fx.hand'), `now "${fx}", later "${later}"`);
-  if (reduced) check(`${label}: the hand is one still frame`, m1 === m2 && m1.includes('hand-still'), `${m1} / ${m2}`);
-  else check(`${label}: the hand moves (descends, opens, lifts)`, m1 !== m2 && /hand\d/.test(m1 + m2), `${m1} / ${m2}`);
+  if (reduced) check(`${label}: the hand is one still frame`, samples.every((x) => x === m1 || x === '') && m1.includes('hand-still'), samples.join(' / '));
+  else check(`${label}: the hand moves (descends, opens, lifts)`, m1 !== m2 && /hand\d/.test(m1 + m2), samples.join(' / '));
   check(`${label}: the dropped band is on the map (1 tribe)`, /1\s+tribe/.test(hud), hud.replace(/\n/g, ' | '));
   await page.getByLabel('Stop using this power').click().catch(() => {});
 }
