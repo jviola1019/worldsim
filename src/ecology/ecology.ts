@@ -4,6 +4,7 @@
  * human hunting, extinction, slow evolution into subspecies, and optional
  * fantasy monsters.
  */
+import { realWorld } from '../powers/powerSet';
 import { flow } from '../population/ledger';
 import type { Sim } from '../sim/context';
 import type { Herd, Monster, Subspecies } from '../sim/types';
@@ -458,7 +459,7 @@ export function monstersTick(sim: Sim): void {
 /** Monthly monster attacks on nearby settlements; militaries can slay monsters. */
 export function monstersMonthly(sim: Sim): void {
   const w = sim.w;
-  if (!w.laws.fantasyCreatures) return;
+  if (!w.laws.fantasyCreatures || realWorld(w.meta.settings)) return;
   const dead: number[] = [];
   for (const mo of w.monsters.values()) {
     const def = MONSTERS.find((d) => d.kind === mo.kind);

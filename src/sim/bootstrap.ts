@@ -6,6 +6,7 @@
  * (not by simulated history) — this is recorded in the world history so it is
  * never presented as emergent.
  */
+import { realWorld } from '../powers/powerSet';
 import { makeName } from '../culture/language';
 import { phonOfCulture } from '../population/persons';
 import { makeTreaty } from '../politics/diplomacy';
@@ -81,7 +82,7 @@ export function seedLife(sim: Sim): void {
     if (!m.isWater(i)) continue;
     spawnHerd(sim, m.terrain[i] === 0 && sim.rng.chance(0.3) ? 'whale' : 'fish', m.xOf(i), m.yOf(i));
   }
-  if (w.laws.fantasyCreatures || st.fantasy) {
+  if ((w.laws.fantasyCreatures || st.fantasy) && !realWorld(st)) {
     for (let k = 0; k < Math.round(land / 4000) + 2; k++) {
       const def = sim.rng.pick(MONSTERS);
       for (let t = 0; t < 30; t++) {

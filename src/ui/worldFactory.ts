@@ -1,4 +1,5 @@
 /** Create a simulation, generating geography in a Web Worker when available. */
+import { normalizeReal } from '../powers/powerSet';
 import type { WorldConfig } from '../config/laws';
 import { TileMap } from '../world/tilemap';
 import { generateWorld, type WorldGenResult } from '../world/worldgen';
@@ -45,6 +46,7 @@ function genInWorker(cfg: WorldConfig): Promise<WorldGenResult> {
 }
 
 export async function createWorldAsync(cfg: WorldConfig): Promise<Simulation> {
+  normalizeReal(cfg); // before the map is generated in the worker (fantasy and alien maps differ)
   let gen: WorldGenResult;
   try {
     gen = await genInWorker(cfg);

@@ -1,4 +1,5 @@
 /** World state creation. */
+import { normalizeReal } from '../powers/powerSet';
 import type { WorldState } from './types';
 import type { WorldConfig } from '../config/laws';
 import { ENGINE_VERSION, SAVE_VERSION } from '../config/laws';
@@ -13,6 +14,7 @@ export const ID_KINDS = [
 ] as const;
 
 export function createWorldState(cfg: WorldConfig, gen?: WorldGenResult): WorldState {
+  normalizeReal(cfg); // round 10 addendum: real-world worlds never generate fiction
   const g = gen ?? generateWorld(cfg.gen);
   const ids: Record<string, number> = {};
   for (const k of ID_KINDS) ids[k] = 0;

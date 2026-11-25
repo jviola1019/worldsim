@@ -1,3 +1,4 @@
+import { realWorld } from '../../powers/powerSet';
 import { useState } from 'preact/hooks';
 import { applyMapShape, defaultConfig, PRESETS, WORLD_SIZES, randomizeConfig, randomSeedString, type WorldConfig } from '../../config/laws';
 import { MAP_SHAPES, SHAPE_FAMILY_LABELS, mapShape, type MapShape, type MapShapeFamily } from '../../world/mapShapes';
@@ -71,6 +72,7 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
     setCfg(c);
   };
   const list = scenarios ? SCENARIOS : PRESETS;
+  const real = realWorld(cfg.settings); // round 10 addendum: no fiction in Realistic or Observer worlds
   return (
     <main class="screen">
       <div class="page">
@@ -147,10 +149,11 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
             Empty world (no people or animals)
             <input type="checkbox" checked={cfg.settings.empty} onChange={(e) => set((c) => (c.settings.empty = (e.target as HTMLInputElement).checked))} />
           </label>
-          <label class="toggle">
+          <label class="toggle" data-testid="fantasy-toggle">
             Fantasy peoples & creatures
-            <input type="checkbox" checked={cfg.settings.fantasy} onChange={(e) => set((c) => ((c.settings.fantasy = (e.target as HTMLInputElement).checked), (c.gen.fantasy = c.settings.fantasy), (c.laws.fantasyCreatures = c.settings.fantasy)))} />
+            <input type="checkbox" checked={cfg.settings.fantasy && !real} disabled={real} aria-describedby={real ? 'real-note' : undefined} onChange={(e) => set((c) => ((c.settings.fantasy = (e.target as HTMLInputElement).checked), (c.gen.fantasy = c.settings.fantasy), (c.laws.fantasyCreatures = c.settings.fantasy)))} />
           </label>
+          {real && <span class="footnote" id="real-note">Realistic and Observer worlds hold only what could really exist.</span>}
           <div class="field">
             <label>Future technology</label>
             <div class="seg">
