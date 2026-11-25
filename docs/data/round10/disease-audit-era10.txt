@@ -1,0 +1,189 @@
+disease audit · 6 worlds × 600 years · 96² · Observer rules from era 10 (Atomic & Space) with 10 peoples
+  disease-0: highest era Near Future · pre-industrial 0y, industrial 0y, modern 600y · pandemics drawn 31 · population now 773,915
+  disease-1: highest era Near Future · pre-industrial 0y, industrial 0y, modern 600y · pandemics drawn 24 · population now 599,089
+  disease-2: highest era Near Future · pre-industrial 0y, industrial 0y, modern 600y · pandemics drawn 25 · population now 1,555,230
+  disease-3: highest era Near Future · pre-industrial 0y, industrial 0y, modern 600y · pandemics drawn 34 · population now 1,579,968
+  disease-4: highest era Near Future · pre-industrial 0y, industrial 0y, modern 600y · pandemics drawn 28 · population now 1,593,069
+  disease-5: highest era Digital · pre-industrial 0y, industrial 0y, modern 600y · pandemics drawn 24 · population now 1,141,020
+
+per era band (rates per world-century; death share = disease deaths / mean world population, per century):
+  pre-industrial: no years in this band
+  industrial: no years in this band
+  modern: 3600 world-years, mean world population 2,502,631, mean connectivity 1.00
+    outbreaks (new natural pathogens) 62 (1.72 per century); engineered 1
+    logged epidemics 141 (3.92 per century)
+    pandemics drawn 166 (4.61 per century); logged 163 (4.53 per century)
+    deaths per century: local outbreaks 0.2505%, pandemics 3.37% of the population
+    largest pandemic: 16.88% of the world (271,084 dead, drawn target 17.54%, disease-1 year 370)
+    endings: conquest 15; pandemic endings 0
+
+largest logged town epidemic: The Reglyrn Flux killed 12,564 in Svukren (year 589, modern)
+
+realised vs drawn severity (163 finished pandemics):
+  drawn to kill >= 1% of the world: 25 (0.15); realised >= 1%: 26 (0.16)
+  realised / drawn share: median 1.058, quartiles 1.028-1.105
+
+every finished pandemic (world, band, years, r0, lethality, drawn share, realised share, share of towns reached, deaths):
+  disease-0 modern         4-7 r0 3.77 lethality 0.0072 drawn 0.1357% realised 0.1516% reach 0.86 deaths 4,866
+  disease-0 modern         21-26 r0 4.22 lethality 0.0073 drawn 0.1399% realised 0.1495% reach 1.00 deaths 5,849
+  disease-0 modern         55-62 r0 3.18 lethality 0.0045 drawn 0.0783% realised 0.0833% reach 1.00 deaths 3,606
+  disease-0 modern         75-77 r0 4.03 lethality 0.0253 drawn 0.4757% realised 0.5602% reach 1.00 deaths 23,363
+  disease-0 modern         79-83 r0 4.19 lethality 0.2698 drawn 5.15% realised 5.36% reach 1.00 deaths 219,309
+  disease-0 modern         80-84 r0 2.32 lethality 0.0691 drawn 0.9009% realised 0.8671% reach 0.83 deaths 35,405
+  disease-0 modern         110-118 r0 2.78 lethality 0.0179 drawn 0.2754% realised 0.2826% reach 1.00 deaths 10,529
+  disease-0 modern         120-123 r0 2.91 lethality 0.0157 drawn 0.2474% realised 0.3176% reach 1.00 deaths 11,655
+  disease-0 modern         179-181 r0 4.38 lethality 0.0506 drawn 0.9442% realised 1.17% reach 1.00 deaths 40,848
+  disease-0 modern         210-215 r0 2.91 lethality 0.0286 drawn 0.4614% realised 0.4999% reach 1.00 deaths 16,344
+  disease-0 modern         221-225 r0 2.50 lethality 0.0132 drawn 0.1899% realised 0.2284% reach 0.90 deaths 7,099
+  disease-0 modern         242-251 r0 2.57 lethality 0.0096 drawn 0.1446% realised 0.1524% reach 1.00 deaths 4,546
+  disease-0 modern         256-259 r0 3.34 lethality 0.0110 drawn 0.1922% realised 0.2253% reach 1.00 deaths 6,628
+  disease-0 modern         263-265 r0 4.03 lethality 0.0084 drawn 0.1613% realised 0.1967% reach 1.00 deaths 5,700
+  disease-0 modern         269-276 r0 3.04 lethality 0.0055 drawn 0.0958% realised 0.0946% reach 1.00 deaths 2,716
+  disease-0 modern         282-288 r0 2.65 lethality 0.0248 drawn 0.3738% realised 0.4148% reach 1.00 deaths 10,962
+  disease-0 modern         288-300 r0 2.73 lethality 0.0036 drawn 0.0552% realised 0.0583% reach 1.00 deaths 1,514
+  disease-0 modern         309-319 r0 2.36 lethality 0.0432 drawn 0.5722% realised 0.5737% reach 0.97 deaths 14,639
+  disease-0 modern         333-340 r0 2.66 lethality 0.0109 drawn 0.1660% realised 0.1767% reach 1.00 deaths 4,144
+  disease-0 modern         337-352 r0 2.14 lethality 0.6194 drawn 7.14% realised 7.13% reach 0.93 deaths 166,679
+  disease-0 modern         376-379 r0 3.42 lethality 0.0057 drawn 0.1012% realised 0.1155% reach 0.97 deaths 2,262
+  disease-0 modern         479-486 r0 3.89 lethality 0.0038 drawn 0.0712% realised 0.0738% reach 1.00 deaths 1,045
+  disease-0 modern         475-487 r0 2.18 lethality 0.0067 drawn 0.0821% realised 0.0841% reach 0.79 deaths 1,195
+  disease-0 modern         484-493 r0 3.31 lethality 0.0157 drawn 0.2818% realised 0.2928% reach 1.00 deaths 3,966
+  disease-0 modern         507-512 r0 3.34 lethality 0.0043 drawn 0.0757% realised 0.0873% reach 0.93 deaths 1,096
+  disease-0 modern         562-569 r0 3.20 lethality 0.0218 drawn 0.3783% realised 0.3987% reach 1.00 deaths 3,868
+  disease-0 modern         561-579 r0 2.12 lethality 0.4815 drawn 5.41% realised 5.19% reach 0.69 deaths 50,276
+  disease-0 modern         576-581 r0 4.29 lethality 0.0089 drawn 0.1742% realised 0.1829% reach 1.00 deaths 1,632
+  disease-0 modern         572-590 r0 2.14 lethality 0.0050 drawn 0.0590% realised 0.0639% reach 0.72 deaths 565
+  disease-1 modern         6-14 r0 3.42 lethality 0.0037 drawn 0.0709% realised 0.0571% reach 0.72 deaths 1,055
+  disease-1 modern         33-45 r0 2.75 lethality 0.0052 drawn 0.0824% realised 0.0878% reach 1.00 deaths 2,212
+  disease-1 modern         60-63 r0 3.28 lethality 0.0205 drawn 0.3563% realised 0.4748% reach 0.89 deaths 12,969
+  disease-1 modern         89-97 r0 2.26 lethality 0.0070 drawn 0.0871% realised 0.0757% reach 0.69 deaths 2,140
+  disease-1 modern         143-153 r0 2.21 lethality 0.0077 drawn 0.0902% realised 0.0957% reach 0.89 deaths 2,486
+  disease-1 modern         145-153 r0 2.76 lethality 0.0089 drawn 0.1368% realised 0.1397% reach 1.00 deaths 3,646
+  disease-1 modern         198-204 r0 3.05 lethality 0.0678 drawn 1.15% realised 1.20% reach 1.00 deaths 27,122
+  disease-1 modern         203-208 r0 4.40 lethality 0.0076 drawn 0.1494% realised 0.1571% reach 1.00 deaths 3,431
+  disease-1 modern         280-284 r0 4.38 lethality 0.0043 drawn 0.0883% realised 0.0936% reach 1.00 deaths 1,762
+  disease-1 modern         370-376 r0 3.40 lethality 0.9000 drawn 17.54% realised 16.88% reach 1.00 deaths 271,084
+  disease-1 modern         362-377 r0 2.23 lethality 0.0067 drawn 0.0879% realised 0.0899% reach 0.93 deaths 1,466
+  disease-1 modern         392-399 r0 3.98 lethality 0.0148 drawn 0.2905% realised 0.3026% reach 1.00 deaths 4,167
+  disease-1 modern         396-404 r0 3.48 lethality 0.0174 drawn 0.3241% realised 0.3334% reach 1.00 deaths 4,529
+  disease-1 modern         409-414 r0 4.18 lethality 0.1367 drawn 2.76% realised 2.89% reach 1.00 deaths 39,473
+  disease-1 modern         408-417 r0 3.09 lethality 0.0035 drawn 0.0637% realised 0.0665% reach 1.00 deaths 905
+  disease-1 modern         432-436 r0 3.77 lethality 0.0064 drawn 0.1236% realised 0.1368% reach 1.00 deaths 1,716
+  disease-1 modern         452-465 r0 2.20 lethality 0.0073 drawn 0.0932% realised 0.0950% reach 0.79 deaths 1,147
+  disease-1 modern         465-467 r0 4.24 lethality 0.1666 drawn 3.38% realised 4.71% reach 1.00 deaths 58,814
+  disease-1 modern         477-481 r0 4.06 lethality 0.0602 drawn 1.26% realised 1.38% reach 1.00 deaths 16,626
+  disease-1 modern         500-512 r0 2.93 lethality 0.0173 drawn 0.2957% realised 0.3022% reach 1.00 deaths 3,437
+  disease-1 modern         551-555 r0 3.93 lethality 0.0151 drawn 0.2864% realised 0.3102% reach 1.00 deaths 2,669
+  disease-1 modern         568-572 r0 3.70 lethality 0.0037 drawn 0.0670% realised 0.0785% reach 1.00 deaths 596
+  disease-1 modern         566-582 r0 2.39 lethality 0.2109 drawn 2.77% realised 2.44% reach 0.79 deaths 19,249
+  disease-1 modern         578-585 r0 3.62 lethality 0.1096 drawn 1.99% realised 2.04% reach 0.97 deaths 14,629
+  disease-2 modern         50-59 r0 2.55 lethality 0.0117 drawn 0.1721% realised 0.1767% reach 0.89 deaths 7,677
+  disease-2 modern         56-59 r0 3.88 lethality 0.0123 drawn 0.2305% realised 0.2636% reach 0.89 deaths 11,638
+  disease-2 modern         55-61 r0 2.78 lethality 0.0164 drawn 0.2592% realised 0.2682% reach 0.89 deaths 11,821
+  disease-2 modern         74-80 r0 3.71 lethality 0.0030 drawn 0.0559% realised 0.0554% reach 0.89 deaths 2,385
+  disease-2 modern         91-94 r0 4.03 lethality 0.0081 drawn 0.1532% realised 0.1707% reach 0.89 deaths 6,730
+  disease-2 modern         105-113 r0 3.21 lethality 0.1566 drawn 2.70% realised 2.76% reach 1.00 deaths 105,465
+  disease-2 modern         152-156 r0 3.05 lethality 0.0042 drawn 0.0721% realised 0.0797% reach 1.00 deaths 2,671
+  disease-2 modern         165-170 r0 2.82 lethality 0.0035 drawn 0.0560% realised 0.0625% reach 1.00 deaths 2,043
+  disease-2 modern         166-178 r0 2.28 lethality 0.0087 drawn 0.1121% realised 0.1143% reach 0.96 deaths 3,721
+  disease-2 modern         196-206 r0 2.55 lethality 0.0273 drawn 0.3972% realised 0.4165% reach 1.00 deaths 13,344
+  disease-2 modern         207-212 r0 3.46 lethality 0.0035 drawn 0.0639% realised 0.0689% reach 1.00 deaths 2,205
+  disease-2 modern         221-230 r0 2.38 lethality 0.0048 drawn 0.0675% realised 0.0715% reach 1.00 deaths 2,256
+  disease-2 modern         237-255 r0 2.19 lethality 0.0065 drawn 0.0809% realised 0.0827% reach 1.00 deaths 2,581
+  disease-2 modern         276-282 r0 3.80 lethality 0.0509 drawn 0.9448% realised 0.9831% reach 1.00 deaths 29,865
+  disease-2 modern         278-282 r0 3.55 lethality 0.0092 drawn 0.1667% realised 0.1936% reach 1.00 deaths 5,863
+  disease-2 modern         299-317 r0 2.30 lethality 0.0106 drawn 0.1390% realised 0.1461% reach 0.96 deaths 4,325
+  disease-2 modern         313-318 r0 4.00 lethality 0.0043 drawn 0.0824% realised 0.0859% reach 1.00 deaths 2,540
+  disease-2 modern         306-322 r0 2.19 lethality 0.0050 drawn 0.0618% realised 0.0631% reach 0.96 deaths 1,886
+  disease-2 modern         355-362 r0 2.82 lethality 0.0033 drawn 0.0546% realised 0.0599% reach 1.00 deaths 1,733
+  disease-2 modern         356-365 r0 2.92 lethality 0.0041 drawn 0.0684% realised 0.0706% reach 1.00 deaths 2,028
+  disease-2 modern         404-409 r0 3.70 lethality 0.0034 drawn 0.0652% realised 0.0700% reach 1.00 deaths 1,835
+  disease-2 modern         471-477 r0 2.22 lethality 0.0044 drawn 0.0605% realised 0.0616% reach 0.65 deaths 1,326
+  disease-2 modern         473-478 r0 3.42 lethality 0.0046 drawn 0.0859% realised 0.0924% reach 1.00 deaths 2,003
+  disease-2 modern         496-505 r0 2.02 lethality 0.0051 drawn 0.0560% realised 0.0361% reach 0.54 deaths 736
+  disease-2 modern         569-586 r0 2.12 lethality 0.0284 drawn 0.3432% realised 0.2031% reach 0.58 deaths 3,468
+  disease-3 modern         22-25 r0 3.82 lethality 0.0058 drawn 0.1162% realised 0.0716% reach 0.50 deaths 2,524
+  disease-3 modern         42-51 r0 2.32 lethality 0.0051 drawn 0.0684% realised 0.0700% reach 0.92 deaths 2,657
+  disease-3 modern         57-59 r0 3.72 lethality 0.0036 drawn 0.0664% realised 0.0987% reach 1.00 deaths 3,668
+  disease-3 modern         59-63 r0 3.28 lethality 0.0114 drawn 0.1987% realised 0.2235% reach 0.96 deaths 8,398
+  disease-3 modern         79-86 r0 2.11 lethality 0.0060 drawn 0.0670% realised 0.0670% reach 0.92 deaths 2,486
+  disease-3 modern         98-100 r0 3.71 lethality 0.0191 drawn 0.3631% realised 0.4496% reach 1.00 deaths 15,671
+  disease-3 modern         113-116 r0 3.58 lethality 0.0652 drawn 1.22% realised 1.37% reach 1.00 deaths 44,789
+  disease-3 modern         108-117 r0 2.57 lethality 0.0036 drawn 0.0560% realised 0.0574% reach 0.96 deaths 1,911
+  disease-3 modern         121-123 r0 4.03 lethality 0.0046 drawn 0.0916% realised 0.1143% reach 1.00 deaths 3,605
+  disease-3 modern         148-160 r0 2.05 lethality 0.9000 drawn 21.77% realised 9.09% reach 0.96 deaths 274,060
+  disease-3 modern         162-172 r0 2.16 lethality 0.0113 drawn 0.1289% realised 0.1293% reach 0.92 deaths 3,434
+  disease-3 modern         171-180 r0 3.09 lethality 0.0632 drawn 1.08% realised 1.10% reach 1.00 deaths 28,973
+  disease-3 modern         200-203 r0 2.80 lethality 0.0062 drawn 0.0937% realised 0.1121% reach 0.96 deaths 2,846
+  disease-3 modern         206-217 r0 2.12 lethality 0.0252 drawn 0.2695% realised 0.2651% reach 0.92 deaths 6,682
+  disease-3 modern         221-227 r0 3.14 lethality 0.1292 drawn 2.14% realised 2.22% reach 1.00 deaths 55,185
+  disease-3 modern         261-264 r0 3.67 lethality 0.0433 drawn 0.7817% realised 0.8736% reach 1.00 deaths 20,503
+  disease-3 modern         260-266 r0 2.79 lethality 0.0579 drawn 0.9044% realised 0.9708% reach 1.00 deaths 22,793
+  disease-3 modern         274-279 r0 2.52 lethality 0.0101 drawn 0.1437% realised 0.1580% reach 1.00 deaths 3,636
+  disease-3 modern         332-334 r0 3.53 lethality 0.0029 drawn 0.0550% realised 0.0755% reach 1.00 deaths 1,590
+  disease-3 modern         336-340 r0 3.27 lethality 0.0076 drawn 0.1404% realised 0.1553% reach 1.00 deaths 3,177
+  disease-3 modern         383-393 r0 2.40 lethality 0.0056 drawn 0.0790% realised 0.0841% reach 1.00 deaths 1,724
+  disease-3 modern         418-421 r0 4.12 lethality 0.0141 drawn 0.2773% realised 0.2966% reach 1.00 deaths 6,344
+  disease-3 modern         417-423 r0 2.49 lethality 0.1156 drawn 1.75% realised 2.06% reach 1.00 deaths 44,006
+  disease-3 modern         435-442 r0 2.27 lethality 0.0124 drawn 0.1851% realised 0.1901% reach 1.00 deaths 3,820
+  disease-3 modern         438-442 r0 4.20 lethality 0.2442 drawn 4.97% realised 5.29% reach 1.00 deaths 106,875
+  disease-3 modern         453-457 r0 3.61 lethality 0.0034 drawn 0.0670% realised 0.0717% reach 1.00 deaths 1,371
+  disease-3 modern         467-470 r0 3.39 lethality 0.0035 drawn 0.0653% realised 0.0730% reach 1.00 deaths 1,427
+  disease-3 modern         507-511 r0 4.08 lethality 0.2945 drawn 5.86% realised 6.04% reach 1.00 deaths 109,902
+  disease-3 modern         524-529 r0 3.77 lethality 0.0568 drawn 1.09% realised 1.16% reach 1.00 deaths 18,598
+  disease-3 modern         527-530 r0 3.99 lethality 0.0045 drawn 0.0915% realised 0.1077% reach 1.00 deaths 1,731
+  disease-3 modern         546-551 r0 3.39 lethality 0.0058 drawn 0.1128% realised 0.1195% reach 1.00 deaths 2,003
+  disease-3 modern         551-556 r0 3.69 lethality 0.0252 drawn 0.5000% realised 0.5487% reach 1.00 deaths 9,312
+  disease-3 modern         583-589 r0 3.00 lethality 0.0034 drawn 0.0620% realised 0.0663% reach 1.00 deaths 1,127
+  disease-4 modern         12-23 r0 2.07 lethality 0.0071 drawn 0.0938% realised 0.0991% reach 0.88 deaths 2,804
+  disease-4 modern         28-32 r0 3.16 lethality 0.0076 drawn 0.1446% realised 0.1677% reach 1.00 deaths 5,521
+  disease-4 modern         56-59 r0 2.58 lethality 0.0076 drawn 0.1126% realised 0.1138% reach 0.88 deaths 4,107
+  disease-4 modern         63-69 r0 3.13 lethality 0.0780 drawn 1.33% realised 1.38% reach 1.00 deaths 52,783
+  disease-4 modern         104-108 r0 4.06 lethality 0.0034 drawn 0.0635% realised 0.0665% reach 1.00 deaths 2,342
+  disease-4 modern         155-157 r0 3.60 lethality 0.0978 drawn 1.88% realised 2.37% reach 1.00 deaths 74,252
+  disease-4 modern         165-171 r0 3.00 lethality 0.0068 drawn 0.1207% realised 0.1264% reach 1.00 deaths 3,885
+  disease-4 modern         184-189 r0 3.08 lethality 0.0034 drawn 0.0628% realised 0.0665% reach 1.00 deaths 2,008
+  disease-4 modern         191-199 r0 2.47 lethality 0.0057 drawn 0.0904% realised 0.0946% reach 1.00 deaths 2,857
+  disease-4 modern         207-212 r0 2.76 lethality 0.3935 drawn 6.46% realised 6.62% reach 1.00 deaths 198,791
+  disease-4 modern         224-230 r0 3.42 lethality 0.0069 drawn 0.1266% realised 0.1317% reach 1.00 deaths 3,688
+  disease-4 modern         236-241 r0 2.83 lethality 0.0076 drawn 0.1243% realised 0.1338% reach 1.00 deaths 3,762
+  disease-4 modern         250-256 r0 3.13 lethality 0.0080 drawn 0.1370% realised 0.1456% reach 1.00 deaths 4,099
+  disease-4 modern         278-282 r0 3.61 lethality 0.0182 drawn 0.3244% realised 0.3423% reach 1.00 deaths 9,242
+  disease-4 modern         273-288 r0 2.22 lethality 0.0511 drawn 0.6315% realised 0.6552% reach 0.96 deaths 17,984
+  disease-4 modern         283-289 r0 2.42 lethality 0.0071 drawn 0.1018% realised 0.1100% reach 0.92 deaths 2,883
+  disease-4 modern         297-306 r0 2.91 lethality 0.0062 drawn 0.1011% realised 0.1048% reach 1.00 deaths 2,777
+  disease-4 modern         316-325 r0 2.94 lethality 0.0081 drawn 0.1302% realised 0.1357% reach 1.00 deaths 3,496
+  disease-4 modern         358-364 r0 3.49 lethality 0.0055 drawn 0.0978% realised 0.1014% reach 1.00 deaths 2,577
+  disease-4 modern         365-372 r0 2.61 lethality 0.0175 drawn 0.2560% realised 0.2780% reach 1.00 deaths 7,085
+  disease-4 modern         371-376 r0 3.53 lethality 0.0056 drawn 0.0999% realised 0.1076% reach 1.00 deaths 2,740
+  disease-4 modern         431-441 r0 2.89 lethality 0.0098 drawn 0.1548% realised 0.1560% reach 1.00 deaths 3,215
+  disease-4 modern         451-456 r0 3.47 lethality 0.0121 drawn 0.2106% realised 0.2254% reach 1.00 deaths 4,621
+  disease-4 modern         467-470 r0 3.71 lethality 0.0092 drawn 0.1632% realised 0.2010% reach 1.00 deaths 4,038
+  disease-4 modern         508-512 r0 3.09 lethality 0.0045 drawn 0.0765% realised 0.0839% reach 1.00 deaths 1,584
+  disease-4 modern         513-518 r0 3.18 lethality 0.0056 drawn 0.0945% realised 0.0984% reach 1.00 deaths 1,879
+  disease-4 modern         523-534 r0 2.58 lethality 0.0145 drawn 0.2201% realised 0.2229% reach 1.00 deaths 4,052
+  disease-4 modern         537-544 r0 3.23 lethality 0.0140 drawn 0.2399% realised 0.2501% reach 1.00 deaths 4,487
+  disease-5 modern         8-14 r0 3.59 lethality 0.0126 drawn 0.2456% realised 0.2754% reach 1.00 deaths 8,367
+  disease-5 modern         30-34 r0 3.50 lethality 0.2174 drawn 4.00% realised 4.24% reach 1.00 deaths 166,049
+  disease-5 modern         44-49 r0 2.63 lethality 0.0039 drawn 0.0595% realised 0.0655% reach 1.00 deaths 2,623
+  disease-5 modern         85-90 r0 3.46 lethality 0.0091 drawn 0.1627% realised 0.1712% reach 1.00 deaths 6,940
+  disease-5 modern         89-92 r0 3.25 lethality 0.0175 drawn 0.3040% realised 0.3481% reach 1.00 deaths 14,210
+  disease-5 modern         105-109 r0 4.15 lethality 0.0058 drawn 0.1097% realised 0.1154% reach 1.00 deaths 4,301
+  disease-5 modern         127-132 r0 2.73 lethality 0.0057 drawn 0.0854% realised 0.0919% reach 1.00 deaths 3,255
+  disease-5 modern         129-133 r0 3.90 lethality 0.0046 drawn 0.0830% realised 0.0883% reach 1.00 deaths 3,127
+  disease-5 modern         144-148 r0 4.01 lethality 0.0114 drawn 0.2039% realised 0.2172% reach 1.00 deaths 7,381
+  disease-5 modern         191-198 r0 3.17 lethality 0.0166 drawn 0.2598% realised 0.2688% reach 1.00 deaths 8,397
+  disease-5 modern         237-245 r0 2.82 lethality 0.0057 drawn 0.0817% realised 0.0856% reach 1.00 deaths 2,423
+  disease-5 modern         265-268 r0 4.15 lethality 0.0101 drawn 0.1752% realised 0.1953% reach 1.00 deaths 5,264
+  disease-5 modern         306-312 r0 3.25 lethality 0.0059 drawn 0.0926% realised 0.0979% reach 1.00 deaths 2,518
+  disease-5 modern         308-315 r0 2.65 lethality 0.0050 drawn 0.0678% realised 0.0693% reach 0.96 deaths 1,774
+  disease-5 modern         314-316 r0 3.74 lethality 0.0106 drawn 0.1777% realised 0.2434% reach 1.00 deaths 6,284
+  disease-5 modern         312-320 r0 2.28 lethality 0.0275 drawn 0.3122% realised 0.3259% reach 0.96 deaths 8,391
+  disease-5 modern         358-361 r0 3.84 lethality 0.0037 drawn 0.0631% realised 0.0688% reach 1.00 deaths 1,718
+  disease-5 modern         366-372 r0 3.41 lethality 0.0074 drawn 0.1194% realised 0.1258% reach 1.00 deaths 3,130
+  disease-5 modern         386-390 r0 2.97 lethality 0.0096 drawn 0.1434% realised 0.1611% reach 1.00 deaths 3,656
+  disease-5 modern         412-415 r0 4.32 lethality 0.0040 drawn 0.0691% realised 0.0745% reach 1.00 deaths 1,541
+  disease-5 modern         420-430 r0 2.55 lethality 0.0125 drawn 0.1619% realised 0.1664% reach 0.96 deaths 3,428
+  disease-5 modern         466-469 r0 3.01 lethality 0.0098 drawn 0.1465% realised 0.1994% reach 0.96 deaths 3,790
+  disease-5 modern         495-499 r0 3.34 lethality 0.2596 drawn 4.14% realised 4.61% reach 1.00 deaths 82,674
+  disease-5 modern         525-536 r0 2.34 lethality 0.2024 drawn 2.35% realised 1.97% reach 0.85 deaths 34,555

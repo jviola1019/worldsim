@@ -103,6 +103,11 @@ Collected 2026-11-25 for the yearly world pandemic draw (`population/pandemic.ts
 
 **How the draw uses these.** A pandemic is drawn with yearly probability `pandemicPreIndustrial + (pandemicModern - pandemicPreIndustrial) x connectivity`, where connectivity is the share of linked settlements times `clamp((leadEra - 6) / 4, 0, 1)`. Its intended world death share follows a Pareto tail with exponent 0.71, scaled so 1/8 of draws reach 1% (the floor is then about 0.05% of the world), capped at 30%. R is drawn in 1.4-3 (2009 H1N1 1.46 to COVID-19 2.69). The historical R and death figures are realised under the medicine of their day, so the drawn R and share describe the pandemic in the world's average town: base r0 and lethality are divided by the population-weighted mean protection of the world's towns. The audit (`scripts/disease-audit.ts`) checks realised against drawn.
 
+**Measured (disease audit, 6 Observer worlds x 600 years, 96², `docs/data/round10/disease-audit-era1.txt` and `-era10.txt`).**
+- From era 10 (3,600 world-years, connectivity 1.00): 4.61 pandemics drawn and 4.53 logged per world-century (history: 4-5); 26 of 163 realised at least 1% of the world, 0.72 per world-century, or 0.72% a year (Marani et al.: 0.27-1.9%); pandemic deaths 3.37% of the population per century (20th century: roughly 1.2-6%, mostly 1918); realised / drawn share median 1.06. The largest killed 16.9% of its world (drawn 17.5%): the tail allows Black Death-scale events in modern worlds about once in a thousand world-years.
+- From era 1 (3,418 pre-industrial world-years, connectivity 0): 0.47 drawn and 0.32 logged per world-century (model rate 0.5); realised / drawn median 0.74, since links carry a pandemic less far in sparse early worlds. Only 182 industrial world-years, with one pandemic: too few to judge that band.
+- No nation ended by `pandemic` in either run.
+
 Queries (2026-11-25, standard web search, no personal or project details):
 1. Marani 2021 PNAS intensity and frequency of extreme novel epidemics probability per year Spanish flu (then the PMC full text, fetched)
 2. influenza pandemics since 1500 number list historical frequency per century

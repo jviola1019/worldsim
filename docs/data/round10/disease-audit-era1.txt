@@ -1,0 +1,49 @@
+disease audit · 6 worlds × 600 years · 96² · Observer rules from era 1 (Prehistoric) with 5 peoples
+  disease-0: highest era Early Industrial · pre-industrial 583y, industrial 17y, modern 0y · pandemics drawn 3 · population now 1,146,691
+  disease-1: highest era Renaissance & Exploration · pre-industrial 600y, industrial 0y, modern 0y · pandemics drawn 2 · population now 926,672
+  disease-2: highest era Early Industrial · pre-industrial 515y, industrial 85y, modern 0y · pandemics drawn 2 · population now 1,724,585
+  disease-3: highest era Early Industrial · pre-industrial 591y, industrial 9y, modern 0y · pandemics drawn 7 · population now 1,300,584
+  disease-4: highest era Early Industrial · pre-industrial 529y, industrial 71y, modern 0y · pandemics drawn 2 · population now 1,260,752
+  disease-5: highest era Renaissance & Exploration · pre-industrial 600y, industrial 0y, modern 0y · pandemics drawn 1 · population now 1,357,545
+
+per era band (rates per world-century; death share = disease deaths / mean world population, per century):
+  pre-industrial: 3418 world-years, mean world population 262,388, mean connectivity 0.00
+    outbreaks (new natural pathogens) 171 (5.00 per century); engineered 0
+    logged epidemics 2185 (63.93 per century)
+    pandemics drawn 16 (0.47 per century); logged 11 (0.32 per century)
+    deaths per century: local outbreaks 29.59%, pandemics 0.5135% of the population
+    largest pandemic: 7.45% of the world (60 dead, drawn target 30.00%, disease-0 year 108)
+    endings: conquest 14, civil_war 6, famine 1; pandemic endings 0
+  industrial: 182 world-years, mean world population 1,388,407, mean connectivity 0.25
+    outbreaks (new natural pathogens) 15 (8.24 per century); engineered 0
+    logged epidemics 222 (121.98 per century)
+    pandemics drawn 1 (0.55 per century); logged 1 (0.55 per century)
+    deaths per century: local outbreaks 18.34%, pandemics 0.1665% of the population
+    largest pandemic: 0.3533% of the world (4,206 dead, drawn target 0.2972%, disease-4 year 541)
+    endings: civil_war 3, conquest 2; pandemic endings 0
+  modern: no years in this band
+
+largest logged town epidemic: The Waipeth Fever killed 21,421 in Shuisthuis (year 598, industrial)
+
+realised vs drawn severity (17 finished pandemics):
+  drawn to kill >= 1% of the world: 4 (0.24); realised >= 1%: 3 (0.18)
+  realised / drawn share: median 0.742, quartiles 0.257-1.024
+
+every finished pandemic (world, band, years, r0, lethality, drawn share, realised share, share of towns reached, deaths):
+  disease-0 pre-industrial 84-87 r0 2.52 lethality 0.0022 drawn 0.1657% realised 0.0592% reach 0.20 deaths 0
+  disease-0 pre-industrial 108-110 r0 3.26 lethality 0.3407 drawn 30.00% realised 7.45% reach 0.08 deaths 60
+  disease-0 pre-industrial 494-501 r0 2.51 lethality 0.0223 drawn 1.97% realised 1.92% reach 0.80 deaths 18,625
+  disease-1 pre-industrial 232-233 r0 2.72 lethality 0.0050 drawn 0.4314% realised 0.3202% reach 0.21 deaths 27
+  disease-1 pre-industrial 374-377 r0 2.62 lethality 0.0007 drawn 0.0635% realised 0.0253% reach 0.28 deaths 27
+  disease-2 pre-industrial 158-162 r0 1.76 lethality 0.0032 drawn 0.1675% realised 0.0307% reach 0.26 deaths 1
+  disease-2 pre-industrial 504-512 r0 2.41 lethality 0.0024 drawn 0.1653% realised 0.1691% reach 0.99 deaths 2,136
+  disease-3 pre-industrial 134-135 r0 3.57 lethality 0.0277 drawn 2.54% realised 0.6524% reach 0.10 deaths 6
+  disease-3 pre-industrial 199-200 r0 3.07 lethality 0.0052 drawn 0.4652% realised 0.4463% reach 0.14 deaths 18
+  disease-3 pre-industrial 195-202 r0 1.97 lethality 0.0015 drawn 0.0982% realised 0.0052% reach 0.14 deaths 0
+  disease-3 pre-industrial 317-326 r0 1.39 lethality 0.0042 drawn 0.2271% realised 0.0525% reach 0.17 deaths 28
+  disease-3 pre-industrial 440-448 r0 1.98 lethality 0.0009 drawn 0.0727% realised 0.0347% reach 0.43 deaths 181
+  disease-3 pre-industrial 505-523 r0 1.32 lethality 0.0021 drawn 0.1089% realised 0.0856% reach 0.80 deaths 815
+  disease-3 pre-industrial 547-552 r0 1.68 lethality 0.0016 drawn 0.1122% realised 0.1239% reach 1.00 deaths 1,381
+  disease-4 pre-industrial 514-528 r0 1.42 lethality 0.0050 drawn 0.2880% realised 0.2997% reach 1.00 deaths 3,050
+  disease-4 industrial     541-545 r0 1.67 lethality 0.0048 drawn 0.2972% realised 0.3533% reach 1.00 deaths 4,206
+  disease-5 pre-industrial 518-526 r0 2.00 lethality 0.0216 drawn 1.76% realised 1.92% reach 0.97 deaths 17,936
