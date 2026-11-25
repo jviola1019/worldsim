@@ -39,7 +39,7 @@ The top-left card counted wandering bands as nations: year 0 of a primitive worl
 - **Observer** keeps the old hands-off Realistic exactly. Before the history-level fixes below, its 1,000-year run reproduced round 9 byte for byte.
 - **Slow pace** places a band of 24 humans next to fresh water on an empty 128² world (`scripts/pace-calibrate.ts`, 5 seeds, final code):
 
-*(Pending: three of five worlds are still running; finished so far: first village at years 42–156 in all five, first city at years 860 and 1,023.)*
+*(Superseded: the final Slow-pace table, measured after this round's pace fixes, is in the addendum below.)*
 
 ### Game-mode audit (`scripts/mode-audit.ts`, 3 worlds per mode, 128²)
 
@@ -92,6 +92,119 @@ The fixes above change history in every world: explorers create contact, ports s
 - the population ledger, finite values and the GDP identity hold in **20/20**;
 - medians, round 9 → round 10: surviving nations 6 → 8, wars 70 → 81, population 1.27M → 1.35M, highest era 7 → 7. More contact between peoples means more nations meet, trade and fight;
 - speed: median 25 → 32 ms per year. Both rounds shared the CPU with other simulations (here 3 calibration runs and 4 history runs), so the timing comparison is rough. Exploration adds one sea pathfind per voyage.
+
+### Addendum (2026-11-25): Realistic is the real world only, life placed by hand, the placing hand
+
+Plan: [`superpowers/plans/2026-11-25-realistic-life-hand.md`](superpowers/plans/2026-11-25-realistic-life-hand.md); spec: [`superpowers/specs/2026-11-25-realistic-life-hand-design.md`](superpowers/specs/2026-11-25-realistic-life-hand-design.md). Raw data in `docs/data/round10/` (files named below).
+
+#### What changed, owner decisions first
+- **Real world only.** Realistic and Observer can never hold fantasy peoples, monsters, horrors, alien land or wildlife, or exotic matter.
+  - Enforced at creation and on load. A save that claims to be Realistic but holds fiction loads as a god-mode world, intact.
+  - **Tests:** `tests/powers/realWorld.test.ts`, covering every preset and scenario under both power sets, forged saves and clean saves.
+- **Everything science allows.** Realistic opens every science-based technology, era 15 included, and every law a realistic catastrophe or ending needs.
+  - **Tests:** `tests/config/presets.test.ts`, `tests/modes/realEvents.test.ts`.
+- **You place only people and animals.**
+  - Humans plus 24 real species, four of them new this round: elephants, water buffalo, llamas and seals, with growth rates from sourced ranges (`research-notes.md`).
+  - Land tools and disasters are god mode only. Fish cannot go on land, nor deer into the sea.
+- **The placing hand,** visual only.
+  - **e2e:** dock contents, hover hand, the drop animates and ends, a tribe afterwards, one still frame under Reduce motion.
+  - Captures were inspected by eye (DESIGN-REVIEW §R10 addendum).
+
+#### Root causes found by this round's audits, and fixed (each with a failing test first)
+
+| Found by | Cause | Fix | Test |
+|---|---|---|---|
+| Life audit | Land predators were never seeded: weighted 0.25 at seeding, but a weight above 0.3 was required | Test the habitat itself | `predation.test.ts` |
+| Life audit | A pack could take 18% of a prey herd a month (about 90% a year) | At most 2% a month, never more than the prey's own monthly growth. Packs hunt every herd within 5 tiles and head for the richest prey in country they can live in. Seeded predators start within reach of edible prey of their realm | `predation.test.ts` |
+| Code review | Predators ate across realms: wolves lived off fish, seals took deer from beaches | Prey must be of the hunter's realm, not birds. The test fails with the old code (6.5 against a 4.3 cap) | `predation.test.ts` |
+| Life audit | Sea animals' habitat was all-or-nothing and ignored temperature, so whales bled out in shallow water | Same rule as on land | `predation.test.ts` |
+| A causal test failing after the history change | Power plants drew fuel before the month's mining, so a nation owned 49–77 idle fossil plants while mining coal | Staff power first, burn fuel after the mines | `tests/economy/fuelOrder.test.ts` |
+| Map-shape test | Every start could land inland by chance (dry sites were accepted 30% of the time) | People begin by a river, lake or sea | `presets.test.ts` (start sites) |
+| Pace test | A lucky draw settled a Slow band at year 27 | No permanent camp in a lineage's first 30 years on new land | `pace.test.ts` |
+| **Checkpointed pace run** | **A save failed** (`Invalid string length`): each band split restarted that delay. One world held 1,272 bands and 83,344 individual foragers by year 400 | Daughter bands keep their arrival year; population pressure raises Slow settling (`slowPressureSettle`, [C]). That world at year 500: 24 bands, 4,183 person records, 5.3 MB | `pace.test.ts` |
+| CI #73, #75, #77 | Person-inspector chips were about 22 px tall on desktop (WCAG 2.5.8) | 24 px on every pointer | `tests/ui/targetSize.test.ts` |
+| CI #68 | The a11y audit waited on infinite animations (broadcast feed) until the 30-minute timeout | Finite animations only, capped at 3 s | CI green from #76 |
+| CI #83 | The hand-motion e2e check sampled only twice and flaked on WebKit | Five samples | e2e |
+
+**Seed-dependent tests were re-measured over more worlds, not re-seeded:**
+- **Ethos temples:** 8 worlds, 14 against 6, never reversed.
+- **Public jobs:** 4 twin worlds; 5 of 6 probed were lower.
+- **Clean levers:** a 3-year mechanism test. With plants burning fuel, all 6 probed worlds emit 5–38% less.
+- **Knowledge diffusion:** the control now excludes each arm's own research target.
+- **Island sea trade:** run to the scenario's 200-year horizon.
+- **Long Standoff:** a world that reaches its goal (3 of 5 do).
+
+#### Life audit (`scripts/life-audit.ts 3 100 96`, expectations written before the run; `life-audit.txt`)
+
+**141 of 153 cases meet the expectation.**
+
+| Group | Result |
+|---|---|
+| Humans in 9 good biomes | Grow in every world (to roughly 100–200 from 24 in 100 years) |
+| Humans on desert, mountain, snow and tundra | Walk off to livable land in every world |
+| Grazers and sea animals at home | Grow |
+| Grazers and sea animals at hostile sites | Decline, die or leave |
+| **Misses** | All 9 land-predator home drops die out: a pack's 5-tile reach covers one prey herd, and packs do not range between herds (STATUS 11). All 3 seals placed at the warm edge of their range decline |
+
+#### Events audit (`scripts/events-audit.ts 6 300 96 11`; `events-audit.txt`)
+
+Six developed worlds under Realistic rules, 300 years each, starting in era 11.
+- **Fictional endings:** none.
+- **Rare catastrophes match their documented rates:** geomagnetic storms 12 in 1,800 world-years (12 expected at 1/150); Tunguska-class airbursts 2 (2.25 expected at 1/800).
+- **Regional disasters:** 0.057 per world-year, a stylized rate far below whole-Earth frequencies (research notes §3).
+- **Modern events that occurred** (earlier run on the same rules): AI systems and incidents, cyberattacks, nuclear states, space stations, chemical attacks, climate tipping points, financial crises.
+- **Not observed:** pandemics (no epidemics at all), nuclear strikes, AI takeover.
+- **Finding:** the worlds never left era 11 (STATUS 9–10, open questions for the owner).
+
+#### Game modes on the final code (`mode-audit2.txt`, 3 worlds per mode; Realistic and Realms of Legend also with 6, `mode-audit-realistic-fantasy-6.txt`)
+- **Realistic:**
+  - starts empty, places life only, allows every science-based technology, and nothing fictional appears: all 3/3;
+  - the dropped band settles a village within 250 years in 5/6.
+- **Observer:** 4 of 4 promises in 3 of 3 worlds.
+- **Promises met only sometimes:**
+  - coal-rich nations industrialise first: 1/3 (was 2/3);
+  - Long Standoff organization: 1/3 (3/5 in a 5-world run);
+  - a monster slain: 2/6;
+  - Space Race colony: now 3/3.
+- **Every other promise:** 3/3.
+
+#### Balance and invariants on the final code
+- **Four 1,000-year histories against round 9** (`compare2-vs-round9.md`):
+
+  | Measure | Round 9 → final code |
+  |---|---|
+  | Population at year 1,000 | −2%, −11%, +12%, +8% (the first round-10 runs: −10%, −25%, −13%, +8%) |
+  | Mean unemployment | 11.3% → 8.9% |
+  | Mean warming | 6.14 → 6.58 °C |
+  | Food shortage | none in any world |
+
+  - Later milestones are within about ±10%.
+  - Shifts beyond ±15% occur only in early eras: modern-2 Bronze +20%; realistic-1 Bronze +17% and Iron +15%. They close by the Medieval era. They are consistent with this round's early-history changes, but not causally traced.
+  - These Standard-pace runs predate the pace fix (94d3960), which changes only Slow pace.
+- **20 seeds × 600 years** (`multi-seed2-20x600.txt`):
+  - ledger, finite values and GDP identity hold in **20/20**;
+  - medians: 8 nations alive, 93 wars, population 1.25M, era 7 everywhere;
+  - timings are not comparable: about 15 runs shared 4 CPUs.
+
+#### Gate on the final code
+**Unit tests:**
+- 751/751 before the pace fix.
+- The run on the final code (after the pace fix, 94d3960) was still running when this section was written; its result will replace this line.
+
+**Browsers:**
+- e2e: 106/106 in Chromium and in WebKit.
+- `npm run a11y`: 80/80 in each, 0 findings at any impact.
+- `node tools/viewports.mjs`: 6/6.
+
+All browser testing is emulation (iPhone 13 and desktop), not a physical device or screen reader.
+
+**Dependencies:** `npm outdated` reports none; `npm audit` reports 0 vulnerabilities.
+
+#### Slow pace (`scripts/pace-calibrate.ts 1600 slow`, five seeds, the final code)
+*In progress:* the five seeds are re-running on the final code. Finished so far: pace-b (village at year 58, town at 804, city at 1,035) and pace-e (village at 139, town at 808, city at 1,056). The full table will replace this note.
+
+#### GitHub Actions and the live site (round 10)
+*To be recorded* once the final commit's CI and Pages runs finish. So far: CI #74, #76 and #82 passed and Pages deployed from them. #73, #75 and #77 failed on the chip target size (fixed in #79), and #83 on the flaky hand check (fixed).
 
 ## R9. Round 9: device-labelled saves, WorldBox-style close zoom, follow camera, warming, unemployment, WebKit (2026-11-19)
 
