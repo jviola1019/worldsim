@@ -16,7 +16,7 @@ export function Dock({ settings, noPeople = false, tool, setTool, brushSize, set
     <div class="dock">
       {grounded && !cat && (
         <div class="realism-note" role="note">
-          {noPeople ? 'No people yet: pick Humans in the Peoples tools and tap dry land near water to place the first band.' : 'Realistic: real people, animals, land and natural disasters only'}
+          {noPeople ? 'No people yet: pick Humans in the Peoples tools and tap dry land near water to place the first band.' : 'Realistic: drop in people and animals. Nature does the rest.'}
         </div>
       )}
       {active && (

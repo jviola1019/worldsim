@@ -162,7 +162,8 @@ export function civFeatures(sim: Sim, civ: Civ): Set<GeoFeature> {
   return set;
 }
 
-function realismAllows(sim: Sim, t: TechDef): boolean {
+/** Does the world's technology setting permit `t` at all (realism mode and the speculative law)? */
+export function techPermitted(sim: Sim, t: TechDef): boolean {
   const mode = sim.w.meta.settings.realism;
   if (t.realism === 'speculative') return sim.w.laws.speculativeTech && mode === 'unrestricted';
   if (t.realism === 'plausible' && mode === 'grounded' && t.era >= 13) return false;
@@ -172,7 +173,7 @@ function realismAllows(sim: Sim, t: TechDef): boolean {
 /** Can this civ research/discover `t` right now? */
 export function techAvailable(sim: Sim, civ: Civ, t: TechDef): boolean {
   if (knows(civ, t.id)) return false;
-  if (!realismAllows(sim, t)) return false;
+  if (!techPermitted(sim, t)) return false;
   if (t.advancedWeapon && !sim.w.laws.advancedWeapons) return false;
   for (const p of t.prereqs) if (!knows(civ, p)) return false;
   if (t.requires?.minPopulation && civ.population < t.requires.minPopulation) return false;

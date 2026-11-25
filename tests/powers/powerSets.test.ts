@@ -1,6 +1,6 @@
 /**
- * Round 10: worlds have a power set. Realistic is 'grounded' (real people, real animals, land shaping,
- * natural disasters); Observer is 'none'; god mode is 'all'. Old observer saves stay 'none'.
+ * Round 10: worlds have a power set. Realistic is 'grounded' (round 10 addendum: place real people and
+ * real animals only); Observer is 'none'; god mode is 'all'. Old observer saves stay 'none'.
  */
 import { describe, it, expect } from 'vitest';
 import { POWERS, POWER_BY_ID, applyPower } from '../../src/powers/powers';
@@ -9,15 +9,9 @@ import { assignMission } from '../../src/civilizations/missions';
 import { encodeWorld, decodeWorld } from '../../src/persistence/serialize';
 import { makeSim } from '../helpers';
 
-const GROUNDED = [
-  'raise', 'lower', 'mountain', 'ocean', 'shallow', 'river', 'fertility_up', 'fertility_down', 'res_remove',
-  ...POWERS.filter((p) => p.id.startsWith('res_') && p.id !== 'res_exotic').map((p) => p.id),
-  ...POWERS.filter((p) => p.id.startsWith('biome_') && !['biome_alien_grass', 'biome_corrupt', 'biome_crystal'].includes(p.id)).map((p) => p.id),
-  'trees', 'clear', 'rain', ...POWERS.filter((p) => p.id.startsWith('animal_')).map((p) => p.id),
-  'spawn_human',
-  ...POWERS.filter((p) => p.id.startsWith('dis_')).map((p) => p.id),
-  'asteroid', 'supervolcano', 'superflare', 'gamma_burst', 'emp',
-];
+// round 10 addendum (owner): in Realistic you place only people and animals; land tools, disasters and
+// every other power are god mode only. Disasters still happen on their own at natural rates.
+const GROUNDED = ['spawn_human', ...POWERS.filter((p) => p.id.startsWith('animal_')).map((p) => p.id)];
 const ctx = { selectedCiv: 0 };
 const land = (sim: ReturnType<typeof makeSim>) => {
   const m = sim.w.map;
@@ -36,8 +30,8 @@ describe('power sets', () => {
     const [x, y] = land(sim);
     sim.syncRng();
     const before = encodeWorld(sim.w);
-    for (const id of ['spawn_sylvan', 'monster', 'found_city', 'war', 'nuke', 'climate_warm', 'tech_grant', 'horror_zombie']) {
-      expect(applyPower(sim, id, x, y, 2, ctx), id).toBe('Not available in this world');
+    for (const id of ['spawn_sylvan', 'monster', 'found_city', 'war', 'nuke', 'climate_warm', 'tech_grant', 'horror_zombie', 'raise', 'river', 'trees', 'rain', 'biome_grass', 'res_iron', 'dis_fire', 'dis_lightning', 'asteroid', 'supervolcano', 'emp']) {
+      expect(applyPower(sim, id, x, y, 2, ctx), id).toBe('Not available in this world: Realistic lets you place only people and animals.');
     }
     sim.syncRng();
     expect(encodeWorld(sim.w)).toEqual(before);
@@ -54,7 +48,7 @@ describe('power sets', () => {
   it('none refuses everything, even placing humans', () => {
     const sim = makeSim('ps-3', 48, (c) => { c.settings.powerSet = 'none'; c.settings.startCivs = 0; });
     const [x, y] = land(sim);
-    expect(applyPower(sim, 'spawn_human', x, y, 1, ctx)).toBe('Not available in this world');
+    expect(applyPower(sim, 'spawn_human', x, y, 1, ctx)).toBe('Not available in this world: Observer allows no powers.');
     expect(sim.w.bands.size).toBe(0);
   });
 
@@ -80,5 +74,14 @@ describe('power sets', () => {
     const sim = makeSim('ps-7', 48, (c) => { c.settings.powerSet = 'grounded'; c.settings.startEra = 4; });
     const civ = [...sim.w.civs.values()][0];
     expect(assignMission(sim, civ, 'expand' as never)).toBe(false);
+  });
+
+  it('an old round-10 Realistic save (made when land tools were allowed) loads and refuses them now', () => {
+    const sim = makeSim('ps-8', 32, (c) => { c.settings.powerSet = 'grounded'; c.settings.startCivs = 0; });
+    sim.syncRng();
+    const w = decodeWorld(encodeWorld(sim.w));
+    expect(powerSetOf(w.meta.settings)).toBe('grounded');
+    expect(powerAllowed(w.meta.settings, POWER_BY_ID.raise)).toBe(false);
+    expect(powerAllowed(w.meta.settings, POWER_BY_ID.spawn_human)).toBe(true);
   });
 });

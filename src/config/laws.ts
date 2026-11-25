@@ -87,11 +87,11 @@ export const PRESETS: Preset[] = [
   {
     key: 'realistic',
     name: 'Realistic',
-    description: 'An empty Earth-like world at year 0, with land, plants and wild animals. Place the first humans and watch them take generations to settle and centuries to build cities. Only real people, animals, land shaping and natural disasters.',
+    description: 'An empty Earth-like world at year 0, with land, plants and wild animals. Drop in the first humans and animals and watch people take generations to settle and centuries to build cities. Nature and history do the rest, with everything that could really happen, from droughts to AI and nuclear war, and nothing that could not.',
     apply: (c) => {
       c.settings.startEra = 1;
       c.settings.startCivs = 0; // you place the first humans
-      c.settings.realism = 'grounded';
+      c.settings.realism = 'unrestricted'; // round 10 addendum (owner): every science-based technology
       c.settings.fantasy = false;
       c.settings.alien = false;
       c.settings.disasterFrequency = 1;
@@ -99,7 +99,8 @@ export const PRESETS: Preset[] = [
       c.settings.powerSet = 'grounded';
       c.settings.pace = 'slow';
       c.laws.fantasyCreatures = false;
-      c.laws.speculativeTech = false;
+      c.laws.speculativeTech = true;
+      c.laws.advancedWeapons = true;
       c.laws.disasters = true;
       c.laws.diseases = true;
       c.laws.horrors = false;

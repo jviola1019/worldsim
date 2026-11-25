@@ -5,6 +5,8 @@
 import { describe, it, expect } from 'vitest';
 import { PRESETS, defaultConfig } from '../../src/config/laws';
 import { createSimulation } from '../../src/sim/bootstrap';
+import { TECHS } from '../../src/technology/techData';
+import { techPermitted } from '../../src/technology/research';
 
 const applied = (key: string) => {
   const c = defaultConfig();
@@ -24,7 +26,12 @@ describe('Realistic and Observer presets', () => {
     expect(c.settings.empty).toBe(false);
     expect(c.laws.horrors).toBe(false);
     expect(c.laws.fantasyCreatures).toBe(false);
+    // round 10 addendum (owner): every science-based technology, era 15 included
+    expect(c.settings.realism).toBe('unrestricted');
+    expect(c.laws.speculativeTech).toBe(true);
+    expect(c.laws.advancedWeapons).toBe(true);
     const sim = createSimulation(c);
+    expect(TECHS.every((t) => techPermitted(sim, t))).toBe(true);
     expect(sim.year).toBe(0);
     expect(sim.w.herds.size).toBeGreaterThan(0);
     expect(sim.w.bands.size).toBe(0);
