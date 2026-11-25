@@ -79,8 +79,11 @@ export function habitat(sim: Sim, sp: SpeciesDef, i: number): number {
   const m = sim.w.map;
   const t = m.terrain[i];
   const water = isWaterTerrain(t);
-  if (sp.aquatic) return water && sp.biomes.includes(t) ? 1 : 0;
-  if (water && !sp.flying) return 0;
+  // round 10 addendum (life audit): sea animals follow the land rule (a quarter outside their home waters, scaled by
+  // temperature) instead of all-or-nothing: whales crossing shallow coastal water bled out at 4% a month, and
+  // seals ignored water temperature entirely
+  if (sp.aquatic && !water) return 0;
+  if (water && !sp.flying && !sp.aquatic) return 0;
   const temp = m.temp[i] + localHeat(sim, i);
   let s = sp.biomes.includes(t) ? 1 : 0.25;
   if (temp < sp.temp[0] - 6 || temp > sp.temp[1] + 6) s *= 0.1;
@@ -131,13 +134,20 @@ export function spawnHerd(sim: Sim, key: string, x: number, y: number, count?: n
   return h;
 }
 
-function pickTarget(sim: Sim, h: Herd, sp: SpeciesDef): void {
+/** Choose where a herd heads next (exported for tests). */
+export function pickTarget(sim: Sim, h: Herd, sp: SpeciesDef = SPECIES_BY_KEY[h.species]): void {
   const m = sim.w.map;
   const rng = sim.rng;
   if (sp.diet === 'predator') {
-    const prey = herdsNear(sim, h.x, h.y, 12).filter((o) => o !== h && SPECIES_BY_KEY[o.species]?.diet !== 'predator' && SPECIES_BY_KEY[o.species]?.meat >= 0.01);
+    // round 10 addendum: only prey standing in country the predator can live in (great cats followed deer up
+    // into cold mountains and died there; life audit)
+    const prey = herdsNear(sim, h.x, h.y, 12).filter((o) => o !== h && SPECIES_BY_KEY[o.species]?.diet !== 'predator' && SPECIES_BY_KEY[o.species]?.meat >= 0.01
+      && habitat(sim, sp, Math.floor(o.y) * m.w + Math.floor(o.x)) >= 0.2);
     if (prey.length) {
-      prey.sort((a, b) => (a.x - h.x) ** 2 + (a.y - h.y) ** 2 - ((b.x - h.x) ** 2 + (b.y - h.y) ** 2) || a.id - b.id);
+      // round 10 addendum: head for the richest prey nearby, not merely the nearest herd (chasing small, straying
+      // herds led packs away from their prey base until they starved; life audit)
+      const value = (o: Herd) => o.count / (1 + Math.hypot(o.x - h.x, o.y - h.y) / 4);
+      prey.sort((a, b) => value(b) - value(a) || a.id - b.id);
       h.tx = prey[0].x;
       h.ty = prey[0].y;
       return;
@@ -214,12 +224,20 @@ export function herdsMonthly(sim: Sim): void {
     const hab = habitat(sim, sp, i);
     let fed = 1;
     if (sp.diet === 'predator' || sp.diet === 'omnivore') {
-      const prey = herdsNear(sim, h.x, h.y, 2.5).filter((o) => o !== h && SPECIES_BY_KEY[o.species]?.diet === 'herbivore' && o.owner === 0);
+      const prey = herdsNear(sim, h.x, h.y, sp.diet === 'predator' ? BALANCE.huntReach : 2.5).filter((o) => o !== h && SPECIES_BY_KEY[o.species]?.diet === 'herbivore' && o.owner === 0);
       if (prey.length) {
-        const p = prey[0];
-        const kills = Math.min(p.count * 0.18, h.count * 0.9);
-        p.count -= kills;
-        fed = Math.min(1, kills / Math.max(0.5, h.count * 0.6));
+        // round 10 addendum: a pack hunts every prey herd in reach, taking at most predationCap of each in a month
+        const need = Math.max(0.5, h.count * BALANCE.preyPerPredator);
+        let kills = 0;
+        for (const p of prey) {
+          if (kills >= need) break;
+          // never more than the prey's own monthly growth: slow breeders (buffalo, elephants) were hunted down
+          const cap = Math.min(BALANCE.predationCap, (SPECIES_BY_KEY[p.species]?.growth ?? 0) / 12);
+          const k = Math.min(p.count * cap, need - kills);
+          p.count -= k;
+          kills += k;
+        }
+        fed = Math.min(1, kills / need);
         h.hunger = 0;
       } else if (sp.diet === 'predator') {
         h.hunger++;

@@ -111,18 +111,19 @@ describe('F3 climate mitigation', () => {
 });
 
 describe('F3 climate mitigation: emissions and the feedback store', () => {
-  // round 10 addendum: a 1-year mechanism test over 3 warmed worlds (was one world over 20 years). Measured on 6 worlds:
-  // the levers cut emissions in every world in the first year (2-7%, mean 3%) and in 5 of 6 over 3 years, but over 20
-  // years the twins diverge chaotically (+-8%) and the mean effect (about +-3%, before and after this round's history
-  // changes) is smaller than that noise. The large reduction in warming comes from the finite feedback store (next test).
-  it('warmed worlds emit less in the first year with electric steel and clean power than without (counterfactual, 3 twin worlds)', () => {
+  // round 10 addendum: a 3-year mechanism test over 3 warmed worlds (was one world over 20 years). Over 20 years the twins
+  // diverge chaotically (+-8%), and before this round the mean effect (about +-3%) was smaller than that noise, partly
+  // because fossil plants drew fuel before the mines produced it and often stood idle. With plants burning this month's
+  // fuel (production.ts), measured on 6 worlds: every world emits less over 3 years (5-38%, mean about 15%); year 1 is
+  // too early in some worlds (new plants take time). The large reduction in warming comes from the feedback store (next test).
+  it('warmed worlds emit less over 3 years with electric steel and clean power than without (counterfactual, 3 twin worlds)', () => {
     for (const seed of ['r8-emit', 'r8-emit-2', 'r8-emit-3']) {
       const base = makeSim(seed, 96, (c) => { c.settings.startEra = 13; });
       base.runYears(2);
       base.w.climate.anomaly = 3;
       const on = clone(base), off = clone(base);
       const keep = { s: BALANCE.steelGreenStrict, b: BALANCE.steelGreenBasic, n: BALANCE.steelGreenNone, p: BALANCE.cleanPowerScore, c: BALANCE.cleanPowerStrictBonus };
-      const emitted = (sim: Simulation) => { const c0 = sim.w.climate.cumulativeEmissions; sim.runYears(1); return sim.w.climate.cumulativeEmissions - c0; };
+      const emitted = (sim: Simulation) => { const c0 = sim.w.climate.cumulativeEmissions; sim.runYears(3); return sim.w.climate.cumulativeEmissions - c0; };
       let a = 0, b = 0;
       try {
         a = emitted(on);

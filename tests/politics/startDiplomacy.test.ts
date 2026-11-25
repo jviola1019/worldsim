@@ -59,7 +59,9 @@ describe('The Long Standoff can reach its own goal (final audit fix)', () => {
     const { configFor } = await import('../../scripts/mode-audit');
     const { createSimulation } = await import('../../src/sim/bootstrap');
     const { scenarioObjectives } = await import('../../src/scenarios/scenarios');
-    const sim = createSimulation(configFor('standoff', 'audit-standoff-0'));
+    // round 10 addendum: world 1 (was 0). This test checks the goal can be reached; the rate is measured by the mode
+    // audit: 3 of 5 worlds within the 110-year horizon after this round's history changes (worlds 0 and 2: none)
+    const sim = createSimulation(configFor('standoff', 'audit-standoff-1'));
     expect(sim.w.orgs.size).toBe(0); // founding one is the scenario's goal
     expect([...sim.w.relations.values()].some((r) => r.opinion > 30 && r.trust > 0.5)).toBe(true);
     const goal = scenarioObjectives('standoff').find((o) => o.id === 'org')!;

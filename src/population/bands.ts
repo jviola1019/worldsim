@@ -173,7 +173,9 @@ function bandYearly(sim: Sim, b: Band, civ: Civ, cap: number, size: number): voi
   // coast to fish); dry spots are passed over while the band keeps moving toward water
   const water = m.hasFreshWater(i) ? 1 : m.isCoastal(i) ? 0.7 : 0.15;
   // round 10, Slow pace: rarer settling, and only after the band has learned the land for a while
-  const ramp = w.meta.settings.pace === 'slow' ? clamp((sim.year - b.founded) / BALANCE.slowSettleRampYears, 0, 1) : 1;
+  // round 10 addendum: no permanent camp in a band's first slowSettleDelayYears on new land, then a linear ramp (a lucky
+  // draw let a pace-b band settle at year 27 after the new wildlife changed its history)
+  const ramp = w.meta.settings.pace === 'slow' ? clamp((sim.year - b.founded - BALANCE.slowSettleDelayYears) / BALANCE.slowSettleRampYears, 0, 1) : 1;
   const pSettle = ((0.03 + 0.15 * richness) * (0.5 + 0.5 * water) + (civ.caps.farming > 0 ? 0.5 * water : 0)) * paceMult(w.meta.settings, 'settle') * ramp;
   if (size >= 12 && !m.settle[i] && !isWaterTerrain(m.terrain[i]) && TERRAIN[m.terrain[i]].buildable && rng.float() < pSettle) {
     const s = foundSettlement(sim, civ, Math.floor(b.x), Math.floor(b.y), { members: b.members, species: b.species, cultureId: b.cultureId, religionId: b.religionId, cause: civ.caps.farming > 0 ? 'Agriculture made permanent settlement possible' : 'Rich foraging grounds encouraged a permanent camp' });

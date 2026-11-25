@@ -50,6 +50,13 @@ export const BALANCE = {
   /** [S] Members at which a wandering band splits in two (part may become a new tribe). */
   bandSplitSize: 90,
 
+  // ---------------- predators and prey (round 10 addendum, life audit)
+  /** [S] Most of a prey herd a pack can kill in one month (2% a month, about 22% a year), and never more than the prey species' own maximum monthly growth (slow breeders such as buffalo and elephants regrow about 1% and 0.6% a month). Real predators take a minority of their prey each year; the old 18% a month (about 90% a year) let any pack eat its prey and then starve (tests/ecology/predation.test.ts). */
+  predationCap: 0.02,
+  /** [S] Prey a predator needs in a month to be fully fed, in herd units (population units, not literal animals). With predationCap it sets the stable ratio of about 1 predator to 15 prey units, so a pack of 4-6 lives on the roughly 100 prey units crowding allows within its reach (was 0.6: about 2 wolves, which fluctuations then removed). */
+  preyPerPredator: 0.3,
+  /** [S] Tiles a predator hunts over in a month (the same radius herds crowd each other over). Real wolves and big cats range over large territories; at 2.5 tiles a pack reached one or two prey herds and starved (life audit). */
+  huntReach: 5,
   // ---------------- monsters and exploration (round 10)
   /** [C] Round 10: monthly damage a settlement deals a monster at its gates, per point of defence (garrison + 1% of people); set so a town of 2,000 wears a giant down in about two years and a hamlet cannot (tests/ecology/monsters.test.ts; VALIDATION §R10). */
   monsterDamage: 0.5,
@@ -66,7 +73,9 @@ export const BALANCE = {
   slowBuildMult: 0.5,
   /** [C] Slow pace: birth multiplier in settlements only; wandering bands keep their fertility, as they died out otherwise (calibration run 3; VALIDATION §R10). */
   slowBirthMult: 0.65, // settlements only: small wandering bands keep their fertility (they die out otherwise)
-  /** [C] Slow pace: a band's settle chance ramps up over its first N years on new land (removes year-14 villages; VALIDATION §R10). */
+  /** [C] Slow pace: a band makes no permanent camp in its first N years on new land (round 10 addendum: a lucky draw let a band settle at year 27; real foragers did not settle within a generation of arriving; VALIDATION §R10). */
+  slowSettleDelayYears: 30,
+  /** [C] Slow pace: after the delay, a band's settle chance ramps up linearly over N years (removes year-14 villages; VALIDATION §R10). */
   slowSettleRampYears: 60,
 
   // ---------------- demography (bands)

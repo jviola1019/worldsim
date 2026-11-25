@@ -184,19 +184,25 @@ describe('#10 advanced technology stays unavailable without prerequisites or cre
     const target = civs.filter((c) => c.knownCivs.length > 0).sort((a, b) => learnable(b).length - learnable(a).length)[0];
     expect(target && learnable(target).length, 'precondition: a nation with something to learn from its contacts').toBeGreaterThan(0);
     const ids = learnable(target).map((t) => t.id).filter((id) => id !== target.researchTarget);
-    const progress = (c: Civ) => ids.reduce((a, id) => a + (c.techs[id]?.progress ?? 0), 0);
+    // own research goes only to the research target, which researchYearly may choose during the step (round 10
+    // addendum: a nation with no target picked republicanism, a learnable technology, and the test counted its own
+    // research as diffusion); compare everything except each arm's target after the step
+    const progress = (c: Civ, skip = c.researchTarget) => ids.reduce((a, id) => a + (id === skip ? 0 : c.techs[id]?.progress ?? 0), 0);
     // same nation, same instant: once with its contacts, once without any
     const A = clone(base), B = clone(base);
     const ca = A.w.civs.get(target.id)!, cb = B.w.civs.get(target.id)!;
     cb.knownCivs = [];
-    const pa0 = progress(ca), pb0 = progress(cb);
+    const snapA = Object.fromEntries(ids.map((id) => [id, ca.techs[id]?.progress ?? 0]));
+    const snapB = Object.fromEntries(ids.map((id) => [id, cb.techs[id]?.progress ?? 0]));
     // serendipity (independent invention) is real but random; switch it off in both arms so only diffusion differs
     const keepSer = BALANCE.serendipity;
     try { BALANCE.serendipity = 0; researchYearly(A, ca); researchYearly(B, cb); } finally { BALANCE.serendipity = keepSer; }
+    const pa0 = ids.reduce((a, id) => a + (id === ca.researchTarget ? 0 : snapA[id]), 0);
+    const pb0 = ids.reduce((a, id) => a + (id === cb.researchTarget ? 0 : snapB[id]), 0);
     // contacts → diffusion: progress on a learnable technology, or its discovery (discovery resets
     // progress to the base cost, which can be below the effective cost it had to reach)
     expect(progress(ca) - pa0 > 0 || ids.some((id) => ca.techs[id]?.known)).toBe(true);
-    expect(ids.some((id) => cb.techs[id]?.known)).toBe(false);
+    expect(ids.some((id) => id !== cb.researchTarget && cb.techs[id]?.known)).toBe(false);
     expect(progress(cb) - pb0).toBe(0); // no contacts → none
   }, 120000);
 });

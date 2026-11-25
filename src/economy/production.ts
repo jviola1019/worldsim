@@ -378,8 +378,9 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
     emp[BUILDINGS[type].sector] += a;
     return a / jobs;
   };
-  // energy first
-  produceEnergy(sim, s, civ, staff, automation, sites, access);
+  // energy first for workers: power buildings are staffed before anything else (same order as produceEnergy)...
+  const energyStaff = new Map<number, number>();
+  for (const [t, l] of [[B.POWER_FOSSIL, 1 - automation * 0.5], [B.POWER_NUCLEAR, 1 - automation * 0.4], [B.SOLAR, 1], [B.WIND, 1], [B.HYDRO, 1], [B.FUSION, 1 - automation * 0.5]] as const) energyStaff.set(t, staff(t, l));
   // extraction
   const lumberStaff = staff(B.LUMBER, 1 - robotics * 0.6);
   if (lumberStaff > 0) {
@@ -397,6 +398,9 @@ export function settlementEconomy(sim: Sim, s: Settlement, civ: Civ, month: numb
   if (mineStaff > 0) extractDeposits(sim, s, civ, sites.mines, mineStaff, false);
   const wellStaff = staff(B.OIL_WELL, 1 - robotics * 0.7);
   if (wellStaff > 0) extractDeposits(sim, s, civ, sites.wells, wellStaff, true);
+  // ...and fuel first: plants burn this month's coal, gas and oil before industry does (round 10 addendum; they used
+  // to draw fuel before the mines produced it, so industry took every new tonne and plants stood idle)
+  produceEnergy(sim, s, civ, (t) => energyStaff.get(t) ?? 0, automation, sites, access);
 
   // processing & manufacturing
   const armsWanted = civ.stock[Good.ARMS] < armsTarget(civ);

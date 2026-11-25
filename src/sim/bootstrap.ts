@@ -25,7 +25,7 @@ import type { Civ, SpeciesKey } from './types';
 import type { WorldConfig } from '../config/laws';
 import { Simulation } from './simulation';
 import { createWorldState } from './world';
-import { SPECIES, MONSTERS } from '../ecology/species';
+import { SPECIES_BY_KEY, SPECIES, MONSTERS } from '../ecology/species';
 import { habitat, spawnHerd, spawnMonster } from '../ecology/ecology';
 import { spawnBand } from '../population/bands';
 import { TERRAIN, isWaterTerrain } from '../world/terrain';
@@ -72,8 +72,10 @@ export function seedLife(sim: Sim): void {
     if (!m.isLand(i)) continue;
     const weights = candidates.map((sp) => habitat(sim, sp, i) * (sp.diet === 'predator' ? 0.25 : 1));
     const pick = sim.rng.weighted(weights);
-    if (pick >= 0 && weights[pick] > 0.3) spawnHerd(sim, candidates[pick].key, m.xOf(i), m.yOf(i));
+    // round 10 addendum: test the habitat itself (predators are weighted 0.25, so 'weight > 0.3' never seeded one)
+    if (pick >= 0 && habitat(sim, candidates[pick], i) > 0.3) spawnHerd(sim, candidates[pick].key, m.xOf(i), m.yOf(i));
   }
+  settlePredators(sim);
   let water = 0;
   for (let i = 0; i < m.n; i++) if (m.isWater(i)) water++;
   const fish = Math.round((water / 300) * st.biodiversity);
@@ -123,6 +125,32 @@ export function seedLife(sim: Sim): void {
     });
   }
   if (w.meta.scenario === 'collapse') applyCollapseScenario(sim);
+}
+
+/**
+ * Round 10 addendum (life audit): a land predator seeded where no prey is within its 12-tile search moves to the
+ * nearest herbivore herd standing in country it can live in, or is not kept. Wildlife starts sparse, so packs
+ * placed far from prey starved before the prey spread. Uses no random draws.
+ */
+function settlePredators(sim: Sim): void {
+  const w = sim.w;
+  const m = w.map;
+  const herbivores = [...w.herds.values()].filter((o) => SPECIES_BY_KEY[o.species]?.diet === 'herbivore');
+  for (const h of [...w.herds.values()]) {
+    const sp = SPECIES_BY_KEY[h.species];
+    if (!sp || sp.diet !== 'predator' || sp.aquatic) continue;
+    if (herbivores.some((o) => Math.hypot(o.x - h.x, o.y - h.y) <= 12)) continue;
+    const home = herbivores
+      .filter((o) => habitat(sim, sp, Math.floor(o.y) * m.w + Math.floor(o.x)) >= 0.3)
+      .sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y) || a.id - b.id)[0];
+    if (home) {
+      h.x = home.x; h.y = home.y; h.tx = home.x; h.ty = home.y;
+    } else {
+      w.herds.delete(h.id);
+      const st = w.speciesStatus[h.species];
+      if (st) st.count = Math.max(0, st.count - h.count);
+    }
+  }
 }
 
 function pickStartSites(sim: Sim, count: number): number[] {

@@ -17,7 +17,7 @@ import { Deposit, DEPOSITS, type DepositKey } from '../world/resources';
 import { biomeFor, computeHydrology, vegCapacity } from '../world/worldgen';
 import { clamp, clamp01 } from '../core/math';
 import { spawnHerd, spawnMonster } from '../ecology/ecology';
-import { MONSTERS } from '../ecology/species';
+import { MONSTERS, SPECIES_BY_KEY } from '../ecology/species';
 import { spawnBand } from '../population/bands';
 import { triggerDisaster, ignite, extinguish } from '../world/environment';
 import { godFoundReligion, godSpreadReligion } from '../culture/religion';
@@ -176,7 +176,17 @@ const animal = (key: string, label: string, icon: string): PowerDef => ({
   icon,
   kind: 'tap',
   desc: `Release ${label.toLowerCase()}. Outside their habitat they may decline — or become invasive.`,
-  apply: (sim, x, y) => (spawnHerd(sim, key, x, y) ? null : 'Cannot place here'),
+  apply: (sim, x, y) => {
+    // round 10 addendum: sea animals go in water, land animals on land (birds anywhere)
+    const sp = SPECIES_BY_KEY[key];
+    const m = sim.w.map;
+    if (sp && m.inBounds(x, y)) {
+      const water = m.isWater(m.idx(x, y));
+      if (sp.aquatic && !water) return `${label} need water`;
+      if (!sp.aquatic && !sp.flying && water) return `${label} need dry land`;
+    }
+    return spawnHerd(sim, key, x, y) ? null : 'Cannot place here';
+  },
 });
 
 const people = (species: SpeciesKey, label: string): PowerDef => ({
