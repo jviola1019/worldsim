@@ -1,0 +1,24 @@
+
+## realistic (preset, 250 years, 6 seeds)
+  empty      6/6  starts empty at year 0, with wildlife and no people
+  life_only  6/6  you can place humans and animals, and nothing else
+  tech       6/6  every science-based technology is possible
+  village    5/6  the people you placed settle a village
+  real       6/6  nothing fictional ever appears
+  seed 0: {"era":0,"nations":0,"tribes":0,"wars":0,"settlements":0,"pop":0,"year":250}
+  seed 1: {"era":1,"nations":6,"tribes":0,"wars":8,"settlements":13,"pop":990,"year":250}
+  seed 2: {"era":1,"nations":2,"tribes":4,"wars":1,"settlements":16,"pop":3764,"year":250}
+  seed 3: {"era":1,"nations":2,"tribes":0,"wars":1,"settlements":11,"pop":1624,"year":250}
+  seed 4: {"era":1,"nations":2,"tribes":3,"wars":0,"settlements":7,"pop":1417,"year":250}
+  seed 5: {"era":1,"nations":11,"tribes":8,"wars":12,"settlements":21,"pop":4548,"year":250}
+
+## fantasy (scenario, 200 years, 6 seeds)
+  peoples    6/6  four peoples share the land
+  monsters   6/6  monsters roam
+  slay       2/6  objective: a monster slain
+  seed 0: {"era":2,"nations":8,"tribes":0,"wars":8,"settlements":36,"pop":24960,"year":200}
+  seed 1: {"era":2,"nations":7,"tribes":0,"wars":0,"settlements":31,"pop":19474,"year":200}
+  seed 2: {"era":2,"nations":7,"tribes":0,"wars":4,"settlements":36,"pop":14215,"year":200}
+  seed 3: {"era":2,"nations":6,"tribes":0,"wars":1,"settlements":21,"pop":5527,"year":200}
+  seed 4: {"era":2,"nations":7,"tribes":0,"wars":0,"settlements":25,"pop":14282,"year":200}
+  seed 5: {"era":2,"nations":8,"tribes":0,"wars":1,"settlements":34,"pop":8442,"year":200}

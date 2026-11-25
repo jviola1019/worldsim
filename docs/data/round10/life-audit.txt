@@ -2,13 +2,13 @@ life audit · 3 seeds · 100 years · 96² empty Realistic worlds · counts at y
 MEETS   humans         grass                      life-0       24     38     55    124  grows    stayed 100%  expected grows
 MEETS   humans         steppe                     life-0       24     51     75     77  grows    stayed   0%  expected grows
 MEETS   humans         savanna                    life-0       24     38     50     50  grows    stayed   0%  expected grows
-MEETS   humans         forest                     life-0       24     38     59    129  grows    stayed   0%  expected grows
+MEETS   humans         forest                     life-0       24     38     59    129  grows    stayed  50%  expected grows
 MEETS   humans         taiga                      life-0       24     34     43    108  grows    stayed   0%  expected grows
 MEETS   humans         jungle                     life-0       24     36     52    174  grows    stayed   0%  expected grows
 n/a     humans         swamp                  life-0 (no patch of this biome on the map)
 n/a     humans         hills                  life-0 (no patch of this biome on the map)
-MEETS   humans         beach                      life-0       24     46     70    210  grows    stayed   0%  expected grows
-MEETS   humans         tundra                     life-0       24     38     58    133  moved    stayed   0%  expected holds-or-declines
+MEETS   humans         beach                      life-0       24     46     70    207  grows    stayed   0%  expected grows
+MEETS   humans         tundra                     life-0       24     38     58    139  moved    stayed   0%  expected holds-or-declines
 MEETS   humans         desert                     life-0       24     48     77    225  moved    stayed   0%  expected fails
 MEETS   humans         mountain                   life-0       24     35     43     95  moved    stayed   0%  expected fails
 MEETS   humans         snow                       life-0       24     42     74    199  moved    stayed   0%  expected fails
@@ -124,16 +124,16 @@ n/a     llama          hostile                life-1 (no such site on the map)
 MISSES  seal           home (ocean 16°C)          life-1       30     29     30     22  declines stayed   0%  expected home
 MEETS   seal           hostile (deep 26°C)        life-1       30      0      0      0  dies     stayed   0%  expected hostile
 MEETS   humans         grass                      life-2       24     28     40    125  grows    stayed  58%  expected grows
-MEETS   humans         steppe                     life-2       24     51     94    302  grows    stayed   0%  expected grows
+MEETS   humans         steppe                     life-2       24     51     94    290  grows    stayed   0%  expected grows
 n/a     humans         savanna                life-2 (no patch of this biome on the map)
 MEETS   humans         forest                     life-2       24     40     61    181  grows    stayed  62%  expected grows
-MEETS   humans         taiga                      life-2       24     43     68    203  grows    stayed   0%  expected grows
+MEETS   humans         taiga                      life-2       24     43     68    197  grows    stayed   0%  expected grows
 MEETS   humans         jungle                     life-2       24     41     99    222  grows    stayed  62%  expected grows
 n/a     humans         swamp                  life-2 (no patch of this biome on the map)
 MEETS   humans         hills                      life-2       24     43     65    164  grows    stayed   0%  expected grows
 n/a     humans         beach                  life-2 (no patch of this biome on the map)
 MEETS   humans         tundra                     life-2       24     39     59    196  moved    stayed   0%  expected holds-or-declines
-MEETS   humans         desert                     life-2       24     50     72    211  moved    stayed   0%  expected fails
+MEETS   humans         desert                     life-2       24     50     72    171  moved    stayed   0%  expected fails
 MEETS   humans         mountain                   life-2       24     48     66    169  moved    stayed   0%  expected fails
 MEETS   humans         snow                       life-2       24     46     75    201  moved    stayed   0%  expected fails
 n/a     humans         glacier                life-2 (no patch of this biome on the map)
