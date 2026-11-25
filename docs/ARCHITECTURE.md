@@ -9,9 +9,9 @@ The app is a static site with no server and no network calls (see [SECURITY.md](
 | Module | Responsibility |
 |---|---|
 | `core/` | Seeded RNG (sfc32, with state kept in the world), simplex noise, hashing and digest, math helpers, binary heap, calendar. |
-| `config/` | World laws, `BALANCE` constants, world-size presets, scenario presets, engine and save versions. |
+| `config/` | World laws, `BALANCE` constants (each with an evidence class; generated registry in [PARAMETERS.md](PARAMETERS.md)), world-size presets, presets (round 10: **Realistic** grounded sandbox and **Observer**), engine and save versions. |
 | `world/` | Terrain enum, `TileMap` (typed arrays per field), world generation (plates, rain shadow, hydrology, biomes, deposits), **map presets** (`mapShapes.ts`: 16 shapes and extremes plus natural), A* pathfinding, environment (fire, disasters, regional climate AR(1), CO₂ forcing, sea level), **natural catastrophes** (`catastrophes.ts`: airbursts, impacts, VEI-7/8, geomagnetic storms, superflares, gamma-ray bursts). |
-| `sim/` | `WorldState` types, world creation, the `Simulation` orchestrator, the per-civilization yearly cycle, bootstrap (later-era starts, collapse scenario), maintenance. |
+| `sim/` | `WorldState` types, world creation, the `Simulation` orchestrator, the per-civilization yearly cycle, bootstrap (later-era starts that reach their promised era; round 10: a **diplomatic past** for era ≥ 9 starts, with full contact and two blocs; the collapse scenario), maintenance. Round 10: `pace.ts` (Slow pace levers; Standard = exactly 1), `peoples.ts` (nation and tribe count), `favorites.ts`. |
 | `population/` | Individuals (`persons.ts`), traits, **character development** (`development.ts`), demography (age cohorts, mortality and fertility schedules), bands, agents, migration, SIR disease, and the **population ledger** (`ledger.ts`). |
 | `civilizations/` | Settlements (monthly cycle), building types, urban planning and construction (redevelopment, construction reserve, material substitution), territory, civilization identity, knowledge and contact. **Ethos** (`ethos.ts`, 11 value archetypes scored relative to other nations), **missions** (`missions.ts`, emergent national goals with metric, target and deadline; god-mode decrees), **endings** (`endings.ts`, typed collapse with causes, global cooling). |
 | `economy/` | Production per settlement (industrial extraction, automation, working hours), the national market and public finance (`market.ts`), trade, routes and infrastructure, **visitor accords** (`visitors.ts`). |
@@ -19,16 +19,16 @@ The app is a static site with no server and no network calls (see [SECURITY.md](
 | `politics/` | Institutions, factions, elections, coups and revolutions, secession; succession, dynasties and notables; diplomacy, treaties and organizations. |
 | `military/` | Armies, A* movement, Lanchester battles (linear before gunpowder, square after), sieges, supply. **Weapons and doctrines by era** (`weapons.ts`), **nuclear arsenals, doctrine, deterrence, fallout and nuclear winter** (`nuclear.ts`). |
 | `culture/` | Languages (phonology, drift), religions (emergence, doctrines, schism), culture traits and blending, **infinite unique names** (`naming.ts`: outlets, platforms, AIs, labs, hashtags, handles, nations, religions; blocked real brands), **sports** (`sports.ts`: 11 era sports, leagues, cups, world games). |
-| `ecology/` | Species, herds, predation, domestication, subspecies divergence, monsters (fantasy toggle). |
+| `ecology/` | Species, herds, predator–prey dynamics (predators hunt herds, not people), domestication, subspecies divergence, monsters (fantasy worlds only; round 10: they heal only away from a fight, so towns can slay them). |
 | `future/` | Space programs, colonies, **anthropogenic risks** (`risks.ts`: engineered pandemics, AI takeover, grey goo, lethal heat). |
 | `history/` | Event log with causes, newspaper text, sampled statistics, historical territory snapshots, **era-medium feed** (`feed.ts`, `feedFrame.ts`: posts and app frames from cave wall to holonet), **city album** (`album.ts`: compact postcard layout records every 50 years). |
 | `media/` | **Media and AI simulation** (`media.ts`: outlets by era with life cycles, reach, trust, state control; polarization, misinformation, online share; AI labs with versions, capability, alignment, autonomy and incidents), `medium.ts` (a nation's current medium). |
 | `security/` | Browser security policy (CSP and headers, `policy.ts`) and the cross-origin frame check (`framing.ts`). |
 | `persistence/` | Binary save format, IndexedDB slots, autosave rotation, export and import, migrations. |
-| `powers/` | God-power definitions (97 tools in 10 categories), undo stack, **god-mode horrors** (`horrors.ts`: zombies, ghouls, blight; refused in observer worlds). |
+| `powers/` | God-power definitions (108 tools in 10 categories), undo stack, **power sets** (round 10, `powerSet.ts`: `all` / `grounded` / `none`; each power is tagged `grounded` or not and `applyPower` refuses disallowed ones), **god-mode horrors** (`horrors.ts`: zombies, ghouls, blight; god mode only). |
 | `rendering/` (round 6) | **Close-up cities.** `cityBlocks.ts` is pure: one tile's real data becomes a 32×32 block plan (streets by era, plots with open ground, yards, amenities by size band and ethos, civic grounds). `cityLayer.ts` caches 8×8-tile detail chunks (LRU 48, invalidated by the map's dirty flags plus a yearly signature check) and draws them over the map from 20–26 px per tile; under it sits a base map without the city buildings. `art/city_lots.ts` holds 117 generated lot sprites. The aerial photo uses the same drawing. |
 | `rendering/` | Procedural pixel-art atlas (708 sprites, plus the round-5 pack: housing styles, sports venues, ports and airports, era vehicles, characters and jobs; selection rules in `art/select.ts`), camera, chunked terrain layer, overlays (16), renderer, procedural flags, **city photos** (`photos.ts`: aerial view from the real tiles, street-level postcard from layout records). |
-| `ui/` | Screens, HUD, tool dock, inspectors, panels, charts, input classification, audio, preferences. |
+| `ui/` | Screens, HUD, tool dock, inspectors, panels, charts, input classification, audio, preferences. Round 10: `mediumTheme.ts` (colour tokens and era fonts per news medium; contrast tested), a medium-themed feed with one scroll, swipeable ARIA tab rows. |
 | `workers/` | World generation in a Web Worker, so the UI never freezes during creation. |
 
 ## Time and the tick model
@@ -141,8 +141,23 @@ The rule adds no saved state.
 
 ### Yearly pipeline
 
-Per civilization, staggered across the year on day `(id·37) % 120` (`sim/civYearly.ts`): ethos → missions → research → economy → politics → diplomacy → military → infrastructure → space → media → risks → sclerosis → absorption → domestication. A nation that dies part-way stops there.
+Per civilization, staggered across the year on day `(id·37) % 120` (`sim/civYearly.ts`): ethos → missions → research → economy → politics → **exploration** (round 10: sailing nations send explorers by sea) → diplomacy → military → infrastructure (trade routes: round 10, ports ship by sea when the water-only voyage is cheaper) → space → media → risks → sclerosis → absorption → domestication → expansion. A nation that dies part-way stops there, and the alive check comes before exploration.
 World, on day 0 (`sim/simulation.ts`): statistics → trade → species census → evolution → religion → culture → sports → visitors → album → climate → catastrophes → world risks → horrors → tech lead → notables.
+
+## Round 10 contracts
+
+| Contract | Where | Test |
+|---|---|---|
+| **Power sets:** a world allows `all`, `grounded` or `none` powers. Old saves with `observer: true` load as `none` | `powers/powerSet.ts`, `applyPower` | `tests/powers/powerSets.test.ts` |
+| **Pace:** `paceMult(settings, lever)` is exactly 1 unless `pace === 'slow'`; no RNG draws are added | `sim/pace.ts` (levers in `bands.ts`, `research.ts`, `urban.ts`, `settlement.ts`) | `tests/sim/pace.test.ts` |
+| **New save fields** (`settings.powerSet`, `settings.pace`) are optional and validated on decode; an unknown value refuses the file | `persistence/serialize.ts` | `powerSets.test.ts`, `pace.test.ts` |
+| **Developed starts** reach the promised era (prerequisite-ready top-up) | `sim/bootstrap.ts` `developedCiv` | `tests/sim/startEra.test.ts` |
+| **Diplomatic past** for era ≥ 9 starts: full contact, two blocs (friends with defensive pacts inside, cold across), and a treaty organization from era 10 except in the Long Standoff | `sim/bootstrap.ts` `seedDiplomaticPast` | `tests/politics/startDiplomacy.test.ts` |
+| **Exploration and sea trade:** at most one voyage per nation; voyages and sea routes go over water only (deep ocean needs naval tier 4) | `sim/civYearly.ts` `exploreYearly`, `world/pathfinding.ts` `voyagePath`, `economy/trade.ts` | `tests/population/explorers.test.ts` |
+| **Every coefficient has an evidence class**, and the registry is in sync | `config/balance.ts`, `tools/param-registry.mjs` | `tests/config/parameters.test.ts` |
+| **Every font named is bundled; every medium meets WCAG AA contrast** | `ui/mediumTheme.ts`, `src/main.tsx` | `tests/ui/fonts.test.ts`, `tests/ui/mediumTheme.test.ts` |
+
+Measurement methods, sample sizes and their limits are in [METHODS.md](METHODS.md).
 
 ## Determinism rules
 

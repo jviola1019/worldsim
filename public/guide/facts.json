@@ -1,10 +1,10 @@
 {
- "generated": "2026-11-24",
+ "generated": "2026-11-25",
  "totals": {
   "srcFiles": 146,
-  "srcLines": 42722,
-  "testFiles": 53,
-  "testCases": 367
+  "srcLines": 42785,
+  "testFiles": 54,
+  "testCases": 370
  },
  "folders": [
   {
@@ -263,7 +263,7 @@
   {
    "name": "config",
    "files": 2,
-   "lines": 474,
+   "lines": 537,
    "deps": {
     "sim": 1,
     "world": 3
@@ -395,7 +395,7 @@
   {
    "path": "src/config/balance.ts",
    "folder": "config",
-   "lines": 230,
+   "lines": 293,
    "about": "Balance parameters. Every gameplay coefficient lives here (not scattered as magic numbers) so it can be tuned, tested for sensitivity and adjusted at runtime from the developer panel."
   },
   {
@@ -1241,6 +1241,11 @@
    "about": "Round 8: city composition, public-service jobs, climate mitigation, and the round-6 leftovers."
   },
   {
+   "path": "tests/config/parameters.test.ts",
+   "cases": 3,
+   "about": "Round 10, Task 12: parameter provenance."
+  },
+  {
    "path": "tests/config/presets.test.ts",
    "cases": 2,
    "about": "Round 10: Realistic is a grounded sandbox that starts empty and slow; Observer keeps the old hands-off Realistic exactly (so long-run balance data stays comparable)."
@@ -1499,7 +1504,7 @@
   },
   {
    "path": "scripts/pace-calibrate.ts",
-   "lines": 37,
+   "lines": 38,
    "about": "Round 10: pace calibration."
   },
   {
@@ -1551,6 +1556,11 @@
    "path": "tools/make-icons.ts",
    "lines": 34,
    "about": "App icons for \"Add to Home Screen\" (iPhone) and installable web app (PC), drawn from the game's own pixel art: a globe-and-crown sprite centered on the midnight-ink background, nearest-neighbor scaled."
+  },
+  {
+   "path": "tools/param-registry.mjs",
+   "lines": 73,
+   "about": "Round 10: the parameter registry."
   },
   {
    "path": "tools/perf-closeup.mjs",

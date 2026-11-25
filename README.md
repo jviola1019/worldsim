@@ -293,6 +293,8 @@ TypeScript 7, Vite 8, Preact 11, Canvas2D, Vitest 5. Runtime dependencies: Preac
 | Document | Contents |
 |---|---|
 | [STATUS.md](docs/STATUS.md) | What is complete, partial, experimental or missing; bug ledger; ranked next steps |
+| [METHODS.md](docs/METHODS.md) | How every number is produced: the reproducibility contract, experiment designs, decision rules, statistical limits, known modelling gaps |
+| [PARAMETERS.md](docs/PARAMETERS.md) | Every model coefficient with its value and evidence class (generated from the code) |
 | [VALIDATION.md](docs/VALIDATION.md) | How everything was verified: tests, seeds, twin-world experiments, long runs, browsers |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Modules, tick model, ERD and data dictionary, yearly pipeline, determinism rules, population ledger, saves |
 | [ROADMAP.md](docs/ROADMAP.md) | Round-5 decisions and phase status |

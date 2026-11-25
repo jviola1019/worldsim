@@ -158,3 +158,36 @@ These are never present in Realistic or observer worlds. The powers refuse to ap
 - **Zombie outbreak.** A horde grows in a settlement by turning the living (ledger `disease`). It is fought by garrisons and armies, scaled by weapons tier and walls. It spreads along road and trade links. Survivors flee to the nearest uninfected town. Nations with medicine research a cure, which stops new infections. An outbreak is contained when every horde is destroyed.
 - **Ghoul packs.** Nocturnal scavengers rise from battlefields and ruins and raid nearby towns (ledger `disaster`). Garrisons and the light of electrified cities drive them off.
 - **The Creeping Blight.** A fungal rot spreads between neighbouring settlements and destroys crops. Famine during a blight is attributed to it. It burns out over time or can be contained by agricultural science.
+
+## Round 10 mechanisms: assumptions and limits
+
+Each entry gives the mechanism, its assumption, its evidence class (see [PARAMETERS.md](PARAMETERS.md)) and what it does not claim. Measurements are in VALIDATION §R10, methods in [METHODS.md](METHODS.md).
+
+- **Nations and tribes.**
+  - **Mechanism:** a people with at least one settlement counts as a nation; a people of wandering bands only counts as a tribe.
+  - **Note:** this is a definition, not a parameter.
+- **Slow pace** [C].
+  - **Mechanism:** four multipliers (settle, research, build, births in settlements) plus a 60-year settle ramp.
+  - **Calibration target:** a first village around year 100 and a first city of 10,000 around year 1,000 after a band of 24 is placed beside fresh water.
+  - **Assumption:** settling waits until people know the land, and early settled growth is slower than standard play.
+  - **Limit:** calibrated to the simulation's own milestones, not to archaeological dates. Real sedentism took millennia, so Slow is still compressed.
+- **Developed starts** (era ≥ 2).
+  - **Mechanism:** granted technology is topped up so the promised era is actually reached (the era threshold is 35% of that era's techs adopted).
+  - **Assumption:** a preset that says "atomic age" means atomic age.
+- **Diplomatic past** (era ≥ 9) [S].
+  - **Mechanism:** full contact; two blocs formed around the two most different cultures, by value distance; friends with defensive pacts inside a bloc; the most distant pairs across blocs start cold; a treaty organization from era 10.
+  - **Assumption:** modern state systems start with alliances and rivalries (a cold-war structure), not as strangers.
+  - **Limit:** stylized: always exactly two blocs; opinions are drawn from fixed ranges.
+- **Exploration** [S].
+  - **Mechanism:** sailing nations (naval tier ≥ 2) send at most one water-only voyage at a time, at 15% a year, to an uncharted coast 20–60 tiles away. Deep ocean needs naval tier 4.
+  - **Assumption:** first contact across water comes from voyages.
+  - **Limit:** no land explorers; overland contact still comes from expansion, bands and trade routes.
+- **Sea trade** [S].
+  - **Mechanism:** between two ports, a water-only voyage is chosen when its cost (0.6 of land per tile) beats the overland route.
+  - **Limit:** no ports-of-call network and no piracy.
+- **Monsters** (fantasy worlds only) [C].
+  - **Mechanism:** a settlement deals 0.5 × defence a month to a monster at its gates (defence = garrison + 1% of people). Monsters heal only away from a fight.
+- **Explicitly not modelled, and why.**
+  - **Wild animals attacking people:** predators hunt herds; people hunt animals. Wild-animal deaths are small worldwide next to disease, famine and war.
+  - **Mutants:** radiation causes illness, cancer and birth defects, which the fallout model represents as deaths and sickness, not new creatures.
+  - **Robot armies:** AI risk is represented as the AI-takeover ending (`future/risks.ts`), driven by AI capability, alignment and autonomy.
