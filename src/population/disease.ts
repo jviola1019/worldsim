@@ -82,7 +82,7 @@ export function diseaseMonthly(sim: Sim, s: Settlement, civ: Civ): void {
     const crowd = clamp(0.55 + density * 0.18, 0.5, 1.5);
     // false claims undermine distancing, treatment and vaccination
     const misinfo = mediaHealthPenalty(civ);
-    const beta = d.r0 * gamma * crowd * (1 - sanitation * 0.45) * (1 - control * 0.6 * (1 - misinfo * 0.5)) * (1 - quarantine * (1 - misinfo));
+    const beta = d.r0 * gamma * crowd * (1 - sanitation * BALANCE.sanitationTransmissionCut) * (1 - control * BALANCE.medicineTransmissionCut * (1 - misinfo * 0.5)) * (1 - quarantine * (1 - misinfo));
     const newInf = Math.min(e.s, beta * e.s * e.i);
     const rec = gamma * e.i;
     const lethal = d.lethality * (1 - control * 0.85 * (1 - misinfo * 0.4)) * (1 - clamp01(caps.healthcare) * 0.4);
@@ -113,8 +113,9 @@ export function diseaseMonthly(sim: Sim, s: Settlement, civ: Civ): void {
     if (e.i > 0.0005) return true;
     const d = w.diseases.get(e.diseaseId);
     s.immunity[e.diseaseId] = Math.max(s.immunity[e.diseaseId] ?? 0, e.r);
-    if (d && e.deaths > Math.max(20, s.pop * 0.03)) onEpidemicSurvived(sim, s.id, d.name);
-    if (d && e.deaths > Math.max(20, s.pop * 0.03))
+    const notable = d && e.deaths > Math.max(20, s.pop * BALANCE.epidemicLogShare);
+    if (d && notable) onEpidemicSurvived(sim, s.id, d.name);
+    if (d && notable)
       logEvent(sim, {
         type: 'epidemic',
         cat: 'demography',

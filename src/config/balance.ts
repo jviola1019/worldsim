@@ -294,6 +294,12 @@ export const BALANCE = {
   // ---------------- disease
   /** [S] Base annual chance of a new pathogen per settlement at reference density. */
   pathogenEmergence: 0.00025,
+  /** [S] Round 10: largest share of transmissions medicine and disease control can stop at full strength (treatment and vaccines mainly save lives; the 1918, 1957, 1968 and 2009 pandemics all spread through modern health systems; see research-notes §5). */
+  medicineTransmissionCut: 0.3,
+  /** [S] Round 10: largest share of transmissions sanitation stops at full strength. Water and hygiene mostly stop waterborne and contact spread, not respiratory spread; handwashing with soap cuts acute respiratory infection by about 17% (RR 0.83), so 0.2 (research-notes §5). Was a hard-coded 0.45. */
+  sanitationTransmissionCut: 0.2,
+  /** [S] Round 10: an epidemic is logged as an event when it kills more than this share of the settlement (and at least 20 people). Was 3%, which hid every modern outbreak. */
+  epidemicLogShare: 0.005,
 
   // ---------------- pacing
   /** [T] Most simulation ticks run per rendered frame (adaptive cap; performance only, no effect on history). */

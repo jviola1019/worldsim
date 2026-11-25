@@ -24,29 +24,34 @@ describe('explorers', () => {
   }, 120000);
 });
 
-// round 10 addendum: the scenario's own 200-year horizon (was 120). After this round's history changes this audit
-// world's first sea route came at year 166 (audit worlds 0, 2, 3: years 99, 158, 148; world 4: none; Island Realms sea
-// trade 4/5 within its horizon)
+// round 10 addendum: the scenario's own 200-year horizon (was 120). Round 10 task 3 (disease) changed histories:
+// audit world 1 no longer builds a sea route within 200 years. Re-measured over six worlds (0 to 5) the first sea
+// route came at years 67, none, 42, none, 147 and 30, so sea trade appears in 4 of 6 within the horizon.
 describe('sea trade', () => {
-  let sim: ReturnType<typeof createSimulation>;
+  const sims: ReturnType<typeof createSimulation>[] = [];
   beforeAll(() => {
-    sim = createSimulation(configFor('islands', 'audit-islands-1'));
-    sim.runYears(200);
-  }, 500000);
+    for (let i = 0; i < 6; i++) {
+      const sim = createSimulation(configFor('islands', `audit-islands-${i}`));
+      sim.runYears(200);
+      sims.push(sim);
+    }
+  }, 900000);
 
   it('coastal partners ship by sea when the voyage is cheaper than the land detour (Island Realms)', () => {
-    const routes = [...sim.w.routes.values()];
-    expect(routes.length).toBeGreaterThan(0);
-    expect(routes.some((r) => r.mode === 'sea'), routes.map((r) => r.mode).join(',')).toBe(true);
+    const withSea = sims.filter((s) => [...s.w.routes.values()].some((r) => r.mode === 'sea')).length;
+    expect(withSea, `${withSea} of ${sims.length} worlds`).toBeGreaterThanOrEqual(3);
   });
 
   it('every sea route runs mostly over water (review fix)', () => {
-    const m = sim.w.map;
-    const sea = [...sim.w.routes.values()].filter((r) => r.mode === 'sea');
-    expect(sea.length).toBeGreaterThan(0);
-    for (const r of sea) {
-      const water = r.path.filter((i) => m.isWater(i)).length / r.path.length;
-      expect(water, `route ${r.id}: ${Math.round(water * 100)}% water`).toBeGreaterThan(0.6);
+    let seen = 0;
+    for (const sim of sims) {
+      const m = sim.w.map;
+      for (const r of [...sim.w.routes.values()].filter((x) => x.mode === 'sea')) {
+        seen++;
+        const water = r.path.filter((i) => m.isWater(i)).length / r.path.length;
+        expect(water, `route ${r.id}: ${Math.round(water * 100)}% water`).toBeGreaterThan(0.6);
+      }
     }
+    expect(seen).toBeGreaterThan(0);
   });
 });

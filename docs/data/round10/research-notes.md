@@ -56,3 +56,33 @@ Queries, all run on 2026-11-25 (standard web search, US results):
 8. guanaco population growth rate per year Patagonia study; feral water buffalo Northern Territory population increase rate per year
 
 The queries carried no personal or project-identifying details.
+
+## 5. Disease (Task 3: medicine saves lives more than it stops spread)
+
+Collected 2026-11-25. The model is an abstract SIR per settlement. These values check order of magnitude only.
+
+| Quantity | Real value | Source | Verdict |
+|---|---|---|---|
+| R of 1918 influenza | Median 1.80 (IQR 1.47-2.27) over 51 estimates; one city-level fit gives 2-3 | Biggerstaff et al. 2014, BMC Infect Dis 14:480 ([link](https://www.biomedcentral.com/1471-2334/14/480)); [PMC4169819](https://pmc.ncbi.nlm.nih.gov/articles/PMC4169819/) | Model novel-disease r0 spans 1.4-4.5, covering it |
+| R of 1957 (H2N2) | Median 1.65 (IQR 1.53-1.70) | Biggerstaff et al. 2014 | Inside the model range |
+| R of 1968 (H3N2) | R0 1.06-2.06 (first wave), 1.21-3.58 (second, with cross-protection). The review median was not read reliably; check the paper before quoting one | [PMC2889325](https://pmc.ncbi.nlm.nih.gov/articles/PMC2889325) and the review above | Inside the model range |
+| R of 2009 (H1N1) | Median 1.46 (IQR 1.30-1.70) over 78 estimates | Biggerstaff et al. 2014 | Near the low end of the model range |
+| R0 of COVID-19 | Not collected by a dedicated search; widely reported as about 2-3 early on | no source recorded here | Not used for a value |
+| Infection fatality, 1918 | Case fatality usually 2-3%, "may be close to" the infection rate | secondary summary ([IEEE Spectrum](https://spectrum.ieee.org/tech-history/heroic-failures/pandemic-memories-and-mortalities)) | Model lethality up to 0.4 for 15% of pathogens; far above any flu, deliberately stylized |
+| Infection fatality, later pandemics | 1957-59 0.017-0.1%; 1968-70 0.1-0.2%; 2009 0.01-0.02%; COVID-19 0.67-1.18% | UK COVID-19 Inquiry reference table ([PDF](https://covid19.public-inquiry.uk/wp-content/uploads/2023/06/14181206/INQ000207453_1.pdf)); the extracted text was partly garbled, so verify against the PDF | Model typical lethality 0.01-0.12 is higher than these; **[S] stylized** (a model infection also stands for severe illness) |
+| Pandemic frequency | A 1918-scale event: about 0.3-1.9% a year | Marani et al. 2021, PNAS, "Intensity and frequency of extreme novel epidemics" | For Task 4's world draw |
+| Outbreak frequency | About 50 WHO Disease Outbreak News events a year | PreventionWeb summary of WHO DON | For Task 4's world draw |
+| Handwashing and respiratory infection | Handwashing with soap, any acute respiratory infection: RR 0.83 (95% CI 0.76-0.90, I2 88%); an older review found a pooled cut of about 24% | Lancet meta-analysis as reported by [LSHTM](https://lshtm.ac.uk/node/378136); [Rabie & Curtis 2006](https://pubmed.ncbi.nlm.nih.gov/16553905/) | **Basis of `sanitationTransmissionCut` = 0.2** |
+
+**Why 0.2 for sanitation.** Hygiene cuts respiratory infection by roughly 17-24%, and sanitation mostly stops waterborne spread, which the model does not separate. A cut of 0.2 sits in that range. The old hard-coded 0.45 was about twice the evidence.
+
+**Why 0.3 for medicine.** Pandemics of 1918, 1957, 1968 and 2009 and COVID-19 all spread widely despite the best health systems of their day. Treatment mostly saved lives rather than stopped infection, so full disease control may stop at most 30% of transmissions (was 60%). Quarantine (15% once healthcare passes 0.3) and the lethality cut (up to 85%, plus 40% from healthcare) are unchanged. This is **[S] stylized**, not fitted. A full-control, full-sanitation settlement facing r0 2.5 keeps effective R of about 1.2-1.3, so a novel disease still spreads.
+
+**Why 0.5% for logging.** Outbreaks that kill 0.5% of a town are historically notable and nearly all modern outbreaks sit below the old 3% line, so none were logged. The 20-death floor stays. **[S]**.
+
+Queries (2026-11-25, standard web search, no personal or project details):
+1. basic reproduction number 1918 influenza 1957 1968 2009 H1N1 pandemic estimates R0
+2. infection fatality ratio 1918 1957 1968 2009 influenza pandemics COVID-19 comparison
+3. sanitation hygiene effect on respiratory infection transmission systematic review handwashing reduction
+
+Marani et al. 2021 and the WHO DON count were supplied by the controller from earlier searches; they were not re-checked here.
