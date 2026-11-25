@@ -17,9 +17,9 @@ describe('game modes keep their promises', () => {
     }, 60000);
   }
 
-  it('Space Race: nations start in era 13, one era from off-world settlement', () => {
+  it('Space Race: nations start in the atomic and space era (10), the cap on starts', () => {
     const sim = createSimulation(configFor('space_race', 'audit-space_race-0'));
-    expect([...sim.w.civs.values()].filter((c) => c.alive).every((c) => c.era >= 13)).toBe(true);
+    expect([...sim.w.civs.values()].filter((c) => c.alive).every((c) => c.era >= 10)).toBe(true);
   }, 60000);
 
   it('The Long Standoff and Modern Geopolitics start in the atomic age', () => {

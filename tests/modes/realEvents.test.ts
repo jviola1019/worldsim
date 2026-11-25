@@ -36,7 +36,7 @@ describe('Realistic includes every technically possible event', () => {
   it('a developed Realistic world runs 150 years without any fictional being or ending', () => {
     const c = realistic();
     c.gen.seed = 'real-events-1'; c.gen.width = 96; c.gen.height = 96;
-    c.settings.startEra = 11; c.settings.startCivs = 6;
+    c.settings.startEra = 10; c.settings.startCivs = 6;
     const sim = createSimulation(c);
     expect(realWorld(sim.w.meta.settings)).toBe(true);
     sim.runYears(150);

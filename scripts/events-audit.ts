@@ -4,7 +4,7 @@
  * science-based technology, natural disaster rates, Slow pace) and counts every event type, catastrophe and civ
  * ending that happens, so the docs can say which real-world events occur, how often, and which never did.
  *
- *   npx tsx scripts/events-audit.ts [worlds=6] [years=300] [size=96] [startEra=11]
+ *   npx tsx scripts/events-audit.ts [worlds=6] [years=300] [size=96] [startEra=10]
  *   CHECKPOINT=<dir> saves each world every 100 years and resumes after a restart.
  *
  * Rates are per world-year. A world map is a continent-scale region, so natural-disaster counts are compared
@@ -20,7 +20,7 @@ import { saveCheckpoint, loadCheckpoint } from './lib/checkpoint';
 const WORLDS = Number(process.argv[2] ?? 6);
 const YEARS = Number(process.argv[3] ?? 300);
 const SIZE = Number(process.argv[4] ?? 96);
-const START_ERA = Number(process.argv[5] ?? 11);
+const START_ERA = Number(process.argv[5] ?? 10);
 
 interface Acc { y: number; events: Record<string, number>; disasters: Record<string, number>; maxEra: number }
 const total: Record<string, number> = {};

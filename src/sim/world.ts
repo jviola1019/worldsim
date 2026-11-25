@@ -2,7 +2,7 @@
 import { normalizeReal } from '../powers/powerSet';
 import type { WorldState } from './types';
 import type { WorldConfig } from '../config/laws';
-import { ENGINE_VERSION, SAVE_VERSION } from '../config/laws';
+import { ENGINE_VERSION, SAVE_VERSION, clampStartEra } from '../config/laws';
 import { generateWorld, type WorldGenResult } from '../world/worldgen';
 import { hashSeed } from '../core/rng';
 import { initClimate } from '../world/environment';
@@ -15,6 +15,7 @@ export const ID_KINDS = [
 
 export function createWorldState(cfg: WorldConfig, gen?: WorldGenResult): WorldState {
   normalizeReal(cfg); // round 10 addendum: real-world worlds never generate fiction
+  cfg.settings.startEra = clampStartEra(cfg.settings.startEra); // round 10: no world starts past Atomic & Space
   const g = gen ?? generateWorld(cfg.gen);
   const ids: Record<string, number> = {};
   for (const k of ID_KINDS) ids[k] = 0;

@@ -5,7 +5,7 @@
  * Prints the year the leading nation first reaches each era, modernization indicators of the most
  * advanced nation every 100 years, and natural-hazard counts.
  */
-import { defaultConfig, PRESETS } from '../src/config/laws';
+import { defaultConfig, presetByKey, START_VARIANTS } from '../src/config/laws';
 import { createSimulation } from '../src/sim/bootstrap';
 import { ERA_NAMES } from '../src/technology/techData';
 import { SECTOR } from '../src/civilizations/buildings';
@@ -17,7 +17,10 @@ const YEARS = Number(process.argv[3] ?? 1000);
 const SIZE = Number(process.argv[4] ?? 128);
 const preset = process.argv[5] ?? 'default';
 const cfg = defaultConfig();
-if (preset !== 'default') PRESETS.find((p) => p.key === (preset === 'realistic' ? 'observer' : preset))?.apply(cfg);
+if (preset !== 'default') {
+  const variant = START_VARIANTS.find((v) => v.key === preset); // old era/theme presets sit on God mode
+  if (variant) { presetByKey('god')!.apply(cfg); variant.apply(cfg); } else presetByKey(preset === 'realistic' ? 'observer' : preset)?.apply(cfg);
+}
 cfg.gen.seed = seed;
 cfg.gen.width = SIZE;
 cfg.gen.height = SIZE;

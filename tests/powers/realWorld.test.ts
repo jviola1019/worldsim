@@ -4,7 +4,7 @@
  * in the simulation (creation and load), not only on the New World screen.
  */
 import { describe, it, expect } from 'vitest';
-import { defaultConfig, PRESETS } from '../../src/config/laws';
+import { defaultConfig, PRESETS, START_VARIANTS, type WorldConfig } from '../../src/config/laws';
 import { SCENARIOS } from '../../src/scenarios/scenarios';
 import { createSimulation } from '../../src/sim/bootstrap';
 import { realWorld, normalizeReal } from '../../src/powers/powerSet';
@@ -33,7 +33,8 @@ function fiction(w: WorldState): string[] {
   return out;
 }
 
-const SOURCES = [...PRESETS.map((p) => ({ key: p.key, apply: p.apply })), ...SCENARIOS.map((s) => ({ key: 'scenario ' + s.key, apply: s.apply }))];
+const godVariants = START_VARIANTS.map((v) => ({ key: 'god + ' + v.key, apply: (c: WorldConfig) => { PRESETS.find((p) => p.key === 'god')!.apply(c); v.apply(c); } }));
+const SOURCES = [...PRESETS.map((p) => ({ key: p.key, apply: p.apply })), ...godVariants, ...SCENARIOS.map((s) => ({ key: 'scenario ' + s.key, apply: s.apply }))];
 
 describe('real-world lock', () => {
   it('realWorld is true for Realistic and Observer, false for god mode', () => {

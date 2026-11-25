@@ -80,9 +80,8 @@ export const SCENARIOS: Scenario[] = [
     name: 'Space Race',
     description: 'Near-future powers with rockets on the pad. Who settles another world first?',
     apply: (c) => {
-      // round 10 (mode audit): era 13. From the Digital era (11) colonies need era-14 technology that took
-      // centuries to reach (era 12 at year 150 in the audit), so the scenario's own goal was out of reach
-      c.settings.startEra = 13;
+      // round 10 second addendum: no start past Atomic & Space (era 10); the space age is reached by playing
+      c.settings.startEra = 10;
       c.settings.startCivs = 5;
       c.settings.realism = 'unrestricted';
       c.laws.speculativeTech = true;

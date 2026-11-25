@@ -10,7 +10,7 @@ import { powerAllowed } from '../src/powers/powerSet';
 import { TECHS } from '../src/technology/techData';
 import { techPermitted } from '../src/technology/research';
 import { SPECIES_BY_KEY } from '../src/ecology/species';
-import { defaultConfig, PRESETS, randomizeConfig, type WorldConfig } from '../src/config/laws';
+import { defaultConfig, presetByKey, START_VARIANTS, randomizeConfig, type WorldConfig } from '../src/config/laws';
 import { SCENARIOS } from '../src/scenarios/scenarios';
 import { createSimulation } from '../src/sim/bootstrap';
 import type { Simulation } from '../src/sim/simulation';
@@ -163,10 +163,12 @@ export const MODES: ModeSpec[] = [
 export function configFor(key: string, seed: string): WorldConfig {
   const c = defaultConfig();
   c.name = 'Audit'; c.gen.seed = seed; c.gen.width = 128; c.gen.height = 128;
-  const p = PRESETS.find((x) => x.key === key);
+  const p = presetByKey(key);
+  const variant = START_VARIANTS.find((x) => x.key === key); // the old era/theme presets: God mode plus the variant
   const sc = SCENARIOS.find((x) => x.key === key);
   if (key === 'islands4') { SCENARIOS.find((x) => x.key === 'islands')!.apply(c); c.settings.startEra = 4; c.gen.width = 128; c.gen.height = 128; return c; } // probe variant
   if (key === 'random') randomizeConfig(c);
+  else if (variant) { presetByKey('god')!.apply(c); variant.apply(c); }
   else if (p) p.apply(c);
   else if (sc) sc.apply(c);
   c.gen.width = 128; c.gen.height = 128;

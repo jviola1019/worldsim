@@ -1,6 +1,6 @@
 import { realWorld } from '../../powers/powerSet';
 import { useState } from 'preact/hooks';
-import { applyMapShape, defaultConfig, PRESETS, WORLD_SIZES, randomizeConfig, randomSeedString, type WorldConfig } from '../../config/laws';
+import { applyMapShape, MAX_START_ERA, START_VARIANTS, presetByKey, defaultConfig, PRESETS, WORLD_SIZES, randomSeedString, type WorldConfig } from '../../config/laws';
 import { MAP_SHAPES, SHAPE_FAMILY_LABELS, mapShape, type MapShape, type MapShapeFamily } from '../../world/mapShapes';
 import { ERA_NAMES } from '../../technology/techData';
 import { SCENARIOS } from '../../scenarios/scenarios';
@@ -44,10 +44,10 @@ const mult = (v: number) => `${v.toFixed(1)}×`;
 export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean; back: () => void; start: (c: WorldConfig) => void }) {
   const [cfg, setCfg] = useState<WorldConfig>(() => {
     const c = defaultConfig();
-    PRESETS.find((p) => p.key === 'primitive')!.apply(c); // the highlighted default (not the list's first entry)
+    PRESETS.find((p) => p.key === 'god')!.apply(c); // the highlighted default (not the list's first entry)
     return c;
   });
-  const [preset, setPreset] = useState(scenarios ? SCENARIOS[0].key : 'primitive');
+  const [preset, setPreset] = useState(scenarios ? SCENARIOS[0].key : 'god');
   const set = (f: (c: WorldConfig) => void) => {
     const c = structuredClone(cfg);
     f(c);
@@ -60,10 +60,9 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
     c.gen.width = cfg.gen.width;
     c.gen.height = cfg.gen.height;
     const p = PRESETS.find((x) => x.key === key);
-    if (p) {
-      p.apply(c);
-      if (key === 'random') randomizeConfig(c);
-    }
+    if (p) p.apply(c);
+    const vr = START_VARIANTS.find((x) => x.key === key); // Task 2 redesigns this screen; variants sit on God mode for now
+    if (vr) { presetByKey('god')!.apply(c); vr.apply(c); }
     const sc = SCENARIOS.find((x) => x.key === key);
     if (sc) sc.apply(c);
     const shape = cfg.gen.shape ?? 'natural';
@@ -143,7 +142,7 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
           <Slider label="Natural disaster frequency" value={cfg.settings.disasterFrequency} min={0} max={2} step={0.05} onInput={(v) => set((c) => (c.settings.disasterFrequency = v))} show={mult} />
           <Slider label="Civilizational aggressiveness" value={cfg.settings.aggressiveness} min={0} max={2} step={0.05} onInput={(v) => set((c) => (c.settings.aggressiveness = v))} show={mult} />
           <Slider label="Technological advancement speed" value={cfg.settings.techSpeed} min={0.25} max={4} step={0.05} onInput={(v) => set((c) => (c.settings.techSpeed = v))} show={mult} />
-          <Slider label="Starting era" value={cfg.settings.startEra} min={1} max={11} step={1} onInput={(v) => set((c) => (c.settings.startEra = v))} show={(v) => ERA_NAMES[v]} />
+          <Slider label="Starting era" value={cfg.settings.startEra} min={1} max={MAX_START_ERA} step={1} onInput={(v) => set((c) => (c.settings.startEra = v))} show={(v) => ERA_NAMES[v]} />
           <Slider label="Starting peoples" value={cfg.settings.startCivs} min={0} max={20} step={1} onInput={(v) => set((c) => (c.settings.startCivs = v))} show={(v) => String(v)} />
           <label class="toggle">
             Empty world (no people or animals)

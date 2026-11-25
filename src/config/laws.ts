@@ -107,6 +107,15 @@ export const PRESETS: Preset[] = [
     },
   },
   {
+    key: 'god',
+    name: 'God mode',
+    description: 'Earth-like continents. A handful of hunter-gatherer bands begin the long road to civilization, and you hold every power.',
+    apply: (c) => {
+      c.settings.startEra = 1;
+      c.settings.startCivs = 5;
+    },
+  },
+  {
     key: 'observer',
     name: 'Observer',
     description: 'An Earth-like world left entirely to itself: grounded technology, no fantasy, natural disasters and diseases on, and no god powers. Watch history happen.',
@@ -126,15 +135,38 @@ export const PRESETS: Preset[] = [
       c.laws.horrors = false; // fictional threats never appear in observer worlds
     },
   },
-  {
-    key: 'primitive',
-    name: 'Primitive Earth',
-    description: 'Earth-like continents. A handful of hunter-gatherer bands begin the long road to civilization.',
-    apply: (c) => {
-      c.settings.startEra = 1;
-      c.settings.startCivs = 5;
-    },
-  },
+];
+
+/** The three starts. Renamed from the old Primitive Earth: 'primitive' stays an alias for old callers. */
+export function presetByKey(key: string): Preset | undefined {
+  return PRESETS.find((p) => p.key === (key === 'primitive' ? 'god' : key));
+}
+
+/** Highest era a new world may start in (Atomic & Space). Digital and later are reached by playing. */
+export const MAX_START_ERA = 10;
+
+export function clampStartEra(era: number): number {
+  const e = Math.round(Number.isFinite(era) ? era : 1);
+  return Math.max(1, Math.min(MAX_START_ERA, e));
+}
+
+/** Default number of starting peoples for a start at a given era. */
+export function eraPeopleDefault(startKey: 'realistic' | 'god' | 'observer', era: number): number {
+  const e = clampStartEra(era);
+  if (e === 1) return startKey === 'realistic' ? 0 : 5;
+  if (e >= 10) return 10;
+  return 8;
+}
+
+export interface StartVariant {
+  key: 'kingdoms' | 'industrial' | 'modern' | 'collapse' | 'alien';
+  name: string;
+  description: string;
+  apply(c: WorldConfig): void;
+}
+
+/** The old era and theme presets, now applied on top of a start (they were presets before the three starts). */
+export const START_VARIANTS: StartVariant[] = [
   {
     key: 'kingdoms',
     name: 'Age of Kingdoms',
@@ -168,7 +200,7 @@ export const PRESETS: Preset[] = [
     name: 'After the Collapse',
     description: 'A once-advanced world fell apart. Ruins, lost knowledge and scattered survivors.',
     apply: (c) => {
-      c.settings.startEra = 3;
+      c.settings.startEra = c.settings.startEra === 1 ? 3 : c.settings.startEra;
       c.settings.startCivs = 9;
       c.scenario = 'collapse';
     },
@@ -186,12 +218,6 @@ export const PRESETS: Preset[] = [
       c.settings.startEra = 1;
       c.settings.startCivs = 6;
     },
-  },
-  {
-    key: 'random',
-    name: 'Complete Randomization',
-    description: 'Everything rolled at random — geography, climate, history and rules.',
-    apply: () => {},
   },
 ];
 
@@ -219,7 +245,7 @@ export function randomSeedString(): string {
   return `${words[r()]}-${words[r()]}-${Math.floor(Math.random() * 1000)}`;
 }
 
-/** Fill a config with random values (Complete Randomization preset). Uses Math.random: UI only, never in simulation. */
+/** Fill a config with random values (the Randomize settings button). Uses Math.random: UI only, never in simulation. */
 export function randomizeConfig(c: WorldConfig): void {
   const R = Math.random;
   const lm = ['continents', 'pangaea', 'archipelago', 'islands'] as const;
@@ -236,7 +262,7 @@ export function randomizeConfig(c: WorldConfig): void {
   c.settings.disasterFrequency = R() * 2;
   c.settings.aggressiveness = 0.3 + R() * 1.5;
   c.settings.techSpeed = 0.5 + R() * 2;
-  c.settings.startEra = R() < 0.6 ? 1 : 1 + Math.floor(R() * 10);
+  c.settings.startEra = R() < 0.6 ? 1 : 1 + Math.floor(R() * MAX_START_ERA);
   c.settings.startCivs = 2 + Math.floor(R() * 12);
   c.settings.fantasy = R() < 0.3;
   c.gen.fantasy = c.settings.fantasy;
