@@ -36,6 +36,23 @@
 4. **A forged save** with Realistic, fantasy on and monsters present loads with no monsters, horrors or alien herds remaining, and none spawn later. *Test in Task 2.*
 5. **Reduce motion:** the hand shows one still frame and nothing moves. *e2e step in Task 6.*
 
+## Per-task checklist (owner: "each should include skills, plugins, prompting, cache, security, design")
+
+Every task closes only when its row is done. The ledger records what was actually used.
+
+| Task | Skills | Plugins / tools | Prompting (player-facing copy, research queries) | Cache | Security | Design |
+|---|---|---|---|---|---|---|
+| 1 Research + checkpoint | executing-plans, test-driven-development, data:statistical-analysis | WebSearch (sources cited), unpkg check not needed | Search queries recorded with each value; copy: none | Ledger: sources, run commands; checkpoints in `.superpowers/` (git-ignored) | Checkpoint files decoded with the same validated `decodeWorld`; no secrets in notes; generic client, no personal data in queries | n/a |
+| 2 Lock | test-driven-development, security-review mindset | — | Footnote copy via design:ux-copy ("only what could exist in the real world") | Ledger rulings | Load path strips fiction from forged saves; validation stays strict (no new trusted fields) | Disabled toggle meets contrast + `aria-describedby`; a11y run |
+| 3 Tech + powers | test-driven-development | — | Dock note and refusal toast copy (ux-copy) | Ledger | Refusal is server-side in `applyPower`, not only hidden in UI | Dock with only Life: layout check at 320 px and desktop |
+| 4 Animals | test-driven-development, frontend-design (pixel art fit) | unpkg not needed | Species names and descriptions (ux-copy) | Atlas is built once at load (no runtime cost); ledger | No new inputs | Sprites match palette and outline style; captured and inspected at 2× |
+| 5 Life audit | systematic-debugging, data:statistical-analysis | — | Expectations written before runs | Output in `docs/data/round10/`, checkpointed | n/a | n/a |
+| 6 Hand | test-driven-development, interaction-design, frontend-design | Playwright (Chromium, WebKit) | Toast on refusal unchanged and readable | Effect lives in `sim.fx` (not saved); hand frames from the atlas cache | No DOM injection; canvas only; CSP unchanged | Timing, easing, Reduce motion still; captured and inspected; DESIGN-REVIEW note |
+| 7 Events audit | systematic-debugging, data:statistical-analysis | — | Event titles stay factual | Checkpointed output | n/a | n/a |
+| 8 Modes + pace | verification-before-completion | Playwright, axe-core | New World and dock copy re-read | Checkpointed | — | e2e + a11y both browsers |
+| 9 Backtest + review | verification-before-completion, code-review (whole branch) | Playwright, axe-core | — | Checkpointed batch; ledger | code-review covers security findings; `npm audit` | viewports + design-capture |
+| 10 Docs + to-dos | engineering:documentation, verification-before-completion | GitHub MCP (Actions), npm | Docs plain and honest | CLAUDE.md + ledger updated | SECURITY.md (packages, CI), secret scan of diff | GUIDE/README images if changed |
+
 ---
 
 ### Task 1: Research, and the checkpointing that makes long runs survive restarts
