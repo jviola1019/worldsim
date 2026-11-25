@@ -146,7 +146,10 @@ Each fix has a regression test. "Mutation" means the test was confirmed to fail 
 6. **GitHub Pages header limits:** HSTS, frame-ancestors and similar headers need another host or a CDN (SECURITY.md §5).
 7. **Some scenario goals are met only sometimes:** an organization in the Long Standoff (1/3), an off-world colony in the Space Race (2/3) and a slain monster in Realms of Legend (1/3). They are reachable now and were impossible before; the owner chose to keep them uncertain.
 8. **Accessibility is verified by automated and scripted checks only:** no screen reader (VoiceOver, NVDA) and no physical device were used.
-9. **Device labels are per browser profile:** clearing site data or using a second browser makes a new "device". There is no cross-device sync (by design: no server).
+9. **Developed modern starts barely advance (found by the round-10 events audit).** Six worlds started in era 11 under Realistic rules were still in era 11 after 300 years, and one at standard pace was still there after 100 years (166 → 173 known technologies). Natural histories do pass the Digital era. Effect: Realistic allows every science-based technology, but holo-feeds, superhuman AI and the AI-takeover ending are rarely reached in a play session. The Space Race scenario starts at era 13 for the same reason. Not fixed this round: it is a research-balance project.
+10. **Pandemics are missing from developed modern starts:** none in 1,800 world-years of the events audit, although real pandemics come every few decades. Natural histories have many deadly epidemics (184–645 per 1,000-year run in round 5). Not fixed this round.
+11. **Predators are fragile:** in the life audit, a pack placed among natural prey survives 100 years in about half of the cases. Crocodiles chase like wolves rather than ambush, and fail. Natural worlds seed few predators. Herd counts are population units, so predator-to-prey ratios are stylized (MODEL.md).
+12. **Device labels are per browser profile:** clearing site data or using a second browser makes a new "device". There is no cross-device sync (by design: no server).
 
 ## History
 
