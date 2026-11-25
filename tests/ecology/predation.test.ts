@@ -122,7 +122,12 @@ describe('predators stay in country they can live in (life audit)', () => {
     const cold = site(sim, (j) => m.terrain[j] === T.MOUNTAIN && m.temp[j] < 0);
     const warm = site(sim, (j) => m.terrain[j] === T.SAVANNA || (m.terrain[j] === T.GRASS && m.temp[j] > 18));
     const cat = spawnHerd(sim, 'bigcat', m.xOf(warm), m.yOf(warm), 3)!;
-    // the only prey: a deer herd standing on the cold mountain, within the cat's 12-tile search
+    // a deer herd standing on the cold mountain, within the cat's 12-tile search, and a farther one at home. (Task 5: with
+    // no home prey at all a hungry cat now ranges for the cold herd, so the test needs one at home to show the preference.)
+    const homeDeer = spawnHerd(sim, 'deer', m.xOf(warm), m.yOf(warm), 30)!;
+    homeDeer.x = cat.x - 9; homeDeer.y = cat.y; homeDeer.tx = homeDeer.x; homeDeer.ty = homeDeer.y;
+    const homeTile = Math.floor(homeDeer.y) * m.w + Math.floor(homeDeer.x);
+    m.terrain[homeTile] = T.SAVANNA; m.temp[homeTile] = 25;
     const deer = spawnHerd(sim, 'deer', m.xOf(cold), m.yOf(cold), 30)!;
     deer.x = cat.x + 6; deer.y = cat.y; deer.tx = deer.x; deer.ty = deer.y;
     const coldTile = Math.floor(deer.y) * m.w + Math.floor(deer.x);
@@ -159,4 +164,123 @@ describe('predators hunt in their own realm (review fix)', () => {
     expect(control.fish - hunted.fish).toBeLessThanOrEqual(200 * BALANCE.predationCap * (1 + SPECIES_BY_KEY.fish.growth / 12));
     expect(control.deer - hunted.deer).toBeLessThanOrEqual(30 * BALANCE.predationCap * (1 + SPECIES_BY_KEY.deer.growth / 12));
   });
+});
+
+describe('predators hunt at home first, then range, and go back (design 6.3)', () => {
+  const cat = (sim: ReturnType<typeof world>) => {
+    const m = sim.w.map;
+    const i = site(sim, (j) => m.terrain[j] === T.SAVANNA || (m.terrain[j] === T.GRASS && m.temp[j] > 18));
+    return { m, i, bigcat: spawnHerd(sim, 'bigcat', m.xOf(i), m.yOf(i), 3)! };
+  };
+  const tileAt = (sim: ReturnType<typeof world>, x: number, y: number) => Math.floor(y) * sim.w.map.w + Math.floor(x);
+  /** Make a tile savanna (home for a great cat) or frozen mountain (hostile) and put a deer herd on it. */
+  const prey = (sim: ReturnType<typeof world>, x: number, y: number, home: boolean, n = 30) => {
+    const m = sim.w.map;
+    const d = spawnHerd(sim, 'deer', Math.floor(x), Math.floor(y), n)!;
+    const t = tileAt(sim, d.x, d.y);
+    m.terrain[t] = home ? T.SAVANNA : T.MOUNTAIN; m.temp[t] = home ? 25 : -10;
+    return d;
+  };
+  const pin = (sim: ReturnType<typeof world>, h: { x: number; y: number }, hab: boolean) => {
+    const m = sim.w.map;
+    const t = tileAt(sim, h.x, h.y);
+    m.terrain[t] = hab ? T.SAVANNA : T.MOUNTAIN; m.temp[t] = hab ? 25 : -10;
+  };
+
+  it('(a) prey 8 tiles off in habitat beats prey 6 tiles off outside habitat', () => {
+    const sim = world('hunt-a', true);
+    const { bigcat } = cat(sim);
+    pin(sim, bigcat, true);
+    const far = prey(sim, bigcat.x + 8, bigcat.y, true);
+    prey(sim, bigcat.x, bigcat.y + 6, false);
+    pickTarget(sim, bigcat);
+    expect(bigcat.tx).toBeCloseTo(far.x, 5); expect(bigcat.ty).toBeCloseTo(far.y, 5);
+  });
+
+  it('(b) with no home prey within 12, it goes for prey 20 tiles off in hostile land', () => {
+    const sim = world('hunt-b', true);
+    const { bigcat } = cat(sim);
+    pin(sim, bigcat, true);
+    const d = prey(sim, bigcat.x + 20, bigcat.y, false);
+    pickTarget(sim, bigcat);
+    expect(bigcat.tx).toBeCloseTo(d.x, 5); expect(bigcat.ty).toBeCloseTo(d.y, 5);
+  });
+
+  it('the second search keeps to the predator realm: a land cat ignores sea fish and a seal ignores deer', () => {
+    const sim = world('hunt-realm', true);
+    const { m, bigcat } = cat(sim);
+    pin(sim, bigcat, true);
+    let sea = -1;
+    for (let j = 0; j < m.n && sea < 0; j++) if (m.isWater(j) && Math.hypot(m.xOf(j) - bigcat.x, m.yOf(j) - bigcat.y) < 22) sea = j;
+    if (sea >= 0) {
+      const fish = spawnHerd(sim, 'fish', m.xOf(sea), m.yOf(sea), 200)!;
+      pickTarget(sim, bigcat);
+      expect(Math.hypot(bigcat.tx - fish.x, bigcat.ty - fish.y)).toBeGreaterThan(0.5);
+    }
+  });
+
+  it('(c) with no prey within 24 it picks a habitat tile', () => {
+    const sim = world('hunt-c', true);
+    const { m, bigcat } = cat(sim);
+    for (let k = 0; k < 20; k++) {
+      pickTarget(sim, bigcat);
+      expect(habitat(sim, SPECIES_BY_KEY.bigcat, tileAt(sim, bigcat.tx, bigcat.ty)), `pick ${k}`).toBeGreaterThan(0);
+      expect(m.isWater(tileAt(sim, bigcat.tx, bigcat.ty))).toBe(false);
+    }
+  });
+
+  it('(d) a fed predator stranded in hostile land heads back to habitat', () => {
+    const sim = world('hunt-d', true);
+    const { m, bigcat } = cat(sim);
+    // a small cold patch around the cat, home just outside it
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+      const t = tileAt(sim, bigcat.x + dx, bigcat.y + dy);
+      if (!m.isWater(t)) { m.terrain[t] = T.MOUNTAIN; m.temp[t] = -10; }
+    }
+    bigcat.hunger = 0;
+    expect(habitat(sim, SPECIES_BY_KEY.bigcat, tileAt(sim, bigcat.x, bigcat.y))).toBeLessThan(0.2);
+    for (let k = 0; k < 10; k++) {
+      pickTarget(sim, bigcat);
+      expect(habitat(sim, SPECIES_BY_KEY.bigcat, tileAt(sim, bigcat.tx, bigcat.ty)), `pick ${k}`).toBeGreaterThanOrEqual(0.2);
+    }
+  });
+
+  it('(e) hunger resets only after a real meal (fed >= 0.5)', () => {
+    const month = (preyCount: number) => {
+      const sim = world('hunt-e', true);
+      const { bigcat } = cat(sim);
+      pin(sim, bigcat, true);
+      bigcat.count = 8; // needs 2.4 prey a month
+      bigcat.hunger = 2;
+      prey(sim, bigcat.x + 1, bigcat.y, true, preyCount);
+      sim.runTicks(10);
+      return sim.w.herds.get(bigcat.id)!.hunger;
+    };
+    expect(month(2)).toBe(3);  // a token herd: takes far less than half of what the pack needs
+    expect(month(400)).toBe(0); // plenty: a full meal
+  });
+
+  it('with no prey anywhere a predator stays in its home range and starves slowly (24 months)', () => {
+    const sim = world('hunt-none', true);
+    const { m, bigcat } = cat(sim);
+    const hab = (h: { x: number; y: number }) => habitat(sim, SPECIES_BY_KEY.bigcat, tileAt(sim, h.x, h.y));
+    expect(hab(bigcat)).toBeGreaterThanOrEqual(0.2);
+    const x0 = bigcat.x, y0 = bigcat.y;
+    let maxD = 0, outside = 0, ticks = 0;
+    for (let mo = 0; mo < 24; mo++) {
+      for (let t = 0; t < 10; t++) {
+        sim.runTicks(1); ticks++;
+        const h = sim.w.herds.get(bigcat.id);
+        if (!h) break;
+        maxD = Math.max(maxD, Math.hypot(h.x - x0, h.y - y0));
+        if (hab(h) < 0.2) outside++;
+      }
+    }
+    const h = sim.w.herds.get(bigcat.id);
+    expect(m.w).toBeGreaterThan(0);
+    // 24 months with a 12-tile home search and no prey to chase: never across the map, and almost never out of habitat
+    expect(maxD).toBeLessThan(30);
+    expect(outside / ticks).toBeLessThan(0.1);
+    if (h) expect(h.count).toBeLessThan(3.0001); // it does not grow without food
+  }, 120000);
 });

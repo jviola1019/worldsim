@@ -134,22 +134,60 @@ export function spawnHerd(sim: Sim, key: string, x: number, y: number, count?: n
   return h;
 }
 
+/** Tiles a predator searches for prey standing in its habitat, and for a way home (design 6.3). */
+const HOME_SEARCH = 12;
+/** Tiles a predator ranges for any prey of its realm once home has none (design 6.3). */
+const RANGE_SEARCH = 24;
+
 /** Choose where a herd heads next (exported for tests). */
 export function pickTarget(sim: Sim, h: Herd, sp: SpeciesDef = SPECIES_BY_KEY[h.species]): void {
   const m = sim.w.map;
   const rng = sim.rng;
   if (sp.diet === 'predator') {
-    // round 10 addendum: only prey standing in country the predator can live in (great cats followed deer up
-    // into cold mountains and died there; life audit)
-    const prey = herdsNear(sim, h.x, h.y, 12).filter((o) => o !== h && SPECIES_BY_KEY[o.species]?.diet !== 'predator' && SPECIES_BY_KEY[o.species]?.meat >= 0.01
+    // design 6.3: a pack that has just eaten, stranded outside its habitat, goes back to the best home tile near it
+    // (it followed prey into country it cannot live in; staying there costs 4% a month)
+    if (h.hunger === 0 && habitat(sim, sp, Math.floor(h.y) * m.w + Math.floor(h.x)) < 0.2) {
+      let home = -1;
+      let hs = 0;
+      const r = HOME_SEARCH;
+      for (let y = Math.max(0, Math.floor(h.y) - r); y <= Math.min(m.h - 1, Math.floor(h.y) + r); y++)
+        for (let x = Math.max(0, Math.floor(h.x) - r); x <= Math.min(m.w - 1, Math.floor(h.x) + r); x++) {
+          const d = Math.hypot(x + 0.5 - h.x, y + 0.5 - h.y);
+          if (d > r) continue;
+          const i = y * m.w + x;
+          const hab = habitat(sim, sp, i);
+          if (hab < 0.2) continue;
+          const score = hab * (sp.aquatic || sp.flying ? 1 : 0.3 + m.veg[i] / 255) - d * 0.02;
+          if (score > hs) { hs = score; home = i; }
+        }
+      if (home >= 0) {
+        h.tx = m.xOf(home) + 0.5;
+        h.ty = m.yOf(home) + 0.5;
+        return;
+      }
+    }
+    // step 1, home first (round 10 addendum): only prey standing in country the predator can live in (great cats
+    // followed deer up into cold mountains and died there; life audit)
+    const edible = (o: Herd) => {
+      const q = SPECIES_BY_KEY[o.species];
+      return o !== h && q?.diet !== 'predator' && q?.meat >= 0.01;
+    };
+    const prey = herdsNear(sim, h.x, h.y, HOME_SEARCH).filter((o) => edible(o)
       && habitat(sim, sp, Math.floor(o.y) * m.w + Math.floor(o.x)) >= 0.2);
-    if (prey.length) {
+    // step 2 (design 6.3): home has none, so range for prey anywhere it can stand, in its own realm
+    // (the realm rule the monthly feeding uses: same water or land, not flying, a herbivore)
+    const ranged = prey.length ? prey : herdsNear(sim, h.x, h.y, RANGE_SEARCH).filter((o) => {
+      const q = SPECIES_BY_KEY[o.species];
+      return edible(o) && o.owner === 0 && q?.diet === 'herbivore' && !q.flying && !!q.aquatic === !!sp.aquatic
+        && m.isWater(Math.floor(o.y) * m.w + Math.floor(o.x)) === !!sp.aquatic;
+    });
+    if (ranged.length) {
       // round 10 addendum: head for the richest prey nearby, not merely the nearest herd (chasing small, straying
       // herds led packs away from their prey base until they starved; life audit)
       const value = (o: Herd) => o.count / (1 + Math.hypot(o.x - h.x, o.y - h.y) / 4);
-      prey.sort((a, b) => value(b) - value(a) || a.id - b.id);
-      h.tx = prey[0].x;
-      h.ty = prey[0].y;
+      ranged.sort((a, b) => value(b) - value(a) || a.id - b.id);
+      h.tx = ranged[0].x;
+      h.ty = ranged[0].y;
       return;
     }
   }
@@ -242,7 +280,8 @@ export function herdsMonthly(sim: Sim): void {
           kills += k;
         }
         fed = Math.min(1, kills / need);
-        h.hunger = 0;
+        // design 6.3: only a real meal resets hunger (a token herd in reach used to wipe it)
+        h.hunger = sp.diet !== 'predator' || fed >= 0.5 ? 0 : h.hunger + 1;
       } else if (sp.diet === 'predator') {
         h.hunger++;
         fed = h.hunger > 3 ? 0.2 : 0.6;
