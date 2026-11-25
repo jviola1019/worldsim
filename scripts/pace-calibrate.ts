@@ -34,7 +34,7 @@ for (const seed of seeds) {
     const maxPop = Math.max(0, ...ss.map((s) => s.pop));
     if (ss.length && ms.village === undefined) { ms.village = y; console.log(`${seed}\tvillage at ${y}`); }
     if (maxPop >= 2000 && ms.town === undefined) { ms.town = y; console.log(`${seed}\ttown at ${y}`); }
-    if (y % 100 === 0) console.log(`${seed}\tyear ${y}: largest settlement ${Math.round(maxPop)}`); // progress survives an interrupted run
+    if (y % 100 === 0) console.log(`${seed}\tyear ${y}: largest settlement ${Math.round(maxPop)} · bands ${sim.w.bands.size} · person records ${sim.w.persons.size}`); // progress survives an interrupted run
     if (maxPop >= 10000 && ms.city === undefined) { ms.city = y; break; }
     if (!sim.w.bands.size && !ss.length) { died = y; break; }
     if (ckPath && y % 100 === 0) saveCheckpoint(ckPath, sim, { y, ms });

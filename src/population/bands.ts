@@ -8,15 +8,15 @@
  * known. This is how civilizations spread across an empty planet.
  */
 import { paceMult } from '../sim/pace';
-import { record, transfer } from './ledger';
+import { record, transfer, residents } from './ledger';
 import type { Sim } from '../sim/context';
-import type { Band, Civ, SpeciesKey } from '../sim/types';
+import type { Band, Civ, Settlement, SpeciesKey } from '../sim/types';
 import { BALANCE } from '../config/balance';
 import { clamp, clamp01 } from '../core/math';
 import { forageCapacity } from '../economy/production';
 import { huntHerds } from '../ecology/ecology';
-import { createPerson, phonOfCulture } from './persons';
-import { emptyFlows, healthIndices, individualMonth, mortalitySchedule, tfrFor } from './demography';
+import { absorbPerson, createPerson, phonOfCulture } from './persons';
+import { emptyFlows, healthIndices, individualMonth, membersToCohorts, mortalitySchedule, tfrFor } from './demography';
 import { createCiv } from '../civilizations/civ';
 import { foundSettlement } from '../civilizations/settlement';
 import { revealAround } from '../civilizations/knowledge';
@@ -174,7 +174,8 @@ export function bandMonthly(sim: Sim, b: Band): void {
   if ((w.tick / TICKS_PER_MONTH | 0) % 12 === b.id % 12) bandYearly(sim, b, civ, cap, size);
 }
 
-function bandYearly(sim: Sim, b: Band, civ: Civ, cap: number, size: number): void {
+/** Yearly band decisions (settle, join a village, split); exported for tests. */
+export function bandYearly(sim: Sim, b: Band, civ: Civ, cap: number, size: number): void {
   const w = sim.w;
   const m = w.map;
   const rng = sim.rng;
@@ -192,6 +193,16 @@ function bandYearly(sim: Sim, b: Band, civ: Civ, cap: number, size: number): voi
     s.food = b.food;
     b.members = [];
     removeBand(sim, b);
+    return;
+  }
+  // round 10 addendum, Slow pace: a band camped on land a village already claims cannot found its own there, so on the
+  // same draw it joins that village (foragers taken in by settled neighbours). Without this, Slow-pace bands that
+  // outlived the first villages foraged and split on village land for ever: 13,420 bands and 794,595 individual
+  // foragers by year 800 on one seed, a world too large to save. Standard pace never gets here (no draw is made), as
+  // its bands all settle long before the land fills.
+  const host = m.settle[i] ? w.settlements.get(m.settle[i]) : undefined;
+  if (host && w.meta.settings.pace === 'slow' && rng.float() < pSettle) {
+    joinSettlement(sim, b, host);
     return;
   }
   // split when large
@@ -231,6 +242,28 @@ function bandYearly(sim: Sim, b: Band, civ: Civ, cap: number, size: number): voi
       crown(sim, target, leader, 'founded');
     }
   }
+}
+
+/** A band's people move into a settlement (any nation's): records become residents, or cohort counts when it is large. */
+export function joinSettlement(sim: Sim, b: Band, s: Settlement): void {
+  const w = sim.w;
+  transfer(sim, b.civId, s.civId, b.members.length);
+  for (const id of b.members) {
+    const p = w.persons.get(id);
+    if (p) { p.settlementId = s.id; p.bandId = 0; p.civId = s.civId; }
+  }
+  if (s.mode === 'cohort') {
+    const add = membersToCohorts(sim, b.members);
+    for (let k = 0; k < add.length; k++) s.cohorts[k] += add[k];
+    for (const id of b.members) {
+      const p = w.persons.get(id);
+      if (p && !p.notable && p.role === 'commoner') absorbPerson(sim, p); // as in convertToCohorts
+    }
+  } else s.members.push(...b.members);
+  s.pop = residents(s);
+  s.food += b.food;
+  b.members = [];
+  removeBand(sim, b);
 }
 
 export function removeBand(sim: Sim, b: Band): void {
