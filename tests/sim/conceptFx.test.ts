@@ -41,7 +41,7 @@ describe('coverage: every concept has a decision', () => {
     const ids = new Set(POWERS.map((p) => p.id));
     for (const id of ids) expect(FX_BY_POWER[id], id).toBeDefined();
     for (const k of Object.keys(FX_BY_POWER)) expect(ids.has(k), `stale entry ${k}`).toBe(true);
-    expect(ids.size).toBe(108);
+    expect(ids.size).toBe(123); // round 10 addendum: +15 animals placeable by hand
   });
 
   it('every event type the source logs has an entry (exact or by prefix)', () => {

@@ -398,6 +398,12 @@ export const POWERS: PowerDef[] = [
   animal('deer', 'Deer', 'ico.animal_deer'), animal('wolf', 'Wolves', 'ico.animal_wolf'), animal('bison', 'Bison', 'ico.animal_bison'),
   animal('horse', 'Wild horses', 'ico.animal_horse'), animal('sheep', 'Wild sheep', 'ico.animal_sheep'), animal('bear', 'Bears', 'ico.animal_bear'),
   animal('mammoth', 'Mammoths', 'ico.animal_mammoth'), animal('fish', 'Fish', 'ico.animal_fish'), animal('rabbit', 'Hares', 'ico.spawn_animal'),
+  // round 10 addendum: every real species can be dropped by hand (the species sprite is the tool icon)
+  ...([
+    ['elk', 'Elk'], ['goat', 'Wild goats'], ['cow', 'Aurochs'], ['boar', 'Boars'], ['chicken', 'Junglefowl'], ['camel', 'Camels'],
+    ['elephant', 'Elephants'], ['buffalo', 'Water buffalo'], ['llama', 'Llamas'], ['crocodile', 'Crocodiles'], ['bigcat', 'Great cats'],
+    ['penguin', 'Penguins'], ['seal', 'Seals'], ['whale', 'Whales'], ['bird', 'Birds'],
+  ] as const).map(([key, label]) => animal(key, label, 'ani.' + key)),
   {
     id: 'monster', cat: 'nature', label: 'Monster', icon: 'ico.monster', kind: 'tap', destructive: true, desc: 'Summon a fantastical creature (needs the fantasy creatures law).',
     apply: (sim, x, y) => {

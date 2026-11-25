@@ -207,6 +207,59 @@ export const ANIMAL_SPRITES: SpriteSheet = {
     ['.C.C.C.C..', '.C.C.C.C..', '.b.b.b.b..'],
     4,
   ),
+  // round 10 addendum: elephant (big ear, trunk, tusk; grey, unlike the brown mammoth)
+  'ani.elephant': walk(
+    [
+      '.............',
+      '......333....',
+      '..3333432333.',
+      '.34333432333.',
+      '.33333332336.',
+      '.333333322.3.',
+      '..33..33...3.',
+      '..33..33...3.',
+      '..22..22..33.',
+    ],
+    ['.33...33...3.', '.22...22..33.'],
+    3,
+  ),
+  // water buffalo: low, dark and wide, with swept-back crescent horns
+  'ani.buffalo': walk(
+    [
+      '..........5..',
+      '.......55.5..',
+      '........1155.',
+      '.21111111112.',
+      '.2111111112..',
+      '..2111112....',
+      '..1.....1....',
+      '..1.....1....',
+    ],
+    ['.1.1...1.1...', '.1.1...1.1...'],
+    3,
+  ),
+  // llama: tall upright neck with ears, cream with tan legs, no hump (unlike the camel)
+  'ani.llama': walk(
+    [
+      '......A.A',
+      '......AAA',
+      '......AAB',
+      '.......A.',
+      '.......A.',
+      '.AAAAAAA.',
+      '.BAAAAAB.',
+      '..C...C..',
+      '..C...C..',
+    ],
+    ['.C.C.C.C.', '.C.C.C.C.'],
+    4,
+  ),
+  // seal: slate teardrop body, pale belly, flipper; frame 2 humps the body forward
+  'ani.seal': two(
+    ['...........', '........MM.', '..MMMMMMNM.', '.MNNNNNNMM.', 'MLLLLLLLM..', '.M..M......'],
+    ['...........', '....MM..MM.', '..MMNNMMNM.', '.MNNNNNNMM.', 'MLLLLLLLM..', '..M..M.....'],
+    3,
+  ),
   'ani.sheep': walk(
     ['.........', '..6.6....', '.6666622.', '.6666621.', '.55555...', '..1..1...'],
     ['.1.1.1...'],

@@ -80,7 +80,9 @@ export function seedLife(sim: Sim): void {
   for (let k = 0; k < fish; k++) {
     const i = sim.rng.int(0, m.n - 1);
     if (!m.isWater(i)) continue;
-    spawnHerd(sim, m.terrain[i] === 0 && sim.rng.chance(0.3) ? 'whale' : 'fish', m.xOf(i), m.yOf(i));
+    // round 10 addendum: seals in cold coastal water
+    const kind = m.terrain[i] === 0 && sim.rng.chance(0.3) ? 'whale' : m.temp[i] < 6 && m.terrain[i] !== 0 && !st.alien && sim.rng.chance(0.3) ? 'seal' : 'fish';
+    spawnHerd(sim, kind, m.xOf(i), m.yOf(i));
   }
   if ((w.laws.fantasyCreatures || st.fantasy) && !realWorld(st)) {
     for (let k = 0; k < Math.round(land / 4000) + 2; k++) {
@@ -131,7 +133,10 @@ function pickStartSites(sim: Sim, count: number): number[] {
     const i = sim.rng.int(0, m.n - 1);
     const def = TERRAIN[m.terrain[i]];
     if (isWaterTerrain(m.terrain[i]) || def.habitability < 0.6 || !def.buildable) continue;
-    if (!m.hasFreshWater(i) && sim.rng.chance(0.7)) continue;
+    // round 10 addendum: people begin beside water (river, lake or sea) as real first settlements did; a dry
+    // site is taken only in the last quarter of the search, when the map has no wet land left (was: dry
+    // sites accepted 30% of the time, so every start could land inland by chance)
+    if (!m.hasFreshWater(i) && !m.isCoastal(i) && tries < 3000) continue;
     const x = m.xOf(i);
     const y = m.yOf(i);
     if (out.some((j) => Math.hypot(m.xOf(j) - x, m.yOf(j) - y) < minDist)) continue;

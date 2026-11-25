@@ -51,7 +51,7 @@ export const STATE_FX = {
 const BRUSH_TERRAIN = fx('dust', 0.5, { cap: 1 });
 const BIOMES = ['grass', 'forest', 'jungle', 'desert', 'steppe', 'savanna', 'snow', 'tundra', 'swamp', 'volcanic', 'beach', 'alien_grass', 'corrupt', 'crystal'];
 const RESOURCES = ['copper', 'tin', 'iron', 'gold', 'gems', 'coal', 'oil', 'gas', 'uranium', 'rare', 'spices', 'furs', 'fish', 'exotic'];
-const ANIMALS = ['deer', 'wolf', 'bison', 'horse', 'sheep', 'bear', 'mammoth', 'fish', 'rabbit'];
+const ANIMALS = ['deer', 'wolf', 'bison', 'horse', 'sheep', 'bear', 'mammoth', 'fish', 'rabbit', 'elk', 'goat', 'cow', 'boar', 'chicken', 'camel', 'elephant', 'buffalo', 'llama', 'crocodile', 'bigcat', 'penguin', 'seal', 'whale', 'bird'];
 const BY_DISASTER = 'drawn by the disaster itself, with its real radius';
 
 export const FX_BY_POWER: Record<string, FxEntry> = {

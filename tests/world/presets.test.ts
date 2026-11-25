@@ -273,3 +273,24 @@ describe.each(SIZES.flatMap((size) => SEEDS.map((seed) => ({ size, seed }))))('m
     expect(r.elev).toBeLessThan(r.restElev - 0.3); // measured trough -0.13..0.00 vs rest 0.57-0.65
   });
 });
+
+describe('start sites (round 10 addendum)', () => {
+  it('every starting people begins beside fresh water or the sea when the map has such land', () => {
+    for (const seed of ['m2', 'sites-1', 'sites-2']) {
+      const cfg = defaultConfig();
+      cfg.gen.seed = seed;
+      cfg.gen.width = 128;
+      cfg.gen.height = 128;
+      applyMapShape(cfg.gen, 'many' as MapShape);
+      cfg.settings.startEra = 4;
+      const sim = createSimulation(cfg);
+      const m = sim.w.map;
+      for (const c of sim.w.civs.values()) {
+        const cap = sim.w.settlements.get(c.capital)!;
+        let near = false;
+        m.forRadius(cap.x, cap.y, 2, (j) => (near ||= m.isWater(j) || m.river[j] > 0));
+        expect(near, `${seed} ${c.name}`).toBe(true);
+      }
+    }
+  });
+});

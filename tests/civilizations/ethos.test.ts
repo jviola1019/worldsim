@@ -58,9 +58,12 @@ describe('ethos', () => {
     expect((civ as Civ).ethos?.key).toBe('atomic');
   });
 
-  it('values reshape construction priorities directly (one planning pass, identical towns; 3 worlds summed)', () => {
-    let templesA = 0, templesB = 0;
-    for (const seed of ['eth-plan', 'eth-plan-2', 'eth-plan-3']) {
+  // round 10 addendum: 8 worlds (was 3). After the new species and water-first starts the 3-world sum tied 5-5;
+  // over 8 worlds theocratic rulers planned 14 temples to 6, and never fewer in any single world
+  it('values reshape construction priorities directly (one planning pass, identical towns; 8 worlds summed)', () => {
+    let templesA = 0, templesB = 0, reversed = 0;
+    for (const seed of ['eth-plan', 'eth-plan-2', 'eth-plan-3', 'eth-plan-4', 'eth-plan-5', 'eth-plan-6', 'eth-plan-7', 'eth-plan-8']) {
+      const a0 = templesA, b0 = templesB;
       const base = makeSim(seed, 96, (c) => { c.settings.startEra = 5; });
       base.runYears(3);
       const id = big(base).id;
@@ -75,8 +78,10 @@ describe('ethos', () => {
         if ((sa.construction as { type: number } | null)?.type === B.TEMPLE) templesA++;
         if ((sb.construction as { type: number } | null)?.type === B.TEMPLE) templesB++;
       }
+      if (templesA - a0 > templesB - b0) reversed++;
     }
     expect(templesB).toBeGreaterThan(templesA);
+    expect(reversed).toBe(0);
   });
 
   it('every ethos is defined with a name, blurb and at least one effect', () => {

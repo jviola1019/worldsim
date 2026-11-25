@@ -151,7 +151,7 @@ export function civFeatures(sim: Sim, civ: Civ): Set<GeoFeature> {
     }
     for (const [x, y] of pts) {
       if ((h.x - x) ** 2 + (h.y - y) ** 2 < 144) {
-        if (['goat', 'sheep', 'cow', 'boar', 'chicken', 'camel', 'horse', 'alienbeast'].includes(h.species)) set.add('domesticable');
+        if (['goat', 'sheep', 'cow', 'boar', 'chicken', 'camel', 'horse', 'llama', 'buffalo', 'alienbeast'].includes(h.species)) set.add('domesticable');
         if (h.species === 'horse') set.add('horses');
         break;
       }
