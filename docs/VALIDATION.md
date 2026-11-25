@@ -189,7 +189,7 @@ Six developed worlds under Realistic rules, 300 years each, starting in era 11.
 #### Gate on the final code
 **Unit tests:**
 - 751/751 before the pace fix.
-- The run on the final code (after the pace fix, 94d3960) was still running when this section was written; its result will replace this line.
+- 753/753 (63 files) on the final code, after the pace fix (94d3960).
 
 **Browsers:**
 - e2e: 106/106 in Chromium and in WebKit.
