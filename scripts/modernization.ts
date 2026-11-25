@@ -10,6 +10,7 @@ import { createSimulation } from '../src/sim/bootstrap';
 import { ERA_NAMES } from '../src/technology/techData';
 import { SECTOR } from '../src/civilizations/buildings';
 import { boundaryPopulation } from '../src/population/ledger';
+import { saveCheckpoint, loadCheckpoint } from './lib/checkpoint';
 
 const seed = process.argv[2] ?? 'modern-1';
 const YEARS = Number(process.argv[3] ?? 1000);
@@ -20,12 +21,17 @@ if (preset !== 'default') PRESETS.find((p) => p.key === (preset === 'realistic' 
 cfg.gen.seed = seed;
 cfg.gen.width = SIZE;
 cfg.gen.height = SIZE;
-const sim = createSimulation(cfg);
-const firstEra = new Map<number, number>();
-const lines: string[] = [];
-let droughtCellYears = 0;
-const t0 = performance.now();
-for (let y = 1; y <= YEARS; y++) {
+// round 10 addendum: CHECKPOINT=<dir> saves every 100 years and resumes after a restart (identical history)
+const ckPath = process.env.CHECKPOINT ? `${process.env.CHECKPOINT}/modernization-${seed}-${preset}-${SIZE}.bin` : '';
+type Acc = { y: number; firstEra: [number, number][]; lines: string[]; drought: number; secs: number };
+const ck = ckPath ? loadCheckpoint<Acc>(ckPath) : null;
+const sim = ck ? ck.sim : createSimulation(cfg);
+const firstEra = new Map<number, number>(ck?.extra.firstEra ?? []);
+const lines: string[] = ck?.extra.lines ?? [];
+let droughtCellYears = ck?.extra.drought ?? 0;
+const t0 = performance.now() - (ck?.extra.secs ?? 0) * 1000;
+if (ck) console.error(`resumed ${seed} at year ${ck.extra.y}`);
+for (let y = (ck?.extra.y ?? 0) + 1; y <= YEARS; y++) {
   sim.runYears(1);
   const alive = [...sim.w.civs.values()].filter((c) => c.alive && c.settlements.length);
   const top = alive.sort((a, b) => b.era - a.era || b.population - a.population)[0];
@@ -44,6 +50,7 @@ for (let y = 1; y <= YEARS; y++) {
     const wf = emp.reduce((a, b) => a + b, 0) || 1;
     lines.push(`  year ${String(sim.year).padStart(4)} · ${ERA_NAMES[top.era].padEnd(26)} pop ${String(Math.round(pop)).padStart(9)} · urban ${(100 * urban / Math.max(1, pop)).toFixed(0).padStart(3)}% · literacy ${top.caps.literacy.toFixed(2)} · electrification ${top.caps.electrification.toFixed(2)} · life-exp index ${(life / Math.max(1, pop)).toFixed(2)} · agri ${(100 * emp[SECTOR.FOOD] / wf).toFixed(0)}% industry ${(100 * emp[SECTOR.INDUSTRY] / wf).toFixed(0)}% services ${(100 * emp[SECTOR.SERVICES] / wf).toFixed(0)}% unemployed ${(100 * emp[SECTOR.UNEMPLOYED] / wf).toFixed(0)}% · GDP/cap ${top.econ.gdpPerCapita.toFixed(2)} · food short ${(100 * top.acc.foodShort / Math.max(1, top.acc.foodNeed)).toFixed(0)}%`);
   }
+  if (ckPath && y % 100 === 0 && y < YEARS) saveCheckpoint(ckPath, sim, { y, firstEra: [...firstEra.entries()], lines, drought: droughtCellYears, secs: (performance.now() - t0) / 1000 } satisfies Acc);
 }
 if (process.env.SAVE_DIR) (await import('node:fs')).writeFileSync(`${process.env.SAVE_DIR}/${seed}-final.bin`, (await import('../src/persistence/serialize')).encodeWorld(sim.w));
 const ev = sim.w.events;

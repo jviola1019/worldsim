@@ -1,0 +1,58 @@
+# Research notes: Realistic addendum (round 10, 2026-11-25)
+
+These are the real-world reference values behind the Realistic addendum. They were collected with web searches on 2026-11-25. Each value names its source; where no source was found, the note says so.
+
+**How to read this:** the simulation is stylized (see [METHODS](../../METHODS.md) and [PARAMETERS](../../PARAMETERS.md)). These figures are used for two things:
+1. to check that a model value has the right **order of magnitude**;
+2. to set new values in an honest range.
+
+None of them is a calibration target fitted to data.
+
+## 1. Animal growth rates (the `growth` field: maximum annual growth in good conditions)
+
+| Species (model key) | Model value | Reference | Source | Verdict |
+|---|---|---|---|---|
+| Elephant (`elephant`, new) | **0.07** | r_max 0.07: a population recovering from poaching, Tanzania | Foley & Faust 2010, as cited in the popbayes vignette ([CRAN](https://cran.r-project.org/web/packages/popbayes/vignettes/generate_data.html)) | Set from the source |
+| Water buffalo (`buffalo`, new) | **0.12** | Feral buffalo in Kakadu: mean exponential increase 0.10 per year; one recent Northern Territory year +17%. African buffalo r_max ≈ 0.21 (body-mass formula after Sinclair 2003) | [Kakadu thesis](https://researchprofiles.canberra.edu.au/en/studentTheses/feral-buffalo-in-kakadu-national-park-survey-methods-population-d/); [news report, undated](https://www.inkl.com/news/feral-buffalo-numbers-in-the-nt-out-of-control-and-nearing-200-000-head); popbayes vignette | Inside the observed range 0.10–0.21 |
+| Seal (`seal`, new) | **0.10** | Baltic grey seal +7.9% a year since 2000; Wadden Sea harbour seal +7% (1974–87) and +12.9% (1989–2002); harbour seal intrinsic maximum just under 13% | [HELCOM 2018](https://helcom.fi/wp-content/uploads/2019/08/Population-trends-and-abundance-of-seals-HELCOM-core-indicator-2018.pdf); [Wadden Sea QSR](https://qsr.waddensea-worldheritage.org/reports/marine-mammals); [COSEWIC](https://www.canada.ca/en/environment-climate-change/services/species-risk-public-registry/cosewic-assessments-status-reports/harbour-seal/chapter-7.html) | Inside the observed 0.08–0.13 |
+| Llama, wild type (`llama`, new) | **0.15** | No published annual guanaco growth rate was found. Camelid biology (one young a year, first breeding at about 2 years) suggests a rate similar to the camel's 0.15 | [Zoological Studies 2015, guanaco density](https://zoolstud.sinica.edu.tw/Journals/54/54-23.html) (density only) | **[S] stylized**, no source for the rate |
+| Bison (`bison`) | 0.22 | Yellowstone: 14.5–15% a year net of removals (2022–23); 11.5% mean 1997–2005; r = 0.16 for the northern herd 1902–52 | [IBMP 2023 status report](https://www.ibmp.info/Library/OpsPlans/2023_StatusYellowstoneBisonPopulation_Oct2023_final.pdf); [IBMP 2022](https://www.ibmp.info/Library/OpsPlans/2022_StatusYellowstoneBisonPopulation_FINAL_Oct2022.pdf) | Above the observed **sustained** rates, which include removals and density limits. Plausible as a maximum; kept |
+| Whale (`whale`) | 0.05 | Gulf of Maine humpbacks 6.5% a year (1979–91); slower near carrying capacity | [MUN thesis](https://research.library.mun.ca/538/3/north_atlantic_humpback.pdf); [UW 2024](https://fish.uw.edu/2024/08/rapid-increase-rates-in-large-whale-populations-continue-until-they-near-carrying-capacity) | Same order, slightly low (the model's "whale" stands for great whales in general); kept |
+| Wolf (`wolf`) | 0.30 | Unexploited wolf populations: mean growth near 0 (they sit at equilibrium), year-to-year λ about 0.86–1.14 | [USGS / Mech & Fieberg 2015](https://pubs.usgs.gov/publication/70138809) | That is equilibrium variation, not a maximum; no maximum found. **[S]**, kept |
+| Deer, elk, horse, goat, sheep, aurochs, boar, junglefowl, camel, hare, mammoth, crocodile, bear, great cat, penguin, fish, birds | see `species.ts` | The searches gave no reliable species-level maximum rates (Fagan et al. 2013, Proc. R. Soc. B 280, has predicted values in its supplement, which could not be read) | [Lynch & Fagan 2009](https://science.umd.edu/biology/faganlab/abstracts/LynchFagan2009.html); [Fagan et al. 2013](https://experts.umn.edu/en/publications/phylogenetic-prediction-of-the-maximum-per-capita-rate-of-populat-2/) | **[S] stylized.** The ordering is plausible: small, fast breeders (hares, fowl, fish) are highest; mammoths, whales and elephants lowest |
+
+**Caveat:** Lynch & Fagan (2009) show that some survivorship models inflate r estimates. Published values also vary with years, removals and density. These are ranges, not single truths.
+
+## 2. Human (forager) growth
+
+- **Archaeological long-run rate:** about **0.04% a year**. Wyoming–Colorado foragers, 13,000–6,000 years ago, doubled roughly every 1,700 years. The same study found farming did not raise the long-term rate. Source: Zahid, Robinson & Kelly, PNAS 2015 ([PMC4743830](https://pmc.ncbi.nlm.nih.gov/articles/PMC4743830); [Smithsonian summary](https://insider.si.edu/2015/12/research-shows-same-growth-rate-for-farming-non-farming-societies/)).
+- **Ethnographic and historical rates are much higher.** The gap between them and the archaeological rate is unresolved; booms and crashes average out to near zero over millennia. Source: [PMC7741106](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7741106/).
+- **Use in the model:** a placed band may grow quickly while food is plentiful (an ethnographic-scale boom), but the long-run average across settled and failed groups should be small. The Slow-pace targets (a village after about 100 years, a city after about 1,000) were chosen by the owner. They are not derived from these rates.
+
+## 3. Natural hazard frequencies (whole Earth)
+
+| Hazard | Real frequency | Source |
+|---|---|---|
+| Earthquakes of magnitude 7 or more | About 16 a year (long-term average since 1900); magnitude 8 or more about 1 a year | [USGS FAQ](https://www.usgs.gov/faqs/why-are-we-having-so-many-earthquakes-has-naturally-occurring-earthquake-activity-been) |
+| Volcanic eruptions | 64–89 under way each year since 2000 (average 78), about 36 starting or ending; most are VEI 2 or smaller; the VEI 4+ rate has been steady for over a century | [GVP via Discover](https://www.discovermagazine.com/volcanic-activity-isnt-increasing-across-the-planet-44448) |
+| Rare catastrophes (Tunguska-class airburst 1/800 yr, VEI-7 1/1,000 yr, supervolcano 1/60,000 yr, severe geomagnetic storm 1/150 yr, and others) | As documented in `src/world/catastrophes.ts`, round 5, of real order of magnitude | (existing, unchanged) |
+
+**What this means for EPOCH:**
+- A world map compresses a continent-sized region into 128² tiles, and a "regional disaster" in the model is one damaging event big enough to matter to towns.
+- The model draws such an event with probability 0.012 a month (about 0.14 a year per world, `world/environment.ts`). That is **far fewer** than Earth's magnitude-7 quakes plus damaging eruptions, floods and storms.
+- The rate is **[S] stylized**, set for readable histories. The events audit (Task 7) reports the realised counts beside these figures, so the gap is visible rather than hidden.
+- Only the rare catastrophes are claimed to have real-world base rates.
+
+## 4. Search log
+
+Queries, all run on 2026-11-25 (standard web search, US results):
+1. maximum intrinsic rate of population increase r_max mammals table deer bison elephant wolf bear
+2. hunter-gatherer population growth rate per year prehistoric 0.1% forager fertility study
+3. global frequency of natural disasters per year earthquakes magnitude 7 volcanic eruptions VEI 4 statistics USGS
+4. annual population growth rate white-tailed deer brown bear wolf population maximum per year percent study
+5. Smithsonian Global Volcanism Program how many volcanoes erupt each year VEI 4 frequency
+6. bison population growth rate per year Yellowstone; seal population growth rate; llama guanaco growth rate; water buffalo feral growth rate Australia
+7. grey seal harbour seal population annual growth rate percent recovery; humpback whale population growth rate 7% per year
+8. guanaco population growth rate per year Patagonia study; feral water buffalo Northern Territory population increase rate per year
+
+The queries carried no personal or project-identifying details.
