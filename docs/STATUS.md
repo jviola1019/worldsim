@@ -98,7 +98,7 @@ Evidence for every figure is in [VALIDATION.md](VALIDATION.md); performance is i
 
 | Item | Status | Evidence |
 |---|---|---|
-| A map effect for every concept (108 powers, every event type), area rings, sequences, a per-place cap, screen flashes | Complete | `conceptFx.test.ts` (coverage, one source, hooks, cap, determinism); e2e (an earthquake plays and ends) |
+| A map effect for every concept (123 powers, every event type), area rings, sequences, a per-place cap, screen flashes | Complete | `conceptFx.test.ts` (coverage, one source, hooks, cap, determinism); e2e (an earthquake plays and ends) |
 | Reduce motion everywhere (still markers, no flash, sheets without animation) | Complete | e2e reduced-motion run; renderer collapses sequences |
 | Render caches follow every concept ("recall cache") | Complete: **9 stale-drawing cases found and fixed** | `cacheFreshness.test.ts` (every power and 30-year runs from 3 eras) |
 | WorldBox-style zone caching of the overview and overlays | Complete | `pixelCache.test.ts` (byte-equal to a full rebuild); PERFORMANCE §2d |

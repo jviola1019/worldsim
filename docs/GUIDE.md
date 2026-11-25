@@ -118,7 +118,7 @@ Model folders call one another freely: a war changes the economy, and the econom
 | `economy` | 6 | 1,500 | Monthly production and jobs, national markets and finance, trade and roads, occupations, traffic, visitor accords. |
 | `politics` | 4 | 1,400 | Government (institutions, policies), government forms, diplomacy, leadership and succession. |
 | `military` | 3 | 1,200 | Armies and battles, weapons by era, nuclear weapons. |
-| `powers` | 3 | 1,200 | The 108 god powers, fictional horrors (god mode only), undo for terrain strokes. |
+| `powers` | 3 | 1,200 | The 123 god powers, fictional horrors (god mode only), undo for terrain strokes. |
 | `technology` | 4 | 1,050 | The tech tree (207 techs, data), research, discovery, adoption, diffusion, loss, overtaking. |
 | `culture` | 5 | 1,000 | Religion, culture drift, languages and names, sport leagues and world games. |
 | `history` | 6 | 900 | Events with causes, statistics series, era-medium feed, headlines, the photo album. |
@@ -383,7 +383,7 @@ flowchart LR
 
 ## 12. God powers
 
-`powers/powers.ts` defines **108 god powers** in 9 groups: terrain, nature, peoples, faith and culture, technology, politics, warfare, disasters, modern and future.
+`powers/powers.ts` defines **123 god powers** in 9 groups: terrain, nature, peoples, faith and culture, technology, politics, warfare, disasters, modern and future.
 - **Real changes:** each power changes real state (terrain, people, institutions, technology, relations) and is recorded in `interventions`, so a timeline can be replayed.
 - **Undo:** terrain strokes can be undone (`undo.ts`).
 - **Power sets** (round 10, `powers/powerSet.ts`): every world has one.

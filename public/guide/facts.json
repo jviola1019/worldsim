@@ -2,9 +2,9 @@
  "generated": "2026-11-25",
  "totals": {
   "srcFiles": 146,
-  "srcLines": 43052,
-  "testFiles": 62,
-  "testCases": 402
+  "srcLines": 43091,
+  "testFiles": 63,
+  "testCases": 407
  },
  "folders": [
   {
@@ -67,7 +67,7 @@
   {
    "name": "sim",
    "files": 11,
-   "lines": 2591,
+   "lines": 2593,
    "deps": {
     "powers": 3,
     "culture": 5,
@@ -102,7 +102,7 @@
   {
    "name": "population",
    "files": 9,
-   "lines": 1622,
+   "lines": 1632,
    "deps": {
     "sim": 17,
     "world": 3,
@@ -154,14 +154,14 @@
   {
    "name": "powers",
    "files": 4,
-   "lines": 1255,
+   "lines": 1276,
    "deps": {
     "sim": 11,
     "core": 2,
     "population": 6,
     "history": 2,
     "civilizations": 6,
-    "world": 10,
+    "world": 12,
     "config": 1,
     "ecology": 3,
     "culture": 1,
@@ -245,7 +245,7 @@
   {
    "name": "ecology",
    "files": 2,
-   "lines": 605,
+   "lines": 609,
    "deps": {
     "powers": 1,
     "population": 2,
@@ -266,7 +266,7 @@
   {
    "name": "config",
    "files": 2,
-   "lines": 547,
+   "lines": 549,
    "deps": {
     "sim": 1,
     "world": 3
@@ -398,7 +398,7 @@
   {
    "path": "src/config/balance.ts",
    "folder": "config",
-   "lines": 302,
+   "lines": 304,
    "about": "Balance parameters. Every gameplay coefficient lives here (not scattered as magic numbers) so it can be tuned, tested for sensitivity and adjusted at runtime from the developer panel."
   },
   {
@@ -470,7 +470,7 @@
   {
    "path": "src/ecology/ecology.ts",
    "folder": "ecology",
-   "lines": 512,
+   "lines": 516,
    "about": "Ecosystems: vegetation regrowth, animal herds (movement, grazing, logistic growth limited by local vegetation, predation, starvation, climate stress), human hunting, extinction, slow evolution into subspecies, and optional fantasy monsters."
   },
   {
@@ -656,7 +656,7 @@
   {
    "path": "src/population/bands.ts",
    "folder": "population",
-   "lines": 245,
+   "lines": 255,
    "about": "Nomadic bands (individual-level hunter-gatherer groups)."
   },
   {
@@ -710,13 +710,13 @@
   {
    "path": "src/powers/powers.ts",
    "folder": "powers",
-   "lines": 943,
+   "lines": 941,
    "about": "God powers. Every power mutates simulation state (terrain, climate, people, institutions, technology, relations...) — never just a label — and is recorded in WorldState.interventions so a timeline can be reproduced."
   },
   {
    "path": "src/powers/powerSet.ts",
    "folder": "powers",
-   "lines": 53,
+   "lines": 76,
    "about": "Round 10: which god powers a world allows."
   },
   {
@@ -926,7 +926,7 @@
   {
    "path": "src/sim/bootstrap.ts",
    "folder": "sim",
-   "lines": 440,
+   "lines": 442,
    "about": "Seeding a new world: wildlife, optional fantasy monsters, and starting peoples."
   },
   {
@@ -1270,7 +1270,7 @@
   },
   {
    "path": "tests/ecology/predation.test.ts",
-   "cases": 8,
+   "cases": 9,
    "about": "Round 10 addendum (life audit): predators coexist with their prey."
   },
   {
@@ -1395,7 +1395,7 @@
   },
   {
    "path": "tests/powers/realWorld.test.ts",
-   "cases": 4,
+   "cases": 5,
    "about": "Round 10 addendum: Realistic and Observer worlds contain only what could exist in the real world: no fantasy peoples or monsters, no god-only horrors, no alien land or wildlife, no exotic matter."
   },
   {
@@ -1465,7 +1465,7 @@
   },
   {
    "path": "tests/sim/pace.test.ts",
-   "cases": 4,
+   "cases": 6,
    "about": "Round 10: Slow pace. Placed humans take generations to settle and centuries to build cities; Standard pace is untouched (every lever exactly 1)."
   },
   {
@@ -1507,6 +1507,11 @@
    "path": "tests/ui/peoples.test.ts",
    "cases": 3,
    "about": "Round 10: the HUD's nation count is honest."
+  },
+  {
+   "path": "tests/ui/targetSize.test.ts",
+   "cases": 1,
+   "about": "Round 10 addendum (CI #73/#75, axe target-size on WebKit desktop): clickable chips were about 22 px tall on a fine pointer (2 px padding, 13 px text), under WCAG 2.5.8's 24 px minimum where chips sit side by side (a ruler's family links in the person inspector"
   },
   {
    "path": "tests/world/fire-determinism.test.ts",
@@ -1564,16 +1569,6 @@
    "path": "scripts/pace-calibrate.ts",
    "lines": 45,
    "about": "Round 10: pace calibration."
-  },
-  {
-   "path": "scripts/probe/modernpace.ts",
-   "lines": 17,
-   "about": ""
-  },
-  {
-   "path": "scripts/probe/natdrop.ts",
-   "lines": 25,
-   "about": ""
   },
   {
    "path": "scripts/run-sim.ts",

@@ -204,7 +204,10 @@ All browser testing is emulation (iPhone 13 and desktop), not a physical device 
 *In progress:* the five seeds are re-running on the final code. Finished so far: pace-b (village at year 58, town at 804, city at 1,035) and pace-e (village at 139, town at 808, city at 1,056). The full table will replace this note.
 
 #### GitHub Actions and the live site (round 10)
-*To be recorded* once the final commit's CI and Pages runs finish. So far: CI #74, #76 and #82 passed and Pages deployed from them. #73, #75 and #77 failed on the chip target size (fixed in #79), and #83 on the flaky hand check (fixed).
+Checked on 2026-11-25 through the GitHub Actions API (branch `claude/epoch-civilizations-unbound-dap8pc`). Every CI run from #84 to #88 (the last, on 954f0fc) passed: types, unit tests, build, e2e and a11y in Chromium and WebKit. Each failure in this addendum had a known cause, fixed in a later commit:
+- **#70–#73, #75, #77:** the axe `target-size` rule (serious) flagged two family-link chips in the person inspector on a desktop pointer, at 79 of 80 checks. The audit opens a random ruler, so the failure showed only on some worlds. Fixed in 4a69538 (chips at least 24 px); #79 was the first run to pass it. The logs of #72, #73, #75 and #77 were read; #70 and #71 failed at the same step but were not opened.
+- **#78, #80, #81, #83:** WebKit e2e passed 105 of 106 checks. The failing check was "the hand moves": two samples 200 ms apart were identical (`hand0y-19` both times) because the slower runner drew no frame between them. Fixed in 100b7a1 (five samples, 120 ms apart); it has passed in every run since (#84–#88). The log was read for #80; #78 and #81 show the same 105/106.
+- **Pages:** the last deploy (Pages #59, on 954f0fc) succeeded. Earlier Pages runs in this addendum that were skipped or cancelled had been triggered by failed or superseded CI runs. The live site at `jviola1019.github.io/worldsim/` serves `assets/index-CMxtFEmH.js`, the same bundle as a local `npm run build` of 954f0fc, and `/guide/` returns 200.
 
 ## R9. Round 9: device-labelled saves, WorldBox-style close zoom, follow camera, warming, unemployment, WebKit (2026-11-19)
 

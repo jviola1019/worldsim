@@ -126,7 +126,7 @@ Every event is recorded with its causes. Charts show population, economy, techno
 
 ### Play god, or just watch
 
-**108 god powers** come in 9 groups: shape land, plant forests, place peoples, found faiths, grant knowledge, start or end wars, call down disasters and launch the space age. You can also change the **world laws** and edit any person's traits ("divine touch"). Every power and every major event shows its effect where it happens (a quake ring, a meteor that falls and explodes, fireworks for world games), as a still marker if Reduce motion is on.
+**123 god powers** come in 9 groups: shape land, plant forests, place peoples and 24 kinds of animal, found faiths, grant knowledge, start or end wars, call down disasters and launch the space age. You can also change the **world laws** and edit any person's traits ("divine touch"). Every power and every major event shows its effect where it happens (a quake ring, a meteor that falls and explodes, fireworks for world games), as a still marker if Reduce motion is on.
 
 Three ways to play:
 - **God mode** (every preset except the two below): every power.

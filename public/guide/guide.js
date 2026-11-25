@@ -30,7 +30,7 @@ const ABOUT = {
   ecology: 'Animals, predators, vegetation, monsters.',
   future: 'Space programmes and existential risks.',
   history: 'Events with causes, statistics, the era-medium feed, the photo album.',
-  powers: 'The 108 god powers, horrors (god mode only), undo.',
+  powers: 'The 123 god powers, horrors (god mode only), undo.',
   scenarios: 'Optional scenario goals.',
   core: 'Seeded random numbers (sfc32), noise, math, time units.',
   config: 'Every balance number in one place; world laws and presets.',
