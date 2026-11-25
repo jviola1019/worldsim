@@ -148,6 +148,7 @@ export const FX_BY_EVENT: Record<string, FxEntry> = {
   nuclear_strike: none('drawn by each nuclear blast (state effect) at the struck city'), online_protest: none('online: no place'),
   orbital_strike: none('drawn by the strike itself (state effect)'), org_founded: none('an international body: no place'), org_join: none('an international body: no place'),
   outlet_closed: none(FREQUENT + ' (media churn)'), outlet_founded: none(FREQUENT + ' (media churn)'),
+  pandemic: fx('plague', 3, { area: true, radius: 3 }), // Task 7 redraws disease visuals
   peace: fx('ring', 2, { area: true, radius: 3 }), religion_extinct: fx('smoke', 2), religion_founded: fx('star', 2),
   revolution: fx('fire', 1.5, { then: fx('flag', 1.5) }), royal_marriage: fx('heal', 1.5), ruler_death: none(FREQUENT), scenario: none('scenario goals'),
   schism: fx('clash', 1.5), sea_level: fx('wave', 2), secession: fx('flag', 2), secularization: none('gradual process'),

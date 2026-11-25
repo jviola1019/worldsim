@@ -300,6 +300,16 @@ export const BALANCE = {
   sanitationTransmissionCut: 0.2,
   /** [S] Round 10: an epidemic is logged as an event when it kills more than this share of the settlement (and at least 20 people). Was 3%, which hid every modern outbreak. */
   epidemicLogShare: 0.005,
+  /** [E] Round 10: yearly chance of a world pandemic with no long-distance connectivity (before rail, steamships and flight). Antiquity and the Middle Ages saw a few world-scale pandemics in over a thousand years (Antonine, Justinian, Black Death); influenza pandemics since 1500 came about once every 38 years (Taubenberger & Morens 2009), already carried by sail. One in two centuries sits between (research-notes §5.1). */
+  pandemicPreIndustrial: 0.005,
+  /** [E] Round 10: yearly chance of a notable world pandemic in a fully connected world: 1918, 1957, 1968, 2009 and COVID-19 make about 4-5 per century; 0.04 is the low end (research-notes §5.1). */
+  pandemicModern: 0.04,
+  /** [E] Round 10: share of pandemics drawn to kill at least 1% of the world: 1 of the 5 notable pandemics since 1918 (1918, at about 1-5%; the others 0.001-0.3%); Marani et al. 2021 put a 1918-scale event at 0.27-1.9% a year (research-notes §5.1). */
+  pandemicSevereShare: 0.125,
+  /** [E] Round 10: tail exponent of the pandemic severity draw (Pareto: P(share >= x) falls as x^-0.71). Marani et al. 2021 fit epidemic intensity with a generalized Pareto distribution whose tail decays with exponent -0.71; the paper's intensity divides by duration, the model uses the total share (research-notes §5.1). */
+  pandemicTailExponent: 0.71,
+  /** [S] Round 10: how much more readily a world pandemic pathogen crosses a link between towns than a local outbreak (travellers and trade). Not fitted: set so pandemics reach most linked towns, as 1918 and COVID-19 reached nearly everywhere; the disease audit reports the reach. */
+  pandemicLinkSpread: 10,
 
   // ---------------- pacing
   /** [T] Most simulation ticks run per rendered frame (adaptive cap; performance only, no effect on history). */

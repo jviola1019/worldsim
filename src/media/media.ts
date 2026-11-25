@@ -143,7 +143,7 @@ function shock(sim: Sim, civ: Civ): number {
   for (let j = evs.length - 1; j >= 0 && n < 3; j--) {
     const e = evs[j];
     if (sim.year - e.year > 2) break;
-    if ((e.type === 'war_declared' || e.type === 'epidemic' || e.cat === 'disaster') && e.civs.includes(civ.id)) n++;
+    if ((e.type === 'war_declared' || e.type === 'epidemic' || e.type === 'pandemic' || e.cat === 'disaster') && e.civs.includes(civ.id)) n++;
   }
   return n * 0.06;
 }

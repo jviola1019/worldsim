@@ -873,6 +873,12 @@ export interface Disease {
   engineered?: boolean;
   /** Recovered people are left sterile (infertility pandemic). */
   sterilizing?: boolean;
+  /** A world pandemic from the yearly draw (population/pandemic.ts); one summary event when it ends. */
+  pandemic?: boolean;
+  /** World population when a pandemic emerged (its death share is measured against this). */
+  worldPop?: number;
+  /** The world death share the severity draw intended, before medicine and limited reach (for audits). */
+  targetShare?: number;
 }
 
 // ---------------------------------------------------------------- relations

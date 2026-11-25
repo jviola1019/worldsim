@@ -187,12 +187,12 @@ function voices(sim: Sim, ev: HistoryEvent, civ: Civ | undefined, post: FeedPost
     if (mood.pol > 0.35) lines.push({ text: 'This war is a distraction from problems at home.' });
   } else if (t === 'peace') {
     lines.push({ text: 'At last. Let the families mourn and rebuild.' });
-  } else if (c === 'disaster' || t === 'epidemic') {
+  } else if (c === 'disaster' || t === 'epidemic' || t === 'pandemic') {
     lines.push({ text: `Thinking of everyone in ${place}. Stay safe.` });
     if (mood.mis > 0.3) {
       const rivals = [...sim.w.civs.values()].filter((o) => o.alive && o.id !== civ.id && civ.knownCivs.includes(o.id));
       const scapegoat = rivals.length ? rivals[rng.int(0, rivals.length - 1)].name : 'outsiders';
-      const real = ev.causes?.length ? ev.causes.map((x) => x.label).join('; ') : t === 'epidemic' ? 'contagion between people' : 'natural forces';
+      const real = ev.causes?.length ? ev.causes.map((x) => x.label).join('; ') : t === 'epidemic' || t === 'pandemic' ? 'contagion between people' : 'natural forces';
       lines.push({ text: `They are hiding the truth: ${scapegoat} did this on purpose!`, flag: 'false', context: `False claim. The recorded cause: ${real}.` });
     }
   } else if (t === 'ai_launched' || c === 'technology') {

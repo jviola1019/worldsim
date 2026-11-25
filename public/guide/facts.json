@@ -1,10 +1,10 @@
 {
  "generated": "2026-11-25",
  "totals": {
-  "srcFiles": 147,
-  "srcLines": 43349,
-  "testFiles": 65,
-  "testCases": 426
+  "srcFiles": 148,
+  "srcLines": 43564,
+  "testFiles": 67,
+  "testCases": 435
  },
  "folders": [
   {
@@ -67,11 +67,11 @@
   {
    "name": "sim",
    "files": 11,
-   "lines": 2594,
+   "lines": 2603,
    "deps": {
     "powers": 3,
     "culture": 5,
-    "population": 9,
+    "population": 10,
     "politics": 7,
     "civilizations": 19,
     "economy": 7,
@@ -101,16 +101,16 @@
   },
   {
    "name": "population",
-   "files": 9,
-   "lines": 1665,
+   "files": 10,
+   "lines": 1855,
    "deps": {
-    "sim": 17,
+    "sim": 19,
     "world": 3,
-    "config": 5,
+    "config": 6,
     "civilizations": 11,
-    "history": 3,
+    "history": 4,
     "culture": 3,
-    "core": 7,
+    "core": 9,
     "economy": 1,
     "ecology": 1,
     "politics": 2,
@@ -260,7 +260,7 @@
   {
    "name": "config",
    "files": 2,
-   "lines": 575,
+   "lines": 591,
    "deps": {
     "sim": 1,
     "world": 3
@@ -398,7 +398,7 @@
   {
    "path": "src/config/balance.ts",
    "folder": "config",
-   "lines": 304,
+   "lines": 320,
    "about": "Balance parameters. Every gameplay coefficient lives here (not scattered as magic numbers) so it can be tuned, tested for sensitivity and adjusted at runtime from the developer panel."
   },
   {
@@ -674,7 +674,7 @@
   {
    "path": "src/population/disease.ts",
    "folder": "population",
-   "lines": 142,
+   "lines": 170,
    "about": "Abstract public-health model."
   },
   {
@@ -688,6 +688,12 @@
    "folder": "population",
    "lines": 82,
    "about": "Migration: people leave settlements suffering hunger, unrest or overcrowding and move toward known settlements that are more prosperous, better fed and have room — preferring their own civilization; foreign destinations depend on migration policies."
+  },
+  {
+   "path": "src/population/pandemic.ts",
+   "folder": "population",
+   "lines": 162,
+   "about": "Round 10 second addendum: world pandemics (design §6.2, research-notes §5)."
   },
   {
    "path": "src/population/persons.ts",
@@ -938,7 +944,7 @@
   {
    "path": "src/sim/conceptFx.ts",
    "folder": "sim",
-   "lines": 229,
+   "lines": 230,
    "about": "Round 7: the one place that decides what every concept shows on the map."
   },
   {
@@ -974,13 +980,13 @@
   {
    "path": "src/sim/simulation.ts",
    "folder": "sim",
-   "lines": 189,
+   "lines": 191,
    "about": "Simulation: fixed-tick, deterministic orchestration of all systems."
   },
   {
    "path": "src/sim/types.ts",
    "folder": "sim",
-   "lines": 1141,
+   "lines": 1147,
    "about": "EPOCH world state model."
   },
   {
@@ -1390,6 +1396,11 @@
    "about": ""
   },
   {
+   "path": "tests/population/disease.test.ts",
+   "cases": 4,
+   "about": ""
+  },
+  {
    "path": "tests/population/explorers.test.ts",
    "cases": 4,
    "about": "Round 10 (mode audit): seafaring nations send explorers."
@@ -1398,6 +1409,11 @@
    "path": "tests/population/ledger.test.ts",
    "cases": 9,
    "about": "Population accounting (R12.4): for the world and for every civilization, Δ boundary population == Σ signed ledger components exactly (up to float rounding), across every way people are created, moved, transferred or removed."
+  },
+  {
+   "path": "tests/population/pandemic.test.ts",
+   "cases": 5,
+   "about": "Round 10 second addendum (Task 4): world pandemics."
   },
   {
    "path": "tests/powers/powerSets.test.ts",
@@ -1546,6 +1562,11 @@
   }
  ],
  "scripts": [
+  {
+   "path": "scripts/disease-audit.ts",
+   "lines": 161,
+   "about": "Round 10 second addendum (Task 4): disease audit."
+  },
   {
    "path": "scripts/endings-census.ts",
    "lines": 27,

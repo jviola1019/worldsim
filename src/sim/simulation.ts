@@ -34,6 +34,7 @@ import { catastrophesYearly } from '../world/catastrophes';
 import { risksWorldYearly } from '../future/risks';
 import { horrorsYearly } from '../powers/horrors';
 import { techLeadYearly } from '../technology/overtaking';
+import { pandemicYearly } from '../population/pandemic';
 
 export const SPEEDS = [0, 20, 60, 150, 400, 1200];
 export const SPEED_LABELS = ['Paused', '1×', '2×', '3×', '4×', 'Max'];
@@ -125,6 +126,7 @@ export class Simulation implements Sim {
     climateYearly(this);
     catastrophesYearly(this);
     risksWorldYearly(this);
+    if (w.laws.diseases) pandemicYearly(this); // world pandemics, gated like the local model
     horrorsYearly(this);
     techLeadYearly(this);
     notablesYearly(this);

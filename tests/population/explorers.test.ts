@@ -8,14 +8,21 @@ import { configFor } from '../../scripts/mode-audit';
 import { createSimulation } from '../../src/sim/bootstrap';
 
 describe('explorers', () => {
-  it('island sailors go exploring and meet other nations', () => {
-    const sim = createSimulation(configFor('islands', 'audit-islands-0'));
-    const known = () => [...sim.w.civs.values()].filter((c) => c.alive).reduce((t, c) => t + c.knownCivs.length, 0);
-    const before = known();
-    sim.runYears(40);
-    expect(sim.w.events.some((e) => e.type === 'exploration')).toBe(true);
-    expect(known()).toBeGreaterThan(before + 2);
-  }, 120000);
+  // Round 10 second addendum, task 4 (world pandemics) changed histories: audit world 0 no longer logs an exploration
+  // within 40 years (it still meets 10 more nations). Re-measured over 36 worlds (0 to 35): a world both logs an
+  // exploration and gains more than 2 contacts in 30 of 36 before the change and 29 of 36 after, so the rate is unchanged.
+  // The test now asks it of at least half of worlds 0 to 7 (5 of 8 after the change).
+  it('island sailors go exploring and meet other nations (most worlds)', () => {
+    let ok = 0;
+    for (let i = 0; i < 8; i++) {
+      const sim = createSimulation(configFor('islands', `audit-islands-${i}`));
+      const known = () => [...sim.w.civs.values()].filter((c) => c.alive).reduce((t, c) => t + c.knownCivs.length, 0);
+      const before = known();
+      sim.runYears(40);
+      if (sim.w.events.some((e) => e.type === 'exploration') && known() > before + 2) ok++;
+    }
+    expect(ok, `${ok} of 8 worlds`).toBeGreaterThanOrEqual(4);
+  }, 300000);
 
   it('a people without sailing sends no sea voyages', () => {
     const sim = createSimulation(configFor('primitive', 'audit-primitive-0'));

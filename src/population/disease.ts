@@ -25,7 +25,8 @@ import { addPressure } from '../civilizations/endings';
 
 const NAMES = ['Fever', 'Pox', 'Plague', 'Cough', 'Flux', 'Sweating Sickness', 'Blight', 'Ague', 'Wasting'];
 
-function emerge(sim: Sim, s: Settlement, civ: Civ): Disease {
+/** A new natural pathogen named in the settlement's language; `over` replaces drawn traits (world pandemics set r0 and lethality). */
+export function emergeNovel(sim: Sim, s: Settlement, civ: Civ, over: Partial<Disease> = {}): Disease {
   const w = sim.w;
   const rng = sim.rng;
   const phon = phonOfCulture(sim, s.cultures[0]?.id ?? civ.cultureId);
@@ -40,9 +41,35 @@ function emerge(sim: Sim, s: Settlement, civ: Civ): Disease {
     emerged: sim.year,
     zoonotic: s.bld[B.PASTURE] > 0 && rng.chance(0.6),
     totalDeaths: 0,
+    ...over,
   };
   w.diseases.set(d.id, d);
   return d;
+}
+
+/** Population density term: about 0.5 for villages up to 5 for megacities. */
+const densityOf = (s: Settlement) => Math.log10(Math.max(10, s.pop)) - 1;
+
+/**
+ * What a settlement does to transmission: crowding, sanitation, medicine and quarantine (and misinformation
+ * undermining them). An epidemic's effective reproduction number there is r0 times this.
+ */
+export function transmissionFactor(s: Settlement, civ: Civ): number {
+  const caps = civ.caps;
+  const sanitation = clamp01(caps.sanitation);
+  const control = clamp01(caps.diseaseControl);
+  const quarantine = caps.healthcare > 0.3 ? 0.15 : 0;
+  const crowd = clamp(0.55 + densityOf(s) * 0.18, 0.5, 1.5);
+  // false claims undermine distancing, treatment and vaccination
+  const misinfo = mediaHealthPenalty(civ);
+  return crowd * (1 - sanitation * BALANCE.sanitationTransmissionCut) * (1 - control * BALANCE.medicineTransmissionCut * (1 - misinfo * 0.5)) * (1 - quarantine * (1 - misinfo));
+}
+
+/** What a settlement's medicine and healthcare leave of a pathogen's lethality (1 = none, about 0.09 at full strength). */
+export function lethalityFactor(civ: Civ): number {
+  const control = clamp01(civ.caps.diseaseControl);
+  const misinfo = mediaHealthPenalty(civ);
+  return (1 - control * 0.85 * (1 - misinfo * 0.4)) * (1 - clamp01(civ.caps.healthcare) * 0.4);
 }
 
 export function infect(sim: Sim, s: Settlement, d: Disease, fraction: number): void {
@@ -57,12 +84,12 @@ export function diseaseMonthly(sim: Sim, s: Settlement, civ: Civ): void {
   const rng = sim.rng;
   const caps = civ.caps;
   // emergence
-  const density = Math.log10(Math.max(10, s.pop)) - 1; // ~0.5 villages .. 5 megacities
+  const density = densityOf(s);
   const livestock = 1 + (s.bld[B.PASTURE] > 0 ? 0.8 : 0);
   const sanitation = clamp01(caps.sanitation);
   const pEmerge = (BALANCE.pathogenEmergence / 12) * density * livestock * (1.3 - sanitation) * (1 + s.links.length * 0.1);
   if (rng.float() < pEmerge) {
-    const d = emerge(sim, s, civ);
+    const d = emergeNovel(sim, s, civ);
     infect(sim, s, d, 0.002);
   }
   if (!s.epidemics.length) {
@@ -74,18 +101,16 @@ export function diseaseMonthly(sim: Sim, s: Settlement, civ: Civ): void {
     return;
   }
   const control = clamp01(caps.diseaseControl);
-  const quarantine = civ.caps.healthcare > 0.3 ? 0.15 : 0;
+  const trans = transmissionFactor(s, civ);
+  const lethF = lethalityFactor(civ);
   for (const e of s.epidemics) {
     const d = w.diseases.get(e.diseaseId);
     if (!d) continue;
     const gamma = 1 / Math.max(0.3, d.duration); // recoveries per month
-    const crowd = clamp(0.55 + density * 0.18, 0.5, 1.5);
-    // false claims undermine distancing, treatment and vaccination
-    const misinfo = mediaHealthPenalty(civ);
-    const beta = d.r0 * gamma * crowd * (1 - sanitation * BALANCE.sanitationTransmissionCut) * (1 - control * BALANCE.medicineTransmissionCut * (1 - misinfo * 0.5)) * (1 - quarantine * (1 - misinfo));
+    const beta = d.r0 * gamma * trans;
     const newInf = Math.min(e.s, beta * e.s * e.i);
     const rec = gamma * e.i;
-    const lethal = d.lethality * (1 - control * 0.85 * (1 - misinfo * 0.4)) * (1 - clamp01(caps.healthcare) * 0.4);
+    const lethal = d.lethality * lethF;
     const dead = rec * lethal;
     e.s -= newInf;
     e.i += newInf - rec;
@@ -100,11 +125,12 @@ export function diseaseMonthly(sim: Sim, s: Settlement, civ: Civ): void {
       flow(sim, s, 'disease', removed);
       addPressure(sim, s.civId, d.sterilizing ? 'infertility' : d.engineered ? 'engineered_pandemic' : 'pandemic', removed, `The ${d.name}${d.engineered ? ' (engineered)' : ''}`);
     }
-    // export infection to linked settlements
+    // export infection to linked settlements (a world pandemic travels along them more readily: travellers and trade)
     if (e.i > 0.01) {
+      const travel = d.pandemic ? BALANCE.pandemicLinkSpread : 1;
       for (const lid of s.links) {
         const o = w.settlements.get(lid);
-        if (o && rng.chance(e.i * 0.4 * (1 - control * 0.5))) infect(sim, o, d, 0.001);
+        if (o && rng.chance(e.i * 0.4 * travel * (1 - control * 0.5))) infect(sim, o, d, 0.001);
       }
     }
   }
@@ -115,7 +141,8 @@ export function diseaseMonthly(sim: Sim, s: Settlement, civ: Civ): void {
     s.immunity[e.diseaseId] = Math.max(s.immunity[e.diseaseId] ?? 0, e.r);
     const notable = d && e.deaths > Math.max(20, s.pop * BALANCE.epidemicLogShare);
     if (d && notable) onEpidemicSurvived(sim, s.id, d.name);
-    if (d && notable)
+    // a world pandemic is logged once, as a whole, when it ends (pandemic.ts), not town by town
+    if (d && notable && !d.pandemic)
       logEvent(sim, {
         type: 'epidemic',
         cat: 'demography',

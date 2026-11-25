@@ -28,7 +28,7 @@ const KIND_FOR: Record<Medium, MediaOutlet['kind'][]> = {
 };
 
 const TOPIC: Record<string, string> = {
-  war_declared: 'War', peace: 'Peace', battle: 'Frontline', siege: 'Siege', epidemic: 'Outbreak', disaster: 'Disaster',
+  war_declared: 'War', peace: 'Peace', battle: 'Frontline', siege: 'Siege', epidemic: 'Outbreak', pandemic: 'Pandemic', disaster: 'Disaster',
   technology: 'Discovery', tech_discovered: 'Discovery', ai_launched: 'AI', ai_incident: 'AIScandal', online_protest: 'Protest',
   election: 'Election', revolution: 'Revolution', coup: 'Coup', mission_start: 'Mission', mission_success: 'Victory',
   mission_failed: 'Setback', outlet_founded: 'NewMedia', founding: 'NewTown', religion: 'Faith', space: 'Space',
