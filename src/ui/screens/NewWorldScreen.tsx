@@ -1,9 +1,69 @@
-import { realWorld } from '../../powers/powerSet';
-import { useState } from 'preact/hooks';
-import { applyMapShape, MAX_START_ERA, START_VARIANTS, presetByKey, defaultConfig, PRESETS, WORLD_SIZES, randomSeedString, type WorldConfig } from '../../config/laws';
+import { normalizeReal, realWorld } from '../../powers/powerSet';
+import { useEffect, useRef, useState } from 'preact/hooks';
+import { applyMapShape, clampStartEra, eraPeopleDefault, MAX_START_ERA, START_VARIANTS, presetByKey, defaultConfig, PRESETS, randomizeConfig, WORLD_SIZES, randomSeedString, type WorldConfig } from '../../config/laws';
 import { MAP_SHAPES, SHAPE_FAMILY_LABELS, mapShape, type MapShape, type MapShapeFamily } from '../../world/mapShapes';
 import { ERA_NAMES } from '../../technology/techData';
 import { SCENARIOS } from '../../scenarios/scenarios';
+import { ConfirmEra } from './ConfirmEra';
+
+type StartKey = 'realistic' | 'god' | 'observer';
+
+/**
+ * Ask "Are you sure?" before a start after Prehistoric. On the Scenario screen only when the player moved the
+ * era away from the scenario's own (a scenario set in the Atomic age needs no warning).
+ */
+export function needsEraConfirm(cfg: WorldConfig, scenarioEra?: number): boolean {
+  const era = cfg.settings.startEra;
+  return era > 1 && (scenarioEra === undefined || era !== scenarioEra);
+}
+
+const variant = (key: string) => START_VARIANTS.find((v) => v.key === key)!;
+
+/** Re-apply what a start fixes, whatever else changed: powers, pace and the real-world lock. */
+function keepStartRules(c: WorldConfig, start: StartKey): void {
+  if (start === 'realistic') {
+    c.settings.powerSet = 'grounded';
+    c.settings.pace = 'slow';
+    c.settings.observer = false;
+    c.settings.realism = 'unrestricted';
+    c.laws.speculativeTech = true;
+  } else if (start === 'observer') {
+    c.settings.powerSet = 'none';
+    c.settings.observer = true;
+    c.settings.realism = 'grounded';
+    c.laws.speculativeTech = false;
+  }
+  normalizeReal(c); // Realistic and Observer: no fantasy, no alien planet, no horrors
+}
+
+/**
+ * "Randomize settings": roll every setting on a copy, then keep the start's rules, the name, seed, size, map
+ * shape and the chosen toggles. A Prehistoric Realistic roll starts empty, as Realistic does.
+ */
+export function randomizeForStart(cfg: WorldConfig, start: StartKey): WorldConfig {
+  const c = structuredClone(cfg);
+  randomizeConfig(c);
+  c.settings.startEra = clampStartEra(c.settings.startEra);
+  if (c.scenario === 'collapse' && c.settings.startEra === 1) c.settings.startEra = 3; // a collapse needs a past
+  if (c.settings.alien) c.settings.fantasy = c.gen.fantasy = c.laws.fantasyCreatures = true; // alien worlds hold other peoples
+  keepStartRules(c, start);
+  if (start === 'realistic' && c.settings.startEra === 1) c.settings.startCivs = 0;
+  return c;
+}
+
+/** What each start leaves in your hands, shown on its card. */
+const START_POWERS: Record<StartKey, string> = {
+  realistic: 'You place people and animals',
+  god: 'Every power is yours',
+  observer: 'No powers: you watch',
+};
+
+/** One line under the era setting: what a world at this era starts with (the old era presets at their stops). */
+function eraHint(era: number): string {
+  if (era === 1) return 'No towns or technology yet. Later eras start with nations already in place.';
+  const stop = START_VARIANTS.find((v) => (v.key === 'kingdoms' && era === 4) || (v.key === 'industrial' && era === 7) || (v.key === 'modern' && era === 10));
+  return stop ? `${stop.name}: ${stop.description}` : 'Nations, towns and technology will already exist.';
+}
 
 function Slider({ label, value, min, max, step, onInput, show }: { label: string; value: number; min: number; max: number; step: number; onInput: (v: number) => void; show?: (v: number) => string }) {
   return (
@@ -44,34 +104,79 @@ const mult = (v: number) => `${v.toFixed(1)}×`;
 export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean; back: () => void; start: (c: WorldConfig) => void }) {
   const [cfg, setCfg] = useState<WorldConfig>(() => {
     const c = defaultConfig();
-    PRESETS.find((p) => p.key === 'god')!.apply(c); // the highlighted default (not the list's first entry)
+    if (scenarios) SCENARIOS[0].apply(c);
+    else presetByKey('god')!.apply(c); // the highlighted default: hunter-gatherer bands and every power
     return c;
   });
-  const [preset, setPreset] = useState(scenarios ? SCENARIOS[0].key : 'god');
+  const [choice, setChoice] = useState(scenarios ? SCENARIOS[0].key : 'god');
+  const [scenarioEra, setScenarioEra] = useState<number | undefined>(scenarios ? cfg.settings.startEra : undefined);
+  const [confirming, setConfirming] = useState(false);
+  const createRef = useRef<HTMLButtonElement>(null);
+  const asked = useRef(false);
+  useEffect(() => {
+    // the era dialog closed without starting: focus goes back to "Create world"
+    if (confirming) asked.current = true;
+    else if (asked.current) { asked.current = false; createRef.current?.focus(); }
+  }, [confirming]);
+  const startKey: StartKey = scenarios ? 'god' : (choice as StartKey);
   const set = (f: (c: WorldConfig) => void) => {
     const c = structuredClone(cfg);
     f(c);
     setCfg(c);
   };
-  const choosePreset = (key: string) => {
+  /** A start keeps the name, seed, size, map shape, era and the collapse toggle; Alien planet only stays on God mode. */
+  const chooseStart = (key: string) => {
     const c = defaultConfig();
     c.name = cfg.name;
     c.gen.seed = cfg.gen.seed;
     c.gen.width = cfg.gen.width;
     c.gen.height = cfg.gen.height;
-    const p = PRESETS.find((x) => x.key === key);
-    if (p) p.apply(c);
-    const vr = START_VARIANTS.find((x) => x.key === key); // Task 2 redesigns this screen; variants sit on God mode for now
-    if (vr) { presetByKey('god')!.apply(c); vr.apply(c); }
     const sc = SCENARIOS.find((x) => x.key === key);
-    if (sc) sc.apply(c);
+    if (sc) {
+      sc.apply(c);
+      c.settings.startEra = clampStartEra(c.settings.startEra);
+      setScenarioEra(c.settings.startEra);
+    } else {
+      const era = cfg.settings.startEra;
+      presetByKey(key)!.apply(c);
+      c.settings.startEra = era;
+      c.settings.startCivs = eraPeopleDefault(key as StartKey, era);
+      if (cfg.scenario === 'collapse') variant('collapse').apply(c);
+      if (cfg.settings.alien && key === 'god') {
+        variant('alien').apply(c);
+        c.settings.startEra = era;
+        c.settings.startCivs = cfg.settings.startCivs;
+      }
+    }
     const shape = cfg.gen.shape ?? 'natural';
-    if (shape !== 'natural') applyMapShape(c.gen, shape); // keep the chosen map shape across presets
-    setPreset(key);
+    if (shape !== 'natural') applyMapShape(c.gen, shape); // keep the chosen map shape across starts
+    setChoice(key);
     setCfg(c);
   };
-  const list = scenarios ? SCENARIOS : PRESETS;
+  const setEra = (v: number) => set((c) => {
+    c.settings.startEra = clampStartEra(v);
+    if (!scenarios) c.settings.startCivs = eraPeopleDefault(startKey, c.settings.startEra); // a scenario keeps its own peoples
+  });
+  const toggleCollapse = (on: boolean) => set((c) => {
+    if (on) return variant('collapse').apply(c); // at Prehistoric the era moves to Bronze & Early Urban
+    c.scenario = undefined;
+    c.settings.startCivs = eraPeopleDefault(startKey, c.settings.startEra);
+  });
+  const toggleAlien = (on: boolean) => set((c) => {
+    if (on) {
+      const era = c.settings.startEra;
+      variant('alien').apply(c);
+      if (era > 1) { c.settings.startEra = era; c.settings.startCivs = eraPeopleDefault('god', era); } // keep the chosen era
+      return;
+    }
+    c.gen.alien = c.settings.alien = false;
+    c.gen.fantasy = c.settings.fantasy = c.laws.fantasyCreatures = false; // undo what the toggle turned on
+  });
+  const create = () => (needsEraConfirm(cfg, scenarioEra) ? setConfirming(true) : start(cfg));
   const real = realWorld(cfg.settings); // round 10 addendum: no fiction in Realistic or Observer worlds
+  const collapse = cfg.scenario === 'collapse';
+  const eraMin = collapse ? 2 : 1; // a collapse needs a past
+  const era = cfg.settings.startEra;
   return (
     <main class="screen">
       <div class="page">
@@ -80,15 +185,61 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
           <h1>{scenarios ? 'Scenario worlds' : 'New world'}</h1>
         </div>
         <section class="fieldset">
-          <h2>{scenarios ? 'Choose a scenario' : 'Start from a preset'}</h2>
-          <div class="presets">
-            {list.map((p) => (
-              <button key={p.key} class="preset" aria-pressed={preset === p.key} onClick={() => choosePreset(p.key)}>
-                <strong>{p.name}</strong>
-                <span>{p.description}</span>
-              </button>
-            ))}
+          <h2>{scenarios ? 'Choose a scenario' : 'Choose a start'}</h2>
+          {scenarios ? (
+            <div class="presets">
+              {SCENARIOS.map((p) => (
+                <button key={p.key} class="preset" aria-pressed={choice === p.key} onClick={() => chooseStart(p.key)}>
+                  <strong>{p.name}</strong>
+                  <span>{p.description}</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div class="presets starts" data-testid="starts">
+              {PRESETS.map((p) => (
+                <button key={p.key} class="preset start-card" aria-pressed={choice === p.key} onClick={() => chooseStart(p.key)}>
+                  <strong>{p.name}</strong>
+                  <span>{p.description}</span>
+                  <em class="start-powers">{START_POWERS[p.key as StartKey]}</em>
+                </button>
+              ))}
+            </div>
+          )}
+          <div class="field era-field">
+            <div class="field-row">
+              <label for="wera">Start in era</label>
+              <span class="era-now">{ERA_NAMES[era]}</span>
+            </div>
+            <input id="wera" type="range" min={eraMin} max={MAX_START_ERA} step={1} value={era} aria-valuetext={ERA_NAMES[era]} aria-describedby="era-hint" onInput={(e) => setEra(Number((e.target as HTMLInputElement).value))} />
+            <div class="era-ends" aria-hidden="true">
+              <span>{ERA_NAMES[eraMin]}</span>
+              <span data-testid="era-max">{ERA_NAMES[MAX_START_ERA]}</span>
+            </div>
+            <span class="footnote" id="era-hint">{eraHint(era)}</span>
           </div>
+          {!scenarios && (
+            <>
+              <div class="field toggle-field">
+                <label class="toggle">
+                  After the collapse
+                  <input type="checkbox" checked={collapse} aria-describedby="collapse-note" onChange={(e) => toggleCollapse((e.target as HTMLInputElement).checked)} />
+                </label>
+                <span class="footnote" id="collapse-note">{variant('collapse').description}</span>
+              </div>
+              <div class="field toggle-field">
+                <label class="toggle">
+                  Alien planet
+                  <input type="checkbox" checked={!!cfg.settings.alien && !real} disabled={real} aria-describedby="alien-note" onChange={(e) => toggleAlien((e.target as HTMLInputElement).checked)} />
+                </label>
+                <span class="footnote" id="alien-note">{real ? 'God mode only. Realistic and Observer worlds hold only what could really exist.' : variant('alien').description}</span>
+              </div>
+              <div class="randomize-row">
+                <button class="btn small" onClick={() => setCfg(randomizeForStart(cfg, startKey))}>Randomize settings</button>
+                <span class="footnote">Rolls the era and the settings below. Your start and its rules stay.</span>
+              </div>
+            </>
+          )}
         </section>
         <section class="fieldset">
           <h2>Identity</h2>
@@ -142,7 +293,6 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
           <Slider label="Natural disaster frequency" value={cfg.settings.disasterFrequency} min={0} max={2} step={0.05} onInput={(v) => set((c) => (c.settings.disasterFrequency = v))} show={mult} />
           <Slider label="Civilizational aggressiveness" value={cfg.settings.aggressiveness} min={0} max={2} step={0.05} onInput={(v) => set((c) => (c.settings.aggressiveness = v))} show={mult} />
           <Slider label="Technological advancement speed" value={cfg.settings.techSpeed} min={0.25} max={4} step={0.05} onInput={(v) => set((c) => (c.settings.techSpeed = v))} show={mult} />
-          <Slider label="Starting era" value={cfg.settings.startEra} min={1} max={MAX_START_ERA} step={1} onInput={(v) => set((c) => (c.settings.startEra = v))} show={(v) => ERA_NAMES[v]} />
           <Slider label="Starting peoples" value={cfg.settings.startCivs} min={0} max={20} step={1} onInput={(v) => set((c) => (c.settings.startCivs = v))} show={(v) => String(v)} />
           <label class="toggle">
             Empty world (no people or animals)
@@ -177,9 +327,10 @@ export function NewWorldScreen({ scenarios, back, start }: { scenarios: boolean;
           </div>
         </section>
         <div class="sticky-actions">
-          <button class="btn primary" onClick={() => start(cfg)}>Create world</button>
+          <button ref={createRef} class="btn primary" onClick={create}>Create world</button>
         </div>
       </div>
+      {confirming && <ConfirmEra era={era} onCancel={() => setConfirming(false)} onConfirm={() => { asked.current = false; setConfirming(false); start(cfg); }} />}
     </main>
   );
 }

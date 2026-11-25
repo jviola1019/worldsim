@@ -44,8 +44,9 @@ for (const [name, ctxOpts] of DEVICES) {
   if (await tryClick(page.getByText(/^Load|Continue|Saved worlds/))) { await snap('03-load'); await tryClick(page.getByText('Back')); }
   await tryClick(page.getByText('New world'));
   await snap('04-new-world');
-  await tryClick(page.locator('button.preset', { hasText: 'Age of Kingdoms' }));
+  await page.getByRole('slider', { name: 'Start in era' }).fill('4'); // the old Age of Kingdoms: God mode at era 4
   await page.getByText('Create world').click();
+  await tryClick(page.getByRole('dialog', { name: /^Start in the/ }).getByRole('button', { name: /^Start in / }));
   await page.waitForSelector('canvas.canvas', { timeout: 60000 });
   await page.waitForTimeout(500);
   await snap('05-tutorial');

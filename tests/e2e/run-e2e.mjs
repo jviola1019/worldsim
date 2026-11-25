@@ -371,6 +371,66 @@ async function realistic() {
   await b2.close();
 }
 
+// starts, disease, predators (Task 2): three start cards, an era setting capped at Atomic & Space that sets the
+// starting peoples, Alien planet in God mode only, and a confirmation dialog before a start after Prehistoric
+async function startScreen() {
+  const browser = await engine.launch();
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const page = await ctx.newPage();
+  page.setDefaultTimeout(10000);
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto(url);
+  await page.getByText('New world').first().click();
+  const cards = await page.locator('[data-testid=starts] button.preset strong').allInnerTexts();
+  check('new world: exactly three starts (Realistic, God mode, Observer)', JSON.stringify(cards) === JSON.stringify(['Realistic', 'God mode', 'Observer']), cards.join(', '));
+  const era = page.getByRole('slider', { name: 'Start in era' });
+  const maxLabel = (await page.locator('[data-testid=era-max]').innerText().catch(() => '')).trim();
+  check('new world: the era setting ends at Atomic & Space', maxLabel === 'Atomic & Space' && (await era.getAttribute('max').catch(() => null)) === '10', `"${maxLabel}"`);
+  // era 1: no dialog, the world starts at once
+  await page.getByText('Create world').click();
+  await page.waitForSelector('canvas.canvas', { timeout: 30000 }).catch(() => {});
+  check('new world: a Prehistoric start opens no dialog', (await page.locator('canvas.canvas').count()) === 1 && (await page.getByRole('dialog', { name: /^Start in the/ }).count()) === 0);
+  await page.goto(url);
+  await page.getByText('New world').first().click();
+  await era.fill('4').catch(() => {});
+  const peoples = await page.getByRole('slider', { name: 'Starting peoples' }).inputValue().catch(() => '');
+  check('new world: moving the era to 4 sets 8 starting peoples', peoples === '8', `peoples ${peoples}`);
+  const create = page.getByRole('button', { name: 'Create world' });
+  await create.click();
+  const dlg = page.getByRole('dialog', { name: /^Start in the/ }); // the tutorial is a dialog too
+  await dlg.waitFor({ timeout: 3000 }).catch(() => {});
+  const shown = await dlg.isVisible().catch(() => false);
+  const named = shown ? await dlg.getAttribute('aria-labelledby').then((id) => page.locator(`#${id}`).innerText()).catch(() => '') : '';
+  const first = await page.evaluate(() => document.activeElement?.textContent?.trim());
+  for (let k = 0; k < 4; k++) await page.keyboard.press('Tab');
+  const trapped = await page.evaluate(() => !!document.activeElement?.closest('[role=dialog], dialog'));
+  check('new world: Create world at era 4 asks first (dialog, title, focus on Cancel, focus stays inside)', shown && /Iron & Classical/.test(named) && first === 'Cancel' && trapped, `shown ${shown}, title "${named}", focus "${first}", trapped ${trapped}`);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  const closed = (await dlg.count()) === 0 || !(await dlg.isVisible());
+  const back = await page.evaluate(() => document.activeElement?.textContent?.trim());
+  check('new world: Escape cancels: no world, focus back on Create world', closed && (await page.locator('canvas.canvas').count()) === 0 && back === 'Create world', `closed ${closed}, focus "${back}"`);
+  await create.click();
+  await dlg.getByRole('button', { name: /^Start in Iron & Classical/ }).click().catch(() => {});
+  await page.waitForSelector('canvas.canvas', { timeout: 30000 }).catch(() => {});
+  const skip = page.getByText('Skip');
+  if (await skip.count()) await skip.click();
+  const hud = await page.locator('.world-card').innerText().catch(() => '');
+  check('new world: confirming starts the world in the Iron & Classical era', /Iron & Classical/.test(hud), hud.replace(/\n/g, ' | '));
+  // Realistic: Alien planet is God mode only
+  await page.goto(url);
+  await page.getByText('New world').first().click();
+  await page.locator('[data-testid=starts] button.preset', { hasText: /^Realistic/ }).click();
+  const alien = page.getByRole('checkbox', { name: /Alien planet/ });
+  const alienOff = (await alien.count()) === 1 && (await alien.isDisabled());
+  await page.locator('[data-testid=starts] button.preset', { hasText: /^God mode/ }).click();
+  const alienOn = (await alien.count()) === 1 && !(await alien.isDisabled());
+  check('new world: Alien planet is off in Realistic and open in God mode', alienOff && alienOn, `realistic disabled ${alienOff}, god enabled ${alienOn}`);
+  check('new world: no page errors', errors.length === 0, errors.slice(0, 2).join(' | '));
+  await browser.close();
+}
+
 /** Round 10 addendum: pick Humans, check the hover hand, then tap until dry land takes the band; the hand plays. */
 async function dropHand(page, label, reduced = false) {
   await page.locator('.tool', { hasText: 'Humans' }).first().click();
@@ -401,6 +461,7 @@ async function dropHand(page, label, reduced = false) {
   await page.getByLabel('Stop using this power').click().catch(() => {});
 }
 
+await startScreen();
 await realistic();
 await narrow();
 await run('phone', { ...devices['iPhone 13'] });

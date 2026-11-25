@@ -16,9 +16,13 @@ async function world(ctx, preset, seconds, label) {
   if (label === 'title') await page.screenshot({ path: out(label) });
   await page.getByText('New world').first().click();
   await page.waitForTimeout(300);
-  if (preset) await page.locator('button.preset', { hasText: preset }).first().click();
+  // the old presets are God mode at an era stop (the three starts replaced them)
+  const era = { 'Age of Kingdoms': 4, 'Industrializing World': 7, 'Modern Geopolitics': 10 }[preset] ?? 1;
+  if (preset && era === 1) await page.locator('button.preset', { hasText: preset }).first().click();
+  if (era > 1) await page.getByRole('slider', { name: 'Start in era' }).fill(String(era));
   if (label === 'new-world') await page.screenshot({ path: out('new-world') });
   await page.getByText('Create world').click();
+  if (era > 1) await page.getByRole('dialog', { name: /^Start in the/ }).getByRole('button', { name: /^Start in / }).click();
   await page.waitForSelector('canvas.canvas', { timeout: 30000 });
   const skip = page.getByText('Skip');
   if (await skip.count()) await skip.click();
@@ -45,7 +49,7 @@ await p.close();
 p = await world(desk, null, 1, 'new-world');
 await p.close();
 // a natural world grown for a while: overview, political & religion overlays, past borders, nations, a ruler
-p = await world(desk, 'Primitive Earth', 40, 'grown');
+p = await world(desk, 'God mode', 40, 'grown');
 await p.screenshot({ path: out('desktop-world') });
 await p.getByLabel('Map layers').click(); await p.getByText('Religion', { exact: true }).click(); await closeSheet(p);
 await p.screenshot({ path: out('overlay-religion') });
@@ -83,7 +87,7 @@ await desk.close();
 
 // ---- iPhone 13 (emulated)
 const phone = await browser.newContext({ ...devices['iPhone 13'] });
-p = await world(phone, 'Primitive Earth', 25, 'phone');
+p = await world(phone, 'God mode', 25, 'phone');
 await p.screenshot({ path: out('iphone-world') });
 await p.getByLabel('Nations').click(); await p.waitForTimeout(300);
 await p.locator('.sheet-body ul.list li button').first().click(); await p.waitForTimeout(300);

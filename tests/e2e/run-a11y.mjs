@@ -39,11 +39,14 @@ async function audit(page, label) {
   check(`axe ${label}`, bad.length === 0, bad.map((v) => `${v.id} (${v.impact}, ${v.nodes.length}): ${v.nodes.slice(0, 2).map((n) => n.target.join(' ')).join(' | ')}`).join('; '));
 }
 
-async function newWorld(page, preset, secs = 0) {
+// start: a start card (Realistic, God mode, Observer); era: the start era (above 1 confirms the dialog)
+async function newWorld(page, start, secs = 0, era = 1) {
   await page.goto(url);
   await page.getByText('New world').first().click();
-  if (preset) await page.locator('button.preset', { hasText: preset }).first().click();
+  if (start) await page.locator('[data-testid=starts] button.preset', { hasText: start }).first().click();
+  if (era > 1) await page.getByRole('slider', { name: 'Start in era' }).fill(String(era));
   await page.getByText('Create world').click();
+  if (era > 1) await page.getByRole('dialog', { name: /^Start in the/ }).getByRole('button', { name: /^Start in / }).click();
   await page.waitForSelector('canvas.canvas', { timeout: 30000 });
   const skip = page.getByText('Skip');
   if (await skip.count()) await skip.click();
@@ -71,8 +74,16 @@ async function run(label, ctxOpts) {
   await page.goto(url);
   await page.getByText('New world').first().click();
   await audit(page, `${label}: new world`);
-  // god mode (Primitive, 9 s at max speed): HUD, dock, every sheet, inspectors
-  await newWorld(page, 'Primitive Earth', 9);
+  // the era confirmation: axe on the open dialog, and Escape closes it
+  await page.getByRole('slider', { name: 'Start in era' }).fill('7');
+  await page.getByText('Create world').click();
+  await page.getByRole('dialog', { name: /^Start in the/ }).waitFor({ timeout: 5000 }).catch(() => {});
+  await audit(page, `${label}: new world (era confirmation)`);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+  check(`${label}: Escape closes the era confirmation`, (await page.getByRole('dialog', { name: /^Start in the/ }).count()) === 0);
+  // God mode (Prehistoric, 9 s at max speed): HUD, dock, every sheet, inspectors
+  await newWorld(page, 'God mode', 9);
   await audit(page, `${label}: game HUD (god mode)`);
   await page.locator('.cat').first().click();
   await audit(page, `${label}: dock tools open`);
@@ -146,8 +157,9 @@ async function run(label, ctxOpts) {
   await newWorld(page, 'Observer');
   await audit(page, `${label}: game HUD (Observer)`);
   // the feed in other mediums (scroll or tablet; broadsheet; broadcast)
-  for (const [preset, secs] of [['Age of Kingdoms', 5], ['Industrializing World', 4], ['Modern Geopolitics', 4]]) {
-    await newWorld(page, preset, secs);
+  // (the old Age of Kingdoms, Industrializing World and Modern Geopolitics presets are now God mode at era 4, 7 and 10)
+  for (const [era, secs] of [[4, 5], [7, 4], [10, 4]]) {
+    await newWorld(page, 'God mode', secs, era);
     await page.getByLabel('News feed', { exact: true }).click();
     await page.waitForTimeout(300);
     const m = await page.locator('aside.sheet').getAttribute('data-medium');
@@ -162,7 +174,7 @@ async function reflow() {
   const browser = await engine.launch();
   const ctx = await browser.newContext({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true, bypassCSP: true });
   const page = await ctx.newPage();
-  await newWorld(page, 'Primitive Earth', 6);
+  await newWorld(page, 'God mode', 6);
   const spacing = '* { line-height: 1.5 !important; letter-spacing: .12em !important; word-spacing: .16em !important; } p { margin-bottom: 2em !important; }';
   for (const [name, sheet] of [['News feed', 'feed'], ['Nations', 'nations'], ['Statistics', 'statistics']]) {
     await page.getByLabel(name, { exact: true }).click();
@@ -178,7 +190,7 @@ async function reflow() {
     await close(page);
     await page.reload();
     await page.waitForSelector('canvas.canvas', { timeout: 30000 }).catch(() => {});
-    if (!(await page.locator('canvas.canvas').count())) await newWorld(page, 'Primitive Earth', 6);
+    if (!(await page.locator('canvas.canvas').count())) await newWorld(page, 'God mode', 6);
   }
   await browser.close();
 }

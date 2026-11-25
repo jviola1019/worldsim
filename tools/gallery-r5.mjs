@@ -15,10 +15,13 @@ async function world(ctx, { preset, shape, seconds, seed }) {
   await page.goto(url);
   await page.getByText('New world').first().click();
   await page.waitForTimeout(300);
-  if (preset) await page.locator('button.preset', { hasText: preset }).first().click();
+  // the old presets are God mode at an era stop (the three starts replaced them)
+  const era = { 'Age of Kingdoms': 4, 'Industrializing World': 7, 'Modern Geopolitics': 10 }[preset] ?? 1;
+  if (era > 1) await page.getByRole('slider', { name: 'Start in era' }).fill(String(era));
   if (shape) await page.locator('#wshape').selectOption(shape);
   if (seed) await page.locator('#wseed').fill(seed);
   await page.getByText('Create world').click();
+  if (era > 1) await page.getByRole('dialog', { name: /^Start in the/ }).getByRole('button', { name: /^Start in / }).click();
   await page.waitForSelector('canvas.canvas', { timeout: 60000 });
   const skip = page.getByText('Skip');
   if (await skip.count()) await skip.click();
@@ -34,7 +37,7 @@ const year = async (page) => (await page.locator('.world-card .year').innerText(
 // 1) The feed in the medium of each era (phone)
 const phone = await browser.newContext({ ...devices['iPhone 13'] });
 const only = process.env.ONLY;
-for (const [preset, label, secs] of [['Primitive Earth', 'feed-cave', 3], ['Age of Kingdoms', 'feed-scroll', 25], ['Industrializing World', 'feed-newspaper', 20], ['Modern Geopolitics', 'feed-social', 28], ['Modern Geopolitics', 'feed-holo', 45]]) {
+for (const [preset, label, secs] of [[undefined, 'feed-cave', 3], ['Age of Kingdoms', 'feed-scroll', 25], ['Industrializing World', 'feed-newspaper', 20], ['Modern Geopolitics', 'feed-social', 28], ['Modern Geopolitics', 'feed-holo', 45]]) {
   if (only && !only.split(',').includes(label)) continue;
   const page = await world(phone, { preset, seconds: secs, seed: 'gallery-' + (label === 'feed-holo' ? 'feed-social' : label) });
   await page.getByLabel('News feed').click();

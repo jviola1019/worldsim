@@ -11,8 +11,9 @@ const browser = await chromium.launch();
 const page = await (await browser.newContext({ viewport: { width: 1280, height: 800 } })).newPage();
 await page.goto(url);
 await page.getByText('New world').first().click();
-await page.locator('button.preset', { hasText: 'Modern Geopolitics' }).first().click();
+await page.getByRole('slider', { name: 'Start in era' }).fill('10'); // the old Modern Geopolitics: God mode at era 10
 await page.getByText('Create world').click();
+await page.getByRole('dialog', { name: /^Start in the/ }).getByRole('button', { name: /^Start in / }).click();
 await page.waitForSelector('canvas.canvas', { timeout: 60000 });
 const skip = page.getByText('Skip'); if (await skip.count()) await skip.click();
 await page.locator('.playback button').last().click(); await page.waitForTimeout(6000);

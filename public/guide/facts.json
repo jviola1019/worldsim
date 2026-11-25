@@ -1,10 +1,10 @@
 {
  "generated": "2026-11-25",
  "totals": {
-  "srcFiles": 146,
-  "srcLines": 43091,
-  "testFiles": 63,
-  "testCases": 407
+  "srcFiles": 147,
+  "srcLines": 43349,
+  "testFiles": 65,
+  "testCases": 426
  },
  "folders": [
   {
@@ -25,18 +25,18 @@
   },
   {
    "name": "ui",
-   "files": 24,
-   "lines": 3155,
+   "files": 25,
+   "lines": 3354,
    "deps": {
     "sim": 37,
     "persistence": 7,
-    "config": 5,
+    "config": 6,
     "core": 3,
     "powers": 8,
     "rendering": 11,
     "history": 7,
     "scenarios": 3,
-    "technology": 5,
+    "technology": 6,
     "civilizations": 5,
     "world": 7,
     "politics": 2,
@@ -67,7 +67,7 @@
   {
    "name": "sim",
    "files": 11,
-   "lines": 2593,
+   "lines": 2594,
    "deps": {
     "powers": 3,
     "culture": 5,
@@ -102,7 +102,7 @@
   {
    "name": "population",
    "files": 9,
-   "lines": 1632,
+   "lines": 1665,
    "deps": {
     "sim": 17,
     "world": 3,
@@ -258,19 +258,19 @@
    }
   },
   {
-   "name": "core",
-   "files": 5,
-   "lines": 570,
-   "deps": {}
-  },
-  {
    "name": "config",
    "files": 2,
-   "lines": 549,
+   "lines": 575,
    "deps": {
     "sim": 1,
     "world": 3
    }
+  },
+  {
+   "name": "core",
+   "files": 5,
+   "lines": 570,
+   "deps": {}
   },
   {
    "name": "media",
@@ -304,7 +304,7 @@
   {
    "name": "scenarios",
    "files": 1,
-   "lines": 115,
+   "lines": 114,
    "deps": {
     "config": 1,
     "sim": 1
@@ -404,7 +404,7 @@
   {
    "path": "src/config/laws.ts",
    "folder": "config",
-   "lines": 245,
+   "lines": 271,
    "about": ""
   },
   {
@@ -656,7 +656,7 @@
   {
    "path": "src/population/bands.ts",
    "folder": "population",
-   "lines": 255,
+   "lines": 288,
    "about": "Nomadic bands (individual-level hunter-gatherer groups)."
   },
   {
@@ -908,7 +908,7 @@
   {
    "path": "src/scenarios/scenarios.ts",
    "folder": "scenarios",
-   "lines": 115,
+   "lines": 114,
    "about": "Scenario worlds: preset configurations with OPTIONAL objectives."
   },
   {
@@ -986,7 +986,7 @@
   {
    "path": "src/sim/world.ts",
    "folder": "sim",
-   "lines": 71,
+   "lines": 72,
    "about": "World state creation."
   },
   {
@@ -1122,6 +1122,12 @@
    "about": ""
   },
   {
+   "path": "src/ui/screens/ConfirmEra.tsx",
+   "folder": "ui",
+   "lines": 47,
+   "about": "Starts, disease, predators (Task 2): \"Are you sure?\" before a world starts after Prehistoric."
+  },
+  {
    "path": "src/ui/screens/LoadScreen.tsx",
    "folder": "ui",
    "lines": 88,
@@ -1130,7 +1136,7 @@
   {
    "path": "src/ui/screens/NewWorldScreen.tsx",
    "folder": "ui",
-   "lines": 187,
+   "lines": 337,
    "about": ""
   },
   {
@@ -1154,7 +1160,7 @@
   {
    "path": "src/ui/worldFactory.ts",
    "folder": "ui",
-   "lines": 58,
+   "lines": 60,
    "about": "Create a simulation, generating geography in a Web Worker when available."
   },
   {
@@ -1252,6 +1258,11 @@
    "path": "tests/config/presets.test.ts",
    "cases": 2,
    "about": "Round 10: Realistic is a grounded sandbox that starts empty and slow; Observer keeps the old hands-off Realistic exactly (so long-run balance data stays comparable)."
+  },
+  {
+   "path": "tests/config/starts.test.ts",
+   "cases": 9,
+   "about": "Round 10 second addendum: three starts, start era capped at Atomic & Space, old presets as variants."
   },
   {
    "path": "tests/culture/sports.test.ts",
@@ -1465,7 +1476,7 @@
   },
   {
    "path": "tests/sim/pace.test.ts",
-   "cases": 6,
+   "cases": 7,
    "about": "Round 10: Slow pace. Placed humans take generations to settle and centuries to build cities; Standard pace is untouched (every lever exactly 1)."
   },
   {
@@ -1502,6 +1513,11 @@
    "path": "tests/ui/mediumTheme.test.ts",
    "cases": 3,
    "about": "Round 10: each news medium themes the whole feed panel."
+  },
+  {
+   "path": "tests/ui/newWorld.test.ts",
+   "cases": 9,
+   "about": "Starts, disease and predators, Task 2: the New World screen's pure helpers."
   },
   {
    "path": "tests/ui/peoples.test.ts",
@@ -1552,12 +1568,12 @@
   },
   {
    "path": "scripts/mode-audit.ts",
-   "lines": 208,
+   "lines": 210,
    "about": "Round 10: game-mode audit."
   },
   {
    "path": "scripts/modernization.ts",
-   "lines": 67,
+   "lines": 70,
    "about": "Natural-history run with NO god powers: does civilization modernize on its own, and do natural hazards happen during ordinary ticks?"
   },
   {
@@ -1587,7 +1603,7 @@
   },
   {
    "path": "tools/design-capture.mjs",
-   "lines": 98,
+   "lines": 99,
    "about": "Design review capture (round 6): every screen at five device sizes, plus measured design metrics."
   },
   {
@@ -1597,12 +1613,12 @@
   },
   {
    "path": "tools/gallery-r5.mjs",
-   "lines": 73,
+   "lines": 76,
    "about": "Captures the round-5 README screenshots from the real built game (Chromium; iPhone 13 emulation + desktop)."
   },
   {
    "path": "tools/gallery.mjs",
-   "lines": 95,
+   "lines": 99,
    "about": "Captures the README screenshot gallery from the real built game (Chromium; desktop + iPhone 13 emulation)."
   },
   {
@@ -1632,7 +1648,7 @@
   },
   {
    "path": "tools/perf-closeup.mjs",
-   "lines": 50,
+   "lines": 51,
    "about": "Frame-time check for the close-up city layer (round 6): a modern capital at maximum zoom (close-up on) and just below the close-up threshold (normal map), Chromium with CPU throttled ×4."
   },
   {

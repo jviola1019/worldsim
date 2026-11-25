@@ -87,7 +87,7 @@ export const PRESETS: Preset[] = [
   {
     key: 'realistic',
     name: 'Realistic',
-    description: 'An empty Earth-like world at year 0, with land, plants and wild animals. Drop in the first humans and animals and watch people take generations to settle and centuries to build cities. Nature and history do the rest: everything science allows, from droughts to AI and nuclear war, and nothing supernatural.',
+    description: 'An Earth-like world with real-world rules at a slow, lifelike pace. Everything science allows, from droughts to nuclear war, and nothing supernatural.',
     apply: (c) => {
       c.settings.startEra = 1;
       c.settings.startCivs = 0; // you place the first humans
@@ -109,7 +109,7 @@ export const PRESETS: Preset[] = [
   {
     key: 'god',
     name: 'God mode',
-    description: 'Earth-like continents. A handful of hunter-gatherer bands begin the long road to civilization, and you hold every power.',
+    description: 'Anything goes. Shape the land, send disasters and guide peoples, with fantasy creatures and alien worlds if you want them.',
     apply: (c) => {
       c.settings.startEra = 1;
       c.settings.startCivs = 5;
@@ -118,7 +118,7 @@ export const PRESETS: Preset[] = [
   {
     key: 'observer',
     name: 'Observer',
-    description: 'An Earth-like world left entirely to itself: grounded technology, no fantasy, natural disasters and diseases on, and no god powers. Watch history happen.',
+    description: 'An Earth-like world left to itself, with real-world rules and grounded technology. History happens on its own.',
     apply: (c) => {
       c.settings.powerSet = 'none';
       c.settings.startEra = 1;
