@@ -65,10 +65,11 @@ export const FX_BY_POWER: Record<string, FxEntry> = {
   // nature
   trees: fx('sparkle', 0.6, { cap: 1 }), clear: BRUSH_TERRAIN,
   rain: fx('rain', 2.5, { area: true, radius: 4 }),
-  ...Object.fromEntries(ANIMALS.map((a) => ['animal_' + a, fx('sparkle', 1.2)])),
+  ...Object.fromEntries(ANIMALS.map((a) => ['animal_' + a, fx('hand', 0.9, { cap: 3, sprite: 'ani.' + a })])),
   monster: fx('smoke_dark', 1, { then: fx('skull', 1.5) }),
   // civilizations
-  spawn_human: fx('banner', 1.5), spawn_sylvan: fx('banner', 1.5), spawn_delver: fx('banner', 1.5), spawn_grakk: fx('banner', 1.5),
+  // round 10 addendum: a pixel hand drops the placed people (about 0.9 s; at most 3 in one place)
+  ...Object.fromEntries(['human', 'sylvan', 'delver', 'grakk'].map((k) => ['spawn_' + k, fx('hand', 0.9, { cap: 3, sprite: 'unit.citizen.0' })])),
   found_city: fx('banner', 1.5, { then: fx('sparkle', 1) }),
   grow: fx('heal', 1.5),
   new_nation: fx('flag', 2, { then: fx('sparkle', 1) }),
@@ -186,7 +187,7 @@ export function emitFx(sim: Sim, spec: FxSpec, x: number, y: number, r = 0): voi
   if ((sim.cache.fxPower as PowerScope | undefined)?.own) return;
   if (x >= 0 && nearby(sim, spec.kind, x, y) >= (spec.cap ?? 3)) return;
   const ring = spec.area ? Math.max(1, spec.radius ?? r) : 0;
-  addFx(sim, spec.kind, x, y, spec.dur, r || undefined, { ring: ring || undefined, then: spec.then, flash: spec.flash });
+  addFx(sim, spec.kind, x, y, spec.dur, r || undefined, { ring: ring || undefined, then: spec.then, flash: spec.flash, sprite: spec.sprite });
 }
 
 interface PowerScope { placed: { x: number; y: number } | null; own: boolean }

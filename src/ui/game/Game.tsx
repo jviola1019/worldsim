@@ -5,7 +5,7 @@ import { SPEEDS } from '../../sim/simulation';
 import { Renderer } from '../../rendering/renderer';
 import { InputHandler } from '../input';
 import { getAtlas, Icon } from '../shared';
-import { POWER_BY_ID, applyPower, endStroke, undo } from '../../powers/powers';
+import { POWER_BY_ID, applyPower, endStroke, undo, isPlacingPower } from '../../powers/powers';
 import type { Prefs } from '../screens/SettingsScreen';
 import { store } from '../App';
 import { TopBar } from './TopBar';
@@ -143,7 +143,9 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
       onHover: (sx, sy, visible) => {
         const p = POWER_BY_ID[stateRef.current.tool];
         const [tx, ty] = r.cam.screenToTile(sx, sy);
-        r.brush = { x: tx, y: ty, r: p?.kind === 'brush' ? stateRef.current.brushSize : 0.6, color: p?.destructive ? '#e2654e' : '#5fd0c4', visible: visible && !!p };
+        const placing = !!p && isPlacingPower(p.id); // round 10 addendum: a placing tool shows the hand instead of a ring
+        r.brush = { x: tx, y: ty, r: p?.kind === 'brush' ? stateRef.current.brushSize : 0.6, color: p?.destructive ? '#e2654e' : '#5fd0c4', visible: visible && !!p && !placing };
+        r.hand = { x: tx, y: ty, visible: visible && placing };
       },
       onCamera: (panned) => { if (panned) setFollowing(null); }, // dragging the map stops following; zooming does not
     });

@@ -607,6 +607,17 @@ E['fx.flag'] = S(
   ],
   { fps: 3, ax: 0 },
 );
+// round 10 addendum: the placing hand (a divine hand in a pale sleeve, seen from the side, fingers down).
+// Frames: 0 closed and carrying, 1 open (the people or animals drop), 2 open and relaxing as it lifts away.
+E['fx.hand'] = S(
+  [
+    ['...04660...', '...04660...', '..0SSSSS0..', '.0SSSSSSS0.', '.0SDSSSDS0.', '.0SSDSDSS0.', '..0SSSSS0..', '...0DDD0...', '....000....', '...........'],
+    ['...04660...', '...04660...', '..0SSSSS0..', '.0SSSSSSS0.', '0SSSSSSSSS0', '0S0SS0SS0S0', '0S0SD0SD0S0', '0D00D00D0D0', '.0..0..0.0.', '...........'],
+    ['...04660...', '...04660...', '..0SSSSS0..', '.0SSSSSSS0.', '0SSSSSSSSS0', '0S0SD0SD0S0', '0D00D00D0D0', '.0..0..0.0.', '...........', '...........'],
+  ],
+  { fps: 4 },
+);
+
 E['fx.banner'] = S(
   [
     [

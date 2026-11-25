@@ -348,7 +348,56 @@ async function realistic() {
   const people = await page.locator('.tool-row .tool span').allInnerTexts();
   check('realistic: empty at year 0 with a hint to place the first humans', /Year 0/.test(hud) && /No people yet/.test(hud) && /Humans/.test(note), `${hud.replace(/\n/g, ' | ')} / ${note}`);
   check('realistic: only grounded tools', JSON.stringify(people) === JSON.stringify(['Inspect', 'Humans']) && !cats.includes('Warfare') && !cats.includes('Technology') && !cats.includes('World laws'), `${cats.join(',')} / ${people.join(',')}`);
+  // round 10 addendum: Realistic places only people and animals (no land tools, no disasters), every real species
+  check('realistic: the dock offers only Peoples and Nature', JSON.stringify([...cats].sort()) === JSON.stringify(['Nature', 'Peoples']), cats.join(','));
+  await page.getByLabel('Nature').click();
+  const animals = await page.locator('.tool-row .tool span').allInnerTexts();
+  check('realistic: every real animal can be placed (24), elephants and seals included', animals.length === 25 && animals.includes('Elephants') && animals.includes('Seals') && !animals.includes('Monster'), `${animals.length - 1} animals`);
+  await page.getByLabel('Peoples').click();
+  await dropHand(page, 'realistic');
   await browser.close();
+  // the same drop under Reduce motion is one still frame
+  const b2 = await engine.launch();
+  const c2 = await b2.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
+  const p2 = await c2.newPage();
+  await p2.goto(url);
+  await p2.getByText('New world').first().click();
+  await p2.locator('button.preset', { hasText: /^Realistic/ }).click();
+  await p2.getByText('Create world').click();
+  await p2.waitForSelector('canvas.canvas', { timeout: 30000 });
+  if (await p2.getByText('Skip').count()) await p2.getByText('Skip').click();
+  await p2.getByLabel('Peoples').click();
+  await dropHand(p2, 'realistic (Reduce motion)', true);
+  await b2.close();
+}
+
+/** Round 10 addendum: pick Humans, check the hover hand, then tap until dry land takes the band; the hand plays. */
+async function dropHand(page, label, reduced = false) {
+  await page.locator('.tool', { hasText: 'Humans' }).first().click();
+  const vp = page.viewportSize();
+  await page.mouse.move(vp.width / 2, vp.height / 2);
+  await page.waitForTimeout(150);
+  const hover = await page.locator('canvas.canvas').getAttribute('data-hand');
+  check(`${label}: an open hand hovers under the pointer while placing`, hover === 'on', String(hover));
+  const canvas = page.locator('canvas.canvas');
+  let fx = '';
+  outer: for (const fy of [0.5, 0.4, 0.6, 0.3, 0.7]) for (const fxp of [0.5, 0.4, 0.6, 0.3, 0.7, 0.2, 0.8]) {
+    await page.mouse.click(vp.width * fxp, vp.height * fy);
+    await page.waitForTimeout(80);
+    fx = (await canvas.getAttribute('data-fx')) ?? '';
+    if (fx.includes('fx.hand')) break outer;
+  }
+  const m1 = (await canvas.getAttribute('data-fx-motion')) ?? '';
+  await page.waitForTimeout(200);
+  const m2 = (await canvas.getAttribute('data-fx-motion')) ?? '';
+  await page.waitForTimeout(1200);
+  const later = (await canvas.getAttribute('data-fx')) ?? '';
+  const hud = await page.locator('.world-card').innerText();
+  check(`${label}: dropping humans plays the hand, which then ends`, fx.includes('fx.hand') && !later.includes('fx.hand'), `now "${fx}", later "${later}"`);
+  if (reduced) check(`${label}: the hand is one still frame`, m1 === m2 && m1.includes('hand-still'), `${m1} / ${m2}`);
+  else check(`${label}: the hand moves (descends, opens, lifts)`, m1 !== m2 && /hand\d/.test(m1 + m2), `${m1} / ${m2}`);
+  check(`${label}: the dropped band is on the map (1 tribe)`, /1\s+tribe/.test(hud), hud.replace(/\n/g, ' | '));
+  await page.getByLabel('Stop using this power').click().catch(() => {});
 }
 
 await realistic();

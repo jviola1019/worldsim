@@ -172,6 +172,7 @@ export class Renderer {
     this.drawFx(dt);
     this.drawSelection();
     this.drawBrush();
+    this.drawHoverHand();
     // labels in screen space
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     if (this.showLabels) this.drawLabels(tilePx);
@@ -725,6 +726,11 @@ export class Renderer {
       if (f.x < 0) continue; // placeless: flash only
       const spr = atlas.get(f.kind);
       const progress = 1 - f.t / f.dur;
+      if (f.kind === 'fx.hand') {
+        motion += this.drawHand(f.x, f.y, progress, f.sprite) + ';';
+        kinds.add(f.kind);
+        continue;
+      }
       if (f.ring) {
         // area ring: grows to the concept's radius and fades; a still ring under Reduce motion
         const grow = reduce ? 1 : 0.35 + 0.65 * progress;
@@ -789,6 +795,62 @@ export class Renderer {
     ctx.ellipse(x * TILE, y * TILE, r * TILE, r * TILE * 0.8, 0, 0, Math.PI * 2);
     ctx.stroke();
     ctx.setLineDash([]);
+  }
+
+  /**
+   * Round 10 addendum: the placing hand. Feedback only: the people or animals already exist on the tap. Timeline
+   * (progress p): the closed hand descends with an ease-out (0-0.35); it opens and three copies of the placed sprite
+   * fall with an ease-in (0.35-0.6) and land in a puff of dust (0.6-0.85); the hand lifts and fades (0.65-1). Under
+   * Reduce motion: one still, the open hand above the landed sprites. Returns a motion signature for tests.
+   */
+  private drawHand(tx: number, ty: number, p: number, sprite?: string): string {
+    const { ctx, atlas } = this;
+    const k = this.unitScale;
+    const gx = tx * TILE + 4;
+    const gy = ty * TILE + 6;
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * Math.max(0, Math.min(1, t));
+    const id = sprite && atlas.has(sprite) ? sprite : undefined;
+    const copies = (dy: number, alpha: number) => {
+      if (!id || alpha <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      for (const dx of [-4, 0, 4]) atlas.draw(ctx, id, gx + dx * k, gy + dy * k + (dx === 0 ? 1 : 0) * k, 0, undefined, dx < 0, false, k);
+      ctx.restore();
+    };
+    if (this.reduceMotion) {
+      copies(0, 1);
+      atlas.draw(ctx, 'fx.hand', gx, gy - 10 * k, 1, undefined, false, false, k);
+      return 'hand-still';
+    }
+    const handY = p < 0.35 ? lerp(-28, -10, 1 - (1 - p / 0.35) ** 2) : p < 0.65 ? -10 : lerp(-10, -30, ((p - 0.65) / 0.35) ** 2);
+    const frame = p < 0.35 ? 0 : p < 0.65 ? 1 : 2;
+    if (p >= 0.35) copies(lerp(-9, 0, ((p - 0.35) / 0.25) ** 2), p > 0.85 ? 1 - (p - 0.85) / 0.15 : 1);
+    if (p >= 0.6 && p < 0.85) {
+      const dust = atlas.get('fx.dust');
+      const df = dust ? Math.min(dust.frames - 1, Math.floor(((p - 0.6) / 0.25) * dust.frames)) : 0;
+      atlas.draw(ctx, 'fx.dust', gx, gy + 1, df, undefined, false, false, k);
+    }
+    ctx.save();
+    ctx.globalAlpha = p > 0.65 ? Math.max(0, 1 - (p - 0.65) / 0.35) : 1;
+    atlas.draw(ctx, 'fx.hand', gx, gy + handY * k, frame, undefined, false, false, k);
+    ctx.restore();
+    return `hand${frame}y${Math.round(handY)}`;
+  }
+
+  /** Round 10 addendum: with a placing tool on desktop, an open hand hovers over the tile under the pointer. */
+  hand = { x: 0, y: 0, visible: false };
+
+  private drawHoverHand(): void {
+    const h = this.hand;
+    // while a drop plays near the pointer, only the dropping hand is drawn (two hands at once read as clutter)
+    const dropping = this.sim.fx.some((f) => f.kind === 'fx.hand' && Math.abs(f.x - h.x) <= 2 && Math.abs(f.y - h.y) <= 2);
+    this.setData('hand', h.visible ? 'on' : 'off');
+    if (!h.visible || dropping) return;
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.globalAlpha = 0.8;
+    this.atlas.draw(ctx, 'fx.hand', h.x * TILE + 4, h.y * TILE - 4 * this.unitScale, 1, undefined, false, false, this.unitScale);
+    ctx.restore();
   }
 
   private drawBrush(): void {

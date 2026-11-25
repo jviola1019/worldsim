@@ -907,6 +907,9 @@ function relationsBrush(sim: Sim, x: number, y: number, r: number, delta: number
 
 export const POWER_BY_ID: Record<string, PowerDef> = Object.fromEntries(POWERS.map((p) => [p.id, p]));
 
+/** Round 10 addendum: powers that place life by hand (the placing hand plays for these). */
+export const isPlacingPower = (id: string): boolean => id.startsWith('animal_') || (id.startsWith('spawn_') && id !== 'spawn_army');
+
 /** Powers that create fictional (god-mode-only) threats. */
 export const HORROR_POWERS: ReadonlySet<string> = new Set(['horror_zombie', 'horror_ghoul', 'horror_blight']);
 

@@ -47,6 +47,8 @@ export interface VisualFx {
   then?: FxSpec;
   /** A brief screen tint (never under Reduce motion). */
   flash?: 'white' | 'red' | 'green';
+  /** Round 10 addendum: the sprite an effect carries (the placing hand drops it). */
+  sprite?: string;
 }
 
 /** What a concept shows on the map (see sim/conceptFx.ts). */
@@ -63,6 +65,8 @@ export interface FxSpec {
   radius?: number;
   /** At most this many of the same effect alive within 2 tiles (default 3). */
   cap?: number;
+  /** Round 10 addendum: a sprite the effect carries (the placing hand drops the placed people or animals). */
+  sprite?: string;
 }
 
 /**
@@ -114,7 +118,7 @@ export function markAllDirty(sim: Sim): void {
 }
 
 /** Low-level effect push. Systems call emitFx (sim/conceptFx.ts) instead, so the registry stays the one source. */
-export function addFx(sim: Sim, kind: string, x: number, y: number, dur = 1, data?: number, extra?: Pick<VisualFx, 'ring' | 'then' | 'flash'>): void {
+export function addFx(sim: Sim, kind: string, x: number, y: number, dur = 1, data?: number, extra?: Pick<VisualFx, 'ring' | 'then' | 'flash' | 'sprite'>): void {
   if (sim.fx.length > 400) return;
   sim.fx.push({ kind, x, y, t: dur, dur, data, ...extra });
 }
