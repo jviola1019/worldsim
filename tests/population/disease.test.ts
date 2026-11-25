@@ -18,7 +18,9 @@ function setup(seed: string) {
 }
 
 describe('disease: medicine mainly saves lives', () => {
-  it('with full control, healthcare and sanitation a novel r0 2.5 disease still spreads', () => {
+  // setup() fixes a dense 10,000-person town (crowd about 1.09, effective R about 1.3). Villages under about 400 people have
+  // a lower crowd factor and stay below 1 at full protection, by design.
+  it('in a dense 10,000-person town, full control, healthcare and sanitation do not stop a novel r0 2.5 disease', () => {
     const { sim, s, civ, d } = setup('dis-1');
     civ.caps.diseaseControl = 1; civ.caps.healthcare = 1; civ.caps.sanitation = 1;
     s.epidemics.push({ diseaseId: d.id, s: 0.99, i: 0.01, r: 0, deaths: 0 });
