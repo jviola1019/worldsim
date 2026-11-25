@@ -200,7 +200,7 @@ Six developed worlds under Realistic rules, 300 years each, starting in era 11.
 
 All browser testing is emulation (iPhone 13 and desktop), not a physical device or screen reader.
 
-**Dependencies:** `npm outdated` reports none; `npm audit` reports 0 vulnerabilities.
+**Dependencies:** `npm audit` reports 0 vulnerabilities. At the final check (2026-11-25, about 12:35 UTC), `npm outdated` listed two patch releases from that day. `@types/node` went from 26.6.7 to 26.6.10, which contains type definitions only; typecheck, 754/754 tests and the build passed after it. vitest 5.1.2 is held on purpose because it was 40 minutes old (SECURITY).
 
 #### Slow pace (`scripts/pace-calibrate.ts 1600 slow`, five seeds, the final code 563a06d)
 Target (METHODS §2.4): a first village after about 100 years (every seed within 40–250) and a first city of 10,000 after about 1,000 years (600–1,600), with no band dying out. Measured on 563a06d (`docs/data/round10/pace-final.txt`), one band of 24 humans placed beside fresh water on an empty 128² world:

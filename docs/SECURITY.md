@@ -16,7 +16,7 @@ Two audits so far:
 | Rendering of data | Preact text nodes (escaped) and canvas `fillText`. No HTML sinks (static guard test). Images are generated locally as data: or blob: URLs. |
 | Cross-context messaging | `postMessage` only between `ui/worldFactory.ts` and the same-origin module worker `workers/worldgen.worker.ts`. There is no `window` message listener. |
 | "AI" in the game | Simulated fictional AI labs (`media/media.ts`). **No LLM, model API, agent, tool calls or MCP at runtime.** |
-| Supply chain | One runtime dependency: `preact` 11.2.0. The fonts are `@fontsource/pixelify-sans` 5.3.0, (round 6) `@fontsource/atkinson-hyperlegible` 5.3.0 and (round 10) eight era faces for the news mediums (R10-1), all OFL-1.1 and bundled, so the CSP stays `'self'`. Dev tools: vite 8.3.8, vitest 5.1.1, TypeScript 7.0.2, tsx, fake-indexeddb, @types/node 26.6.7, axe-core 4.14.1 (round 10, tests only). CI is GitHub Actions. |
+| Supply chain | One runtime dependency: `preact` 11.2.0. The fonts are `@fontsource/pixelify-sans` 5.3.0, (round 6) `@fontsource/atkinson-hyperlegible` 5.3.0 and (round 10) eight era faces for the news mediums (R10-1), all OFL-1.1 and bundled, so the CSP stays `'self'`. Dev tools: vite 8.3.8, vitest 5.1.1, TypeScript 7.0.2, tsx, fake-indexeddb, @types/node 26.6.10, axe-core 4.14.1 (round 10, tests only). CI is GitHub Actions. |
 | Who can change what | Players can change only their own browser's state. No data is shared between players, so there is no tenant boundary. Repository write access and CI are the only privileged paths. |
 
 **Threat model in one line:** the attacker controls a save file the victim imports, anything else on the same origin (an extension, the dev tools, another app on the same `github.io` subdomain), or a site that frames or links to the game. The attacker cannot reach a server, because there is none. The assets worth protecting are the player's saves, the integrity of the published build, and the repository and CI credentials.
@@ -177,7 +177,7 @@ All testing was local and non-production: the local build (`vite preview` on loc
 | Check | Command or method | Result |
 |---|---|---|
 | Dependency audit | `npm audit` | 0 vulnerabilities |
-| Outdated packages | `npm outdated` | All direct dependencies on their latest versions |
+| Outdated packages | `npm outdated` | All direct dependencies on their latest versions except vitest 5.1.2, held on purpose (2026-11-25): it was published 40 minutes before the check, and a test runner executes code in CI. Upgrade it once it has been out for a few days. `@types/node` 26.6.10 contains type definitions only and was taken the same day. |
 | Static analysis | `tsc --noEmit` (TypeScript 7.0.2, strict) and the source-tree guards in `tests/security/hardening.test.ts` (HTML sinks, eval, network calls, message listeners, `Math.random`, secret patterns, `noopener`) | Clean; guards pass |
 | Secret scanning | Regex scan of `git log --all -p` (78 commits) for common key formats, private keys and credential literals; tracked-file check for `.env`, `.pem`, `.npmrc` and credential files | No findings. The GitHub secret-scanning API was not available (Advanced Security not enabled). gitleaks was not run: downloading and executing a binary was not permitted in this environment. |
 | Security unit tests | `npx vitest run tests/security tests/persistence` | 66/66 |

@@ -17,7 +17,7 @@ Last verified 2026-11-24 (round 10):
 | E2E | **97/97 on Chromium and 96/96 on WebKit** (Safari's engine), each with iPhone 13 emulation, desktop and Reduce motion, plus the Realistic sandbox and a 320-px HUD. This is emulation, not a physical device. |
 | Accessibility | `npm run a11y` (axe-core 4.14.1, WCAG 2.2 A/AA rules, plus scripted keyboard, Escape, reflow and text-spacing checks): **80/80 in Chromium and WebKit**, 0 violations. Automated and scripted checks only: no screen reader and no physical device. |
 | Design floors | 6/6 device profiles; 121 captures with 0 violations |
-| Dependencies | `npm audit`: 0 vulnerabilities; `npm outdated`: none |
+| Dependencies | `npm audit`: 0 vulnerabilities; `npm outdated`: only vitest 5.1.2, held because it was published 40 minutes before the 2026-11-25 check (SECURITY, outdated packages) |
 | GitHub Actions | CI (now with a WebKit e2e step), then Pages after a green CI (`workflow_run`); weekly long run (VALIDATION §R7–§R9) |
 | Multi-seed invariants | 20 seeds × 600 years: **20/20** (round-10 code) |
 | Game modes | All 12 audited (`scripts/mode-audit.ts`); 6 fixed, none removed (VALIDATION §R10) |
