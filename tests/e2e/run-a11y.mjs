@@ -24,7 +24,14 @@ const check = (name, ok, info = '') => { results.push({ name, ok }); console.log
 async function audit(page, label) {
   // measure the settled page: an entrance animation (sheets fade in over 200 ms) would read as low contrast
   // on a slower machine (seen on CI: the Laws sheet was audited mid-fade)
-  await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => null))));
+  // only finite animations: the broadcast feed's on-air dot and ticker loop forever, and awaiting their
+  // `finished` hung the audit until CI's 30-minute timeout (#68). A 3 s cap guards against any other stall.
+  await page.evaluate(() => Promise.race([
+    Promise.all(document.getAnimations()
+      .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
+      .map((a) => a.finished.catch(() => null))),
+    new Promise((r) => setTimeout(r, 3000)),
+  ]));
   await page.evaluate(AXE);
   const r = await page.evaluate((tags) => window.axe.run(document, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] }), TAGS);
   const bad = r.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
