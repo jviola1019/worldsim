@@ -1,0 +1,14 @@
+# 8a: mode-audit realistic 6 after fix(pace) (identical metrics to 639ab4a)
+
+## realistic (preset, 250 years, 6 seeds)
+  empty      6/6  starts empty at year 0, with wildlife and no people
+  life_only  6/6  you can place humans and animals, and nothing else
+  tech       6/6  every science-based technology is possible
+  village    6/6  the people you placed settle a village
+  real       6/6  nothing fictional ever appears
+  seed 0: {"era":1,"nations":2,"tribes":0,"wars":0,"settlements":3,"pop":636,"year":250}
+  seed 1: {"era":1,"nations":1,"tribes":0,"wars":0,"settlements":1,"pop":63,"year":250}
+  seed 2: {"era":1,"nations":1,"tribes":1,"wars":0,"settlements":1,"pop":672,"year":250}
+  seed 3: {"era":1,"nations":12,"tribes":9,"wars":9,"settlements":19,"pop":4632,"year":250}
+  seed 4: {"era":1,"nations":1,"tribes":0,"wars":0,"settlements":5,"pop":217,"year":250}
+  seed 5: {"era":1,"nations":2,"tribes":4,"wars":0,"settlements":7,"pop":1181,"year":250}

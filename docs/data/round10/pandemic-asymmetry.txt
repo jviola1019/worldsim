@@ -1,0 +1,6 @@
+pandemic asymmetry · 64² · era-10 world · nation A (era 10, pop 657,752) beside nation B stripped to era 5 (now era 5, pop 285,143)
+protection (share of transmission / lethality left): A 0.816 / 0.435 · B 1.240 / 0.956 · world mean 0.944 / 0.592
+lethality multiplier from normalising by the world mean: A 0.73× · B 1.61× the drawn lethality (cap 0.9)
+seeded in A: 200 pandemics · deaths as a share of each nation: A mean 0.698% median 0.082% max 20.77% · B mean 1.050% median 0.158% max 46.06% · drawn share mean 1.167% · B/A ratio of mean shares 1.5
+seeded in B: 200 pandemics · deaths as a share of each nation: A mean 0.695% median 0.083% max 20.55% · B mean 1.570% median 0.192% max 54.85% · drawn share mean 1.167% · B/A ratio of mean shares 2.3
+drawn ≥ 1% of the world (56 runs): A mean 4.30% · B mean 8.06% (reference: final size at r0 2 is 80%)
