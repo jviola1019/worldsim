@@ -439,6 +439,15 @@ async function dropHand(page, label, reduced = false) {
   await page.waitForTimeout(150);
   const hover = await page.locator('canvas.canvas').getAttribute('data-hand');
   check(`${label}: an open hand hovers under the pointer while placing`, hover === 'on', String(hover));
+  // switching to Inspect with the keyboard (the pointer has not moved) takes the hand away; picking Humans again brings it back on the next move
+  await page.locator('.tool', { hasText: 'Inspect' }).first().focus();
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(150);
+  const afterKey = await page.locator('canvas.canvas').getAttribute('data-hand');
+  check(`${label}: switching to Inspect by keyboard hides the hand`, afterKey === 'off', String(afterKey));
+  await page.locator('.tool', { hasText: 'Humans' }).first().click();
+  await page.mouse.move(vp.width / 2 + 3, vp.height / 2 + 3);
+  await page.waitForTimeout(150);
   const canvas = page.locator('canvas.canvas');
   let fx = '';
   outer: for (const fy of [0.5, 0.4, 0.6, 0.3, 0.7]) for (const fxp of [0.5, 0.4, 0.6, 0.3, 0.7, 0.2, 0.8]) {

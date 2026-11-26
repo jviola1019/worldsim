@@ -7,7 +7,7 @@
 import { defaultConfig } from '../src/config/laws';
 import { createSimulation } from '../src/sim/bootstrap';
 import { spawnBand } from '../src/population/bands';
-import { saveCheckpoint, loadCheckpoint } from './lib/checkpoint';
+import { saveCheckpoint, loadCheckpoint, checkpointPath } from './lib/checkpoint';
 
 const years = Number(process.argv[2] ?? 1600);
 const pace = (process.argv[3] ?? 'slow') as 'slow' | 'standard';
@@ -16,7 +16,7 @@ for (const seed of seeds) {
   const cfg = defaultConfig();
   cfg.name = 'Test'; cfg.gen.seed = seed; cfg.gen.width = 128; cfg.gen.height = 128;
   cfg.settings.startCivs = 0; cfg.settings.startEra = 1; cfg.settings.pace = pace;
-  const ckPath = process.env.CHECKPOINT ? `${process.env.CHECKPOINT}/pace-${seed}-${pace}.bin` : '';
+  const ckPath = process.env.CHECKPOINT ? checkpointPath(process.env.CHECKPOINT, 'calibrate', [seed, pace, `${years}y`]) : '';
   const ck = ckPath ? loadCheckpoint<{ y: number; ms: Record<string, number> }>(ckPath) : null;
   const sim = ck ? ck.sim : createSimulation(cfg);
   if (!ck) {

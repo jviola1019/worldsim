@@ -25,3 +25,12 @@ export function loadCheckpoint<T>(path: string): { sim: Simulation; extra: T } |
   const w = decodeWorld(new Uint8Array(readFileSync(path)));
   return { sim: new Simulation(w), extra: JSON.parse(readFileSync(path + '.json', 'utf8')) as T };
 }
+
+/**
+ * Round 10 second addendum: the checkpoint file for one run. Every script passes what makes the run unique (seed,
+ * size, options, and the length with a `y` suffix such as `1600y`), so a 300-year run never resumes a 200-year one.
+ * Pass the kind once: a seed that already starts with the kind repeats it (`pace` + `pace-a` is `pace-pace-a-...`).
+ */
+export function checkpointPath(dir: string, kind: string, parts: (string | number)[]): string {
+  return `${dir}/${kind}-${parts.join('-')}.bin`;
+}

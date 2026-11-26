@@ -16,7 +16,7 @@ import { defaultConfig, presetByKey, eraPeopleDefault } from '../src/config/laws
 import { createSimulation } from '../src/sim/bootstrap';
 import { ERA_NAMES } from '../src/technology/techData';
 import type { Simulation } from '../src/sim/simulation';
-import { saveCheckpoint, loadCheckpoint } from './lib/checkpoint';
+import { saveCheckpoint, loadCheckpoint, checkpointPath } from './lib/checkpoint';
 import { connectivity } from '../src/population/pandemic';
 
 const WORLDS = Number(process.argv[2] ?? 6);
@@ -49,7 +49,7 @@ const worldPop = (sim: Simulation) => { let n = 0; for (const s of sim.w.settlem
 
 for (let k = 0; k < WORLDS; k++) {
   const seed = `disease-${k}`;
-  const ckPath = process.env.CHECKPOINT ? `${process.env.CHECKPOINT}/disease-${seed}-${SIZE}-era${START_ERA}-${YEARS}y.bin` : '';
+  const ckPath = process.env.CHECKPOINT ? checkpointPath(process.env.CHECKPOINT, 'disease', [k, SIZE, `era${START_ERA}`, `${YEARS}y`]) : '';
   const ck = ckPath ? loadCheckpoint<Acc>(ckPath) : null;
   let sim: Simulation;
   if (ck) { sim = ck.sim; console.error(`resumed ${seed} at year ${ck.extra.y}`); }

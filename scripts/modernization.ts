@@ -10,7 +10,7 @@ import { createSimulation } from '../src/sim/bootstrap';
 import { ERA_NAMES } from '../src/technology/techData';
 import { SECTOR } from '../src/civilizations/buildings';
 import { boundaryPopulation } from '../src/population/ledger';
-import { saveCheckpoint, loadCheckpoint } from './lib/checkpoint';
+import { saveCheckpoint, loadCheckpoint, checkpointPath } from './lib/checkpoint';
 
 const seed = process.argv[2] ?? 'modern-1';
 const YEARS = Number(process.argv[3] ?? 1000);
@@ -25,7 +25,7 @@ cfg.gen.seed = seed;
 cfg.gen.width = SIZE;
 cfg.gen.height = SIZE;
 // round 10 addendum: CHECKPOINT=<dir> saves every 100 years and resumes after a restart (identical history)
-const ckPath = process.env.CHECKPOINT ? `${process.env.CHECKPOINT}/modernization-${seed}-${preset}-${SIZE}.bin` : '';
+const ckPath = process.env.CHECKPOINT ? checkpointPath(process.env.CHECKPOINT, 'modernization', [seed, preset, SIZE, `${YEARS}y`]) : '';
 type Acc = { y: number; firstEra: [number, number][]; lines: string[]; drought: number; secs: number };
 const ck = ckPath ? loadCheckpoint<Acc>(ckPath) : null;
 const sim = ck ? ck.sim : createSimulation(cfg);

@@ -15,7 +15,7 @@ import { createSimulation } from '../src/sim/bootstrap';
 import { ENDINGS } from '../src/civilizations/endings';
 import { ERA_NAMES } from '../src/technology/techData';
 import type { Simulation } from '../src/sim/simulation';
-import { saveCheckpoint, loadCheckpoint } from './lib/checkpoint';
+import { saveCheckpoint, loadCheckpoint, checkpointPath } from './lib/checkpoint';
 
 const WORLDS = Number(process.argv[2] ?? 6);
 const YEARS = Number(process.argv[3] ?? 300);
@@ -31,7 +31,7 @@ const worldLines: string[] = [];
 
 for (let k = 0; k < WORLDS; k++) {
   const seed = `events-${k}`;
-  const ckPath = process.env.CHECKPOINT ? `${process.env.CHECKPOINT}/events-${seed}-${SIZE}-${START_ERA}.bin` : '';
+  const ckPath = process.env.CHECKPOINT ? checkpointPath(process.env.CHECKPOINT, 'events', [k, SIZE, `era${START_ERA}`, `${YEARS}y`]) : '';
   const ck = ckPath ? loadCheckpoint<Acc>(ckPath) : null;
   let sim: Simulation;
   if (ck) { sim = ck.sim; console.error(`resumed ${seed} at year ${ck.extra.y}`); }

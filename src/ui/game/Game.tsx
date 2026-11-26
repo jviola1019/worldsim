@@ -261,6 +261,8 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
   const pickTool = (id: string) => {
     setTool(id);
     if (id === 'inspect') r && (r.brush.visible = false);
+    // a keyboard or dock switch moves no pointer, so no hover event clears the hand: only a placing tool keeps it
+    if (r) r.hand.visible = isPlacingPower(id) && r.hand.visible;
   };
 
   return (
