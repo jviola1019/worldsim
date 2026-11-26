@@ -3,11 +3,13 @@
  * Standard pace is untouched (every lever exactly 1).
  */
 import { describe, it, expect } from 'vitest';
-import { paceMult } from '../../src/sim/pace';
+import { paceMult, birthPaceMult } from '../../src/sim/pace';
+import { BALANCE } from '../../src/config/balance';
 import { spawnBand, slowSettleFactor, bandYearly } from '../../src/population/bands';
 import { encodeWorld, decodeWorld } from '../../src/persistence/serialize';
 import { Simulation } from '../../src/sim/simulation';
 import { makeSim } from '../helpers';
+import { presetByKey, eraPeopleDefault } from '../../src/config/laws';
 import { foundSettlement } from '../../src/civilizations/settlement';
 import { residents, boundaryPopulation, emptyLedger, LEDGER_KEYS, LEDGER_SIGN } from '../../src/population/ledger';
 
@@ -107,4 +109,33 @@ describe('pace', () => {
       expect(lg.destroyed - lg0.destroyed).toBe(0);
     }
   }, 120000);
+});
+
+// Round 10 second addendum (Task 8f): the Slow birth lever cut every town's fertility by slowBirthMult (0.65), whatever
+// its development. A modern town at near-replacement fertility (about 2.1) fell to about 1.4, so Realistic worlds that
+// start in a modern era shrank by more than 90% in 300 years and their research stalled with them (advance audit: 1 of
+// 6 era-10 Realistic worlds gained an era). Slow pace slows growth; it should not make a modern society shrink.
+describe('Slow pace in a developed world', () => {
+  const developed = (pace: 'slow' | 'standard') => makeSim('slow-modern', 64, (c) => {
+    presetByKey('realistic')!.apply(c);
+    c.settings.startEra = 10;
+    c.settings.startCivs = eraPeopleDefault('realistic', 10);
+    c.settings.pace = pace;
+  });
+
+  it('modern towns have nearly as many births at Slow pace as at Standard pace', () => {
+    const slow = developed('slow'), standard = developed('standard');
+    slow.runYears(3);
+    standard.runYears(3);
+    const ratio = (slow.w.popLedger?.births ?? 0) / (standard.w.popLedger?.births ?? 1);
+    expect(ratio).toBeGreaterThan(0.85);
+  }, 120000);
+
+  it('the birth lever keeps its calibrated value before the transition and fades out across it', () => {
+    const slow = { pace: 'slow' } as never;
+    expect(birthPaceMult(slow, 0)).toBe(BALANCE.slowBirthMult); // early peoples: exactly the calibrated lever
+    expect(birthPaceMult(slow, 1)).toBe(1); // fully transitioned: fertility already set by the transition
+    expect(birthPaceMult(slow, 0.5)).toBeCloseTo((1 + BALANCE.slowBirthMult) / 2, 12);
+    expect(birthPaceMult({ pace: 'standard' } as never, 0)).toBe(1);
+  });
 });

@@ -3,7 +3,7 @@
  * construction -> health/migration), yearly upkeep (territory, education,
  * access), transfer between civilizations and destruction.
  */
-import { paceMult } from '../sim/pace';
+import { birthPaceMult } from '../sim/pace';
 import { record, residents, transfer } from '../population/ledger';
 import type { Sim } from '../sim/context';
 import type { Civ, Settlement, SpeciesKey } from '../sim/types';
@@ -15,7 +15,7 @@ import { makeName } from '../culture/language';
 import { phonOfCulture } from '../population/persons';
 import {
   cohortMonth, cohortTotal, convertToCohorts, convertToIndividuals, emptyFlows, healthIndices, individualMonth,
-  lifeExpectancy, mortalitySchedule, tfrFor, removePeople,
+  lifeExpectancy, mortalitySchedule, tfrFor, fertilityTransition, removePeople,
 } from '../population/demography';
 import { settlementEconomy } from '../economy/production';
 import { planConstruction, progressConstruction, placeBuilding, removeBuilding, recomputeHousing, cancelProject } from './urban';
@@ -254,7 +254,7 @@ export function settlementMonthly(sim: Sim, s: Settlement): void {
     const urban = 1 + 0.35 * (1 - clamp01(civ.caps.sanitation)) * Math.min(1, Math.log10(s.pop / 5000));
     for (let b = 0; b < AGE_BANDS; b++) q[b] = Math.min(0.95, q[b] * urban);
   }
-  let tfr = tfrFor(civ, s, q[0], econ.adequacy, s.species) * paceMult(sim.w.meta.settings, 'birth');
+  let tfr = tfrFor(civ, s, q[0], econ.adequacy, s.species) * birthPaceMult(sim.w.meta.settings, fertilityTransition(civ, s, q[0]));
   // an infertility pandemic sterilizes adults; generations born to the fertile slowly replace them
   if (s.sterility) {
     tfr *= 1 - s.sterility;

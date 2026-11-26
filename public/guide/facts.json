@@ -2,15 +2,15 @@
  "generated": "2026-11-26",
  "totals": {
   "srcFiles": 152,
-  "srcLines": 44599,
+  "srcLines": 44622,
   "testFiles": 69,
-  "testCases": 505
+  "testCases": 507
  },
  "folders": [
   {
    "name": "rendering",
    "files": 34,
-   "lines": 19408,
+   "lines": 19410,
    "deps": {
     "sim": 14,
     "world": 10,
@@ -68,7 +68,7 @@
   {
    "name": "sim",
    "files": 11,
-   "lines": 2681,
+   "lines": 2695,
    "deps": {
     "powers": 3,
     "culture": 5,
@@ -81,7 +81,7 @@
     "ecology": 4,
     "world": 12,
     "history": 5,
-    "core": 9,
+    "core": 10,
     "military": 2,
     "future": 3,
     "media": 1
@@ -103,7 +103,7 @@
   {
    "name": "population",
    "files": 10,
-   "lines": 1858,
+   "lines": 1865,
    "deps": {
     "sim": 20,
     "world": 3,
@@ -663,7 +663,7 @@
   {
    "path": "src/population/demography.ts",
    "folder": "population",
-   "lines": 411,
+   "lines": 418,
    "about": "Demography at two resolutions."
   },
   {
@@ -927,7 +927,7 @@
   {
    "path": "src/rendering/renderer.ts",
    "folder": "rendering",
-   "lines": 1113,
+   "lines": 1115,
    "about": "Frame renderer. Draws (back to front): cached world chunks (or the far-zoom overview), the overlay, animated tiles (volcanoes, fires, smoke, windmills), living things and agents, traffic derived from real infrastructure and trade, effects, labels, selection an"
   },
   {
@@ -993,7 +993,7 @@
   {
    "path": "src/sim/pace.ts",
    "folder": "sim",
-   "lines": 14,
+   "lines": 28,
    "about": "Round 10: development pace."
   },
   {
@@ -1527,7 +1527,7 @@
   },
   {
    "path": "tests/sim/pace.test.ts",
-   "cases": 7,
+   "cases": 9,
    "about": "Round 10: Slow pace. Placed humans take generations to settle and centuries to build cities; Standard pace is untouched (every lever exactly 1)."
   },
   {
@@ -1598,6 +1598,11 @@
  ],
  "scripts": [
   {
+   "path": "scripts/advance-audit.ts",
+   "lines": 93,
+   "about": "Round 10 second addendum (Task 8f): do developed starts advance?"
+  },
+  {
    "path": "scripts/disease-audit.ts",
    "lines": 161,
    "about": "Round 10 second addendum (Task 4): disease audit."
@@ -1641,6 +1646,11 @@
    "path": "scripts/pace-calibrate.ts",
    "lines": 45,
    "about": "Round 10: pace calibration."
+  },
+  {
+   "path": "scripts/pandemic-asymmetry.ts",
+   "lines": 95,
+   "about": "Round 10 second addendum (Task 8f): one modern nation beside one pre-industrial nation."
   },
   {
    "path": "scripts/run-sim.ts",

@@ -96,6 +96,21 @@ export function lifeExpectancy(q: ArrayLike<number>): number {
 }
 
 /**
+ * How far a society has gone through the demographic transition (0 = natural fertility, 1 = fully transitioned).
+ * Development drives the decline (child survival, schooling, cities, living standards); modern contraception
+ * accelerates it but does not gate it: European fertility fell from the 19th century, before modern methods existed.
+ * Below a development threshold fertility stays near natural.
+ */
+export function fertilityTransition(civ: Civ, s: { education: number; prosperity: number; pop: number }, q0: number): number {
+  const childSurvival = Math.pow(1 - q0, 5); // ~0.68 pre-modern .. 0.99 modern
+  const survivalFactor = clamp01((childSurvival - 0.7) / 0.28);
+  const urban = clamp01(Math.log10(Math.max(1, s.pop) / 5000) / 2);
+  const dev = clamp01(0.35 * s.education + 0.3 * survivalFactor + 0.2 * urban + 0.15 * clamp01(s.prosperity / 1.6));
+  const access = clamp01(civ.caps.contraception);
+  return clamp01((dev - BALANCE.transitionOnset) / (BALANCE.transitionFull - BALANCE.transitionOnset)) * (0.65 + 0.35 * access);
+}
+
+/**
  * Total fertility rate. Pre-transition societies sit near natural fertility;
  * the transition requires contraception capability and is driven by child
  * survival, education, urbanization and prosperity (evidence-informed
@@ -105,15 +120,7 @@ export function tfrFor(civ: Civ | undefined, s: { education: number; prosperity:
   const sp = SPECIES_DEMOGRAPHY[species];
   let tfr = BALANCE.tfrMax * sp.fertility;
   if (civ) {
-    const childSurvival = Math.pow(1 - q0, 5); // ~0.68 pre-modern .. 0.99 modern
-    const survivalFactor = clamp01((childSurvival - 0.7) / 0.28);
-    const urban = clamp01(Math.log10(Math.max(1, s.pop) / 5000) / 2);
-    const dev = clamp01(0.35 * s.education + 0.3 * survivalFactor + 0.2 * urban + 0.15 * clamp01(s.prosperity / 1.6));
-    // Development drives the decline (child survival, schooling, cities, living standards); modern
-    // contraception accelerates it but does not gate it: European fertility fell from the 19th century,
-    // before modern methods existed. Below a development threshold fertility stays near natural.
-    const access = clamp01(civ.caps.contraception);
-    const transition = clamp01((dev - BALANCE.transitionOnset) / (BALANCE.transitionFull - BALANCE.transitionOnset)) * (0.65 + 0.35 * access);
+    const transition = fertilityTransition(civ, s, q0);
     tfr = tfr - (tfr - BALANCE.tfrMin * sp.fertility) * transition;
     // cultural/religious pronatalism (small)
     tfr *= 1 + 0.08 * (civ.inst.religiousAuthority - 0.3);

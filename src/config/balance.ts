@@ -79,7 +79,7 @@ export const BALANCE = {
   slowResearchMult: 0.45,
   /** [C] Slow pace: construction multiplier (same calibration, VALIDATION §R10). */
   slowBuildMult: 0.5,
-  /** [C] Slow pace: birth multiplier in settlements only; wandering bands keep their fertility, as they died out otherwise (calibration run 3; VALIDATION §R10). */
+  /** [C] Slow pace: birth multiplier in settlements only; wandering bands keep their fertility, as they died out otherwise (calibration run 3; VALIDATION §R10). It applies in full before the demographic transition and fades out across it (sim/pace.ts birthPaceMult), so Slow pace slows growth without making modern towns shrink. */
   slowBirthMult: 0.65, // settlements only: small wandering bands keep their fertility (they die out otherwise)
   /** [C] Slow pace: a band makes no permanent camp in its first N years on new land (round 10 addendum: a lucky draw let a band settle at year 27; real foragers did not settle within a generation of arriving; VALIDATION §R10). */
   slowSettleDelayYears: 30,
