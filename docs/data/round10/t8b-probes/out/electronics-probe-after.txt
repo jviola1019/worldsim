@@ -1,0 +1,48 @@
+y5
+  Republic of Selolar      pop 221298 computing 0.50 fabs 2 elec prod 15 use 0 want 4454 stock 353 rare 19430 access rare 1.00 · tier 0 port job - · projects 5
+  Republic of Liozar       pop 837139 computing 0.01 fabs 0 elec prod 0 use 784 want 401 stock 10148 rare 20000 access rare 1.00 · tier 0 port job - · projects 3
+  Republic of Losvia       pop 212611 computing 0.50 fabs 0 elec prod 0 use 0 want 673 stock 362 rare 20000 access rare 1.00 · tier 1 port job - · projects 4
+  Homamisi Oligarchy       pop 789114 computing 0.50 fabs 2 elec prod 550 use 432 want 17859 stock 1578 rare 17706 access rare 1.00 · tier 0 port job - · projects 3
+  Varekorese Oligarchy     pop 393587 computing 0.50 fabs 0 elec prod 0 use 0 want 5916 stock 1208 rare 20000 access rare 1.00 · tier 0 port job - · projects 2
+y10
+  Republic of Selolar      pop 241040 computing 0.50 fabs 4 elec prod 15 use 20 want 4811 stock 274 rare 8066 access rare 1.00 · tier 0 port job - · projects 4
+  Republic of Liozar       pop 879142 computing 0.08 fabs 0 elec prod 0 use 2 want 1547 stock 1539 rare 20000 access rare 1.00 · tier 0 port job - · projects 2
+  Commonwealth of Losvia   pop 230253 computing 0.50 fabs 0 elec prod 0 use 0 want 569 stock 266 rare 20000 access rare 1.00 · tier 1 port job - · projects 0
+  Republic of Homamis      pop 854127 computing 0.50 fabs 2 elec prod 10 use 0 want 19321 stock 1578 rare 11373 access rare 1.00 · tier 0 port job - · projects 2
+  Republic of Varekor      pop 418286 computing 0.50 fabs 1 elec prod 0 use 0 want 6290 stock 606 rare 19810 access rare 1.00 · tier 0 port job - · projects 3
+y15
+  Republic of Selolar      pop 262964 computing 0.50 fabs 4 elec prod 0 use 3 want 5286 stock 166 rare 3902 access rare 1.00 · tier 0 port job - · projects 7
+  Commonwealth of Liozar   pop 948558 computing 0.14 fabs 7 elec prod 0 use 40 want 3078 stock 1091 rare 19121 access rare 1.00 · tier 0 port job - · projects 3
+  Commonwealth of Losvia   pop 253796 computing 0.50 fabs 0 elec prod 0 use 0 want 543 stock 0 rare 20000 access rare 1.00 · tier 1 port job - · projects 0
+  Republic of Homamis      pop 918271 computing 0.50 fabs 2 elec prod 10 use 0 want 20765 stock 1217 rare 9333 access rare 1.00 · tier 0 port job - · projects 1
+  Republic of Varekor      pop 435388 computing 0.50 fabs 2 elec prod 0 use 0 want 6536 stock 409 rare 19810 access rare 1.00 · tier 0 port job - · projects 3
+y20
+  Republic of Selolar      pop 282933 computing 0.50 fabs 4 elec prod 0 use 5 want 5687 stock 42 rare 0 access rare 0.00 · tier 0 port job - · projects 7
+  Commonwealth of Liozar   pop 1011573 computing 0.20 fabs 7 elec prod 0 use 20 want 4637 stock 380 rare 15504 access rare 1.00 · tier 0 port job - · projects 3
+  Commonwealth of Losvia   pop 263079 computing 0.50 fabs 0 elec prod 0 use 0 want 576 stock 0 rare 20000 access rare 1.00 · tier 1 port job - · projects 0
+  Republic of Homamis      pop 984017 computing 0.50 fabs 3 elec prod 71 use 0 want 22249 stock 723 rare 5192 access rare 1.00 · tier 0 port job - · projects 1
+  Republic of Varekor      pop 460789 computing 0.50 fabs 2 elec prod 0 use 0 want 6975 stock 150 rare 19810 access rare 1.00 · tier 0 port job - · projects 0
+y25
+  Commonwealth of Selolar  pop 302796 computing 0.50 fabs 4 elec prod 0 use 1 want 6237 stock 0 rare 535 access rare 1.00 · tier 0 port job - · projects 10
+  Commonwealth of Liozar   pop 1007756 computing 0.26 fabs 7 elec prod 0 use 0 want 6005 stock 140 rare 9935 access rare 1.00 · tier 0 port job - · projects 2
+  Commonwealth of Losvia   pop 249902 computing 0.50 fabs 0 elec prod 0 use 0 want 635 stock 0 rare 20000 access rare 1.00 · tier 1 port job - · projects 0
+  Republic of Homamis      pop 1048237 computing 0.50 fabs 3 elec prod 73 use 0 want 23700 stock 649 rare 1 access rare 1.00 · tier 0 port job - · projects 1
+  Republic of Varekor      pop 484078 computing 0.50 fabs 2 elec prod 0 use 2 want 7316 stock 15 rare 19810 access rare 1.00 · tier 0 port job - · projects 3
+y30
+  Commonwealth of Selolar  pop 322915 computing 0.50 fabs 4 elec prod 0 use 0 want 6659 stock 0 rare 134 access rare 1.00 · tier 0 port job - · projects 12
+  Commonwealth of Liozar   pop 1048494 computing 0.31 fabs 7 elec prod 0 use 0 want 7503 stock 102 rare 4823 access rare 1.00 · tier 0 port job - · projects 2
+  Commonwealth of Losvia   pop 269802 computing 0.50 fabs 0 elec prod 0 use 0 want 683 stock 0 rare 20000 access rare 1.00 · tier 1 port job - · projects 0
+  Republic of Homamis      pop 1110515 computing 0.50 fabs 3 elec prod 279 use 0 want 25105 stock 1809 rare 0 access rare 1.00 · tier 0 port job - · projects 1
+  Republic of Varekor      pop 505032 computing 0.50 fabs 4 elec prod 0 use 0 want 7595 stock 0 rare 19810 access rare 1.00 · tier 0 port job - · projects 1
+y35
+  Commonwealth of Selolar  pop 342821 computing 0.50 fabs 4 elec prod 0 use 0 want 7062 stock 0 rare 0 access rare 0.00 · tier 0 port job - · projects 11
+  Commonwealth of Liozar   pop 1102415 computing 0.37 fabs 7 elec prod 0 use 1 want 9441 stock 44 rare 1288 access rare 1.00 · tier 0 port job - · projects 2
+  Commonwealth of Losvia   pop 252216 computing 0.50 fabs 0 elec prod 0 use 0 want 659 stock 0 rare 20000 access rare 1.00 · tier 1 port job - · projects 0
+  Republic of Homamis      pop 1144340 computing 0.50 fabs 3 elec prod 277 use 108 want 25918 stock 2289 rare 0 access rare 0.98 · tier 0 port job - · projects 1
+  Republic of Varekor      pop 523546 computing 0.50 fabs 4 elec prod 0 use 0 want 8056 stock 0 rare 19526 access rare 1.00 · tier 0 port job - · projects 1
+y40
+  Commonwealth of Selolar  pop 361816 computing 0.50 fabs 4 elec prod 0 use 0 want 7442 stock 0 rare 742 access rare 1.00 · tier 0 port job - · projects 7
+  Commonwealth of Liozar   pop 1110241 computing 0.42 fabs 7 elec prod 0 use 1 want 10727 stock 29 rare 229 access rare 0.51 · tier 0 port job - · projects 1
+  Commonwealth of Losvia   pop 257244 computing 0.50 fabs 0 elec prod 0 use 0 want 684 stock 0 rare 20000 access rare 1.00 · tier 1 port job - · projects 0
+  Republic of Homamis      pop 1156254 computing 0.50 fabs 3 elec prod 124 use 0 want 26274 stock 2275 rare 0 access rare 0.97 · tier 0 port job - · projects 1
+  Federation of Varekor    pop 539823 computing 0.50 fabs 4 elec prod 0 use 0 want 8296 stock 0 rare 17684 access rare 1.00 · tier 0 port job - · projects 0

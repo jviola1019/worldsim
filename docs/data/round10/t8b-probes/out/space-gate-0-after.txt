@@ -1,0 +1,126 @@
+y0:
+  Faumeflithian Tribe tier 0 rocketry 0.00 port no  · largest 131697 · gdp 0 · budget 0 vs launch 2000 · stock metal 19796 mach 20000 elec 20000 · launches 0
+  Glamast Chiefdom tier 0 rocketry 0.00 port no  · largest 474618 · gdp 0 · budget 0 vs launch 2000 · stock metal 19472 mach 20000 elec 20000 · launches 0
+  Fliazuwarese Tribe tier 1 rocketry 1.00 port no  · largest 245006 · gdp 0 · budget 0 vs launch 2000 · stock metal 19792 mach 20000 elec 20000 · launches 0
+  Dremar Chiefdom tier 0 rocketry 0.00 port no  · largest 232654 · gdp 0 · budget 0 vs launch 2000 · stock metal 19656 mach 20000 elec 20000 · launches 0
+  Zhendvornese Tribe tier 0 rocketry 0.00 port no  · largest 111526 · gdp 0 · budget 0 vs launch 2000 · stock metal 19820 mach 20000 elec 20000 · launches 0
+y10:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 154130 · gdp 616435 · budget 2594 vs launch 2000 · stock metal 4358 mach 20554 elec 249 · launches 0
+  Kingdom of Glamast tier 0 rocketry 0.04 port no  · largest 541810 · gdp 3787815 · budget 12594 vs launch 2000 · stock metal 3475 mach 49077 elec 2677 · launches 0
+  Republic of Fliazuwar tier 1 rocketry 1.00 port no  · largest 287905 · gdp 2234883 · budget 7795 vs launch 2000 · stock metal 894 mach 29982 elec 4562 · launches 0
+  Kingdom of Dremar tier 0 rocketry 0.00 port no  · largest 227860 · gdp 1792261 · budget 7185 vs launch 2000 · stock metal 2 mach 24417 elec 477 · launches 0
+  Zhendvornese Oligarchy tier 0 rocketry 0.00 port no  · largest 126271 · gdp 616748 · budget 2085 vs launch 2000 · stock metal 0 mach 19762 elec 207 · launches 0
+y20:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 144311 · gdp 680307 · budget 2863 vs launch 2000 · stock metal 11157 mach 13521 elec 56 · launches 0
+  Glamastese Oligarchy tier 0 rocketry 0.30 port no  · largest 618675 · gdp 5323436 · budget 26218 vs launch 2000 · stock metal 5763 mach 69631 elec 1268 · launches 0
+  Republic of Fliazuwar tier 1 rocketry 1.00 port no  · largest 334818 · gdp 1489412 · budget 5195 vs launch 2000 · stock metal 0 mach 16945 elec 494 · launches 0
+  Republic of Dremar tier 0 rocketry 0.00 port no  · largest 251738 · gdp 969778 · budget 3888 vs launch 2000 · stock metal 1419 mach 20011 elec 544 · launches 0
+  Zhendvornese Oligarchy tier 0 rocketry 0.00 port no  · largest 138711 · gdp 838095 · budget 2833 vs launch 2000 · stock metal 357 mach 14761 elec 112 · launches 0
+y30:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 164282 · gdp 779200 · budget 3279 vs launch 2000 · stock metal 25314 mach 8249 elec 29 · launches 0
+  Republic of Glamast tier 1 rocketry 0.51 port yes · largest 574571 · gdp 5393778 · budget 21170 vs launch 2000 · stock metal 7466 mach 115460 elec 394 · launches 0
+  Republic of Fliazuwar tier 1 rocketry 1.00 port no  · largest 379656 · gdp 1517330 · budget 5292 vs launch 2000 · stock metal 11 mach 6684 elec 182 · launches 0
+  Republic of Dremar tier 0 rocketry 0.00 port no  · largest 267460 · gdp 919578 · budget 3687 vs launch 2000 · stock metal 1318 mach 13585 elec 282 · launches 0
+  Republic of Zhendvorn tier 0 rocketry 0.00 port no  · largest 147593 · gdp 578030 · budget 1954 vs launch 2000 · stock metal 963 mach 9869 elec 60 · launches 0
+y40:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 169522 · gdp 849286 · budget 3574 vs launch 2000 · stock metal 29140 mach 4486 elec 9 · launches 0
+  Republic of Glamast tier 1 rocketry 0.81 port yes · largest 639175 · gdp 5683533 · budget 22307 vs launch 2000 · stock metal 5768 mach 142390 elec 474 · launches 101
+  Commonwealth of Fliazuwar tier 1 rocketry 1.00 port no  · largest 416044 · gdp 1835017 · budget 6400 vs launch 2000 · stock metal 1615 mach 1118 elec 0 · launches 0
+  Republic of Dremar tier 0 rocketry 0.00 port no  · largest 268331 · gdp 3138738 · budget 12584 vs launch 2000 · stock metal 996 mach 8525 elec 67 · launches 0
+  Republic of Zhendvorn tier 0 rocketry 0.00 port no  · largest 153389 · gdp 1106317 · budget 3740 vs launch 2000 · stock metal 4025 mach 6561 elec 32 · launches 0
+y50:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 177740 · gdp 1016836 · budget 4279 vs launch 2000 · stock metal 34870 mach 11552 elec 0 · launches 0
+  Republic of Glamast tier 1 rocketry 1.00 port yes · largest 689175 · gdp 5639340 · budget 32285 vs launch 2000 · stock metal 4291 mach 150160 elec 591 · launches 226
+  Commonwealth of Fliazuwar tier 1 rocketry 1.00 port no  · largest 444479 · gdp 2725057 · budget 9505 vs launch 2000 · stock metal 1726 mach 4508 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 270143 · gdp 3226916 · budget 12937 vs launch 2000 · stock metal 2096 mach 5689 elec 18 · launches 0
+  Republic of Zhendvorn tier 0 rocketry 0.00 port no  · largest 155690 · gdp 821349 · budget 2777 vs launch 2000 · stock metal 2646 mach 7525 elec 17 · launches 0
+y60:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 186201 · gdp 1027036 · budget 5349 vs launch 2000 · stock metal 54752 mach 14044 elec 0 · launches 0
+  Commonwealth of Glamast tier 1 rocketry 1.00 port yes · largest 721047 · gdp 5586143 · budget 21925 vs launch 2000 · stock metal 5847 mach 150854 elec 703 · launches 362
+  Commonwealth of Fliazuwar tier 1 rocketry 1.00 port no  · largest 463902 · gdp 2599544 · budget 9067 vs launch 2000 · stock metal 8512 mach 1834 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 261790 · gdp 2907520 · budget 11657 vs launch 2000 · stock metal 21892 mach 4967 elec 10 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 142435 · gdp 503457 · budget 1400 vs launch 2000 · stock metal 391 mach 6592 elec 9 · launches 0
+y70:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 165346 · gdp 1728678 · budget 6237 vs launch 2000 · stock metal 1464 mach 28738 elec 0 · launches 0
+  Commonwealth of Glamast tier 2 rocketry 1.00 port yes · largest 701272 · gdp 5355137 · budget 21019 vs launch 2000 · stock metal 6509 mach 153185 elec 635 · launches 463
+  Commonwealth of Fliazuwar tier 1 rocketry 1.00 port no  · largest 446504 · gdp 2937354 · budget 10245 vs launch 2000 · stock metal 10137 mach 1817 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 235082 · gdp 2711212 · budget 10870 vs launch 2000 · stock metal 31412 mach 3952 elec 5 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 139950 · gdp 824744 · budget 2788 vs launch 2000 · stock metal 1946 mach 9388 elec 5 · launches 0
+y80:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 164241 · gdp 1866126 · budget 7852 vs launch 2000 · stock metal 1635 mach 21245 elec 497 · launches 0
+  Commonwealth of Glamast tier 3 rocketry 1.00 port yes · largest 723200 · gdp 6708517 · budget 26330 vs launch 2000 · stock metal 3427 mach 157825 elec 388 · launches 577
+  Commonwealth of Fliazuwar tier 2 rocketry 1.00 port no  · largest 452281 · gdp 3096848 · budget 10801 vs launch 2000 · stock metal 14482 mach 2003 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 230360 · gdp 2479699 · budget 9942 vs launch 2000 · stock metal 28459 mach 2648 elec 3 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 137340 · gdp 809003 · budget 2735 vs launch 2000 · stock metal 1670 mach 9391 elec 3 · launches 0
+y90:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 165402 · gdp 2938213 · budget 12363 vs launch 2000 · stock metal 2316 mach 25702 elec 643 · launches 0
+  Commonwealth of Glamast tier 3 rocketry 1.00 port yes · largest 737825 · gdp 6727009 · budget 33130 vs launch 2000 · stock metal 4565 mach 161022 elec 138 · launches 734
+  Commonwealth of Fliazuwar tier 3 rocketry 1.00 port no  · largest 443733 · gdp 4379004 · budget 19652 vs launch 2000 · stock metal 17143 mach 2142 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 223580 · gdp 2637661 · budget 10575 vs launch 2000 · stock metal 23128 mach 1413 elec 1 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 133630 · gdp 479889 · budget 1622 vs launch 2000 · stock metal 363 mach 7105 elec 1 · launches 0
+y100:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 160744 · gdp 2662499 · budget 11203 vs launch 2000 · stock metal 2312 mach 39283 elec 639 · launches 0
+  Commonwealth of Glamast tier 3 rocketry 1.00 port yes · largest 749661 · gdp 6844177 · budget 33707 vs launch 2000 · stock metal 5071 mach 161586 elec 110 · launches 895
+  Commonwealth of Fliazuwar tier 3 rocketry 1.00 port no  · largest 420762 · gdp 4229205 · budget 18980 vs launch 2000 · stock metal 23232 mach 2112 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 216436 · gdp 2467986 · budget 12363 vs launch 2000 · stock metal 17100 mach 2532 elec 0 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 129795 · gdp 881086 · budget 2979 vs launch 2000 · stock metal 2276 mach 7103 elec 0 · launches 0
+y110:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 138147 · gdp 2489484 · budget 10475 vs launch 2000 · stock metal 2338 mach 55697 elec 416 · launches 0
+  Commonwealth of Glamast tier 3 rocketry 1.00 port yes · largest 692337 · gdp 6835182 · budget 26828 vs launch 2000 · stock metal 3741 mach 164241 elec 80 · launches 1035
+  Commonwealth of Fliazuwar tier 3 rocketry 1.00 port no  · largest 416556 · gdp 3904202 · budget 17521 vs launch 2000 · stock metal 23687 mach 2100 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 209639 · gdp 2292856 · budget 9192 vs launch 2000 · stock metal 19916 mach 3838 elec 0 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 126058 · gdp 795231 · budget 3007 vs launch 2000 · stock metal 2121 mach 10367 elec 0 · launches 0
+y120:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 138677 · gdp 2511620 · budget 10568 vs launch 2000 · stock metal 1826 mach 69174 elec 223 · launches 0
+  Commonwealth of Glamast tier 3 rocketry 1.00 port yes · largest 618687 · gdp 5878728 · budget 23074 vs launch 2000 · stock metal 3791 mach 173356 elec 83 · launches 1150
+  Commonwealth of Fliazuwar tier 3 rocketry 1.00 port no  · largest 408522 · gdp 3627284 · budget 12651 vs launch 2000 · stock metal 19905 mach 1999 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 203412 · gdp 2290668 · budget 9184 vs launch 2000 · stock metal 41732 mach 4887 elec 0 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 122435 · gdp 675751 · budget 2285 vs launch 2000 · stock metal 1115 mach 9522 elec 0 · launches 0
+y130:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 127676 · gdp 2548717 · budget 10724 vs launch 2000 · stock metal 1442 mach 76886 elec 116 · launches 0
+  Commonwealth of Glamast tier 3 rocketry 1.00 port yes · largest 623235 · gdp 6102049 · budget 23950 vs launch 2000 · stock metal 4070 mach 182767 elec 75 · launches 1260
+  Commonwealth of Fliazuwar tier 3 rocketry 1.00 port no  · largest 399265 · gdp 3553775 · budget 12395 vs launch 2000 · stock metal 17896 mach 2054 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 197630 · gdp 2115459 · budget 8481 vs launch 2000 · stock metal 52106 mach 5436 elec 0 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 119018 · gdp 861048 · budget 2911 vs launch 2000 · stock metal 2643 mach 11320 elec 0 · launches 0
+y140:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 126285 · gdp 2581465 · budget 10862 vs launch 2000 · stock metal 1856 mach 84624 elec 57 · launches 0
+  Commonwealth of Glamast tier 3 rocketry 1.00 port yes · largest 632775 · gdp 6189328 · budget 24293 vs launch 2000 · stock metal 5029 mach 185343 elec 0 · launches 1374
+  Commonwealth of Fliazuwar tier 4 rocketry 1.00 port no  · largest 389610 · gdp 3664148 · budget 31101 vs launch 2000 · stock metal 15318 mach 1975 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 192127 · gdp 1776010 · budget 7120 vs launch 2000 · stock metal 61955 mach 7530 elec 0 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 115601 · gdp 943584 · budget 3190 vs launch 2000 · stock metal 2884 mach 11437 elec 0 · launches 0
+y150:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 123311 · gdp 2608317 · budget 10975 vs launch 2000 · stock metal 758 mach 88417 elec 27 · launches 0
+  Commonwealth of Glamast tier 3 rocketry 1.00 port yes · largest 636455 · gdp 6248981 · budget 24527 vs launch 2000 · stock metal 15461 mach 186714 elec 11 · launches 1493
+  Commonwealth of Fliazuwar tier 4 rocketry 1.00 port no  · largest 373520 · gdp 3779142 · budget 26030 vs launch 2000 · stock metal 9666 mach 1964 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 185748 · gdp 1437327 · budget 7200 vs launch 2000 · stock metal 69751 mach 7583 elec 0 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 109963 · gdp 848216 · budget 3207 vs launch 2000 · stock metal 1856 mach 10293 elec 0 · launches 0
+y160:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 120304 · gdp 2528374 · budget 9122 vs launch 2000 · stock metal 745 mach 91566 elec 14 · launches 0
+  Commonwealth of Glamast tier 4 rocketry 1.00 port no  · largest 638516 · gdp 5396454 · budget 42767 vs launch 2000 · stock metal 39842 mach 178122 elec 7 · launches 1539
+  Commonwealth of Fliazuwar tier 4 rocketry 1.00 port no  · largest 367109 · gdp 4227552 · budget 31655 vs launch 2000 · stock metal 9494 mach 2038 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 180971 · gdp 1559199 · budget 6251 vs launch 2000 · stock metal 69778 mach 7490 elec 0 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 107534 · gdp 964636 · budget 2683 vs launch 2000 · stock metal 2656 mach 10800 elec 0 · launches 0
+y170:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 117269 · gdp 2618074 · budget 11016 vs launch 2000 · stock metal 2328 mach 98870 elec 8 · launches 0
+  Commonwealth of Glamast tier 4 rocketry 1.00 port no  · largest 638715 · gdp 5475608 · budget 43394 vs launch 2000 · stock metal 61949 mach 161425 elec 5 · launches 1539
+  Commonwealth of Fliazuwar tier 4 rocketry 1.00 port no  · largest 360604 · gdp 4216342 · budget 31571 vs launch 2000 · stock metal 9712 mach 2102 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 176664 · gdp 1502944 · budget 6026 vs launch 2000 · stock metal 68515 mach 8506 elec 0 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 105199 · gdp 1059297 · budget 3581 vs launch 2000 · stock metal 4284 mach 16457 elec 0 · launches 0
+y180:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 114408 · gdp 2742347 · budget 11539 vs launch 2000 · stock metal 2099 mach 107316 elec 2 · launches 0
+  Commonwealth of Glamast tier 4 rocketry 1.00 port no  · largest 450728 · gdp 5529467 · budget 46032 vs launch 2000 · stock metal 72070 mach 150959 elec 8 · launches 1539
+  Commonwealth of Fliazuwar tier 4 rocketry 1.00 port no  · largest 355244 · gdp 9257360 · budget 69318 vs launch 2000 · stock metal 2062 mach 12965 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 173062 · gdp 1743065 · budget 6988 vs launch 2000 · stock metal 71293 mach 10349 elec 0 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 103426 · gdp 1026678 · budget 3471 vs launch 2000 · stock metal 3509 mach 20710 elec 0 · launches 0
+y190:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 111906 · gdp 2693161 · budget 11332 vs launch 2000 · stock metal 3082 mach 115062 elec 1 · launches 0
+  Commonwealth of Glamast tier 4 rocketry 1.00 port no  · largest 468496 · gdp 5442877 · budget 43134 vs launch 2000 · stock metal 68041 mach 148090 elec 11 · launches 1539
+  Commonwealth of Fliazuwar tier 4 rocketry 1.00 port no  · largest 351051 · gdp 5310986 · budget 39768 vs launch 2000 · stock metal 10058 mach 22214 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 169910 · gdp 2174485 · budget 8718 vs launch 2000 · stock metal 74208 mach 11731 elec 0 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 102029 · gdp 1040935 · budget 3519 vs launch 2000 · stock metal 5922 mach 24454 elec 0 · launches 0
+y200:
+  Commonwealth of Faumeflith tier 0 rocketry 0.00 port no  · largest 108998 · gdp 3555588 · budget 14961 vs launch 2000 · stock metal 3078 mach 124754 elec 532 · launches 0
+  Commonwealth of Glamast tier 4 rocketry 1.00 port no  · largest 472317 · gdp 5357504 · budget 44601 vs launch 2000 · stock metal 64872 mach 144894 elec 11 · launches 1539
+  Commonwealth of Fliazuwar tier 4 rocketry 1.00 port no  · largest 347765 · gdp 5379061 · budget 40278 vs launch 2000 · stock metal 12080 mach 26522 elec 0 · launches 0
+  Commonwealth of Dremar tier 0 rocketry 0.00 port no  · largest 166873 · gdp 2464365 · budget 9880 vs launch 2000 · stock metal 76285 mach 12493 elec 0 · launches 0
+  Commonwealth of Zhendvorn tier 0 rocketry 0.00 port no  · largest 101044 · gdp 1005163 · budget 3398 vs launch 2000 · stock metal 5213 mach 29322 elec 0 · launches 0

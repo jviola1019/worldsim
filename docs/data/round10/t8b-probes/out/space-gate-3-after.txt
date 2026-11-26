@@ -1,0 +1,126 @@
+y0:
+  Satlosh Chiefdom tier 0 rocketry 0.00 port no  · largest 180154 · gdp 0 · budget 0 vs launch 2000 · stock metal 19808 mach 20000 elec 20000 · launches 0
+  Gliakriosh Chiefdom tier 0 rocketry 0.00 port no  · largest 349354 · gdp 0 · budget 0 vs launch 2000 · stock metal 19504 mach 20000 elec 20000 · launches 0
+  Biwuirnese Tribe tier 0 rocketry 0.00 port no  · largest 468257 · gdp 0 · budget 0 vs launch 2000 · stock metal 19704 mach 20000 elec 20000 · launches 0
+  Oltsonese Tribe tier 0 rocketry 0.00 port no  · largest 457611 · gdp 0 · budget 0 vs launch 2000 · stock metal 19736 mach 20000 elec 20000 · launches 0
+  Thoakrakese Tribe tier 0 rocketry 0.00 port no  · largest 100970 · gdp 0 · budget 0 vs launch 2000 · stock metal 19592 mach 20000 elec 20000 · launches 0
+y10:
+  Kingdom of Satlosh tier 0 rocketry 0.00 port no  · largest 208170 · gdp 1554494 · budget 5509 vs launch 2000 · stock metal 362 mach 44122 elec 10386 · launches 0
+  Kingdom of Gliakriosh tier 0 rocketry 0.00 port no  · largest 397189 · gdp 2722485 · budget 14057 vs launch 2000 · stock metal 2050 mach 29410 elec 1163 · launches 0
+  Biwuirnese Oligarchy tier 0 rocketry 0.00 port no  · largest 517390 · gdp 1498526 · budget 5501 vs launch 2000 · stock metal 21171 mach 21308 elec 827 · launches 0
+  Republic of Oltson tier 0 rocketry 0.00 port no  · largest 512982 · gdp 4182794 · budget 16343 vs launch 2000 · stock metal 5043 mach 45594 elec 1501 · launches 0
+  Republic of Thoakrak tier 0 rocketry 0.00 port no  · largest 119480 · gdp 283850 · budget 1201 vs launch 2000 · stock metal 19785 mach 18126 elec 193 · launches 0
+y20:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 245816 · gdp 708052 · budget 2509 vs launch 2000 · stock metal 0 mach 33893 elec 2651 · launches 0
+  Gliakrioshian Oligarchy tier 0 rocketry 0.00 port no  · largest 447072 · gdp 5478308 · budget 22808 vs launch 2000 · stock metal 1923 mach 27843 elec 2022 · launches 0
+  Republic of Biwuirn tier 0 rocketry 0.00 port no  · largest 570095 · gdp 1549787 · budget 4759 vs launch 2000 · stock metal 8117 mach 11402 elec 273 · launches 0
+  Republic of Oltson tier 0 rocketry 0.00 port no  · largest 575520 · gdp 2906902 · budget 14265 vs launch 2000 · stock metal 1543 mach 67820 elec 1629 · launches 0
+  Federation of Thoakrak tier 0 rocketry 0.00 port no  · largest 136993 · gdp 1074196 · budget 4543 vs launch 2000 · stock metal 3628 mach 42467 elec 111 · launches 0
+y30:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 283657 · gdp 1106108 · budget 3920 vs launch 2000 · stock metal 852 mach 30646 elec 524 · launches 0
+  Republic of Gliakriosh tier 0 rocketry 0.00 port no  · largest 450598 · gdp 5056139 · budget 20039 vs launch 2000 · stock metal 2108 mach 59696 elec 1267 · launches 0
+  Republic of Biwuirn tier 0 rocketry 0.00 port no  · largest 625540 · gdp 1636138 · budget 6006 vs launch 2000 · stock metal 5808 mach 7752 elec 125 · launches 0
+  Republic of Oltson tier 0 rocketry 0.00 port no  · largest 585060 · gdp 3465895 · budget 13542 vs launch 2000 · stock metal 1581 mach 66474 elec 713 · launches 0
+  Federation of Thoakrak tier 0 rocketry 0.00 port no  · largest 152050 · gdp 683276 · budget 2890 vs launch 2000 · stock metal 898 mach 43893 elec 60 · launches 0
+y40:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 300915 · gdp 2313716 · budget 8199 vs launch 2000 · stock metal 931 mach 29443 elec 282 · launches 0
+  Republic of Gliakriosh tier 0 rocketry 0.00 port no  · largest 474044 · gdp 5227288 · budget 21763 vs launch 2000 · stock metal 2236 mach 101826 elec 682 · launches 0
+  Republic of Biwuirn tier 0 rocketry 0.00 port no  · largest 670705 · gdp 1788220 · budget 6565 vs launch 2000 · stock metal 7288 mach 5823 elec 67 · launches 0
+  Republic of Oltson tier 0 rocketry 0.00 port no  · largest 633691 · gdp 4302234 · budget 16810 vs launch 2000 · stock metal 2251 mach 73472 elec 348 · launches 0
+  Federation of Thoakrak tier 0 rocketry 0.00 port no  · largest 164354 · gdp 806466 · budget 3411 vs launch 2000 · stock metal 1053 mach 39207 elec 32 · launches 0
+y50:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 333267 · gdp 1759581 · budget 6236 vs launch 2000 · stock metal 1199 mach 36476 elec 106 · launches 0
+  Republic of Gliakriosh tier 0 rocketry 0.00 port no  · largest 439879 · gdp 5118564 · budget 21310 vs launch 2000 · stock metal 1887 mach 130763 elec 322 · launches 0
+  Republic of Biwuirn tier 0 rocketry 0.00 port no  · largest 710740 · gdp 1725560 · budget 6334 vs launch 2000 · stock metal 8163 mach 4569 elec 34 · launches 0
+  Commonwealth of Oltson tier 0 rocketry 0.00 port no  · largest 549453 · gdp 4368460 · budget 17068 vs launch 2000 · stock metal 2033 mach 87340 elec 175 · launches 0
+  Federation of Thoakrak tier 0 rocketry 0.00 port no  · largest 171588 · gdp 890538 · budget 3767 vs launch 2000 · stock metal 1136 mach 36148 elec 12 · launches 0
+y60:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 364455 · gdp 2055220 · budget 7283 vs launch 2000 · stock metal 1270 mach 48790 elec 22 · launches 0
+  Republic of Gliakriosh tier 0 rocketry 0.00 port no  · largest 451406 · gdp 7122786 · budget 29654 vs launch 2000 · stock metal 1910 mach 143531 elec 87 · launches 0
+  Commonwealth of Biwuirn tier 0 rocketry 0.00 port no  · largest 746887 · gdp 1837160 · budget 6744 vs launch 2000 · stock metal 8201 mach 3718 elec 9 · launches 0
+  Commonwealth of Oltson tier 0 rocketry 0.00 port no  · largest 526390 · gdp 3746588 · budget 18385 vs launch 2000 · stock metal 2211 mach 77632 elec 47 · launches 0
+  Federation of Thoakrak tier 0 rocketry 0.00 port no  · largest 182570 · gdp 945231 · budget 3998 vs launch 2000 · stock metal 1169 mach 34461 elec 0 · launches 0
+y70:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 390300 · gdp 2094062 · budget 7421 vs launch 2000 · stock metal 1398 mach 60303 elec 0 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 460407 · gdp 6716212 · budget 27962 vs launch 2000 · stock metal 1971 mach 153091 elec 1 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 612464 · gdp 1862095 · budget 6836 vs launch 2000 · stock metal 8481 mach 3182 elec 5 · launches 0
+  Commonwealth of Oltson tier 0 rocketry 0.00 port no  · largest 546575 · gdp 4692056 · budget 23025 vs launch 2000 · stock metal 2519 mach 77969 elec 69 · launches 0
+  Federation of Thoakrak tier 0 rocketry 0.00 port no  · largest 187590 · gdp 1171795 · budget 4956 vs launch 2000 · stock metal 2499 mach 38749 elec 0 · launches 0
+y80:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 278885 · gdp 1800613 · budget 8182 vs launch 2000 · stock metal 26936 mach 57982 elec 0 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 380486 · gdp 6886671 · budget 28671 vs launch 2000 · stock metal 2967 mach 167632 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 604208 · gdp 1857050 · budget 8674 vs launch 2000 · stock metal 8692 mach 2814 elec 3 · launches 0
+  Commonwealth of Oltson tier 0 rocketry 0.00 port no  · largest 553485 · gdp 4899501 · budget 19143 vs launch 2000 · stock metal 4428 mach 83093 elec 54 · launches 0
+  Federation of Thoakrak tier 0 rocketry 0.00 port no  · largest 190703 · gdp 612238 · budget 2590 vs launch 2000 · stock metal 17349 mach 23846 elec 0 · launches 0
+y90:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 299142 · gdp 1879777 · budget 6662 vs launch 2000 · stock metal 59836 mach 53156 elec 9 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 339235 · gdp 6763976 · budget 28160 vs launch 2000 · stock metal 3118 mach 182357 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 644346 · gdp 1900648 · budget 8878 vs launch 2000 · stock metal 8648 mach 2554 elec 1 · launches 0
+  Commonwealth of Oltson tier 0 rocketry 0.00 port no  · largest 532231 · gdp 5311506 · budget 20753 vs launch 2000 · stock metal 5053 mach 98282 elec 75 · launches 0
+  Federation of Thoakrak tier 0 rocketry 0.00 port no  · largest 192695 · gdp 677880 · budget 2867 vs launch 2000 · stock metal 22510 mach 13920 elec 0 · launches 0
+y100:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 303655 · gdp 1879972 · budget 5534 vs launch 2000 · stock metal 91663 mach 46284 elec 21 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 341667 · gdp 7572601 · budget 26983 vs launch 2000 · stock metal 3408 mach 192532 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 499369 · gdp 1663569 · budget 6107 vs launch 2000 · stock metal 8931 mach 1348 elec 1 · launches 0
+  Commonwealth of Oltson tier 0 rocketry 0.00 port no  · largest 535824 · gdp 4998095 · budget 19529 vs launch 2000 · stock metal 5024 mach 108629 elec 86 · launches 0
+  Federation of Thoakrak tier 0 rocketry 0.00 port no  · largest 193475 · gdp 716558 · budget 3031 vs launch 2000 · stock metal 26718 mach 8235 elec 0 · launches 0
+y110:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 299156 · gdp 1902067 · budget 6741 vs launch 2000 · stock metal 119643 mach 39842 elec 27 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 330554 · gdp 7554103 · budget 26918 vs launch 2000 · stock metal 3639 mach 199413 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 504060 · gdp 1647561 · budget 6048 vs launch 2000 · stock metal 8870 mach 897 elec 0 · launches 0
+  Commonwealth of Oltson tier 0 rocketry 0.00 port no  · largest 512917 · gdp 5115490 · budget 19987 vs launch 2000 · stock metal 5317 mach 108909 elec 5 · launches 0
+  Federation of Thoakrak tier 0 rocketry 0.00 port no  · largest 190189 · gdp 726847 · budget 3074 vs launch 2000 · stock metal 27942 mach 7670 elec 0 · launches 0
+y120:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 296307 · gdp 2032215 · budget 7202 vs launch 2000 · stock metal 140655 mach 37555 elec 30 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 322407 · gdp 7903040 · budget 28161 vs launch 2000 · stock metal 4642 mach 204626 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 528365 · gdp 1778511 · budget 6529 vs launch 2000 · stock metal 9309 mach 765 elec 0 · launches 0
+  Commonwealth of Oltson tier 0 rocketry 0.00 port no  · largest 515251 · gdp 4943139 · budget 24257 vs launch 2000 · stock metal 4305 mach 116035 elec 51 · launches 0
+  Federation of Thoakrak tier 0 rocketry 0.00 port no  · largest 190137 · gdp 746770 · budget 3159 vs launch 2000 · stock metal 32921 mach 7371 elec 0 · launches 0
+y130:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 293058 · gdp 2209441 · budget 7830 vs launch 2000 · stock metal 154726 mach 37164 elec 32 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 311589 · gdp 8575619 · budget 35703 vs launch 2000 · stock metal 6349 mach 215223 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 448119 · gdp 1564812 · budget 5744 vs launch 2000 · stock metal 10505 mach 742 elec 0 · launches 0
+  Commonwealth of Oltson tier 0 rocketry 0.23 port no  · largest 511164 · gdp 4684147 · budget 18302 vs launch 2000 · stock metal 3901 mach 110141 elec 68 · launches 0
+  Holy State of Thoakrak tier 0 rocketry 0.00 port no  · largest 188658 · gdp 719897 · budget 3045 vs launch 2000 · stock metal 47259 mach 8457 elec 0 · launches 0
+y140:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 282910 · gdp 2307499 · budget 8177 vs launch 2000 · stock metal 192099 mach 41874 elec 60 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 303416 · gdp 8755134 · budget 36450 vs launch 2000 · stock metal 6434 mach 229000 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 470948 · gdp 1580248 · budget 5801 vs launch 2000 · stock metal 11025 mach 745 elec 0 · launches 0
+  Commonwealth of Oltson tier 1 rocketry 0.57 port no  · largest 509300 · gdp 4580588 · budget 17897 vs launch 2000 · stock metal 3929 mach 104063 elec 74 · launches 0
+  Holy State of Thoakrak tier 0 rocketry 0.00 port no  · largest 187921 · gdp 770487 · budget 3259 vs launch 2000 · stock metal 55416 mach 8613 elec 0 · launches 0
+y150:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 259629 · gdp 2164828 · budget 7672 vs launch 2000 · stock metal 216403 mach 47194 elec 4 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 294848 · gdp 8327692 · budget 34671 vs launch 2000 · stock metal 4572 mach 221764 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 415071 · gdp 1764504 · budget 5419 vs launch 2000 · stock metal 1379 mach 1297 elec 903 · launches 0
+  Commonwealth of Oltson tier 1 rocketry 0.92 port no  · largest 506059 · gdp 4882432 · budget 23959 vs launch 2000 · stock metal 17122 mach 106147 elec 23 · launches 0
+  Holy State of Thoakrak tier 0 rocketry 0.00 port no  · largest 186408 · gdp 773390 · budget 3271 vs launch 2000 · stock metal 49082 mach 8877 elec 0 · launches 0
+y160:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 255734 · gdp 2333801 · budget 8271 vs launch 2000 · stock metal 232700 mach 58255 elec 72 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 285014 · gdp 8195477 · budget 29203 vs launch 2000 · stock metal 5092 mach 216015 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 435003 · gdp 1787954 · budget 6564 vs launch 2000 · stock metal 1436 mach 1353 elec 1435 · launches 0
+  Commonwealth of Oltson tier 2 rocketry 1.00 port no  · largest 471683 · gdp 4674877 · budget 15461 vs launch 2000 · stock metal 16644 mach 105782 elec 41 · launches 0
+  Holy State of Thoakrak tier 0 rocketry 0.00 port no  · largest 184991 · gdp 793287 · budget 3355 vs launch 2000 · stock metal 55245 mach 9256 elec 0 · launches 0
+y170:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 251678 · gdp 2383083 · budget 8445 vs launch 2000 · stock metal 246623 mach 68526 elec 111 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 278238 · gdp 8171115 · budget 34019 vs launch 2000 · stock metal 7539 mach 216600 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 444168 · gdp 1823072 · budget 6692 vs launch 2000 · stock metal 1476 mach 1390 elec 1475 · launches 0
+  Commonwealth of Oltson tier 2 rocketry 1.00 port no  · largest 474213 · gdp 4903360 · budget 16216 vs launch 2000 · stock metal 22774 mach 105635 elec 52 · launches 0
+  Holy State of Thoakrak tier 0 rocketry 0.00 port no  · largest 183385 · gdp 838589 · budget 3547 vs launch 2000 · stock metal 58238 mach 9667 elec 0 · launches 0
+y180:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 246570 · gdp 2829289 · budget 10027 vs launch 2000 · stock metal 257103 mach 77072 elec 77 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 271052 · gdp 8434336 · budget 35115 vs launch 2000 · stock metal 11093 mach 228190 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 451540 · gdp 1812028 · budget 8464 vs launch 2000 · stock metal 1512 mach 1446 elec 1512 · launches 0
+  Commonwealth of Oltson tier 3 rocketry 1.00 port no  · largest 458915 · gdp 4843526 · budget 18925 vs launch 2000 · stock metal 30711 mach 100806 elec 51 · launches 0
+  Holy State of Thoakrak tier 0 rocketry 0.00 port no  · largest 181542 · gdp 884382 · budget 4625 vs launch 2000 · stock metal 62707 mach 9264 elec 0 · launches 0
+y190:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 240999 · gdp 3332731 · budget 11811 vs launch 2000 · stock metal 268248 mach 83134 elec 42 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 264347 · gdp 8199198 · budget 34136 vs launch 2000 · stock metal 12321 mach 249389 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 458687 · gdp 1900872 · budget 6978 vs launch 2000 · stock metal 1549 mach 1461 elec 1550 · launches 0
+  Commonwealth of Oltson tier 3 rocketry 1.00 port no  · largest 459189 · gdp 4816404 · budget 15929 vs launch 2000 · stock metal 39330 mach 93500 elec 43 · launches 0
+  Holy State of Thoakrak tier 0 rocketry 0.00 port no  · largest 179899 · gdp 840354 · budget 3554 vs launch 2000 · stock metal 64279 mach 9169 elec 0 · launches 0
+y200:
+  Federation of Satlosh tier 0 rocketry 0.00 port no  · largest 236138 · gdp 3001608 · budget 10637 vs launch 2000 · stock metal 290122 mach 80860 elec 22 · launches 0
+  Federation of Gliakriosh tier 0 rocketry 0.00 port no  · largest 257773 · gdp 8062455 · budget 33566 vs launch 2000 · stock metal 12802 mach 266890 elec 0 · launches 0
+  Holy State of Biwuirn tier 0 rocketry 0.00 port no  · largest 465056 · gdp 1838177 · budget 6748 vs launch 2000 · stock metal 1521 mach 1468 elec 1521 · launches 0
+  Commonwealth of Oltson tier 3 rocketry 1.00 port no  · largest 456577 · gdp 4845490 · budget 16025 vs launch 2000 · stock metal 44189 mach 88652 elec 31 · launches 0
+  Holy State of Thoakrak tier 0 rocketry 0.00 port no  · largest 178059 · gdp 887199 · budget 3220 vs launch 2000 · stock metal 66296 mach 8867 elec 0 · launches 0

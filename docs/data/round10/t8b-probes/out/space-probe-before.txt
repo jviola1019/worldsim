@@ -1,0 +1,66 @@
+seed 0:
+  first year: rocketry 1 · space:first_launch 28 · satellites 37 · space:satellite 60 · crewed_spaceflight 68 · space:crewed 89 · space_stations 181 · space:station 233 · stationObjective 234
+  y50: leader era 10 (1,449,789 people, rp 43972), world 3,223,559, eras 10,10,10,10,10
+  y100: leader era 10 (1,285,682 people, rp 40457), world 2,992,072, eras 10,10,10,10,10
+  y150: leader era 10 (1,116,980 people, rp 37739), world 2,777,666, eras 10,10,10,10,10
+  y200: leader era 11 (1,050,383 people, rp 31325), world 2,734,129, eras 11,11,11,11,11
+  y250: leader era 11 (973,193 people, rp 29976), world 2,752,407, eras 11,11,11,11,11
+  y300: leader era 11 (954,624 people, rp 28790), world 2,893,360, eras 11,11,11,11,11
+  y350: leader era 11 (897,509 people, rp 83207), world 2,742,490, eras 11,11,11,11,11
+  y400: leader era 11 (801,863 people, rp 142846), world 2,504,528, eras 11,11,11,11,11
+  y450: leader era 12 (787,574 people, rp 167523), world 2,288,352, eras 12,12,11,11,11
+seed 1:
+  first year: rocketry 1 · satellites 49 · crewed_spaceflight 62 · space_stations 95 · space:first_launch 201 · space:satellite 201 · space:crewed 201 · space:station 201 · stationObjective 202 · reusable_rockets 374 · fusion_power 393 · orbital_industry 442
+  y50: leader era 10 (1,168,661 people, rp 77242), world 3,408,322, eras 10,10,10,10,10
+  y100: leader era 10 (1,048,690 people, rp 80657), world 3,219,848, eras 10,10,10,10,10
+  y150: leader era 11 (676,328 people, rp 44029), world 2,435,966, eras 11,11,10,10,10
+  y200: leader era 11 (849,171 people, rp 50584), world 2,532,101, eras 11,11,11,11,11
+  y250: leader era 11 (917,571 people, rp 87049), world 2,738,953, eras 11,11,11,11,11
+  y300: leader era 11 (697,423 people, rp 192210), world 2,710,917, eras 11,11,11,11,11
+  y350: leader era 12 (691,744 people, rp 297472), world 2,789,899, eras 12,12,11,11,11
+  y400: leader era 12 (917,298 people, rp 203873), world 2,822,839, eras 12,12,12,11,11
+  y450: leader era 13 (867,474 people, rp 165314), world 2,526,450, eras 13,13,12,11,11
+seed 2:
+  first year: rocketry 1 · space:first_launch 1 · satellites 16 · crewed_spaceflight 34 · space:satellite 35 · space_stations 73 · space:crewed 78 · reusable_rockets 115 · space:station 122 · stationObjective 123 · fusion_power 157 · orbital_industry 172 · closed_ecosystems 229 · offworld_settlement 237 · space:lunar_base 248 · space:colony 260 · colonyObjective 261
+  y50: leader era 10 (1,986,417 people, rp 203861), world 4,991,002, eras 10,10,10,10,10
+  y100: leader era 11 (1,705,226 people, rp 236148), world 4,578,755, eras 11,11,10,10,10
+  y150: leader era 11 (1,709,944 people, rp 902610), world 4,758,699, eras 11,11,11,11,11
+  y200: leader era 13 (1,679,224 people, rp 1566318), world 4,569,223, eras 13,12,12,11,11
+  y250: leader era 13 (1,925,039 people, rp 2460020), world 4,660,640, eras 13,13,13,11,11
+  y300: leader era 14 (2,280,588 people, rp 3443312), world 5,180,411, eras 14,14,14,11,11,11
+  y350: leader era 15 (2,366,641 people, rp 3030210), world 5,005,234, eras 15,15,15,11,11,11
+  y400: leader era 15 (1,283,652 people, rp 880227), world 5,146,660, eras 15,15,15,11,11,11
+  y450: leader era 15 (7,611,366 people, rp 566653), world 18,186,242, eras 15,15,15,11,11,11
+seed 3:
+  first year: rocketry 139 · satellites 149 · crewed_spaceflight 239 · space:first_launch 260 · space:satellite 260 · space:crewed 260 · space_stations 262 · space:station 283 · stationObjective 284 · reusable_rockets 361
+  y50: leader era 10 (981,921 people, rp 51596), world 3,592,881, eras 10,10,10,10,10
+  y100: leader era 11 (819,893 people, rp 88127), world 3,087,125, eras 11,11,10,10,10
+  y150: leader era 11 (756,770 people, rp 62043), world 3,301,134, eras 11,11,11,11,11
+  y200: leader era 11 (841,477 people, rp 71480), world 3,083,009, eras 11,11,11,11,11
+  y250: leader era 11 (984,790 people, rp 70593), world 3,239,380, eras 11,11,11,11,11
+  y300: leader era 11 (1,170,862 people, rp 87285), world 3,443,707, eras 11,11,11,11,11
+  y350: leader era 11 (1,129,924 people, rp 152504), world 3,327,219, eras 11,11,11,11,11
+  y400: leader era 12 (1,148,813 people, rp 311046), world 2,990,929, eras 12,12,11,11,11,11
+  y450: leader era 12 (1,196,397 people, rp 348866), world 2,923,652, eras 12,12,12,11,11,11
+seed 4:
+  first year: rocketry 20 · satellites 35 · crewed_spaceflight 81 · space:first_launch 85 · space:satellite 85 · space:crewed 103 · space_stations 165 · space:station 189 · stationObjective 190 · reusable_rockets 210 · fusion_power 229 · orbital_industry 250 · space:lunar_base 291 · closed_ecosystems 316 · space:colony 353 · offworld_settlement 354 · colonyObjective 354
+  y50: leader era 10 (1,485,840 people, rp 60580), world 5,736,652, eras 10,10,10,10,10
+  y100: leader era 10 (1,684,227 people, rp 128623), world 5,887,894, eras 10,10,10,10,10
+  y150: leader era 11 (1,658,814 people, rp 178474), world 5,968,841, eras 11,11,11,11,11
+  y200: leader era 12 (1,532,724 people, rp 470620), world 5,628,843, eras 12,11,11,11,11
+  y250: leader era 12 (1,699,606 people, rp 825095), world 5,211,139, eras 12,12,12,11
+  y300: leader era 13 (1,649,649 people, rp 829758), world 4,940,639, eras 13,13,13,11
+  y350: leader era 14 (1,501,399 people, rp 737036), world 4,418,721, eras 14,13,13,11
+  y400: leader era 14 (1,296,412 people, rp 455255), world 3,966,010, eras 14,14,14,11
+  y450: leader era 14 (1,498,653 people, rp 857953), world 3,605,334, eras 14,14,14,11
+seed 5:
+  first year: rocketry 44 · satellites 51 · crewed_spaceflight 70 · space_stations 85 · reusable_rockets 183 · space:first_launch 195 · space:satellite 195 · space:crewed 195 · space:station 195 · stationObjective 196 · orbital_industry 217 · fusion_power 272 · space:lunar_base 356 · closed_ecosystems 389 · space:colony 435 · colonyObjective 436
+  y50: leader era 10 (1,101,520 people, rp 60836), world 3,802,621, eras 10,10,10,10,10
+  y100: leader era 10 (1,241,405 people, rp 125643), world 3,832,168, eras 10,10,10,10,10
+  y150: leader era 11 (1,115,517 people, rp 137068), world 3,662,707, eras 11,11,11,11,11
+  y200: leader era 11 (1,036,842 people, rp 307154), world 3,633,056, eras 11,11,11,11,11
+  y250: leader era 12 (1,030,922 people, rp 452492), world 3,613,885, eras 12,12,12,11,11
+  y300: leader era 13 (1,226,376 people, rp 365143), world 3,818,353, eras 13,13,12,11,11
+  y350: leader era 13 (1,539,625 people, rp 481833), world 4,141,869, eras 13,13,13,11,11
+  y400: leader era 14 (678,198 people, rp 297682), world 3,677,119, eras 14,14,14,11,11,11
+  y450: leader era 14 (670,797 people, rp 269394), world 3,831,359, eras 14,14,14,11,11,11

@@ -1,0 +1,18 @@
+y9.5
+  Republic of Selolar      fabs 4 in 2 towns · energy prod 24766 use 24766 want 316410 · elec prod 4 want 1199 · rare 8659 mach 18709 · electrification 1.00
+  Republic of Liozar       fabs 0 in 0 towns · energy prod 416175 use 416169 want 3785229 · elec prod 0 want 3097 · rare 20000 mach 56623 · electrification 1.00
+  Commonwealth of Losvia   fabs 0 in 0 towns · energy prod 57147 use 57147 want 547472 · elec prod 0 want 4053 · rare 20000 mach 50373 · electrification 1.00
+  Republic of Homamis      fabs 2 in 2 towns · energy prod 3389 use 3389 want 906557 · elec prod 4 want 6421 · rare 12015 mach 32070 · electrification 1.00
+  Republic of Varekor      fabs 1 in 1 towns · energy prod 131051 use 131051 want 1990267 · elec prod 0 want 12459 · rare 19810 mach 30235 · electrification 1.00
+y19.5
+  Republic of Selolar      fabs 4 in 2 towns · energy prod 29061 use 28270 want 233563 · elec prod 0 want 1417 · rare 0 mach 6400 · electrification 1.00
+  Commonwealth of Liozar   fabs 7 in 4 towns · energy prod 259873 use 259873 want 3744444 · elec prod 0 want 9867 · rare 15868 mach 118265 · electrification 1.00
+  Commonwealth of Losvia   fabs 0 in 0 towns · energy prod 54855 use 54855 want 611424 · elec prod 0 want 4851 · rare 20000 mach 91274 · electrification 1.00
+  Republic of Homamis      fabs 3 in 2 towns · energy prod 3529 use 3529 want 1066562 · elec prod 24 want 7400 · rare 5797 mach 31124 · electrification 1.00
+  Republic of Varekor      fabs 2 in 1 towns · energy prod 43746 use 43746 want 1593831 · elec prod 0 want 13952 · rare 19810 mach 20529 · electrification 1.00
+y29.5
+  Commonwealth of Selolar  fabs 4 in 2 towns · energy prod 15937 use 15934 want 249592 · elec prod 0 want 1652 · rare 0 mach 3922 · electrification 1.00
+  Commonwealth of Liozar   fabs 7 in 4 towns · energy prod 285831 use 285831 want 4028516 · elec prod 0 want 16627 · rare 5329 mach 114374 · electrification 1.00
+  Commonwealth of Losvia   fabs 0 in 0 towns · energy prod 54853 use 54853 want 756314 · elec prod 0 want 4989 · rare 20000 mach 78953 · electrification 1.00
+  Republic of Homamis      fabs 3 in 2 towns · energy prod 26252 use 26252 want 1184124 · elec prod 93 want 8361 · rare 0 mach 24214 · electrification 1.00
+  Republic of Varekor      fabs 4 in 2 towns · energy prod 61381 use 61381 want 1773589 · elec prod 0 want 15183 · rare 19810 mach 22691 · electrification 1.00

@@ -1,0 +1,132 @@
+y0:
+  Selolarese Tribe tier 0 rocketry 0.00 port no  · largest 132699 · gdp 0 · budget 0 vs launch 2000 · stock metal 19616 mach 20000 elec 20000 · launches 0
+  Liozarese Tribe tier 0 rocketry 0.00 port no  · largest 299252 · gdp 0 · budget 0 vs launch 2000 · stock metal 19328 mach 20000 elec 20000 · launches 0
+  Losvian Tribe  tier 1 rocketry 1.00 port no  · largest 117310 · gdp 0 · budget 0 vs launch 2000 · stock metal 19676 mach 20000 elec 20000 · launches 0
+  Homamisi Tribe tier 0 rocketry 0.00 port no  · largest 418524 · gdp 0 · budget 0 vs launch 2000 · stock metal 19760 mach 20000 elec 20000 · launches 0
+  Varekorese Tribe tier 0 rocketry 0.00 port no  · largest 249854 · gdp 0 · budget 0 vs launch 2000 · stock metal 19568 mach 20000 elec 20000 · launches 0
+y10:
+  Republic of Selolar tier 0 rocketry 0.00 port no  · largest 152481 · gdp 956728 · budget 4557 vs launch 2000 · stock metal 6191 mach 25810 elec 11 · launches 0
+  Republic of Liozar tier 0 rocketry 0.00 port no  · largest 348647 · gdp 4604691 · budget 18639 vs launch 2000 · stock metal 22043 mach 68486 elec 1248 · launches 0
+  Commonwealth of Losvia tier 1 rocketry 1.00 port no  · largest 136410 · gdp 1112397 · budget 4487 vs launch 2000 · stock metal 442 mach 47643 elec 266 · launches 0
+  Republic of Homamis tier 0 rocketry 0.00 port no  · largest 479295 · gdp 2752763 · budget 9166 vs launch 2000 · stock metal 8167 mach 39309 elec 337 · launches 0
+  Republic of Varekor tier 0 rocketry 0.00 port no  · largest 269619 · gdp 2138840 · budget 8893 vs launch 2000 · stock metal 3208 mach 30123 elec 543 · launches 0
+y20:
+  Republic of Selolar tier 0 rocketry 0.00 port no  · largest 174470 · gdp 901113 · budget 4292 vs launch 2000 · stock metal 7679 mach 17324 elec 0 · launches 0
+  Commonwealth of Liozar tier 0 rocketry 0.00 port no  · largest 396228 · gdp 3509101 · budget 14204 vs launch 2000 · stock metal 121588 mach 62139 elec 595 · launches 0
+  Commonwealth of Losvia tier 1 rocketry 1.00 port no  (queued) · largest 148164 · gdp 607719 · budget 2451 vs launch 2000 · stock metal 44193 mach 47473 elec 0 · launches 0
+  Republic of Homamis tier 0 rocketry 0.00 port no  · largest 545324 · gdp 2226291 · budget 7413 vs launch 2000 · stock metal 51951 mach 36464 elec 182 · launches 0
+  Republic of Varekor tier 0 rocketry 0.00 port no  · largest 299774 · gdp 1408441 · budget 6420 vs launch 2000 · stock metal 4376 mach 27969 elec 276 · launches 0
+y30:
+  Commonwealth of Selolar tier 0 rocketry 0.00 port no  · largest 194268 · gdp 986891 · budget 4701 vs launch 2000 · stock metal 27532 mach 10822 elec 0 · launches 0
+  Commonwealth of Liozar tier 0 rocketry 0.00 port no  · largest 438010 · gdp 2700540 · budget 10931 vs launch 2000 · stock metal 183018 mach 47098 elec 68 · launches 0
+  Commonwealth of Losvia tier 1 rocketry 1.00 port no  · largest 145643 · gdp 649365 · budget 2619 vs launch 2000 · stock metal 153649 mach 32425 elec 0 · launches 0
+  Republic of Homamis tier 0 rocketry 0.00 port no  · largest 575261 · gdp 2438174 · budget 8118 vs launch 2000 · stock metal 58024 mach 29669 elec 98 · launches 0
+  Republic of Varekor tier 0 rocketry 0.00 port no  · largest 323306 · gdp 2143431 · budget 8913 vs launch 2000 · stock metal 9122 mach 45534 elec 28 · launches 0
+y40:
+  Commonwealth of Selolar tier 0 rocketry 0.00 port no  · largest 211402 · gdp 977883 · budget 3094 vs launch 2000 · stock metal 35396 mach 7592 elec 0 · launches 0
+  Commonwealth of Liozar tier 0 rocketry 0.23 port no  · largest 427679 · gdp 3582580 · budget 14501 vs launch 2000 · stock metal 233666 mach 50047 elec 36 · launches 0
+  Commonwealth of Losvia tier 1 rocketry 1.00 port no  · largest 139091 · gdp 598107 · budget 2054 vs launch 2000 · stock metal 234703 mach 22460 elec 0 · launches 0
+  Republic of Homamis tier 0 rocketry 0.00 port no  · largest 597133 · gdp 2527936 · budget 9428 vs launch 2000 · stock metal 69800 mach 24317 elec 48 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 341783 · gdp 2306702 · budget 10514 vs launch 2000 · stock metal 8522 mach 69412 elec 15 · launches 0
+y50:
+  Commonwealth of Selolar tier 0 rocketry 0.00 port no  · largest 215605 · gdp 1010408 · budget 3803 vs launch 2000 · stock metal 45049 mach 6250 elec 0 · launches 0
+  Commonwealth of Liozar tier 1 rocketry 0.58 port no  · largest 455586 · gdp 3592399 · budget 14541 vs launch 2000 · stock metal 249304 mach 56210 elec 20 · launches 0
+  Commonwealth of Losvia tier 1 rocketry 1.00 port no  · largest 146736 · gdp 601350 · budget 2426 vs launch 2000 · stock metal 301711 mach 15793 elec 0 · launches 0
+  Commonwealth of Homamis tier 0 rocketry 0.00 port no  · largest 538140 · gdp 2388346 · budget 7953 vs launch 2000 · stock metal 49804 mach 25740 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 353883 · gdp 2634856 · budget 10956 vs launch 2000 · stock metal 24992 mach 98580 elec 0 · launches 0
+y60:
+  Commonwealth of Selolar tier 0 rocketry 0.00 port no  · largest 226758 · gdp 1152275 · budget 4337 vs launch 2000 · stock metal 53802 mach 8979 elec 0 · launches 0
+  Commonwealth of Liozar tier 1 rocketry 0.91 port no  · largest 471410 · gdp 5194263 · budget 23103 vs launch 2000 · stock metal 291285 mach 49045 elec 11 · launches 0
+  Commonwealth of Losvia tier 1 rocketry 1.00 port no  · largest 143699 · gdp 645576 · budget 2604 vs launch 2000 · stock metal 360737 mach 11346 elec 0 · launches 0
+  Commonwealth of Homamis tier 0 rocketry 0.25 port no  · largest 546035 · gdp 2509740 · budget 8357 vs launch 2000 · stock metal 76706 mach 23874 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 362548 · gdp 2541855 · budget 10569 vs launch 2000 · stock metal 12183 mach 114199 elec 0 · launches 0
+y70:
+  Commonwealth of Selolar tier 0 rocketry 0.00 port no  · largest 230362 · gdp 3547245 · budget 12640 vs launch 2000 · stock metal 55536 mach 11119 elec 0 · launches 0
+  Commonwealth of Liozar tier 1 rocketry 1.00 port no  · largest 412264 · gdp 3281210 · budget 14594 vs launch 2000 · stock metal 302305 mach 42826 elec 6 · launches 0
+  Commonwealth of Losvia tier 1 rocketry 1.00 port no  · largest 148524 · gdp 632161 · budget 2803 vs launch 2000 · stock metal 414629 mach 8431 elec 0 · launches 0
+  Commonwealth of Homamis tier 1 rocketry 0.59 port no  · largest 479927 · gdp 2411158 · budget 8028 vs launch 2000 · stock metal 90027 mach 28420 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 361951 · gdp 2448894 · budget 10183 vs launch 2000 · stock metal 10256 mach 126329 elec 0 · launches 0
+y80:
+  Commonwealth of Selolar tier 0 rocketry 0.00 port no  · largest 217574 · gdp 2701139 · budget 10166 vs launch 2000 · stock metal 43865 mach 22102 elec 0 · launches 0
+  Commonwealth of Liozar tier 2 rocketry 1.00 port no  · largest 418946 · gdp 3823863 · budget 15478 vs launch 2000 · stock metal 294725 mach 49247 elec 0 · launches 0
+  Commonwealth of Losvia tier 1 rocketry 1.00 port no  · largest 142312 · gdp 618191 · budget 3112 vs launch 2000 · stock metal 464518 mach 6496 elec 0 · launches 0
+  Commonwealth of Homamis tier 1 rocketry 0.94 port no  · largest 488283 · gdp 2360280 · budget 7859 vs launch 2000 · stock metal 103015 mach 33847 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 369267 · gdp 2546704 · budget 10589 vs launch 2000 · stock metal 11626 mach 129326 elec 0 · launches 0
+y90:
+  Commonwealth of Selolar tier 0 rocketry 0.00 port no  · largest 216287 · gdp 2552576 · budget 9607 vs launch 2000 · stock metal 52242 mach 31780 elec 0 · launches 0
+  Commonwealth of Liozar tier 3 rocketry 1.00 port no  · largest 417292 · gdp 3856596 · budget 15610 vs launch 2000 · stock metal 280067 mach 55037 elec 0 · launches 0
+  Commonwealth of Losvia tier 1 rocketry 1.00 port no  · largest 124084 · gdp 545534 · budget 2200 vs launch 2000 · stock metal 509773 mach 5186 elec 0 · launches 0
+  Commonwealth of Homamis tier 3 rocketry 1.00 port no  · largest 459126 · gdp 2339645 · budget 7790 vs launch 2000 · stock metal 105063 mach 34566 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 368783 · gdp 2555002 · budget 10624 vs launch 2000 · stock metal 10380 mach 131469 elec 0 · launches 0
+y100:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 218187 · gdp 2553103 · budget 9609 vs launch 2000 · stock metal 55657 mach 37169 elec 0 · launches 0
+  Commonwealth of Liozar tier 3 rocketry 1.00 port no  · largest 411086 · gdp 3905285 · budget 15808 vs launch 2000 · stock metal 270688 mach 57972 elec 0 · launches 0
+  Commonwealth of Losvia tier 2 rocketry 1.00 port no  · largest 102536 · gdp 550387 · budget 2220 vs launch 2000 · stock metal 555432 mach 4339 elec 0 · launches 0
+  Commonwealth of Homamis tier 3 rocketry 1.00 port no  · largest 455134 · gdp 2526778 · budget 8413 vs launch 2000 · stock metal 108754 mach 35669 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 375274 · gdp 2602885 · budget 10823 vs launch 2000 · stock metal 10186 mach 132503 elec 0 · launches 0
+y110:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 213644 · gdp 2571374 · budget 9677 vs launch 2000 · stock metal 39287 mach 42381 elec 0 · launches 0
+  Commonwealth of Liozar tier 3 rocketry 1.00 port no  · largest 370585 · gdp 3733464 · budget 15112 vs launch 2000 · stock metal 266343 mach 60676 elec 0 · launches 0
+  Commonwealth of Losvia tier 3 rocketry 1.00 port no  · largest 103042 · gdp 512742 · budget 2273 vs launch 2000 · stock metal 602648 mach 3772 elec 0 · launches 0
+  Commonwealth of Homamis tier 3 rocketry 1.00 port no  · largest 445253 · gdp 2613041 · budget 8701 vs launch 2000 · stock metal 114876 mach 36332 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 381764 · gdp 3171991 · budget 13189 vs launch 2000 · stock metal 11374 mach 139737 elec 0 · launches 0
+y120:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 211840 · gdp 2572529 · budget 9682 vs launch 2000 · stock metal 17136 mach 47344 elec 0 · launches 0
+  Commonwealth of Liozar tier 4 rocketry 1.00 port no  · largest 340235 · gdp 3683157 · budget 29641 vs launch 2000 · stock metal 276049 mach 60024 elec 0 · launches 0
+  Commonwealth of Losvia tier 3 rocketry 1.00 port no  · largest 100441 · gdp 520012 · budget 2097 vs launch 2000 · stock metal 647848 mach 3358 elec 0 · launches 0
+  Commonwealth of Homamis tier 3 rocketry 1.00 port no  · largest 433410 · gdp 2938314 · budget 9784 vs launch 2000 · stock metal 125611 mach 41319 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 389345 · gdp 2808710 · budget 11679 vs launch 2000 · stock metal 8680 mach 137228 elec 0 · launches 0
+y130:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 160341 · gdp 2357955 · budget 8874 vs launch 2000 · stock metal 15560 mach 48547 elec 0 · launches 0
+  Commonwealth of Liozar tier 4 rocketry 1.00 port no  · largest 254309 · gdp 2594177 · budget 20877 vs launch 2000 · stock metal 291500 mach 38590 elec 0 · launches 0
+  Commonwealth of Losvia tier 3 rocketry 1.00 port no  · largest 95022 · gdp 490235 · budget 1977 vs launch 2000 · stock metal 696707 mach 3184 elec 0 · launches 0
+  Commonwealth of Homamis tier 3 rocketry 1.00 port no  · largest 346328 · gdp 2508637 · budget 8353 vs launch 2000 · stock metal 134495 mach 41720 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 302548 · gdp 1385053 · budget 5759 vs launch 2000 · stock metal 8640 mach 121856 elec 0 · launches 0
+y140:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 157225 · gdp 2391602 · budget 9001 vs launch 2000 · stock metal 16127 mach 50933 elec 0 · launches 0
+  Commonwealth of Liozar tier 4 rocketry 1.00 port no  · largest 246365 · gdp 2762650 · budget 22233 vs launch 2000 · stock metal 289540 mach 21178 elec 0 · launches 0
+  Commonwealth of Losvia tier 3 rocketry 1.00 port no  · largest 91290 · gdp 489025 · budget 1972 vs launch 2000 · stock metal 747630 mach 3193 elec 0 · launches 0
+  Commonwealth of Homamis tier 3 rocketry 1.00 port no  · largest 336176 · gdp 2613324 · budget 8702 vs launch 2000 · stock metal 142505 mach 44247 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 305110 · gdp 2673005 · budget 11115 vs launch 2000 · stock metal 9084 mach 118385 elec 0 · launches 0
+y150:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 153785 · gdp 2500324 · budget 9410 vs launch 2000 · stock metal 18587 mach 52080 elec 0 · launches 0
+  Commonwealth of Liozar tier 4 rocketry 1.00 port no  · largest 241933 · gdp 2794200 · budget 22487 vs launch 2000 · stock metal 274156 mach 10544 elec 0 · launches 0
+  Commonwealth of Losvia tier 3 rocketry 1.00 port no  · largest 87869 · gdp 215325 · budget 869 vs launch 2000 · stock metal 792080 mach 3272 elec 0 · launches 0
+  Commonwealth of Homamis tier 4 rocketry 1.00 port no  · largest 326388 · gdp 2232318 · budget 16362 vs launch 2000 · stock metal 146196 mach 45632 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 310598 · gdp 2680151 · budget 11144 vs launch 2000 · stock metal 9982 mach 125767 elec 0 · launches 0
+y160:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 150462 · gdp 2551096 · budget 9601 vs launch 2000 · stock metal 29439 mach 51028 elec 0 · launches 0
+  Commonwealth of Liozar tier 4 rocketry 1.00 port no  · largest 237769 · gdp 3013160 · budget 24249 vs launch 2000 · stock metal 258815 mach 8156 elec 0 · launches 0
+  Commonwealth of Losvia tier 3 rocketry 1.00 port no  · largest 84846 · gdp 259511 · budget 1047 vs launch 2000 · stock metal 777597 mach 3078 elec 0 · launches 0
+  Commonwealth of Homamis tier 4 rocketry 1.00 port no  · largest 317917 · gdp 2875069 · budget 21073 vs launch 2000 · stock metal 160962 mach 47974 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 315981 · gdp 2673733 · budget 11118 vs launch 2000 · stock metal 11633 mach 133717 elec 0 · launches 0
+y170:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 147817 · gdp 2640161 · budget 9936 vs launch 2000 · stock metal 41817 mach 52256 elec 0 · launches 0
+  Commonwealth of Liozar tier 4 rocketry 1.00 port no  · largest 234411 · gdp 3239323 · budget 29309 vs launch 2000 · stock metal 245380 mach 6894 elec 0 · launches 0
+  Commonwealth of Losvia tier 3 rocketry 1.00 port no  · largest 79532 · gdp 269726 · budget 1088 vs launch 2000 · stock metal 726455 mach 2944 elec 0 · launches 0
+  Commonwealth of Homamis tier 4 rocketry 1.00 port no  · largest 311217 · gdp 2949272 · budget 21617 vs launch 2000 · stock metal 163488 mach 49092 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 322399 · gdp 3041151 · budget 12645 vs launch 2000 · stock metal 42897 mach 146876 elec 0 · launches 0
+y180:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 143459 · gdp 2852927 · budget 10737 vs launch 2000 · stock metal 34175 mach 54086 elec 0 · launches 0
+  Commonwealth of Liozar tier 4 rocketry 1.00 port no  · largest 228068 · gdp 3444545 · budget 27721 vs launch 2000 · stock metal 247285 mach 9411 elec 0 · launches 0
+  Commonwealth of Losvia tier 4 rocketry 1.00 port no  · largest 76706 · gdp 270990 · budget 2177 vs launch 2000 · stock metal 670666 mach 2852 elec 0 · launches 0
+  Commonwealth of Homamis tier 4 rocketry 1.00 port no  · largest 301238 · gdp 2801329 · budget 20533 vs launch 2000 · stock metal 167963 mach 48639 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 324314 · gdp 3037056 · budget 10806 vs launch 2000 · stock metal 47016 mach 155657 elec 0 · launches 0
+y190:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 140706 · gdp 2983519 · budget 11228 vs launch 2000 · stock metal 27324 mach 53205 elec 0 · launches 0
+  Commonwealth of Liozar tier 4 rocketry 1.00 port no  · largest 222211 · gdp 3702586 · budget 29797 vs launch 2000 · stock metal 239953 mach 11823 elec 0 · launches 0
+  Commonwealth of Losvia tier 4 rocketry 1.00 port no  · largest 74838 · gdp 272287 · budget 2187 vs launch 2000 · stock metal 618270 mach 2771 elec 0 · launches 0
+  Commonwealth of Homamis tier 4 rocketry 1.00 port no  · largest 294044 · gdp 2779995 · budget 23157 vs launch 2000 · stock metal 169135 mach 50631 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 326806 · gdp 3244539 · budget 13491 vs launch 2000 · stock metal 38176 mach 158220 elec 0 · launches 0
+y200:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 134325 · gdp 2978852 · budget 11211 vs launch 2000 · stock metal 25346 mach 54661 elec 0 · launches 0
+  Commonwealth of Liozar tier 4 rocketry 1.00 port no  · largest 216793 · gdp 3824338 · budget 30777 vs launch 2000 · stock metal 210099 mach 16340 elec 0 · launches 0
+  Commonwealth of Losvia tier 4 rocketry 1.00 port no  · largest 73287 · gdp 260473 · budget 2092 vs launch 2000 · stock metal 570407 mach 2738 elec 0 · launches 0
+  Commonwealth of Homamis tier 4 rocketry 1.00 port no  · largest 286958 · gdp 3191032 · budget 23389 vs launch 2000 · stock metal 168049 mach 49651 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 333341 · gdp 3542887 · budget 18274 vs launch 2000 · stock metal 40968 mach 163059 elec 0 · launches 0
+y210:
+  Federation of Selolar tier 0 rocketry 0.00 port no  · largest 132386 · gdp 3051235 · budget 11483 vs launch 2000 · stock metal 25231 mach 57511 elec 0 · launches 0
+  Commonwealth of Liozar tier 4 rocketry 1.00 port yes · largest 212089 · gdp 4356073 · budget 35057 vs launch 2000 · stock metal 172419 mach 16600 elec 1386 · launches 151
+  Commonwealth of Losvia tier 4 rocketry 1.00 port no  · largest 72073 · gdp 262887 · budget 2112 vs launch 2000 · stock metal 523958 mach 2714 elec 0 · launches 0
+  Commonwealth of Homamis tier 4 rocketry 1.00 port no  · largest 280423 · gdp 3448953 · budget 25280 vs launch 2000 · stock metal 147059 mach 52783 elec 0 · launches 0
+  Federation of Varekor tier 0 rocketry 0.00 port no  · largest 339946 · gdp 3567285 · budget 16260 vs launch 2000 · stock metal 48878 mach 168514 elec 0 · launches 0

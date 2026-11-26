@@ -1,0 +1,85 @@
+seed 0: org founded in year 14; tech known (year) 0,6,0,0,0,0; capability (year) 0,6,0,0,0,0; adoption at end 1.00,1.00,1.00,1.00,1.00,1.00
+  opinions at start (each nation of the others): 40/-31/-28/48/1 | 40/-4/-36/49/4 | -31/-4/52/-25/43 | -28/-36/52/-35/55 | 48/49/-25/-35/10 | 1/4/43/55/10
+  per nation every 10 years: C = has the capability; friends (opinion > 25) / friends with the capability
+    y10: C0/0 C1/1 C2/2 C2/2 C1/1 C2/2 · wars 0
+    y20: C1/1 C2/2 C2/2 C2/2 C1/1 C2/2 · wars 1
+    y30: C1/1 C2/2 C2/2 C2/2 C1/1 C2/2 · wars 0
+    y40: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+    y50: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+    y60: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+    y70: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+    y80: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+    y90: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+    y100: C2/2 C2/2 C1/1 C2/2 C2/2 C1/1 · wars 0
+    y110: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+seed 1: org founded in year 8; tech known (year) 16,0,0,7,0,0; capability (year) 16,0,0,7,0,0; adoption at end 1.00,1.00,1.00,1.00,1.00,1.00
+  opinions at start (each nation of the others): 4/-33/-1/-33/-22 | 4/52/46/40/50 | -33/52/41/46/49 | -1/46/41/37/44 | -33/40/46/37/46 | -22/50/49/44/46
+  per nation every 10 years: C = has the capability; friends (opinion > 25) / friends with the capability
+    y10: -0/0 C4/4 C4/4 C3/3 C3/3 C4/4 · wars 1
+    y20: C0/0 C4/4 C4/4 C4/4 C4/4 C4/4 · wars 0
+    y30: C0/0 C4/4 C4/4 C4/4 C4/4 C4/4 · wars 0
+    y40: C0/0 C4/4 C4/4 C4/4 C4/4 C4/4 · wars 0
+    y50: C0/0 C3/3 C4/4 C3/3 C4/4 C4/4 · wars 1
+    y60: C0/0 C3/3 C4/4 C3/3 C4/4 C4/4 · wars 0
+    y70: C0/0 C3/3 C4/4 C3/3 C4/4 C4/4 · wars 0
+    y80: C0/0 C3/3 C4/4 C2/2 C4/4 C3/3 · wars 0
+    y90: C3/3 C4/4 C5/5 C3/3 C5/5 C4/4 · wars 0
+    y100: C3/3 C4/4 C5/5 C3/3 C5/5 C4/4 · wars 0
+    y110: C3/3 C5/5 C5/5 C3/3 C5/5 C3/3 · wars 0
+seed 2: org founded in year -1; tech known (year) 0,0,0,0,0,0; capability (year) 0,0,0,0,0,0; adoption at end 1.00,1.00,1.00,1.00,1.00,1.00
+  opinions at start (each nation of the others): -23/-29/39/-10/48 | -23/43/-32/45/-2 | -29/43/-28/47/-38 | 39/-32/-28/8/35 | -10/45/47/8/-7 | 48/-2/-38/35/-7
+  per nation every 10 years: C = has the capability; friends (opinion > 25) / friends with the capability
+    y10: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+    y20: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+    y30: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+    y40: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+    y50: C2/2 C2/2 C2/2 C2/2 C2/2 C2/2 · wars 0
+    y60: C2/2 C2/2 C2/2 C2/2 C3/3 C3/3 · wars 0
+    y70: C3/3 C2/2 C4/4 C2/2 C2/2 C3/3 · wars 1
+    y80: C3/3 C2/2 C4/4 C2/2 C2/2 C3/3 · wars 0
+    y90: C3/3 C2/2 C4/4 x C4/4 C3/3 · wars 0
+    y100: C3/3 C2/2 C4/4 x C3/3 C2/2 · wars 0
+    y110: C2/2 C2/2 C2/2 x C4/4 C2/2 · wars 0
+seed 3: org founded in year -1; tech known (year) 0,0,0,7,0,0; capability (year) 0,0,0,7,0,0; adoption at end 1.00,1.00,1.00,1.00,1.00,1.00
+  opinions at start (each nation of the others): 35/43/44/-1/40 | 35/37/38/-24/51 | 43/37/36/-5/43 | 44/38/36/-34/35 | -1/-24/-5/-34/-30 | 40/51/43/35/-30
+  per nation every 10 years: C = has the capability; friends (opinion > 25) / friends with the capability
+    y10: C3/3 C3/3 C4/4 C1/1 C0/0 C3/3 · wars 0
+    y20: C4/4 C4/4 C4/4 C4/4 C0/0 C4/4 · wars 0
+    y30: C4/4 C4/4 C4/4 C4/4 C0/0 C4/4 · wars 0
+    y40: C5/5 C5/5 C5/5 C5/5 C4/4 C4/4 · wars 0
+    y50: C5/5 C4/4 C5/5 C5/5 C4/4 C3/3 · wars 0
+    y60: C5/5 C4/4 C5/5 C5/5 C5/5 C4/4 · wars 0
+    y70: C5/5 C5/5 C5/5 C5/5 C5/5 C5/5 · wars 0
+    y80: C5/5 C3/3 C4/4 C5/5 C5/5 C4/4 · wars 0
+    y90: C5/5 C3/3 C4/4 C5/5 C5/5 C4/4 · wars 0
+    y100: C5/5 C4/4 C5/5 C5/5 C4/4 C3/3 · wars 0
+    y110: C5/5 C5/5 C5/5 C5/5 C5/5 C5/5 · wars 1
+seed 4: org founded in year 6; tech known (year) 0,0,5,6,0,0; capability (year) 0,0,5,6,0,0; adoption at end 1.00,1.00,1.00,1.00,1.00,1.00
+  opinions at start (each nation of the others): 41/41/43/9/43 | 41/43/47/-38/38 | 41/43/53/-3/55 | 43/47/53/-34/39 | 9/-38/-3/-34/-34 | 43/38/55/39/-34
+  per nation every 10 years: C = has the capability; friends (opinion > 25) / friends with the capability
+    y10: C3/3 C3/3 C3/3 C0/0 C0/0 C3/3 · wars 0
+    y20: C3/3 C3/3 C3/3 C0/0 C0/0 C3/3 · wars 0
+    y30: C3/3 C4/4 C4/4 C2/2 C0/0 C3/3 · wars 0
+    y40: C3/3 C3/3 C4/4 C1/1 C0/0 C3/3 · wars 0
+    y50: C3/3 C3/3 C4/4 C1/1 C0/0 C3/3 · wars 0
+    y60: C3/3 C3/3 C4/4 C1/1 C0/0 C3/3 · wars 0
+    y70: C3/3 C3/3 C3/3 C0/0 C0/0 C3/3 · wars 0
+    y80: C3/3 C3/3 C3/3 C0/0 C0/0 C3/3 · wars 0
+    y90: C3/3 C4/4 C4/4 C1/1 C1/1 C3/3 · wars 1
+    y100: C3/3 C4/4 C3/3 C1/1 C2/2 C3/3 · wars 0
+    y110: C3/3 C5/5 C3/3 C2/2 C2/2 C3/3 · wars 0
+seed 5: org founded in year 2; tech known (year) 0,0,0,0,0,0; capability (year) 0,0,0,0,0,0; adoption at end 1.00,1.00,1.00,1.00,1.00,1.00
+  opinions at start (each nation of the others): 9/48/38/-9/52 | 9/4/-32/36/-23 | 48/4/37/3/39 | 38/-32/37/-30/43 | -9/36/3/-30/-32 | 52/-23/39/43/-32
+  per nation every 10 years: C = has the capability; friends (opinion > 25) / friends with the capability
+    y10: C3/3 C0/0 C3/3 C3/3 C0/0 C3/3 · wars 0
+    y20: C3/3 C0/0 C3/3 C3/3 C0/0 C3/3 · wars 0
+    y30: C4/4 C1/1 C3/3 C3/3 C0/0 C3/3 · wars 1
+    y40: C4/4 C3/3 C4/4 C4/4 C0/0 C3/3 · wars 0
+    y50: C3/3 C3/3 C4/4 C4/4 C0/0 C4/4 · wars 0
+    y60: C3/3 C2/2 C4/4 C4/4 C0/0 C3/3 · wars 0
+    y70: C4/4 C4/4 C4/4 C4/4 C0/0 C4/4 · wars 0
+    y80: C4/4 C4/4 C4/4 C4/4 C0/0 C4/4 · wars 0
+    y90: C4/4 C4/4 C4/4 C4/4 C0/0 C4/4 · wars 0
+    y100: C3/3 C4/4 C3/3 C4/4 C0/0 C4/4 · wars 0
+    y110: C4/4 C4/4 C4/4 C4/4 C0/0 C4/4 · wars 0
+

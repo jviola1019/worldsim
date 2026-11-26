@@ -1,0 +1,165 @@
+# mode-audit all 6 at 462da62 (start of Task 8 Part B), each mode its own process, MODES order. 'random' uses Math.random by design, so its rows differ between runs.
+
+## realistic (preset, 250 years, 6 seeds)
+  empty      6/6  starts empty at year 0, with wildlife and no people
+  life_only  6/6  you can place humans and animals, and nothing else
+  tech       6/6  every science-based technology is possible
+  village    6/6  the people you placed settle a village
+  real       6/6  nothing fictional ever appears
+  seed 0: {"era":1,"nations":2,"tribes":0,"wars":0,"settlements":3,"pop":636,"year":250}
+  seed 1: {"era":1,"nations":1,"tribes":0,"wars":0,"settlements":1,"pop":63,"year":250}
+  seed 2: {"era":1,"nations":1,"tribes":1,"wars":0,"settlements":1,"pop":672,"year":250}
+  seed 3: {"era":1,"nations":12,"tribes":9,"wars":9,"settlements":19,"pop":4632,"year":250}
+  seed 4: {"era":1,"nations":1,"tribes":0,"wars":0,"settlements":5,"pop":217,"year":250}
+  seed 5: {"era":1,"nations":2,"tribes":4,"wars":0,"settlements":7,"pop":1181,"year":250}
+
+## observer (preset, 150 years, 6 seeds)
+  peoples    6/6  five peoples at the start, left to themselves
+  no_powers  6/6  no powers at all
+  village    6/6  villages appear
+  real       6/6  nothing fictional ever appears
+  seed 0: {"era":2,"nations":5,"tribes":0,"wars":1,"settlements":22,"pop":2903,"year":150}
+  seed 1: {"era":1,"nations":5,"tribes":0,"wars":0,"settlements":17,"pop":1467,"year":150}
+  seed 2: {"era":1,"nations":5,"tribes":0,"wars":1,"settlements":27,"pop":2454,"year":150}
+  seed 3: {"era":1,"nations":5,"tribes":0,"wars":0,"settlements":22,"pop":1665,"year":150}
+  seed 4: {"era":1,"nations":5,"tribes":0,"wars":2,"settlements":21,"pop":2608,"year":150}
+  seed 5: {"era":1,"nations":5,"tribes":0,"wars":0,"settlements":24,"pop":2432,"year":150}
+
+## primitive (preset, 150 years, 6 seeds)
+  bands      6/6  starts with wandering bands only (no towns)
+  village    6/6  a first village appears
+  seed 0: {"era":1,"nations":5,"tribes":0,"wars":0,"settlements":22,"pop":3393,"year":150}
+  seed 1: {"era":1,"nations":5,"tribes":0,"wars":2,"settlements":28,"pop":2639,"year":150}
+  seed 2: {"era":1,"nations":5,"tribes":0,"wars":0,"settlements":21,"pop":1920,"year":150}
+  seed 3: {"era":1,"nations":5,"tribes":0,"wars":0,"settlements":25,"pop":2267,"year":150}
+  seed 4: {"era":1,"nations":5,"tribes":0,"wars":5,"settlements":28,"pop":3129,"year":150}
+  seed 5: {"era":1,"nations":5,"tribes":0,"wars":1,"settlements":26,"pop":2841,"year":150}
+
+## kingdoms (preset, 100 years, 6 seeds)
+  kingdoms   6/6  ≥ 5 nations with towns at start, Bronze-to-Iron era
+  temples    6/6  temples stand at start
+  rivalry    6/6  a war within 100 years (rivalries)
+  seed 0: {"era":5,"nations":10,"tribes":0,"wars":39,"settlements":109,"pop":1052453,"year":100}
+  seed 1: {"era":5,"nations":10,"tribes":0,"wars":34,"settlements":101,"pop":871997,"year":100}
+  seed 2: {"era":5,"nations":8,"tribes":0,"wars":29,"settlements":112,"pop":989113,"year":100}
+  seed 3: {"era":5,"nations":10,"tribes":0,"wars":30,"settlements":108,"pop":873963,"year":100}
+  seed 4: {"era":5,"nations":7,"tribes":0,"wars":21,"settlements":81,"pop":645639,"year":100}
+  seed 5: {"era":5,"nations":9,"tribes":0,"wars":30,"settlements":87,"pop":712474,"year":100}
+
+## industrial (preset, 120 years, 6 seeds)
+  gunpowder  6/6  Renaissance-era empires at start
+  steam      6/6  someone reaches the industrial era
+  coal       2/6  coal-rich nations industrialise first (rank correlation > 0)
+  seed 0: {"era":7,"nations":8,"tribes":0,"wars":44,"settlements":56,"pop":2643318,"year":120}
+  seed 1: {"era":7,"nations":10,"tribes":0,"wars":34,"settlements":57,"pop":2818107,"year":120}
+  seed 2: {"era":8,"nations":7,"tribes":0,"wars":21,"settlements":51,"pop":3039750,"year":120}
+  seed 3: {"era":8,"nations":8,"tribes":0,"wars":35,"settlements":75,"pop":3026401,"year":120}
+  seed 4: {"era":7,"nations":8,"tribes":0,"wars":31,"settlements":52,"pop":2342994,"year":120}
+  seed 5: {"era":8,"nations":10,"tribes":0,"wars":41,"settlements":73,"pop":2867029,"year":120}
+
+## modern (preset, 60 years, 6 seeds)
+  atomic     6/6  nation-states in the atomic age at start
+  alliances  6/6  alliances or defensive pacts form
+  borders    6/6  tense borders: a border dispute or war
+  seed 0: {"era":10,"nations":9,"tribes":0,"wars":11,"settlements":43,"pop":5286004,"year":60}
+  seed 1: {"era":10,"nations":10,"tribes":0,"wars":9,"settlements":38,"pop":7561227,"year":60}
+  seed 2: {"era":10,"nations":10,"tribes":0,"wars":3,"settlements":46,"pop":6036202,"year":60}
+  seed 3: {"era":10,"nations":10,"tribes":0,"wars":2,"settlements":44,"pop":6692600,"year":60}
+  seed 4: {"era":10,"nations":10,"tribes":0,"wars":2,"settlements":42,"pop":5680116,"year":60}
+  seed 5: {"era":10,"nations":10,"tribes":0,"wars":4,"settlements":40,"pop":6428522,"year":60}
+
+## collapse (preset, 150 years, 6 seeds)
+  ruins      6/6  ruins of a fallen age at start
+  lost       6/6  knowledge was lost at start
+  relearn    6/6  lost knowledge is re-learned
+  survivors  6/6  scattered survivors: ≥ 6 small nations
+  seed 0: {"era":5,"nations":9,"tribes":0,"wars":41,"settlements":107,"pop":1070187,"year":150}
+  seed 1: {"era":5,"nations":9,"tribes":0,"wars":45,"settlements":92,"pop":667203,"year":150}
+  seed 2: {"era":5,"nations":9,"tribes":0,"wars":37,"settlements":114,"pop":978645,"year":150}
+  seed 3: {"era":5,"nations":12,"tribes":0,"wars":44,"settlements":95,"pop":641739,"year":150}
+  seed 4: {"era":5,"nations":9,"tribes":0,"wars":31,"settlements":108,"pop":1122429,"year":150}
+  seed 5: {"era":5,"nations":9,"tribes":0,"wars":33,"settlements":112,"pop":1208884,"year":150}
+
+## alien (preset, 100 years, 6 seeds)
+  biomes     6/6  alien biomes (violet meadows, crystal)
+  beasts     6/6  alien wildlife
+  species    6/6  several intelligent species
+  seed 0: {"era":1,"nations":6,"tribes":0,"wars":0,"settlements":11,"pop":896,"year":100}
+  seed 1: {"era":1,"nations":6,"tribes":0,"wars":0,"settlements":10,"pop":782,"year":100}
+  seed 2: {"era":1,"nations":6,"tribes":0,"wars":0,"settlements":12,"pop":919,"year":100}
+  seed 3: {"era":1,"nations":6,"tribes":0,"wars":0,"settlements":11,"pop":681,"year":100}
+  seed 4: {"era":1,"nations":6,"tribes":0,"wars":0,"settlements":12,"pop":630,"year":100}
+  seed 5: {"era":1,"nations":6,"tribes":0,"wars":0,"settlements":10,"pop":733,"year":100}
+
+## random (preset, 150 years, 6 seeds)
+  runs       6/6  a randomised world runs to its horizon
+  seed 0: {"era":2,"nations":6,"tribes":0,"wars":3,"settlements":26,"pop":2348,"year":150}
+  seed 1: {"era":2,"nations":9,"tribes":0,"wars":1,"settlements":36,"pop":5547,"year":150}
+  seed 2: {"era":2,"nations":8,"tribes":0,"wars":1,"settlements":33,"pop":2950,"year":150}
+  seed 3: {"era":12,"nations":12,"tribes":0,"wars":14,"settlements":45,"pop":6512359,"year":150}
+  seed 4: {"era":1,"nations":10,"tribes":0,"wars":8,"settlements":36,"pop":5160,"year":150}
+  seed 5: {"era":10,"nations":5,"tribes":0,"wars":13,"settlements":83,"pop":3135173,"year":150}
+
+## cradles (scenario, 400 years, 6 seeds)
+  rivers     6/6  a dry world: people start near rivers
+  agri       6/6  objective: agriculture
+  writing    6/6  objective: writing
+  city       6/6  objective: a settlement of 10,000
+  seed 0: {"era":4,"nations":6,"tribes":0,"wars":8,"settlements":51,"pop":412665,"year":400}
+  seed 1: {"era":4,"nations":7,"tribes":0,"wars":12,"settlements":71,"pop":530846,"year":400}
+  seed 2: {"era":4,"nations":6,"tribes":0,"wars":11,"settlements":74,"pop":460098,"year":400}
+  seed 3: {"era":4,"nations":6,"tribes":0,"wars":12,"settlements":72,"pop":487369,"year":400}
+  seed 4: {"era":4,"nations":7,"tribes":0,"wars":14,"settlements":64,"pop":437724,"year":400}
+  seed 5: {"era":4,"nations":6,"tribes":0,"wars":16,"settlements":75,"pop":647119,"year":400}
+
+## islands (scenario, 200 years, 6 seeds)
+  sail       6/6  objective: ocean navigation
+  sea_trade  6/6  objective: a sea trade route
+  seed 0: {"era":5,"nations":11,"tribes":0,"wars":69,"settlements":92,"pop":1436811,"year":200}
+  seed 1: {"era":6,"nations":8,"tribes":0,"wars":39,"settlements":91,"pop":1469680,"year":200}
+  seed 2: {"era":5,"nations":10,"tribes":0,"wars":50,"settlements":83,"pop":1092683,"year":200}
+  seed 3: {"era":6,"nations":9,"tribes":0,"wars":61,"settlements":82,"pop":1568135,"year":200}
+  seed 4: {"era":5,"nations":9,"tribes":0,"wars":49,"settlements":96,"pop":804119,"year":200}
+  seed 5: {"era":6,"nations":9,"tribes":0,"wars":81,"settlements":91,"pop":1295738,"year":200}
+
+## islands4 (scenario, 200 years, 6 seeds)
+  sail       6/6  objective: ocean navigation
+  sea_trade  6/6  objective: a sea trade route
+  seed 0: {"era":6,"nations":11,"tribes":0,"wars":65,"settlements":86,"pop":1283061,"year":200}
+  seed 1: {"era":6,"nations":9,"tribes":0,"wars":91,"settlements":91,"pop":1589661,"year":200}
+  seed 2: {"era":6,"nations":11,"tribes":0,"wars":76,"settlements":86,"pop":1475676,"year":200}
+  seed 3: {"era":6,"nations":10,"tribes":0,"wars":43,"settlements":88,"pop":1322614,"year":200}
+  seed 4: {"era":6,"nations":11,"tribes":0,"wars":71,"settlements":89,"pop":1392874,"year":200}
+  seed 5: {"era":6,"nations":9,"tribes":0,"wars":61,"settlements":91,"pop":1417320,"year":200}
+
+## standoff (scenario, 110 years, 6 seeds)
+  org        4/6  objective: an international organization
+  no_nukes   6/6  objective: 100 years without a nuclear strike
+  brink      6/6  on the brink: at least one war or crisis
+  seed 0: {"era":11,"nations":6,"tribes":0,"wars":18,"settlements":63,"pop":5265088,"year":110}
+  seed 1: {"era":10,"nations":6,"tribes":0,"wars":8,"settlements":63,"pop":3947210,"year":110}
+  seed 2: {"era":11,"nations":5,"tribes":0,"wars":16,"settlements":45,"pop":5812885,"year":110}
+  seed 3: {"era":11,"nations":6,"tribes":0,"wars":4,"settlements":52,"pop":6741429,"year":110}
+  seed 4: {"era":10,"nations":6,"tribes":0,"wars":3,"settlements":50,"pop":4177736,"year":110}
+  seed 5: {"era":10,"nations":6,"tribes":0,"wars":9,"settlements":45,"pop":3924350,"year":110}
+
+## space_race (scenario, 150 years, 6 seeds)
+  station    1/6  objective: a space station
+  colony     0/6  objective: an off-world colony
+  seed 0: {"era":10,"nations":5,"tribes":0,"wars":2,"settlements":55,"pop":2777661,"year":150}
+  seed 1: {"era":11,"nations":5,"tribes":0,"wars":9,"settlements":46,"pop":2435393,"year":150}
+  seed 2: {"era":11,"nations":5,"tribes":0,"wars":6,"settlements":71,"pop":4755027,"year":150}
+  seed 3: {"era":11,"nations":5,"tribes":0,"wars":1,"settlements":55,"pop":3300176,"year":150}
+  seed 4: {"era":11,"nations":5,"tribes":0,"wars":10,"settlements":56,"pop":6019720,"year":150}
+  seed 5: {"era":11,"nations":5,"tribes":0,"wars":1,"settlements":53,"pop":3660220,"year":150}
+
+## fantasy (scenario, 200 years, 6 seeds)
+  peoples    6/6  four peoples share the land
+  monsters   6/6  monsters roam
+  slay       2/6  objective: a monster slain
+  seed 0: {"era":2,"nations":7,"tribes":0,"wars":7,"settlements":37,"pop":25008,"year":200}
+  seed 1: {"era":2,"nations":8,"tribes":0,"wars":7,"settlements":33,"pop":20488,"year":200}
+  seed 2: {"era":2,"nations":7,"tribes":0,"wars":4,"settlements":26,"pop":20859,"year":200}
+  seed 3: {"era":2,"nations":6,"tribes":0,"wars":1,"settlements":30,"pop":9019,"year":200}
+  seed 4: {"era":2,"nations":6,"tribes":0,"wars":5,"settlements":27,"pop":14131,"year":200}
+  seed 5: {"era":2,"nations":8,"tribes":0,"wars":9,"settlements":29,"pop":12275,"year":200}

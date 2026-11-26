@@ -1,0 +1,109 @@
+seed 0 as generated: first era 8 in year -1; at era ≥ 8 at year 120: 0/8; Spearman(coal, era) 0.00; Spearman(coal, earliness of era 8) 0.00; Spearman(coal, era-7/8 adoption) 0.79; Spearman(coal, steam years) 0.78; Spearman(coal, GDP per head) 0.75; mean era-7/8 adoption 16.33; mean techScore 424.62; mean GDP per head 3.25
+    nation 1: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→0.64→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 13.1, steam years 32, GDP/head 2.61, coal access 0.00, pop 337537
+    nation 2: coal tiles 11, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 18.5, steam years 120, GDP/head 3.10, coal access 1.00, pop 434909
+    nation 3: coal tiles 9, era by 30y 7→7→7→7→7, steam adoption 1.00→0.98→0.51→1.00→1.00, era 8 in -1, era-7/8 adoption 17.2, steam years 100, GDP/head 3.34, coal access 1.00, pop 146801
+    nation 4: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.04→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 13.3, steam years 22, GDP/head 1.74, coal access 0.00, pop 309282
+    nation 5: coal tiles 6, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 17.9, steam years 120, GDP/head 7.41, coal access 1.00, pop 268266
+    nation 6: coal tiles 4, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 18.6, steam years 120, GDP/head 2.71, coal access 1.00, pop 464112
+    nation 7: coal tiles 11, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 18.8, steam years 120, GDP/head 3.25, coal access 1.00, pop 359512
+    nation 8: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 13.2, steam years 9, GDP/head 1.87, coal access 0.00, pop 322899
+seed 0 NO COAL: first era 8 in year 118; at era ≥ 8 at year 120: 1/8; Spearman(coal, era) 0.00; Spearman(coal, earliness of era 8) 0.00; Spearman(coal, era-7/8 adoption) 0.00; Spearman(coal, steam years) 0.00; Spearman(coal, GDP per head) 0.00; mean era-7/8 adoption 13.40; mean techScore 404.96; mean GDP per head 2.85
+    nation 1: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.10→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 15.8, steam years 23, GDP/head 3.83, coal access 0.00, pop 442862
+    nation 2: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 15.0, steam years 11, GDP/head 3.67, coal access 0.00, pop 436490
+    nation 3: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.0, steam years 8, GDP/head 3.66, coal access 0.00, pop 182212
+    nation 4: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.04→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.0, steam years 22, GDP/head 3.57, coal access 0.00, pop 293347
+    nation 5: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 12.0, steam years 16, GDP/head 2.88, coal access 0.00, pop 340777
+    nation 6: coal tiles 0, era by 30y 7→6→6→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 14.0, steam years 8, GDP/head 1.95, coal access 0.00, pop 529169
+    nation 7: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.2, steam years 17, GDP/head 1.27, coal access 0.00, pop 324642
+    nation 8: coal tiles 0, era by 30y 7→7→7→7→8, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in 118, era-7/8 adoption 17.1, steam years 9, GDP/head 1.98, coal access 0.00, pop 357367
+seed 1 as generated: first era 8 in year -1; at era ≥ 8 at year 120: 0/7; Spearman(coal, era) 0.00; Spearman(coal, earliness of era 8) 0.00; Spearman(coal, era-7/8 adoption) 0.70; Spearman(coal, steam years) 0.69; Spearman(coal, GDP per head) 0.33; mean era-7/8 adoption 16.19; mean techScore 429.72; mean GDP per head 3.71
+    nation 1: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 13.3, steam years 13, GDP/head 2.73, coal access 0.00, pop 328757
+    nation 2: coal tiles 8, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 18.2, steam years 120, GDP/head 3.47, coal access 1.00, pop 628088
+    nation 3: coal tiles 17, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 20.2, steam years 120, GDP/head 4.61, coal access 1.00, pop 580694
+    nation 4: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 12.3, steam years 0, GDP/head 2.15, coal access 0.00, pop 274449
+    nation 5: coal tiles 2, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 19.5, steam years 120, GDP/head 3.27, coal access 1.00, pop 436493
+    nation 6: coal tiles 20, era by 30y 7→6→7→7→7, steam adoption 1.00→0.27→0.22→1.00→1.00, era 8 in -1, era-7/8 adoption 18.2, steam years 77, GDP/head 3.31, coal access 1.00, pop 485628
+    nation 7: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.6, steam years 12, GDP/head 6.40, coal access 0.00, pop 62959
+    nation 8: coal tiles 0, era by 30y 7→7→0→0→0, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 6.0, steam years 0, GDP/head 2.88, coal access 1.00, pop 54089 (fallen)
+seed 1 NO COAL: first era 8 in year -1; at era ≥ 8 at year 120: 0/8; Spearman(coal, era) 0.00; Spearman(coal, earliness of era 8) 0.00; Spearman(coal, era-7/8 adoption) 0.00; Spearman(coal, steam years) 0.00; Spearman(coal, GDP per head) 0.00; mean era-7/8 adoption 11.38; mean techScore 390.53; mean GDP per head 2.71
+    nation 1: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 9.5, steam years 18, GDP/head 1.68, coal access 0.00, pop 207302
+    nation 2: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 10.9, steam years 9, GDP/head 3.45, coal access 0.00, pop 638733
+    nation 3: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 13.8, steam years 11, GDP/head 3.42, coal access 0.00, pop 484930
+    nation 4: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 9.7, steam years 0, GDP/head 1.95, coal access 0.00, pop 213252
+    nation 5: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 13.5, steam years 19, GDP/head 2.79, coal access 0.00, pop 482351
+    nation 6: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.04→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 13.3, steam years 18, GDP/head 2.65, coal access 0.00, pop 541632
+    nation 7: coal tiles 0, era by 30y 7→6→6→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 10.2, steam years 12, GDP/head 3.67, coal access 0.00, pop 73391
+    nation 8: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 10.2, steam years 0, GDP/head 2.03, coal access 0.00, pop 87616
+seed 2 as generated: first era 8 in year 101; at era ≥ 8 at year 120: 2/7; Spearman(coal, era) 0.16; Spearman(coal, earliness of era 8) -0.09; Spearman(coal, era-7/8 adoption) 0.43; Spearman(coal, steam years) 0.40; Spearman(coal, GDP per head) 0.61; mean era-7/8 adoption 19.25; mean techScore 448.30; mean GDP per head 3.34
+    nation 1: coal tiles 4, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 20.1, steam years 120, GDP/head 3.24, coal access 1.00, pop 487185
+    nation 2: coal tiles 9, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→0.40→0.88→1.00, era 8 in -1, era-7/8 adoption 18.1, steam years 94, GDP/head 3.16, coal access 1.00, pop 520191
+    nation 3: coal tiles 10, era by 30y 7→7→7→7→8, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in 101, era-7/8 adoption 20.2, steam years 120, GDP/head 3.58, coal access 1.00, pop 615718
+    nation 4: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 12.5, steam years 0, GDP/head 1.79, coal access 0.00, pop 246961
+    nation 5: coal tiles 5, era by 30y 7→7→7→7→8, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in 111, era-7/8 adoption 23.2, steam years 120, GDP/head 2.35, coal access 1.00, pop 663473
+    nation 6: coal tiles 14, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 21.4, steam years 120, GDP/head 3.50, coal access 1.00, pop 339402
+    nation 7: coal tiles 7, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 19.4, steam years 120, GDP/head 5.73, coal access 1.00, pop 166820
+    nation 8: coal tiles 0, era by 30y 7→6→7→0→0, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 6.4, steam years 11, GDP/head 2.91, coal access 0.00, pop 109912 (fallen)
+seed 2 NO COAL: first era 8 in year -1; at era ≥ 8 at year 120: 0/8; Spearman(coal, era) 0.00; Spearman(coal, earliness of era 8) 0.00; Spearman(coal, era-7/8 adoption) 0.00; Spearman(coal, steam years) 0.00; Spearman(coal, GDP per head) 0.00; mean era-7/8 adoption 11.08; mean techScore 391.50; mean GDP per head 2.68
+    nation 1: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.8, steam years 9, GDP/head 3.08, coal access 0.00, pop 531531
+    nation 2: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.2, steam years 9, GDP/head 2.58, coal access 0.00, pop 557831
+    nation 3: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→0.00→0.58→0.00→0.00, era 8 in -1, era-7/8 adoption 13.2, steam years 21, GDP/head 1.76, coal access 0.00, pop 587854
+    nation 4: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 9.8, steam years 0, GDP/head 2.49, coal access 0.00, pop 225898
+    nation 5: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 12.7, steam years 16, GDP/head 1.79, coal access 0.00, pop 707810
+    nation 6: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→0.22→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.3, steam years 25, GDP/head 2.40, coal access 0.00, pop 229331
+    nation 7: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.22→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 10.2, steam years 25, GDP/head 5.38, coal access 0.00, pop 178888
+    nation 8: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 8.5, steam years 11, GDP/head 1.97, coal access 0.00, pop 165980
+seed 3 as generated: first era 8 in year 115; at era ≥ 8 at year 120: 1/8; Spearman(coal, era) 0.17; Spearman(coal, earliness of era 8) -0.17; Spearman(coal, era-7/8 adoption) -0.38; Spearman(coal, steam years) -0.36; Spearman(coal, GDP per head) -0.25; mean era-7/8 adoption 15.92; mean techScore 424.23; mean GDP per head 3.38
+    nation 1: coal tiles 4, era by 30y 7→7→7→7→8, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in 115, era-7/8 adoption 20.3, steam years 120, GDP/head 4.70, coal access 1.00, pop 585266
+    nation 2: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 17.1, steam years 120, GDP/head 3.31, coal access 1.00, pop 324275
+    nation 3: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.21→0.00, era 8 in -1, era-7/8 adoption 12.8, steam years 15, GDP/head 3.24, coal access 0.00, pop 666342
+    nation 4: coal tiles 4, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 15.6, steam years 120, GDP/head 4.05, coal access 1.00, pop 203708
+    nation 5: coal tiles 7, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 10.7, steam years 18, GDP/head 1.92, coal access 0.00, pop 194587
+    nation 6: coal tiles 1, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 20.2, steam years 120, GDP/head 3.79, coal access 1.00, pop 352107
+    nation 7: coal tiles 11, era by 30y 7→7→7→7→7, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.0, steam years 0, GDP/head 1.66, coal access 1.00, pop 207970
+    nation 8: coal tiles 1, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 19.6, steam years 120, GDP/head 4.39, coal access 1.00, pop 492146
+seed 3 NO COAL: first era 8 in year -1; at era ≥ 8 at year 120: 0/8; Spearman(coal, era) 0.00; Spearman(coal, earliness of era 8) 0.00; Spearman(coal, era-7/8 adoption) 0.00; Spearman(coal, steam years) 0.00; Spearman(coal, GDP per head) 0.00; mean era-7/8 adoption 11.60; mean techScore 392.30; mean GDP per head 2.76
+    nation 1: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 12.8, steam years 9, GDP/head 4.45, coal access 0.00, pop 648088
+    nation 2: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.3, steam years 15, GDP/head 2.86, coal access 0.00, pop 287127
+    nation 3: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 13.3, steam years 10, GDP/head 2.26, coal access 0.00, pop 769132
+    nation 4: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.03→0.37→0.00, era 8 in -1, era-7/8 adoption 11.5, steam years 23, GDP/head 3.64, coal access 0.01, pop 409525
+    nation 5: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.2, steam years 9, GDP/head 1.81, coal access 0.00, pop 294744
+    nation 6: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.9, steam years 16, GDP/head 3.42, coal access 0.00, pop 325167
+    nation 7: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 8.6, steam years 0, GDP/head 1.91, coal access 0.04, pop 185682
+    nation 8: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 12.1, steam years 18, GDP/head 1.71, coal access 0.00, pop 328813
+seed 4 as generated: first era 8 in year -1; at era ≥ 8 at year 120: 0/8; Spearman(coal, era) 0.00; Spearman(coal, earliness of era 8) 0.00; Spearman(coal, era-7/8 adoption) 0.75; Spearman(coal, steam years) 0.79; Spearman(coal, GDP per head) 0.60; mean era-7/8 adoption 14.66; mean techScore 415.20; mean GDP per head 3.33
+    nation 1: coal tiles 14, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 18.6, steam years 120, GDP/head 4.03, coal access 1.00, pop 481143
+    nation 2: coal tiles 22, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 16.0, steam years 120, GDP/head 4.92, coal access 1.00, pop 316515
+    nation 3: coal tiles 4, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 17.7, steam years 120, GDP/head 3.19, coal access 1.00, pop 530338
+    nation 4: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 9.5, steam years 9, GDP/head 2.66, coal access 0.00, pop 168476
+    nation 5: coal tiles 3, era by 30y 7→7→7→7→7, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 12.4, steam years 0, GDP/head 2.43, coal access 0.00, pop 285584
+    nation 6: coal tiles 5, era by 30y 7→7→7→7→7, steam adoption 0.00→0.62→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 15.3, steam years 94, GDP/head 2.80, coal access 1.00, pop 246530
+    nation 7: coal tiles 6, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 16.6, steam years 120, GDP/head 2.84, coal access 1.00, pop 289555
+    nation 8: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.28→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.0, steam years 26, GDP/head 3.74, coal access 0.00, pop 24852
+seed 4 NO COAL: first era 8 in year 119; at era ≥ 8 at year 120: 1/8; Spearman(coal, era) 0.00; Spearman(coal, earliness of era 8) 0.00; Spearman(coal, era-7/8 adoption) 0.00; Spearman(coal, steam years) 0.00; Spearman(coal, GDP per head) 0.00; mean era-7/8 adoption 13.11; mean techScore 406.75; mean GDP per head 2.75
+    nation 1: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 14.1, steam years 14, GDP/head 3.03, coal access 0.00, pop 498063
+    nation 2: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 14.5, steam years 13, GDP/head 1.68, coal access 0.00, pop 356836
+    nation 3: coal tiles 0, era by 30y 7→6→7→7→8, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in 119, era-7/8 adoption 16.2, steam years 13, GDP/head 2.57, coal access 0.00, pop 667726
+    nation 4: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 10.1, steam years 9, GDP/head 4.04, coal access 0.00, pop 158038
+    nation 5: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.8, steam years 0, GDP/head 1.78, coal access 0.00, pop 374889
+    nation 6: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.8, steam years 0, GDP/head 2.85, coal access 0.00, pop 282820
+    nation 7: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 15.7, steam years 19, GDP/head 2.56, coal access 0.00, pop 339358
+    nation 8: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.28→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 10.8, steam years 26, GDP/head 3.50, coal access 0.00, pop 21651
+seed 5 as generated: first era 8 in year 99; at era ≥ 8 at year 120: 4/8; Spearman(coal, era) -0.22; Spearman(coal, earliness of era 8) 0.13; Spearman(coal, era-7/8 adoption) -0.22; Spearman(coal, steam years) -0.17; Spearman(coal, GDP per head) -0.63; mean era-7/8 adoption 18.86; mean techScore 449.48; mean GDP per head 3.60
+    nation 1: coal tiles 7, era by 30y 7→7→7→7→7, steam adoption 0.00→0.32→1.00→0.64→0.00, era 8 in -1, era-7/8 adoption 8.8, steam years 56, GDP/head 1.24, coal access 0.00, pop 61085
+    nation 2: coal tiles 4, era by 30y 7→7→7→7→8, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in 99, era-7/8 adoption 24.1, steam years 120, GDP/head 9.95, coal access 1.00, pop 538283
+    nation 3: coal tiles 11, era by 30y 7→7→7→7→7, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in -1, era-7/8 adoption 20.1, steam years 120, GDP/head 2.91, coal access 1.00, pop 360299
+    nation 4: coal tiles 3, era by 30y 7→7→7→7→7, steam adoption 1.00→0.94→0.00→0.00→0.76, era 8 in -1, era-7/8 adoption 16.6, steam years 50, GDP/head 3.96, coal access 1.00, pop 222315
+    nation 5: coal tiles 4, era by 30y 7→7→7→7→8, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in 99, era-7/8 adoption 24.5, steam years 120, GDP/head 2.94, coal access 1.00, pop 531159
+    nation 6: coal tiles 4, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.69→1.00→1.00, era 8 in -1, era-7/8 adoption 18.5, steam years 80, GDP/head 2.55, coal access 1.00, pop 439949
+    nation 7: coal tiles 0, era by 30y 7→7→7→7→8, steam adoption 1.00→1.00→1.00→1.00→1.00, era 8 in 116, era-7/8 adoption 21.3, steam years 120, GDP/head 3.10, coal access 1.00, pop 391331
+    nation 8: coal tiles 9, era by 30y 7→7→7→7→8, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in 120, era-7/8 adoption 17.0, steam years 15, GDP/head 2.15, coal access 1.00, pop 209767
+seed 5 NO COAL: first era 8 in year 105; at era ≥ 8 at year 120: 3/8; Spearman(coal, era) 0.00; Spearman(coal, earliness of era 8) 0.00; Spearman(coal, era-7/8 adoption) 0.00; Spearman(coal, steam years) 0.00; Spearman(coal, GDP per head) 0.00; mean era-7/8 adoption 14.78; mean techScore 422.86; mean GDP per head 2.40
+    nation 1: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 0.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 11.3, steam years 0, GDP/head 3.31, coal access 0.00, pop 169988
+    nation 2: coal tiles 0, era by 30y 7→7→7→7→8, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in 105, era-7/8 adoption 19.1, steam years 13, GDP/head 3.03, coal access 0.00, pop 816281
+    nation 3: coal tiles 0, era by 30y 7→7→7→7→7, steam adoption 1.00→0.07→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 14.9, steam years 11, GDP/head 2.27, coal access 0.00, pop 450367
+    nation 4: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 14.1, steam years 19, GDP/head 2.38, coal access 0.00, pop 470134
+    nation 5: coal tiles 0, era by 30y 7→7→7→7→8, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in 112, era-7/8 adoption 18.4, steam years 11, GDP/head 2.24, coal access 0.00, pop 556223
+    nation 6: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 10.0, steam years 14, GDP/head 2.28, coal access 0.00, pop 314215
+    nation 7: coal tiles 0, era by 30y 7→7→7→7→8, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in 110, era-7/8 adoption 17.4, steam years 19, GDP/head 2.30, coal access 0.00, pop 520160
+    nation 8: coal tiles 0, era by 30y 7→6→7→7→7, steam adoption 1.00→0.00→0.00→0.00→0.00, era 8 in -1, era-7/8 adoption 13.1, steam years 16, GDP/head 1.37, coal access 0.00, pop 146558
+
