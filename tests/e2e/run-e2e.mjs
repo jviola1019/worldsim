@@ -68,7 +68,9 @@ async function run(label, ctxOpts) {
   const flags = await page.locator('img.flag').count();
   check(`${label}: nations list renders flags`, flags > 0, `${flags} flags`);
   // nation overview: key figures, live aerial photo and postcard, album tab
-  await page.locator('.sheet-body ul.list li button').first().click();
+  // the first nation with a settlement: the list also holds wandering tribes, which have no city to picture
+  // (fix round 2: the most populous entry of a young world can be a tribe, and the check then had nothing to find)
+  await firstNation(page).click();
   await page.waitForTimeout(800);
   const pics = await page.locator('.photo canvas').count();
   const tiles = await page.locator('.stat-tile').count();
@@ -152,7 +154,7 @@ async function run(label, ctxOpts) {
   await page.getByLabel('Close').first().click();
   // close-up city: zoom into the capital; streets of the 32-px blocks must be on screen
   await page.getByLabel('Nations').click();
-  await page.locator('.sheet-body ul.list li button').first().click();
+  await firstNation(page).click();
   await page.waitForTimeout(300);
   const showCap = page.getByText('Show capital');
   if (await showCap.count()) await showCap.first().click();
@@ -179,7 +181,7 @@ async function run(label, ctxOpts) {
   // round 7: the capital's inspector lists jobs, homes, and streets and traffic
   // open the capital from its nation's panel
   await page.getByLabel('Nations').click();
-  await page.locator('.sheet-body ul.list li button').first().click();
+  await firstNation(page).click();
   await page.waitForTimeout(300);
   await page.locator('[data-testid=open-capital]').first().click();
   await page.waitForTimeout(400);
@@ -225,27 +227,7 @@ async function run(label, ctxOpts) {
   await page.getByLabel('Stop using this power').click().catch(() => {});
   await page.keyboard.press('Escape').catch(() => {});
   await diseaseAndEruption(page, label, reduced);
-  if (label === 'desktop') {
-    // cache pressure: a big screen just past the close-up threshold wants more chunks than the cache
-    // holds; the layer must settle (nothing pending) with at most 48 chunks drawn
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.mouse.move(960, 540);
-    for (let k = 0; k < 40; k++) {
-      await page.mouse.wheel(0, 120); await page.waitForTimeout(40);
-      if (Number(await page.locator('canvas.canvas').getAttribute('data-city-chunks')) === 0) break;
-    }
-    await page.mouse.wheel(0, -160);
-    await page.waitForTimeout(4000);
-    const attr = async (n) => page.locator('canvas.canvas').getAttribute(n);
-    const r0 = await attr('data-city-redraws');
-    await page.waitForTimeout(2000);
-    const r1 = await attr('data-city-redraws');
-    const drawnBig = Number(await attr('data-city-chunks'));
-    const pendingBig = await attr('data-city-pending');
-    // settled: chunks drawn within the cap, nothing pending, and no chunk redrawn in 2 s of a still view
-    check(`${label}: close-up settles on a 1920x1080 screen (no thrash)`, drawnBig > 0 && drawnBig <= 48 && pendingBig === '0' && r0 !== null && r0 === r1, `${drawnBig} drawn, ${pendingBig} pending, redraws ${r0} -> ${r1}`);
-    await page.setViewportSize({ width: 1280, height: 800 });
-  }
+  // the close-up cache under a 1920x1080 screen is checked in its own developed world (cachePressure)
   await zoom(page, noWheel ? 16 : 30, 300);
   // save
   await page.getByLabel('Menu').click();
@@ -482,6 +464,63 @@ async function diseaseAndEruption(page, label, reduced) {
   await page.keyboard.press('Escape').catch(() => {});
 }
 
+/** The first entry in the Nations list that has a settlement (tribes, listed too, have none). */
+const firstNation = (page) => page.locator('.sheet-body ul.list li button', { hasText: /\d+ settlements? ·/ }).first();
+
+/**
+ * Fix round 2: the close-up cache on a big screen, in its own world. A big screen just past the close-up threshold
+ * wants many chunks; the layer must settle (nothing pending) with at most 48 chunks drawn and no redraws in 2 s.
+ * It used to run in the prehistoric world of the main run, where the only close-up chunk is one small village and
+ * the earthquake fired just before it can level that village (3 of 6 fresh worlds in a probe): then "0 drawn"
+ * whatever the zoom. Here the world starts in era 6 (established towns, no disaster), the capital is centred, and the
+ * zoom is reached by measurement (the renderer's data-tile-px hook), not by counting wheel steps.
+ */
+async function cachePressure() {
+  const label = 'desktop';
+  const browser = await engine.launch();
+  const page = await (await browser.newContext({ viewport: { width: 1920, height: 1080 } })).newPage();
+  await page.goto(url);
+  await page.getByText('New world').first().click();
+  await page.getByRole('slider', { name: 'Start in era' }).fill('6');
+  await page.getByRole('button', { name: 'Create world' }).click();
+  await page.getByRole('dialog', { name: /^Start in the/ }).getByRole('button', { name: /^Start in/ }).click();
+  await page.waitForSelector('canvas.canvas', { timeout: 60000 });
+  if (await page.getByText('Skip').count()) await page.getByText('Skip').click();
+  await page.getByLabel('Paused', { exact: true }).click();
+  // centre the capital: open it from its nation and follow it once
+  await page.getByLabel('Nations').click();
+  await firstNation(page).click();
+  await page.waitForTimeout(300);
+  await page.locator('[data-testid=open-capital]').first().click();
+  await page.locator('[data-testid=follow]').first().click();
+  await page.waitForTimeout(300);
+  await page.locator('[data-testid=follow]').first().click();
+  await page.getByLabel('Close').first().click().catch(() => {});
+  const canvas = page.locator('canvas.canvas');
+  const attr = async (n) => (await canvas.getAttribute(n)) ?? '';
+  const tilePx = async () => Number(await attr('data-tile-px'));
+  // after each wheel step, wait for a frame drawn at the new zoom (the hook changes), up to 1 s
+  const nextFrame = async (prev) => { for (let t = 0; t < 50; t++) { const v = await tilePx(); if (v !== prev) return v; await page.waitForTimeout(20); } return tilePx(); };
+  await page.mouse.move(960, 540);
+  let px = await tilePx();
+  for (let k = 0; k < 80 && px > 20; k++) { await page.mouse.wheel(0, 120); px = await nextFrame(px); }
+  // in small steps to just past the close-up threshold (20 px per tile)
+  for (let k = 0; k < 120 && px <= 21; k++) { await page.mouse.wheel(0, -40); px = await nextFrame(px); }
+  // settle: chunks drawn, nothing pending and no effect playing (up to 15 s)
+  for (let t = 0; t < 60; t++) {
+    if (Number(await attr('data-city-chunks')) > 0 && (await attr('data-city-pending')) === '0' && !(await attr('data-fx'))) break;
+    await page.waitForTimeout(250);
+  }
+  const r0 = await canvas.getAttribute('data-city-redraws');
+  await page.waitForTimeout(2000);
+  const r1 = await canvas.getAttribute('data-city-redraws');
+  const drawnBig = Number(await attr('data-city-chunks'));
+  const pendingBig = await attr('data-city-pending');
+  // settled: chunks drawn within the cap, nothing pending, and no chunk redrawn in 2 s of a still view
+  check(`${label}: close-up settles on a 1920x1080 screen (no thrash)`, drawnBig > 0 && drawnBig <= 48 && pendingBig === '0' && r0 !== null && r0 === r1, `${drawnBig} drawn, ${pendingBig} pending, redraws ${r0} -> ${r1}, at ${px} px per tile`);
+  await browser.close();
+}
+
 /** Round 10 addendum: pick Humans, check the hover hand, then tap until dry land takes the band; the hand plays. */
 async function dropHand(page, label, reduced = false) {
   await page.locator('.tool', { hasText: 'Humans' }).first().click();
@@ -526,6 +565,7 @@ await realistic();
 await narrow();
 await run('phone', { ...devices['iPhone 13'] });
 await run('desktop', { viewport: { width: 1280, height: 800 } });
+await cachePressure();
 await run('reduced', { viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
 const failed = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - failed}/${results.length} checks passed`);

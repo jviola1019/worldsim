@@ -143,6 +143,8 @@ export class Renderer {
     if (close > 0) this.drawCity(close);
     else this.cityChunksDrawn = 0;
     this.setData('cityChunks', String(this.cityChunksDrawn));
+    // the zoom the frame was drawn at (screen px per tile): the e2e test zooms to a measured threshold, not a guess
+    this.setData('tilePx', tilePx.toFixed(1));
     this.setData('overviewRepaints', String(this.layer.overviewRepaints));
     this.setData('overlayRepaints', String(this.overlay.repaints));
     // overlay
