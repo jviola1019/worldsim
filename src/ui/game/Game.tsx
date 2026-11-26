@@ -80,10 +80,16 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
     const r = new Renderer(canvas, sim, getAtlas());
     renderer.current = r;
     r.showLabels = prefs.labels;
+    // round 10 second addendum: effects drawn across the top of the view (the aurora) start below the top HUD
+    const hudTop = () => { r.topInset = Math.max(0, document.querySelector('.hud-top')?.getBoundingClientRect().bottom ?? 0); };
     const resize = () => {
       r.resize(window.innerWidth, window.innerHeight, Math.min(3, window.devicePixelRatio || 1));
+      hudTop();
     };
     resize();
+    const hudObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(hudTop) : null;
+    const hudEl = document.querySelector('.hud-top');
+    if (hudObserver && hudEl) hudObserver.observe(hudEl);
     r.cam.fitWorld(sim.w.map.w, sim.w.map.h);
     window.addEventListener('resize', resize);
     window.addEventListener('orientationchange', resize);
@@ -204,6 +210,7 @@ export function Game({ sim, prefs, exit, replaceSim }: { sim: Simulation; prefs:
       input.dispose();
       unsub();
       window.removeEventListener('resize', resize);
+      hudObserver?.disconnect();
       window.removeEventListener('orientationchange', resize);
     };
   }, [sim]);

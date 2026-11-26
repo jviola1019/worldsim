@@ -23,17 +23,38 @@ export const isSpec = (e: FxEntry | undefined): e is FxSpec => !!e && 'kind' in 
 /** Disasters draw themselves with their real radius (natural ones and the god powers alike). */
 export const DISASTER_FX: Record<string, FxSpec> = {
   earthquake: fx('quake', 3, { area: true }),
-  volcano: fx('explosion', 1.2, { area: true, then: fx('smoke_dark', 3) }),
+  // round 10 second addendum (Task 7): an eruption, a rain squall, a hurricane, a heat-cracked drought, a snow squall
+  volcano: fx('eruption', 4.5, { area: true, then: fx('smoke_dark', 2.5) }),
   flood: fx('flood', 3, { area: true }),
   tsunami: fx('wave', 2, { area: true, then: fx('flood', 2) }),
-  storm: fx('tornado', 3, { area: true }),
+  storm: fx('squall', 3, { area: true }),
+  hurricane: fx('hurricane', 4, { area: true }),
   meteor: fx('meteor', 0.8, { then: fx('explosion', 1.2, { area: true, then: fx('smoke', 2) }) }),
-  drought: fx('dust', 3, { area: true }),
-  blizzard: fx('snow', 3, { area: true }),
+  // a stony meteoroid that bursts in the air: a fireball and shock ring in the sky, then smoke (no ground blast)
+  airburst: fx('meteor', 0.6, { then: fx('airburst', 2, { area: true, flash: 'white', then: fx('smoke', 2) }) }),
+  drought: fx('heat', 3, { area: true }),
+  blizzard: fx('blizzard', 3, { area: true }),
   lightning: fx('lightning', 0.6),
   fire: fx('fire_big', 2),
-  plague: fx('plague', 3, { area: true }),
+  plague: fx('pall', 3, { area: true }),
 };
+
+/** A storm this large over or beside the sea is drawn as a hurricane. */
+export const HURRICANE_RADIUS = 5;
+
+/**
+ * The effect a disaster plays. `look` names another DISASTER_FX entry (an airburst is a meteor that bursts in the
+ * air). A storm of radius HURRICANE_RADIUS or more over the sea or on the coast is a hurricane. Reads the map only.
+ */
+export function disasterFx(sim: Sim, kind: string, x: number, y: number, r: number, look?: string): FxSpec {
+  if (look && DISASTER_FX[look]) return DISASTER_FX[look];
+  if (kind === 'storm' && r >= HURRICANE_RADIUS) {
+    const m = sim.w.map;
+    const i = m.inBounds(x, y) ? m.idx(x, y) : -1;
+    if (i >= 0 && (!m.isLand(i) || m.isCoastal(i))) return DISASTER_FX.hurricane;
+  }
+  return DISASTER_FX[kind] ?? DISASTER_FX.fire;
+}
 
 /** Effects of states that last (fighting, sieges, outbreaks), emitted by their systems while they last. */
 export const STATE_FX = {
@@ -44,6 +65,8 @@ export const STATE_FX = {
   gooSpread: fx('anomaly', 2, { cap: 2 }),
   nuclearBlast: fx('nuke', 4, { area: true, radius: 5, flash: 'white', then: fx('radiation', 3) }),
   orbitalStrike: fx('alien_beam', 1, { then: fx('explosion', 1.2) }),
+  /** A world pandemic closing: the pall on each town it reached (the origin's pall comes with the event). */
+  pandemicTown: fx('pall', 3, { cap: 1 }),
 } satisfies Record<string, FxSpec>;
 
 // ------------------------------------------------------------------------------- god powers
@@ -92,7 +115,7 @@ export const FX_BY_POWER: Record<string, FxEntry> = {
   dis_lightning: fx('lightning', 0.6), dis_meteor: none(BY_DISASTER), dis_earthquake: none(BY_DISASTER), dis_volcano: none(BY_DISASTER),
   dis_flood: none(BY_DISASTER), dis_storm: none(BY_DISASTER), dis_drought: none(BY_DISASTER), dis_tsunami: none(BY_DISASTER),
   dis_blizzard: none(BY_DISASTER), dis_fire: fx('fire', 0.6, { cap: 2 }),
-  dis_plague: fx('plague', 3, { area: true, radius: 3 }),
+  dis_plague: fx('pall', 3, { area: true, radius: 3 }), // a natural disease, sent by a god: the pall, not a skull
   horror_zombie: fx('skull', 1.5, { then: fx('fire', 1.5) }),
   horror_ghoul: fx('skull', 1.5, { then: fx('smoke_dark', 1.5) }),
   horror_blight: fx('skull', 1.5, { then: fx('plague', 1.5) }),
@@ -100,14 +123,14 @@ export const FX_BY_POWER: Record<string, FxEntry> = {
   nuke: none('drawn by each nuclear blast (state effect) at the struck city'),
   nuclear_war: none('drawn by each nuclear blast (state effect) at the struck cities'),
   asteroid: fx('meteor', 0.8, { flash: 'white', then: fx('explosion', 1.5, { area: true, radius: 6, then: fx('smoke_dark', 3) }) }),
-  supervolcano: fx('explosion', 1.5, { area: true, radius: 8, then: fx('smoke_dark', 3) }),
+  supervolcano: fx('eruption', 4.5, { area: true, radius: 8, then: fx('smoke_dark', 3) }),
   superflare: fx('star', 2, { area: true, radius: 6, flash: 'white' }),
   gamma_burst: fx('star', 2, { area: true, radius: 8, flash: 'white' }),
   engineered_plague: fx('plague', 2, { area: true, radius: 3, then: fx('skull', 1.5) }),
   infertility_plague: fx('plague', 2.5, { area: true, radius: 3 }),
   ai_uprising: fx('emp', 1.5, { area: true, radius: 3, then: fx('anomaly', 2) }),
   grey_goo: fx('anomaly', 3, { area: true, radius: 3 }),
-  emp: fx('emp', 2, { area: true, radius: 5, flash: 'white' }),
+  emp: fx('emp', 2, { area: true, radius: 5, flash: 'white', then: fx('aurora', 8, { world: true }) }), // a geomagnetic storm: auroras follow
   alien: fx('ufo', 3, { then: fx('alien_beam', 2.5) }),
   climate_warm: fx('steam', 2, { area: true, radius: 5 }),
   climate_cool: fx('snow', 2, { area: true, radius: 5 }),
@@ -133,22 +156,23 @@ export const FX_BY_EVENT: Record<string, FxEntry> = {
   culture_blend: fx('ring', 1.5, { area: true, radius: 2 }), culture_diverged: fx('ring', 1.5, { area: true, radius: 2 }),
   cyberattack: fx('emp', 1.5), debt_crisis: none(NO_PLACE), demographic_collapse: none('gradual process'),
   deposit_exhausted: fx('dust', 1.5), disaster: none(BY_DISASTER), dispersal: fx('dust', 1.5), domestication: fx('sparkle', 1.5),
-  election: none(FREQUENT), emp_strike: fx('emp', 2, { area: true, radius: 4, flash: 'white' }), epidemic: fx('plague', 2, { area: true, radius: 2 }),
+  election: none(FREQUENT), emp_strike: fx('emp', 2, { area: true, radius: 4, flash: 'white' }), epidemic: fx('pall', 3, { area: true, radius: 2 }),
   ethos_change: none('national values: shown in the news feed'), exploration: fx('star', 1.5), famine: fx('skull', 2),
   federation: fx('flag', 1.5, { then: fx('ring', 1.5, { area: true, radius: 3 }) }), financial_crisis: none(NO_PLACE), first_contact: fx('ring', 1.5, { area: true, radius: 2 }),
   gamma_ray_burst: fx('star', 2, { flash: 'white' }), generated_start: none('world setup'),
+  geomagnetic_storm: fx('aurora', 10, { world: true }), superflare: fx('aurora', 10, { world: true, flash: 'white' }),
   god_alien: none(BY_POWER), god_culture: none(BY_POWER), god_horror: none(BY_POWER), god_nuke: none(BY_POWER), god_people: none(BY_POWER),
   god_plague: none(BY_POWER), god_rain: none(BY_POWER), god_solar: none(BY_POWER),
   goo_contained: fx('heal', 1.5), government_change: fx('banner', 1.5), grey_goo: fx('anomaly', 3, { area: true, radius: 3 }),
   'horror_*': fx('skull', 1.5, { then: fx('plague', 1.5) }), horror_contained: fx('heal', 1.5),
   impact: fx('meteor', 0.8, { then: fx('explosion', 1.2, { area: true, radius: 4, then: fx('smoke', 2) }) }),
-  independence: fx('flag', 2), infertility_outbreak: fx('plague', 2), leader: none(FREQUENT), leapfrog: fx('book', 1.5),
+  independence: fx('flag', 2), infertility_outbreak: fx('pall', 2.5), leader: none(FREQUENT), leapfrog: fx('book', 1.5),
   league_founded: fx('coin', 1.5), mission_start: none('a national plan: shown in the news feed'), module: fx('steam', 1.5),
   monster_attack: fx('skull', 1.5), monster_slain: fx('star', 1.5), notable_death: none(FREQUENT), nuclear_state: fx('radiation', 2),
   nuclear_strike: none('drawn by each nuclear blast (state effect) at the struck city'), online_protest: none('online: no place'),
   orbital_strike: none('drawn by the strike itself (state effect)'), org_founded: none('an international body: no place'), org_join: none('an international body: no place'),
   outlet_closed: none(FREQUENT + ' (media churn)'), outlet_founded: none(FREQUENT + ' (media churn)'),
-  pandemic: fx('plague', 3, { area: true, radius: 3 }), // Task 7 redraws disease visuals
+  pandemic: fx('pall', 3, { area: true, radius: 3, flash: 'sick' }), // and the pall on each reached town (STATE_FX.pandemicTown)
   peace: fx('ring', 2, { area: true, radius: 3 }), religion_extinct: fx('smoke', 2), religion_founded: fx('star', 2),
   revolution: fx('fire', 1.5, { then: fx('flag', 1.5) }), royal_marriage: fx('heal', 1.5), ruler_death: none(FREQUENT), scenario: none('scenario goals'),
   schism: fx('clash', 1.5), sea_level: fx('wave', 2), secession: fx('flag', 2), secularization: none('gradual process'),
@@ -164,7 +188,10 @@ export const FX_BY_EVENT: Record<string, FxEntry> = {
 };
 
 /** Effect sprites no concept uses, with the reason (the coverage test checks this list). */
-export const UNUSED_SPRITES: Record<string, string> = {};
+export const UNUSED_SPRITES: Record<string, string> = {
+  'fx.tornado': 'kept for tornado events (none yet): storms show the rain squall, large coastal ones the hurricane',
+  'fx.sick': 'drawn by the renderer on every town with more than 1% infected (sickMarker), not by a concept',
+};
 
 export function eventEntry(type: string): FxEntry | undefined {
   const exact = FX_BY_EVENT[type];
@@ -225,5 +252,6 @@ export function eventFx(sim: Sim, ev: HistoryEvent): void {
   const e = eventEntry(ev.type);
   if (!isSpec(e) || ev.importance < (e.minImportance ?? 2)) return;
   if (ev.x >= 0 && ev.y >= 0) emitFx(sim, e, ev.x, ev.y);
+  else if (e.world) addFx(sim, e.kind, -1, -1, e.dur, undefined, { flash: e.flash }); // the aurora: across the view
   else if (e.flash) addFx(sim, 'flash', -1, -1, 0.4, undefined, { flash: e.flash });
 }

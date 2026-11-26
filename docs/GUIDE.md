@@ -560,6 +560,7 @@ A **counterfactual** test is the main tool for checking cause and effect. It clo
 | `viewports.mjs` | Opens the game on 6 device profiles and enforces text ≥ 12 px, touch targets ≥ 44 px and WCAG AA contrast. |
 | `design-capture.mjs` | Takes about 120 screenshots across devices and measures text size, touch targets, contrast and motion. |
 | `perf-closeup.mjs` | Frame times of the close-up city, with the CPU throttled. |
+| `fx-capture.mjs` | Starts a Vite dev server and captures every disaster and disease effect at 2× over its life (`REDUCED=1` for the Reduce-motion stills), for design review. |
 | `render-sprites.ts`, `contact-sheet.ts` | Export the pixel art to PNG and make a sprite contact sheet. |
 | `gallery*.mjs`, `screenshot.mjs`, `guide.mjs` | README screenshots and annotated "what's on screen" images. |
 

@@ -22,7 +22,7 @@
 import { flow } from '../population/ledger';
 import type { Sim } from '../sim/context';
 import { markTile, setVeg, setPollution } from '../sim/context';
-import { emitFx, DISASTER_FX } from '../sim/conceptFx';
+import { emitFx, disasterFx } from '../sim/conceptFx';
 import { BALANCE } from '../config/balance';
 import { clamp, clamp01, DX4, DY4 } from '../core/math';
 import { T, isWaterTerrain } from './terrain';
@@ -188,8 +188,11 @@ const DISASTER_NAMES: Record<string, string> = {
   tsunami: 'A tsunami', drought: 'A drought', blizzard: 'A blizzard', lightning: 'Lightning', fire: 'A fire', plague: 'A plague',
 };
 
-/** Apply a disaster's physical and human effects. Also used by god powers. */
-export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r: number, natural = false, pressure: EndingType = 'disaster', severityMult = 1, causes?: Cause[]): void {
+/**
+ * Apply a disaster's physical and human effects. Also used by god powers. `look` only changes what is drawn (a
+ * DISASTER_FX entry: an airburst is a meteor that bursts in the air); it never changes what happens.
+ */
+export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r: number, natural = false, pressure: EndingType = 'disaster', severityMult = 1, causes?: Cause[], look?: string): void {
   const w = sim.w;
   const m = w.map;
   const rng = sim.rng;
@@ -279,7 +282,7 @@ export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r:
     deaths += dead;
     s.unrest = clamp01(s.unrest + share * 2);
   }
-  emitFx(sim, DISASTER_FX[kind] ?? DISASTER_FX.fire, x, y, r);
+  emitFx(sim, disasterFx(sim, kind, x, y, r, look), x, y, r);
   if (deaths > 10 || destroyed > 2 || !natural || kind === 'volcano')
     logEvent(sim, {
       type: 'disaster',

@@ -27,6 +27,7 @@ import { HAZARD } from '../world/tilemap';
 import { B, eraToTier } from '../civilizations/buildingTypes';
 import { SPECIES_BY_KEY, MONSTERS } from '../ecology/species';
 import { hash3 } from '../core/rng';
+import { fxFrame, sickMarker, auroraAlpha, stillKind } from './fxMotion';
 
 export interface Brush {
   x: number;
@@ -170,15 +171,17 @@ export class Renderer {
       this.drawArmies(vis, tilePx);
     }
     this.drawFx(dt);
+    this.drawSickTowns();
     this.drawSelection();
     this.drawBrush();
     this.drawHoverHand();
     // labels in screen space
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    this.drawAurora();
     if (this.showLabels) this.drawLabels(tilePx);
     if (this.flashT > 0) {
       // full-screen tint (0.25 opacity, fading over 400 ms)
-      const rgb = this.flashColor === 'red' ? '230,60,40' : this.flashColor === 'green' ? '90,220,120' : '255,255,255';
+      const rgb = FLASH_RGB[this.flashColor] ?? FLASH_RGB.white;
       ctx.fillStyle = `rgba(${rgb},${(0.25 * this.flashT) / 0.4})`;
       ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
       this.flashT = Math.max(0, this.flashT - dt);
@@ -707,9 +710,10 @@ export class Renderer {
     const kinds = new Set<string>();
     let motion = ''; // what each effect looks like this frame (ring size, sprite frame): a test hook for movement
     const reduce = this.reduceMotion;
+    this.aurora = null;
     for (let k = fx.length - 1; k >= 0; k--) {
       const f = fx[k];
-      if (reduce && f.then) collapseSequence(f); // Reduce motion: the sequence shows only its final still
+      if (reduce && f.then) collapseSequence(f); // Reduce motion: the sequence shows one still (its characteristic step)
       const fresh = f.t >= f.dur;
       f.t -= dt;
       if (f.t <= 0) {
@@ -723,9 +727,15 @@ export class Renderer {
         this.flashT = 0.4;
         this.flashColor = f.flash;
       }
+      const progress = 1 - f.t / f.dur;
+      if (f.kind === 'fx.aurora') {
+        // drawn across the top of the view after the map (drawAurora); one band however many storms
+        if (!this.aurora || progress < this.aurora.p) this.aurora = { p: progress };
+        kinds.add(f.kind);
+        continue;
+      }
       if (f.x < 0) continue; // placeless: flash only
       const spr = atlas.get(f.kind);
-      const progress = 1 - f.t / f.dur;
       if (f.kind === 'fx.hand') {
         motion += this.drawHand(f.x, f.y, progress, f.sprite) + ';';
         kinds.add(f.kind);
@@ -734,18 +744,16 @@ export class Renderer {
       if (f.ring) {
         // area ring: grows to the concept's radius and fades; a still ring under Reduce motion
         const grow = reduce ? 1 : 0.35 + 0.65 * progress;
-        ctx.strokeStyle = f.kind === 'fx.nuke' ? `rgba(255,255,255,${reduce ? 0.6 : 0.85 * (1 - progress)})` : `rgba(248,232,137,${reduce ? 0.6 : 0.8 * (1 - progress)})`;
+        const rgb = f.kind === 'fx.nuke' ? '255,255,255' : f.kind === 'fx.pall' ? '196,208,150' : '248,232,137'; // sickness: a pale green-grey ring, not gold
+        ctx.strokeStyle = `rgba(${rgb},${reduce ? 0.6 : (f.kind === 'fx.nuke' ? 0.85 : 0.8) * (1 - progress)})`;
         ctx.lineWidth = 2 / this.cam.zoom;
         ctx.beginPath();
         ctx.arc(f.x * TILE + 4, f.y * TILE + 4, f.ring * TILE * grow, 0, Math.PI * 2);
         ctx.stroke();
         motion += `r${Math.round(f.ring * TILE * grow * 4)}`;
       }
-      let frame = 0;
-      if (spr && spr.frames > 1) {
-        if (reduce) frame = Math.floor((spr.frames - 1) / 2); // one still marker for the whole duration
-        else frame = f.kind === 'fx.fire' || f.kind === 'fx.clash' ? this.frameIdx(8) : Math.min(spr.frames - 1, Math.floor(progress * spr.frames));
-      }
+      // weather and sickness loop, blasts play once; one still frame under Reduce motion (fxMotion.ts)
+      const frame = spr ? fxFrame(f.kind, spr.frames, progress, this.time, reduce) : 0;
       atlas.draw(ctx, f.kind, f.x * TILE + 4, f.y * TILE + 6, frame);
       kinds.add(f.kind);
       motion += `f${frame};`;
@@ -764,6 +772,69 @@ export class Renderer {
         ctx.stroke();
       }
     }
+  }
+
+  /** CSS px of the view hidden under the top HUD (set by the game); the aurora hangs just below it. */
+  topInset = 0;
+  /** The aurora playing this frame (its progress), set by drawFx. */
+  private aurora: { p: number } | null = null;
+
+  /**
+   * Round 10 second addendum: a geomagnetic storm's aurora, a band of light across the top of the view for the
+   * storm's duration, over a dark night-sky wash so it reads on any land. Screen space, 4 px per art pixel. Fades in and
+   * out; one still frame at a fixed opacity under Reduce motion.
+   */
+  private drawAurora(): void {
+    const a = this.aurora;
+    if (!a) { this.setData('aurora', ''); return; }
+    const { ctx, atlas } = this;
+    const spr = atlas.get('fx.aurora');
+    if (!spr) return;
+    const alpha = auroraAlpha(a.p, this.reduceMotion);
+    const k = 4;
+    const h = spr.h * k;
+    const top = Math.min(this.topInset, this.cam.viewH / 3);
+    ctx.save();
+    // the sky darkens from the top of the view down past the curtains (under the HUD too: it hangs from above)
+    const bottom = top + h + 24;
+    const sky = ctx.createLinearGradient(0, 0, 0, bottom);
+    sky.addColorStop(0, `rgba(13,20,36,${0.85 * alpha})`);
+    sky.addColorStop((top + h * 0.75) / bottom, `rgba(13,20,36,${0.8 * alpha})`);
+    sky.addColorStop(1, 'rgba(13,20,36,0)');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, this.cam.viewW, bottom);
+    ctx.globalAlpha = alpha * 1.15; // the land shows faintly through the light
+    ctx.imageSmoothingEnabled = false;
+    const frame = fxFrame('fx.aurora', spr.frames, a.p, this.time, this.reduceMotion);
+    for (let x = 0; x < this.cam.viewW; x += spr.w * k) atlas.draw(ctx, 'fx.aurora', x, top + 2, frame, undefined, false, false, k);
+    ctx.restore();
+    this.setData('aurora', `${frame}:${alpha.toFixed(2)}`);
+  }
+
+  /**
+   * Round 10 second addendum: while more than 1% of a town is infected, a small red plague cross stands just right
+   * of its centre, pulsing slowly (still under Reduce motion). It keeps a readable size (about 11 px) at any zoom.
+   */
+  private drawSickTowns(): void {
+    const { ctx, atlas, cam } = this;
+    const m = this.sim.w.map;
+    const [x0, y0, x1, y1] = cam.visibleTiles(m.w, m.h, 2);
+    const k = Math.max(this.unitScale, 11 / (7 * cam.zoom)); // about 11 screen px tall
+    let n = 0;
+    let pulse = '';
+    for (const s of this.sim.w.settlements.values()) {
+      if (s.x < x0 || s.x > x1 || s.y < y0 || s.y > y1) continue;
+      const mark = sickMarker(s, this.time, this.reduceMotion);
+      if (!mark) continue;
+      ctx.save();
+      ctx.globalAlpha = mark.alpha;
+      atlas.draw(ctx, 'fx.sick', (s.x + 0.5) * TILE + 6 * k, (s.y + 0.5) * TILE + 2 * k, 0, undefined, false, false, k); // just right of the town's centre
+      ctx.restore();
+      if (!n) pulse = mark.alpha.toFixed(2);
+      n++;
+    }
+    this.setData('sick', String(n));
+    this.setData('sickPulse', pulse);
   }
 
   private drawSelection(): void {
@@ -938,6 +1009,9 @@ export class Renderer {
 
 export { OV_SCALE };
 
+/** Full-screen tints for the biggest concepts ('sick': the pale green-grey of the sickness pall). */
+const FLASH_RGB: Record<string, string> = { white: '255,255,255', red: '230,60,40', green: '90,220,120', sick: '170,186,128' };
+
 /**
  * A walker drawn from the town's real employment mix: farmers, miners, smiths, merchants and scholars,
  * soldiers of the nation's land-warfare tier, builders, and the unemployed out walking.
@@ -948,8 +1022,12 @@ function followUp(f: VisualFx, spec: FxSpec): VisualFx {
   return { kind: spec.kind, x: f.x, y: f.y, t: spec.dur, dur: spec.dur, data: f.data, ring, then: spec.then, flash: spec.flash };
 }
 
-/** Reduce motion: a sequence becomes its last effect, shown for the whole sequence's duration. */
+/**
+ * Reduce motion: a sequence becomes one still, shown for the whole sequence's duration: its characteristic step
+ * (the eruption, the airburst) when it names one, else its last effect (stillKind).
+ */
 function collapseSequence(f: VisualFx): void {
+  const kind = stillKind(f);
   let spec = f.then!;
   let total = f.t;
   let ring = f.ring ?? 0;
@@ -959,7 +1037,7 @@ function collapseSequence(f: VisualFx): void {
     if (!spec.then) break;
     spec = spec.then;
   }
-  f.kind = spec.kind;
+  f.kind = kind;
   f.t = f.dur = total;
   f.ring = ring || undefined;
   f.then = undefined;

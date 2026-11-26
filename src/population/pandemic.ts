@@ -24,6 +24,7 @@ import { BALANCE } from '../config/balance';
 import { clamp } from '../core/math';
 import { emergeNovel, infect, transmissionFactor, lethalityFactor } from './disease';
 import { logEvent } from '../history/events';
+import { emitFx, STATE_FX } from '../sim/conceptFx';
 
 /** Smallest town the local model runs in (`diseaseMonthly` skips smaller ones). */
 const MIN_POP = 30;
@@ -149,6 +150,8 @@ export function closePandemics(sim: Sim): void {
         { label: 'Trade and travel links between towns', weight: 0.3 + connectivity(sim) },
       ],
     });
+    // visual only: the sickness pall over every town it reached (the event's own pall covers the origin)
+    for (const s of reached) emitFx(sim, STATE_FX.pandemicTown, s.x, s.y);
   }
 }
 

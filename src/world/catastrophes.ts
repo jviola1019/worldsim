@@ -91,7 +91,7 @@ export function asteroidImpact(sim: Sim, x: number, y: number, size: 'airburst' 
   const e = worldEndings(sim);
   const c: Cause[] = causes ?? [{ label: size === 'airburst' ? 'A stony meteoroid exploded in the atmosphere' : `An impactor about ${size === 'major' ? '1 km' : '10 km'} across`, weight: 1 }];
   if (size === 'airburst') {
-    triggerDisaster(sim, 'meteor', x, y, 2, true, 'asteroid', 1, c);
+    triggerDisaster(sim, 'meteor', x, y, 2, true, 'asteroid', 1, c, 'airburst');
     logCatastrophe(sim, 'airburst', x, y);
     return;
   }

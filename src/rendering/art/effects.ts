@@ -1,67 +1,7 @@
 /** Fire, smoke, explosions, weather, divine/disaster effects (fx.*) */
 import { S, type SpriteSheet } from './types';
-
-// ---------------------------------------------------------------- author-time raster helpers
-// Small generators used to build the geometric effects (fireballs, clouds, rings). They run once
-// at module load and produce ordinary palette-key rows.
-type Canvas = string[][];
-type Blob = [cx: number, cy: number, r: number];
-/** Cel-shading tones for cloud(): outline, shadow, main, light. */
-interface Tones {
-  o?: string;
-  s: string;
-  m: string;
-  l: string;
-}
-
-const canvas = (w: number, h: number): Canvas => Array.from({ length: h }, () => Array<string>(w).fill('.'));
-const rowsOf = (c: Canvas): string[] => c.map((r) => r.join(''));
-
-function plot(c: Canvas, x: number, y: number, ch: string): void {
-  if (y >= 0 && y < c.length && x >= 0 && x < c[0].length) c[y][x] = ch;
-}
-function inEllipse(x: number, y: number, cx: number, cy: number, rx: number, ry: number): boolean {
-  if (rx <= 0 || ry <= 0) return false;
-  const dx = (x + 0.5 - cx) / rx;
-  const dy = (y + 0.5 - cy) / ry;
-  return dx * dx + dy * dy <= 1;
-}
-function fillEllipse(c: Canvas, cx: number, cy: number, rx: number, ry: number, ch: string): void {
-  for (let y = 0; y < c.length; y++)
-    for (let x = 0; x < c[0].length; x++) if (inEllipse(x, y, cx, cy, rx, ry)) c[y][x] = ch;
-}
-/** 1px ellipse outline; `ch` may pick a color per pixel (null = skip). */
-function strokeEllipse(
-  c: Canvas,
-  cx: number,
-  cy: number,
-  rx: number,
-  ry: number,
-  ch: string | ((x: number, y: number) => string | null),
-): void {
-  const inside = (x: number, y: number) => inEllipse(x, y, cx, cy, rx, ry);
-  for (let y = 0; y < c.length; y++)
-    for (let x = 0; x < c[0].length; x++) {
-      if (!inside(x, y)) continue;
-      if (inside(x - 1, y) && inside(x + 1, y) && inside(x, y - 1) && inside(x, y + 1)) continue;
-      const v = typeof ch === 'string' ? ch : ch(x, y);
-      if (v) c[y][x] = v;
-    }
-}
-/** Cartoon cloud / fireball: union of round blobs, lit from the top-left. */
-function cloud(c: Canvas, blobs: Blob[], t: Tones): void {
-  if (t.o) for (const [x, y, r] of blobs) fillEllipse(c, x, y, r + 1, r + 1, t.o);
-  for (const [x, y, r] of blobs) fillEllipse(c, x, y, r, r, t.s);
-  for (const [x, y, r] of blobs) fillEllipse(c, x - 0.6, y - 0.8, r - 0.8, r - 0.8, t.m);
-  for (const [x, y, r] of blobs) fillEllipse(c, x - 1.2, y - 1.5, r * 0.45, r * 0.45, t.l);
-}
-
-const FIRE: Tones = { o: 'n', s: 'f', m: 'F', l: 'O' };
-const BURN: Tones = { o: 'm', s: 'f', m: 'F', l: 'O' };
-const EMBER: Tones = { o: 'r', s: 'm', m: 'n', l: 'f' };
-const SMOKE: Tones = { o: '2', s: '3', m: '4', l: '5' };
-const DUST: Tones = { o: '3', s: '4', m: '5', l: '6' };
-const HAZE: Tones = { s: '3', m: '4', l: '5' };
+import { canvas, rowsOf, plot, fillEllipse, strokeEllipse, cloud, FIRE, BURN, EMBER, SMOKE, DUST, HAZE } from './pixelDraw';
+import { DISASTER_EFFECTS } from './effects_disaster';
 
 const E: SpriteSheet = {};
 
@@ -520,14 +460,6 @@ E['fx.splash'] = S(
   ],
   { fps: 8 },
 );
-E['fx.wave'] = S(
-  [
-    ['..q..', '.q.q.'],
-    ['.q7q.', 'q...q'],
-    ['.....', 'q.q.q'],
-  ],
-  { fps: 3 },
-);
 E['fx.foam'] = S(
   [
     ['77q..q7q', 'q.qqq.qq'],
@@ -536,14 +468,6 @@ E['fx.foam'] = S(
   ],
   { fps: 3 },
 );
-E['fx.flood'] = S(
-  [
-    ['..qqq...', '.qzzzq..', '....qqq.', '...qzzzq'],
-    ['...qqq..', '..qzzzq.', '.qqq....', 'qzzzq...'],
-  ],
-  { fps: 3 },
-);
-
 // ---------------------------------------------------------------- divine / combat / markers
 E['fx.sparkle'] = S(
   [
@@ -653,13 +577,6 @@ E['fx.banner'] = S(
 );
 
 // ---------------------------------------------------------------- disasters & strange things
-E['fx.quake'] = S(
-  [
-    ['........', '.....1..', '....10..', '...01...', '..10....', '.10..1..', '10...01.', '.......0'],
-    ['......t.', '....t01.', '...1001.', '..001.1t', 't100..10', '.00..t.0', '10...001', 't....t.0'],
-  ],
-  { fps: 6 },
-);
 E['fx.plague'] = S(
   [
     ['......', '..kl..', '.kYkl.', 'kY.Ykk', '.kYXk.', '..kk..'],
@@ -792,5 +709,8 @@ function firework(f: number): string[] {
   return rowsOf(c);
 }
 E['fx.firework'] = S([0, 1, 2, 3].map(firework), { fps: 6, ax: 6, ay: 10 });
+
+// round 10 second addendum: realistic storms, eruptions, floods, sickness and auroras (effects_disaster.ts)
+Object.assign(E, DISASTER_EFFECTS);
 
 export const EFFECT_SPRITES: SpriteSheet = E;

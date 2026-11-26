@@ -13,6 +13,10 @@ import { logEvent } from '../../src/history/events';
 import { encodeWorld, decodeWorld } from '../../src/persistence/serialize';
 import { Simulation } from '../../src/sim/simulation';
 import type { Sim } from '../../src/sim/context';
+import { triggerDisaster } from '../../src/world/environment';
+import { asteroidImpact } from '../../src/world/catastrophes';
+import { closePandemics } from '../../src/population/pandemic';
+import type { Disease } from '../../src/sim/types';
 
 const srcFiles = (dir: string): string[] => readdirSync(dir).flatMap((f) => {
   const p = join(dir, f);
@@ -168,6 +172,132 @@ describe('effects never change history', () => {
       const s = biggest(sim);
       for (const id of ['dis_earthquake', 'grow', 'tech_grant', 'religion_found', 'dis_plague', 'raise']) applyPower(sim, id, s.x, s.y, 2, { selectedCiv: s.civId });
       sim.runYears(5);
+      sim.syncRng();
+    }
+    expect(a.fx.length).toBeGreaterThan(0);
+    expect(Buffer.from(encodeWorld(a.w)).equals(Buffer.from(encodeWorld(b.w)))).toBe(true);
+  }, 120000);
+});
+
+// ------------------------------------------------------------------------------- Task 7: realistic visuals
+
+const kindsOf = (e: FxEntry | FxSpec | undefined) => allSpecs(e).map((s) => s.kind);
+/** A land tile with no water within 6 tiles, and a coastal land tile (both exist on a 64-tile world). */
+function landSites(sim: Sim) {
+  const m = sim.w.map;
+  let inland: [number, number] | null = null, coast: [number, number] | null = null;
+  for (let i = 0; i < m.n && !(inland && coast); i++) {
+    if (!m.isLand(i)) continue;
+    const x = m.xOf(i), y = m.yOf(i);
+    if (!coast && m.isCoastal(i)) coast = [x, y];
+    if (!inland && x > 6 && y > 6 && x < m.w - 7 && y < m.h - 7) {
+      let water = 0;
+      m.forRadius(x, y, 6, (j) => { if (!m.isLand(j)) water++; });
+      if (!water) inland = [x, y];
+    }
+  }
+  if (!inland || !coast) throw new Error('no sites');
+  return { inland, coast };
+}
+
+describe('Task 7: realistic disaster and disease visuals', () => {
+  it('a storm is a rain squall; a large coastal storm is a hurricane; the tornado is kept for tornado events', () => {
+    expect(DISASTER_FX.storm.kind).toBe('fx.squall');
+    expect(DISASTER_FX.hurricane.kind).toBe('fx.hurricane');
+    expect(EFFECT_SPRITES['fx.tornado']).toBeDefined();
+    expect(UNUSED_SPRITES['fx.tornado']).toMatch(/tornado/);
+  });
+
+  it('triggerDisaster draws a hurricane for a large coastal storm and a squall inland or small', () => {
+    const sim = makeSim('fx-storm', 64, (c) => { c.settings.startCivs = 0; });
+    const { inland, coast } = landSites(sim);
+    const play = (x: number, y: number, r: number) => { sim.fx.length = 0; triggerDisaster(sim, 'storm', x, y, r, true); return sim.fx.map((f) => f.kind); };
+    expect(play(coast[0], coast[1], 5)).toEqual(['fx.hurricane']);
+    expect(play(inland[0], inland[1], 6)).toEqual(['fx.squall']);
+    expect(play(coast[0], coast[1], 2)).toEqual(['fx.squall']);
+  });
+
+  it('a volcano erupts (ash column, then dark smoke), not the generic explosion; the supervolcano too', () => {
+    expect(kindsOf(DISASTER_FX.volcano)[0]).toBe('fx.eruption');
+    expect(kindsOf(DISASTER_FX.volcano)).not.toContain('fx.explosion');
+    expect(kindsOf(FX_BY_POWER.supervolcano)[0]).toBe('fx.eruption');
+  });
+
+  it('natural disease shows the sickness pall, never a skull; skulls stay for fictional horrors', () => {
+    for (const id of ['epidemic', 'pandemic', 'infertility_outbreak']) {
+      expect(kindsOf(eventEntry(id))[0], id).toBe('fx.pall');
+      expect(kindsOf(eventEntry(id)), id).not.toContain('fx.skull');
+    }
+    expect(kindsOf(FX_BY_POWER.dis_plague)[0]).toBe('fx.pall');
+    expect(kindsOf(DISASTER_FX.plague)[0]).toBe('fx.pall');
+    expect(kindsOf(FX_BY_POWER.horror_zombie)).toContain('fx.skull');
+    expect(kindsOf(eventEntry('horror_ghoul'))).toContain('fx.skull');
+  });
+
+  it('a geomagnetic storm shows the aurora across the map (placeless), as does the solar storm power', () => {
+    const e = eventEntry('geomagnetic_storm');
+    expect(isSpec(e) && e.kind).toBe('fx.aurora');
+    expect(isSpec(e) && e.world).toBe(true);
+    expect(kindsOf(FX_BY_POWER.emp)).toContain('fx.aurora');
+    const sim = makeSim('fx-aurora', 48);
+    sim.fx.length = 0;
+    logEvent(sim, { type: 'geomagnetic_storm', cat: 'disaster', title: 'Storm', importance: 3 });
+    expect(sim.fx.map((f) => [f.kind, f.x])).toEqual([['fx.aurora', -1]]);
+  });
+
+  it('an airburst is a fireball and shock ring in the sky, then smoke; a ground impact keeps the explosion', () => {
+    expect(kindsOf(DISASTER_FX.airburst)).toContain('fx.airburst');
+    expect(kindsOf(DISASTER_FX.airburst)).not.toContain('fx.explosion');
+    expect(kindsOf(DISASTER_FX.meteor)).toContain('fx.explosion');
+    const sim = makeSim('fx-airburst', 64, (c) => { c.settings.startCivs = 0; });
+    const { inland } = landSites(sim);
+    sim.fx.length = 0;
+    asteroidImpact(sim, inland[0], inland[1], 'airburst');
+    expect(sim.fx.map((f) => f.kind)).toEqual(['fx.meteor']);
+    expect(kindsOf(sim.fx[0].then)).toContain('fx.airburst');
+  });
+
+  it('a pandemic lays the pall on each town it reached, with one world flash in its colour', () => {
+    const sim = makeSim('fx-pandemic', 64, (c) => { c.settings.startEra = 4; });
+    const towns = [...sim.w.settlements.values()];
+    expect(towns.length).toBeGreaterThan(3);
+    const origin = towns[0];
+    const d: Disease = { id: ++sim.w.ids.disease, name: 'Test Flu', r0: 2, lethality: 0.01, duration: 1, immunity: 600, origin: origin.id, emerged: sim.year - 2, zoonotic: false, totalDeaths: 5000, pandemic: true, worldPop: 1e5 };
+    sim.w.diseases.set(d.id, d);
+    for (const s of towns) s.immunity[d.id] = 0.5;
+    sim.fx.length = 0;
+    closePandemics(sim);
+    const palls = sim.fx.filter((f) => f.kind === 'fx.pall');
+    const places = new Set(palls.map((f) => `${f.x},${f.y}`));
+    expect(palls.length).toBe(places.size); // one per place
+    const expected = new Set(towns.map((s) => `${s.x},${s.y}`));
+    // every reached town is covered: by its own pall or a pall within 2 tiles (the per-place cap)
+    for (const s of towns) expect(palls.some((f) => (f.x - s.x) ** 2 + (f.y - s.y) ** 2 <= 4), s.name).toBe(true);
+    expect(places.size).toBeLessThanOrEqual(expected.size);
+    expect(sim.fx.filter((f) => f.flash).map((f) => f.flash)).toEqual(['sick']);
+  });
+
+  it('the new effects change no history: storms, an airburst and a pandemic with and without their effects', () => {
+    const base = makeSim('fx-det7', 64, (c) => { c.settings.startEra = 5; });
+    base.runYears(1);
+    base.syncRng();
+    const save = encodeWorld(base.w);
+    const a = new Simulation(decodeWorld(save));
+    const b = new Simulation(decodeWorld(save));
+    b.fx.push(...Array.from({ length: 401 }, () => ({ kind: 'fx.star', x: 0, y: 0, t: 1e9, dur: 1e9 })));
+    for (const sim of [a, b]) {
+      const { inland, coast } = landSites(sim);
+      triggerDisaster(sim, 'storm', coast[0], coast[1], 5, true);
+      triggerDisaster(sim, 'storm', inland[0], inland[1], 6);
+      triggerDisaster(sim, 'volcano', inland[0], inland[1], 3, true);
+      asteroidImpact(sim, inland[0], inland[1], 'airburst');
+      logEvent(sim, { type: 'geomagnetic_storm', cat: 'disaster', title: 'Storm', importance: 3 });
+      const towns = [...sim.w.settlements.values()];
+      const d: Disease = { id: ++sim.w.ids.disease, name: 'Test Flu', r0: 2, lethality: 0.01, duration: 1, immunity: 600, origin: towns[0].id, emerged: sim.year - 2, zoonotic: false, totalDeaths: 5000, pandemic: true, worldPop: 1e5 };
+      sim.w.diseases.set(d.id, d);
+      for (const s of towns) s.immunity[d.id] = 0.5;
+      closePandemics(sim); // the pall on every reached town
+      sim.runYears(3);
       sim.syncRng();
     }
     expect(a.fx.length).toBeGreaterThan(0);

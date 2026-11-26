@@ -224,6 +224,7 @@ async function run(label, ctxOpts) {
   else check(`${label}: the effect animates`, changes >= 2, `${changes} of 3 samples changed (last: ${prev})`);
   await page.getByLabel('Stop using this power').click().catch(() => {});
   await page.keyboard.press('Escape').catch(() => {});
+  await diseaseAndEruption(page, label, reduced);
   if (label === 'desktop') {
     // cache pressure: a big screen just past the close-up threshold wants more chunks than the cache
     // holds; the layer must settle (nothing pending) with at most 48 chunks drawn
@@ -429,6 +430,56 @@ async function startScreen() {
   check('new world: Alien planet is off in Realistic and open in God mode', alienOff && alienOn, `realistic disabled ${alienOff}, god enabled ${alienOn}`);
   check('new world: no page errors', errors.length === 0, errors.slice(0, 2).join(' | '));
   await browser.close();
+}
+
+/**
+ * Round 10 second addendum (Task 7): realistic disease and eruption visuals through the real dock. The camera is on
+ * the capital (followed earlier). A plague there shows the sickness pall (not a skull) and the sick-town marker; the
+ * pall ends, and once time runs the town recovers and the marker goes. An eruption nearby animates (5 samples);
+ * under Reduce motion both are still.
+ */
+async function diseaseAndEruption(page, label, reduced) {
+  const canvas = page.locator('canvas.canvas');
+  const vp = page.viewportSize();
+  const attr = async (n) => (await canvas.getAttribute(n)) ?? '';
+  // the Disasters tools may still be open from the earthquake
+  const openDisasters = async () => { if (!(await page.getByRole('toolbar', { name: 'Disasters' }).count())) await page.getByRole('button', { name: 'Disasters' }).click(); };
+  await openDisasters();
+  await page.locator('.tool', { hasText: 'Plague' }).first().click();
+  await page.mouse.click(vp.width / 2, vp.height / 2);
+  await page.waitForTimeout(400);
+  const fx0 = await attr('data-fx');
+  const sick0 = Number(await attr('data-sick'));
+  const pulses = [];
+  for (let k = 0; k < 5; k++) { pulses.push(`${await attr('data-fx-motion')}|${await attr('data-sick-pulse')}`); await page.waitForTimeout(250); }
+  check(`${label}: a plague shows the sickness pall and the sick-town marker (no skull)`, fx0.includes('fx.pall') && !fx0.includes('fx.skull') && sick0 >= 1, `fx "${fx0}", sick towns ${sick0}`);
+  if (reduced) check(`${label}: under Reduce motion the pall and the marker are still`, pulses.every((x) => x === pulses[0]), pulses.join(' / '));
+  else check(`${label}: the pall drifts and the marker pulses`, new Set(pulses.map((x) => x.split('|')[0])).size >= 3 && new Set(pulses.map((x) => x.split('|')[1])).size >= 2, pulses.join(' / '));
+  await page.waitForTimeout(3000);
+  const fx1 = await attr('data-fx');
+  check(`${label}: the pall ends`, !fx1.includes('fx.pall'), `later "${fx1}"`);
+  await page.getByLabel('Stop using this power').click().catch(() => {});
+  await page.keyboard.press('Escape').catch(() => {});
+  // let time run until the town recovers (a divine plague lasts about a year)
+  await page.getByLabel('Max', { exact: true }).click();
+  let sick1 = sick0;
+  for (let k = 0; k < 40 && sick1 > 0; k++) { await page.waitForTimeout(500); sick1 = Number(await attr('data-sick')); }
+  await page.getByLabel('Paused', { exact: true }).click();
+  check(`${label}: the sick-town marker goes when the town recovers`, sick1 === 0, `sick towns ${sick0} → ${sick1}`);
+  // an eruption a little way off: the ash column rises (sprite frames and ring change), or one still under Reduce motion
+  await openDisasters();
+  await page.locator('.tool', { hasText: 'Eruption' }).first().click();
+  await page.mouse.click(vp.width / 2 - Math.min(120, vp.width / 4), vp.height / 2 + 30);
+  await page.waitForTimeout(200);
+  const fxE = await attr('data-fx');
+  const samples = [];
+  for (let k = 0; k < 5; k++) { samples.push(await attr('data-fx-motion')); await page.waitForTimeout(300); }
+  const frames = new Set(samples.map((x) => (x.match(/f(\d+);/) ?? [])[1]));
+  check(`${label}: an eruption plays the ash column (not the generic explosion)`, fxE.includes('fx.eruption') && !fxE.includes('fx.explosion'), `fx "${fxE}"`);
+  if (reduced) check(`${label}: under Reduce motion the eruption is one still`, samples.every((x) => x === samples[0]), samples.join(' / '));
+  else check(`${label}: the eruption animates (5 samples)`, new Set(samples).size >= 4 && frames.size >= 2, samples.join(' / '));
+  await page.getByLabel('Stop using this power').click().catch(() => {});
+  await page.keyboard.press('Escape').catch(() => {});
 }
 
 /** Round 10 addendum: pick Humans, check the hover hand, then tap until dry land takes the band; the hand plays. */

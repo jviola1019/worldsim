@@ -46,10 +46,13 @@ export interface VisualFx {
   /** Played at the same place when this one ends (meteor, then explosion, then smoke). */
   then?: FxSpec;
   /** A brief screen tint (never under Reduce motion). */
-  flash?: 'white' | 'red' | 'green';
+  flash?: FxFlash;
   /** Round 10 addendum: the sprite an effect carries (the placing hand drops it). */
   sprite?: string;
 }
+
+/** Screen tints: 'sick' is the pale green-grey of the sickness pall (a world pandemic). */
+export type FxFlash = 'white' | 'red' | 'green' | 'sick';
 
 /** What a concept shows on the map (see sim/conceptFx.ts). */
 export interface FxSpec {
@@ -60,7 +63,9 @@ export interface FxSpec {
   then?: FxSpec;
   /** Events only: skip below this importance (default 2). */
   minImportance?: number;
-  flash?: 'white' | 'red' | 'green';
+  flash?: FxFlash;
+  /** Round 10 second addendum: drawn across the whole view, not at a place (the aurora). Placeless events play it too. */
+  world?: boolean;
   /** Fixed ring radius in tiles (events carry no radius). */
   radius?: number;
   /** At most this many of the same effect alive within 2 tiles (default 3). */
