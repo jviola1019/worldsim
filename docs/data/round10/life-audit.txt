@@ -37,14 +37,14 @@ MEETS   rabbit         home (grass 9°C)           life-0       45    315   1469
 n/a     rabbit         hostile                life-0 (no such site on the map)
 MEETS   mammoth        home (snow -8°C)           life-0        6      6      7      7  holds    stayed 100%  expected home
 MEETS   mammoth        hostile (desert 19°C)      life-0        6      0      0      0  dies     stayed 100%  expected hostile
-MISSES  crocodile      home (swamp 27°C)          life-0        6      0      0      0  dies     stayed 100%  expected home
-MEETS   crocodile      hostile (mountain -21°C)   life-0        6      0      0      0  dies     stayed 100%  expected hostile
-MISSES  wolf           home (steppe 18°C)         life-0       10      0      0      0  dies     stayed 100%  expected home
+MISSES  crocodile      home (jungle 19°C)         life-0        2      0      0      0  dies     stayed 100%  expected home
+MEETS   crocodile      hostile (mountain -21°C)   life-0        2      0      0      0  dies     stayed 100%  expected hostile
+MEETS   wolf           home (tundra -5°C)         life-0        4     17     30     17  grows    stayed   0%  expected home
 n/a     wolf           hostile                life-0 (no such site on the map)
 MEETS   bear           home (mountain -21°C)      life-0        1      4      8     15  grows    stayed   0%  expected home
 n/a     bear           hostile                life-0 (no such site on the map)
-MISSES  bigcat         home (grass 19°C)          life-0        6      0      0      0  dies     stayed 100%  expected home
-MEETS   bigcat         hostile (mountain -21°C)   life-0        6      0      0      0  dies     stayed 100%  expected hostile
+MISSES  bigcat         home (grass 18°C)          life-0        2      0      0      0  dies     stayed 100%  expected home
+MEETS   bigcat         hostile (mountain -21°C)   life-0        2      0      0      0  dies     stayed 100%  expected hostile
 MEETS   penguin        home (snow -8°C)           life-0       32    165    207    313  grows    stayed   0%  expected home
 MEETS   penguin        hostile (steppe 16°C)      life-0       32     66    155    209  moved    stayed   0%  expected hostile
 MEETS   fish           home (ocean 1°C)           life-0      116   1665   2094   2479  grows    stayed   0%  expected home
@@ -59,8 +59,8 @@ MEETS   buffalo        home (jungle 25°C)         life-0       11     48     85
 MEETS   buffalo        hostile (mountain -21°C)   life-0       11      0      0      0  dies     stayed 100%  expected hostile
 MEETS   llama          home (mountain -8°C)       life-0        9     45    103    119  grows    stayed  33%  expected home
 n/a     llama          hostile                life-0 (no such site on the map)
-MEETS   seal           home (ocean 16°C)          life-0       30     27     32     34  holds    stayed   0%  expected home
-MEETS   seal           hostile (deep 28°C)        life-0       30      0      0      0  dies     stayed 100%  expected hostile
+MEETS   seal           home (ocean 15°C)          life-0       10     47     71     78  grows    stayed 100%  expected home
+MEETS   seal           hostile (deep 28°C)        life-0       10      5     33     65  moved    stayed   0%  expected hostile
 MEETS   humans         grass                      life-1       24     44     69    214  grows    stayed  53%  expected grows
 MEETS   humans         steppe                     life-1       24     34     55    173  grows    stayed   0%  expected grows
 n/a     humans         savanna                life-1 (no patch of this biome on the map)
@@ -99,14 +99,14 @@ MEETS   rabbit         home (grass 19°C)          life-1       51    617   1292
 n/a     rabbit         hostile                life-1 (no such site on the map)
 MEETS   mammoth        home (snow -11°C)          life-1        7      7     10     13  grows    stayed   0%  expected home
 MEETS   mammoth        hostile (grass 23°C)       life-1        7      0      0      0  dies     stayed 100%  expected hostile
-MISSES  crocodile      home (jungle 20°C)         life-1        6      0      0      0  dies     stayed 100%  expected home
-MEETS   crocodile      hostile (snow -11°C)       life-1        6      0      0      0  dies     stayed 100%  expected hostile
-MISSES  wolf           home (hills 2°C)           life-1       10      0      0      0  dies     stayed 100%  expected home
+MISSES  crocodile      home (jungle 20°C)         life-1        3      1      0      0  dies     stayed 100%  expected home
+MEETS   crocodile      hostile (snow -11°C)       life-1        3      0      0      0  dies     stayed 100%  expected hostile
+MEETS   wolf           home (steppe 9°C)          life-1        5     24     19     21  grows    stayed   0%  expected home
 n/a     wolf           hostile                life-1 (no such site on the map)
 MEETS   bear           home (mountain -3°C)       life-1        2      5      6      9  grows    stayed   0%  expected home
 n/a     bear           hostile                life-1 (no such site on the map)
-MISSES  bigcat         home (grass 13°C)          life-1        6      0      0      0  dies     stayed 100%  expected home
-MEETS   bigcat         hostile (snow -11°C)       life-1        6      0      0      0  dies     stayed 100%  expected hostile
+MISSES  bigcat         home (grass 13°C)          life-1        3      0      0      0  dies     stayed 100%  expected home
+MEETS   bigcat         hostile (snow -11°C)       life-1        3      0      0      0  dies     stayed 100%  expected hostile
 MEETS   penguin        home (snow -11°C)          life-1       37    241    316    436  grows    stayed  12%  expected home
 MEETS   penguin        hostile (grass 18°C)       life-1       37      0      0      0  dies     stayed 100%  expected hostile
 MEETS   fish           home (ocean 2°C)           life-1      132   1830   5856  17368  grows    stayed   1%  expected home
@@ -121,8 +121,8 @@ MEETS   buffalo        home (grass 19°C)          life-1       13     39     78
 MEETS   buffalo        hostile (snow -11°C)       life-1       13      0      0      0  dies     stayed 100%  expected hostile
 MEETS   llama          home (mountain -11°C)      life-1       11     43     63    185  grows    stayed  10%  expected home
 n/a     llama          hostile                life-1 (no such site on the map)
-MEETS   seal           home (ocean 16°C)          life-1       30     27     27     39  grows    stayed   0%  expected home
-MEETS   seal           hostile (deep 26°C)        life-1       30      0      0      0  dies     stayed 100%  expected hostile
+MEETS   seal           home (ocean 15°C)          life-1       15     53     74     78  grows    stayed   0%  expected home
+MEETS   seal           hostile (deep 26°C)        life-1       15     12     49     55  moved    stayed   0%  expected hostile
 MEETS   humans         grass                      life-2       24     28     40    125  grows    stayed  58%  expected grows
 MEETS   humans         steppe                     life-2       24     51     94    273  grows    stayed   0%  expected grows
 n/a     humans         savanna                life-2 (no patch of this biome on the map)
@@ -161,13 +161,13 @@ MEETS   rabbit         home (tundra 5°C)          life-2       71   1296   2908
 MEETS   rabbit         hostile (mountain -30°C)   life-2       71   1244   2715   4849  moved    stayed   0%  expected hostile
 MEETS   mammoth        home (snow -7°C)           life-2       11      7      5     11  holds    stayed   0%  expected home
 MEETS   mammoth        hostile (jungle 25°C)      life-2       11      4      9     13  moved    stayed   0%  expected hostile
-MISSES  crocodile      home (jungle 23°C)         life-2        4      4      0      0  dies     stayed 100%  expected home
+MEETS   crocodile      home (jungle 21°C)         life-2        4     10     12     12  grows    stayed   0%  expected home
 MEETS   crocodile      hostile (snow -13°C)       life-2        4      0      0      0  dies     stayed 100%  expected hostile
-MISSES  wolf           home (hills 8°C)           life-2        7      0      0      0  dies     stayed 100%  expected home
+MEETS   wolf           home (steppe 1°C)          life-2        8     47     54     53  grows    stayed   0%  expected home
 n/a     wolf           hostile                life-2 (no such site on the map)
 MEETS   bear           home (mountain -12°C)      life-2        3      7     14     28  grows    stayed   0%  expected home
 n/a     bear           hostile                life-2 (no such site on the map)
-MISSES  bigcat         home (savanna 21°C)        life-2        4      0      0      0  dies     stayed 100%  expected home
+MEETS   bigcat         home (jungle 21°C)         life-2        4      8      8      9  grows    stayed 100%  expected home
 MEETS   bigcat         hostile (snow -13°C)       life-2        4      0      0      0  dies     stayed 100%  expected hostile
 MEETS   penguin        home (snow -7°C)           life-2       53    200    331    624  grows    stayed  11%  expected home
 MEETS   penguin        hostile (grass 17°C)       life-2       53      0      0      0  dies     stayed 100%  expected hostile
@@ -183,7 +183,7 @@ MEETS   buffalo        home (grass 20°C)          life-2       18     48     77
 MEETS   buffalo        hostile (snow -13°C)       life-2       18      0      0      0  dies     stayed 100%  expected hostile
 MEETS   llama          home (hills 1°C)           life-2       16     57    122    296  grows    stayed   0%  expected home
 n/a     llama          hostile                life-2 (no such site on the map)
-MISSES  seal           home (ocean 16°C)          life-2       20      0      0      0  dies     stayed 100%  expected home
-MEETS   seal           hostile (deep 28°C)        life-2       20      0      0      0  dies     stayed 100%  expected hostile
+MEETS   seal           home (ocean 10°C)          life-2       22     62     53     47  grows    stayed   0%  expected home
+MEETS   seal           hostile (deep 28°C)        life-2       22      0      0      0  dies     stayed 100%  expected hostile
 
-142/153 cases meet the expectation written before the run
+148/153 cases meet the expectation written before the run

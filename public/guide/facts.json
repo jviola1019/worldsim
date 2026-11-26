@@ -1,10 +1,10 @@
 {
- "generated": "2026-11-25",
+ "generated": "2026-11-26",
  "totals": {
   "srcFiles": 148,
-  "srcLines": 43564,
+  "srcLines": 43809,
   "testFiles": 67,
-  "testCases": 435
+  "testCases": 465
  },
  "folders": [
   {
@@ -67,7 +67,7 @@
   {
    "name": "sim",
    "files": 11,
-   "lines": 2603,
+   "lines": 2638,
    "deps": {
     "powers": 3,
     "culture": 5,
@@ -232,20 +232,9 @@
    }
   },
   {
-   "name": "persistence",
-   "files": 4,
-   "lines": 641,
-   "deps": {
-    "sim": 4,
-    "config": 3,
-    "powers": 1,
-    "world": 2
-   }
-  },
-  {
    "name": "ecology",
    "files": 2,
-   "lines": 609,
+   "lines": 811,
    "deps": {
     "powers": 1,
     "population": 2,
@@ -258,9 +247,20 @@
    }
   },
   {
+   "name": "persistence",
+   "files": 4,
+   "lines": 641,
+   "deps": {
+    "sim": 4,
+    "config": 3,
+    "powers": 1,
+    "world": 2
+   }
+  },
+  {
    "name": "config",
    "files": 2,
-   "lines": 591,
+   "lines": 599,
    "deps": {
     "sim": 1,
     "world": 3
@@ -398,7 +398,7 @@
   {
    "path": "src/config/balance.ts",
    "folder": "config",
-   "lines": 320,
+   "lines": 328,
    "about": "Balance parameters. Every gameplay coefficient lives here (not scattered as magic numbers) so it can be tuned, tested for sensitivity and adjusted at runtime from the developer panel."
   },
   {
@@ -470,13 +470,13 @@
   {
    "path": "src/ecology/ecology.ts",
    "folder": "ecology",
-   "lines": 516,
+   "lines": 714,
    "about": "Ecosystems: vegetation regrowth, animal herds (movement, grazing, logistic growth limited by local vegetation, predation, starvation, climate stress), human hunting, extinction, slow evolution into subspecies, and optional fantasy monsters."
   },
   {
    "path": "src/ecology/species.ts",
    "folder": "ecology",
-   "lines": 93,
+   "lines": 97,
    "about": "Animal species. Habitat suitability, diet and growth parameters are stylized; predator–prey coupling follows Lotka–Volterra-style dynamics (prey growth limited by vegetation, predators by prey encounters)."
   },
   {
@@ -932,7 +932,7 @@
   {
    "path": "src/sim/bootstrap.ts",
    "folder": "sim",
-   "lines": 442,
+   "lines": 477,
    "about": "Seeding a new world: wildlife, optional fantasy monsters, and starting peoples."
   },
   {
@@ -1287,7 +1287,7 @@
   },
   {
    "path": "tests/ecology/predation.test.ts",
-   "cases": 9,
+   "cases": 39,
    "about": "Round 10 addendum (life audit): predators coexist with their prey."
   },
   {
@@ -1584,7 +1584,7 @@
   },
   {
    "path": "scripts/life-audit.ts",
-   "lines": 154,
+   "lines": 157,
    "about": "Round 10 addendum: life audit."
   },
   {
@@ -1611,6 +1611,11 @@
    "path": "scripts/run-sim.ts",
    "lines": 39,
    "about": "Headless simulation runner: prints a world summary every N years."
+  },
+  {
+   "path": "scripts/wild-audit.ts",
+   "lines": 70,
+   "about": "Task 5 (owner options A + C, 2026-11-25): natural-world check."
   },
   {
    "path": "tools/balance-compare.mjs",

@@ -10,7 +10,8 @@ import { findPath } from '../../src/world/pathfinding';
 import { computeHydrology } from '../../src/world/worldgen';
 import { civEconomyYearly } from '../../src/economy/market';
 import { declareWar, makeTreaty } from '../../src/politics/diplomacy';
-import { spawnHerd } from '../../src/ecology/ecology';
+import { spawnHerd, habitat } from '../../src/ecology/ecology';
+import { SPECIES_BY_KEY } from '../../src/ecology/species';
 import { planConstruction, findSite } from '../../src/civilizations/urban';
 import { BUILDINGS, SECTOR } from '../../src/civilizations/buildings';
 import { BLDF } from '../../src/world/tilemap';
@@ -189,17 +190,28 @@ describe('disease, ecology, society', () => {
   }, 120000);
 
   it('predatorsReducePrey: prey herds fare worse with wolves nearby (counterfactual)', () => {
-    const base = makeSim('plan-eco', 96);
-    const m = base.w.map;
-    let x = -1, y = -1;
-    for (let i = 0; i < m.n && x < 0; i++) if (m.isLand(i) && m.veg[i] > 120 && !m.settle[i]) { x = m.xOf(i); y = m.yOf(i); }
-    for (const h of [...base.w.herds.values()]) base.w.herds.delete(h.id); // isolate the experiment
-    spawnHerd(base, 'deer', x, y, 60);
-    const A = clone(base), B = clone(base);
-    spawnHerd(B, 'wolf', x, y, 12);
-    A.runYears(4); B.runYears(4);
+    // task 5: a pack now takes what a herd can replace (about 1% of a deer herd a month, was a flat 2%), so one world's
+    // random draws drowned the effect after a few years; re-measured over four worlds and three months, with the same
+    // wolves placed far away in the control so both runs make the same draws
     const deer = (sim: Simulation) => [...sim.w.herds.values()].filter((h) => h.species === 'deer').reduce((a, h) => a + h.count, 0);
-    expect(deer(B)).toBeLessThan(deer(A));
+    let control = 0, hunted = 0;
+    for (const seed of ['plan-eco', 'plan-eco-1', 'plan-eco-2', 'plan-eco-3']) {
+      const base = makeSim(seed, 96);
+      const m = base.w.map;
+      let x = -1, y = -1;
+      // on deer country (a herd outside its habitat is not growing, so it yields nothing)
+      for (let i = 0; i < m.n && x < 0; i++) if (m.isLand(i) && m.veg[i] > 120 && !m.settle[i] && habitat(base, SPECIES_BY_KEY.deer, i) >= 1) { x = m.xOf(i); y = m.yOf(i); }
+      let fx = -1, fy = -1;
+      for (let i = 0; i < m.n && fx < 0; i++) if (m.isLand(i) && Math.hypot(m.xOf(i) - x, m.yOf(i) - y) > 40) { fx = m.xOf(i); fy = m.yOf(i); }
+      for (const h of [...base.w.herds.values()]) base.w.herds.delete(h.id); // isolate the experiment
+      spawnHerd(base, 'deer', x, y, 40);
+      const A = clone(base), B = clone(base);
+      spawnHerd(A, 'wolf', fx, fy, 12);
+      spawnHerd(B, 'wolf', x, y, 12);
+      A.runTicks(30); B.runTicks(30);
+      control += deer(A); hunted += deer(B);
+    }
+    expect(hunted).toBeLessThan(control);
   }, 120000);
 });
 

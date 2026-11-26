@@ -51,12 +51,20 @@ export const BALANCE = {
   bandSplitSize: 90,
 
   // ---------------- predators and prey (round 10 addendum, life audit)
-  /** [S] Most of a prey herd a pack can kill in one month (2% a month, about 22% a year), and never more than the prey species' own maximum monthly growth (slow breeders such as buffalo and elephants regrow about 1% and 0.6% a month). Real predators take a minority of their prey each year; the old 18% a month (about 90% a year) let any pack eat its prey and then starve (tests/ecology/predation.test.ts). */
-  predationCap: 0.02,
-  /** [S] Prey a predator needs in a month to be fully fed, in herd units (population units, not literal animals). With predationCap it sets the stable ratio of about 1 predator to 15 prey units, so a pack of 4-6 lives on the roughly 100 prey units crowding allows within its reach (was 0.6: about 2 wolves, which fluctuations then removed). */
+  /** [S] Task 5 (owner option C): predators never hunt a prey herd below this share of its carrying capacity (a refuge: scarce prey is hard to find). Each pack takes at most what the herd can replace in a month (its logistic growth at its size, no more than its yield at half capacity), so one pack holds a herd at half its capacity or above; the refuge stops several packs together from stripping it (replaces the flat 2% a month cap, which was above most prey's real growth: herds and packs ratcheted down together; tests/ecology/predation.test.ts). */
+  predationRefuge: 0.25,
+  /** [S] Prey a predator needs in a month to be fully fed, in herd units (population units, not literal animals). A prey herd at half its capacity replaces about 1% (horse) to 5% (hare) of itself a month, so a predator lives on roughly 15 to 70 prey units in its territory (was 0.6: about 2 wolves, which fluctuations then removed). */
   preyPerPredator: 0.3,
-  /** [S] Tiles a predator hunts over in a month (the same radius herds crowd each other over). Real wolves and big cats range over large territories; at 2.5 tiles a pack reached one or two prey herds and starved (life audit). */
-  huntReach: 5,
+  /** [S] Radius of a predator herd's hunting territory in tiles (about 10 km each): it takes prey anywhere in it each month. A predator herd is a population unit, so its range is many packs' territories. Task 5 (owner option C): at 5 tiles prey herds drifting in and out of reach made intake boom and bust and packs starved beside prey (life audit traces); 8 is two-thirds of the 12-tile home search (was 2.5, then 5). */
+  huntReach: 8,
+  /** [S] Task 5 (owner option C): months of hunger (fed below half) after which a predator herd disperses towards prey outside its territory: half of it if it is big enough to make two (twice the species' smallest starting herd), otherwise all of it. Real packs shed dispersers and shift range when prey runs short instead of starving in place. */
+  predatorDisperseAfter: 2,
+  /** [S] Task 5: share of an omnivore's food (bears, wild boar) that it hunts; the rest it grazes. Both eat mostly plants; at a full predator's need a boar herd took more of a deer herd's yield than a wolf pack, and the wolves starved beside it. */
+  omnivoreMeat: 0.2,
+  /** [S] Task 5 (owner option A, mature ecosystems): share of the world's herd limit (one herd per 30 tiles) that a natural world starts with, split between land and water by area, every herd at 60-100% of its carrying capacity on good habitat. An untouched planet's wildlife sits near capacity; before, a world started with about 20 herds and its herbivores multiplied 5 to 50 times over the first century, so predators placed at the start starved (life audit). Left below 1 so herds can still split and packs disperse. */
+  wildFill: 0.7,
+  /** [E] Task 5 (owner option A): predator biomass a region's prey biomass supports at the start of a natural world (herd units times meat as the biomass measure). Carbone & Gittleman (2002, Science 295: 2273) found about 90 kg of a carnivore species per 10,000 kg of prey, whatever the carnivore's size (research-notes.md §1). */
+  predatorPreyBiomass: 0.01,
   // ---------------- monsters and exploration (round 10)
   /** [C] Round 10: monthly damage a settlement deals a monster at its gates, per point of defence (garrison + 1% of people); set so a town of 2,000 wears a giant down in about two years and a hamlet cannot (tests/ecology/monsters.test.ts; VALIDATION §R10). */
   monsterDamage: 0.5,

@@ -21,12 +21,12 @@ import { cohortTotal } from '../population/demography';
 import { BALANCE } from '../config/balance';
 import { cropSuitability } from '../economy/production';
 import type { Sim } from './context';
-import type { Civ, SpeciesKey } from './types';
+import type { Civ, Herd, SpeciesKey } from './types';
 import type { WorldConfig } from '../config/laws';
 import { Simulation } from './simulation';
 import { createWorldState } from './world';
-import { SPECIES_BY_KEY, SPECIES, MONSTERS } from '../ecology/species';
-import { habitat, spawnHerd, spawnMonster } from '../ecology/ecology';
+import { SPECIES_BY_KEY, SPECIES, MONSTERS, type SpeciesDef } from '../ecology/species';
+import { habitat, spawnHerd, spawnMonster, herdsNear, preyShare, huntNeed } from '../ecology/ecology';
 import { spawnBand } from '../population/bands';
 import { TERRAIN, isWaterTerrain } from '../world/terrain';
 import { createCiv, createCulture } from '../civilizations/civ';
@@ -62,30 +62,9 @@ export function seedLife(sim: Sim): void {
   const st = w.meta.settings;
   logEvent(sim, { type: 'world_created', cat: 'founding', title: `The world of ${w.meta.name} was created`, importance: 3 });
   if (st.empty) return;
-  // wildlife
+  seedWildlife(sim);
   let land = 0;
   for (let i = 0; i < m.n; i++) if (m.isLand(i)) land++;
-  const herds = Math.round((land / 70) * st.biodiversity);
-  const candidates = SPECIES.filter((s) => !s.aquatic && (st.alien ? s.alien || s.flying : !s.alien) && (!s.megafauna || st.startEra <= 2));
-  for (let k = 0; k < herds; k++) {
-    const i = sim.rng.int(0, m.n - 1);
-    if (!m.isLand(i)) continue;
-    const weights = candidates.map((sp) => habitat(sim, sp, i) * (sp.diet === 'predator' ? 0.25 : 1));
-    const pick = sim.rng.weighted(weights);
-    // round 10 addendum: test the habitat itself (predators are weighted 0.25, so 'weight > 0.3' never seeded one)
-    if (pick >= 0 && habitat(sim, candidates[pick], i) > 0.3) spawnHerd(sim, candidates[pick].key, m.xOf(i), m.yOf(i));
-  }
-  let water = 0;
-  for (let i = 0; i < m.n; i++) if (m.isWater(i)) water++;
-  const fish = Math.round((water / 300) * st.biodiversity);
-  for (let k = 0; k < fish; k++) {
-    const i = sim.rng.int(0, m.n - 1);
-    if (!m.isWater(i)) continue;
-    // round 10 addendum: seals in cold coastal water
-    const kind = m.terrain[i] === 0 && sim.rng.chance(0.3) ? 'whale' : m.temp[i] < 6 && m.terrain[i] !== 0 && !st.alien && sim.rng.chance(0.3) ? 'seal' : 'fish';
-    spawnHerd(sim, kind, m.xOf(i), m.yOf(i));
-  }
-  settlePredators(sim); // after the sea animals, so seals are checked against fish too
   if ((w.laws.fantasyCreatures || st.fantasy) && !realWorld(st)) {
     for (let k = 0; k < Math.round(land / 4000) + 2; k++) {
       const def = sim.rng.pick(MONSTERS);
@@ -128,31 +107,87 @@ export function seedLife(sim: Sim): void {
 }
 
 /**
- * Round 10 addendum (life audit): a predator seeded where no edible prey of its realm is within its 12-tile search moves to the
- * nearest herbivore herd standing in country it can live in, or is not kept. Wildlife starts sparse, so packs
- * placed far from prey starved before the prey spread. Uses no random draws.
+ * Task 5 (owner option A, mature ecosystems): a natural world starts with its wildlife near carrying capacity, as an
+ * untouched planet would be. Herbivores and omnivores fill BALANCE.wildFill of the land share of the herd limit (one
+ * herd per 30 tiles), fish and whales the water share, each herd on good habitat (at least 0.5) at 60-100% of its
+ * capacity; then predators are placed where their realm's prey biomass within 12 tiles (the home search) supports
+ * them at BALANCE.predatorPreyBiomass, counting predators already there, and no more than their hunting territory can
+ * feed (their share of what its prey replaces each month). Before, a world began with about 20 herds
+ * at seed size, and predators placed then starved before the prey multiplied (life audit).
  */
-function settlePredators(sim: Sim): void {
+function seedWildlife(sim: Sim): void {
   const w = sim.w;
   const m = w.map;
-  // edible prey only: not birds (almost no food), and of the predator's own realm (review fix)
-  const edible = [...w.herds.values()].filter((o) => { const q = SPECIES_BY_KEY[o.species]; return q?.diet === 'herbivore' && !q.flying && q.meat >= 0.01; });
-  for (const h of [...w.herds.values()]) {
-    const sp = SPECIES_BY_KEY[h.species];
-    if (!sp || sp.diet !== 'predator') continue;
-    const mine = edible.filter((o) => !!SPECIES_BY_KEY[o.species].aquatic === !!sp.aquatic);
-    if (mine.some((o) => Math.hypot(o.x - h.x, o.y - h.y) <= 12)) continue;
-    const home = mine
-      .filter((o) => habitat(sim, sp, Math.floor(o.y) * m.w + Math.floor(o.x)) >= 0.3)
-      .sort((a, b) => Math.hypot(a.x - h.x, a.y - h.y) - Math.hypot(b.x - h.x, b.y - h.y) || a.id - b.id)[0];
-    if (home) {
-      h.x = home.x; h.y = home.y; h.tx = home.x; h.ty = home.y;
-    } else {
-      w.herds.delete(h.id);
-      const st = w.speciesStatus[h.species];
-      if (st) st.count = Math.max(0, st.count - h.count);
+  const st = w.meta.settings;
+  const rng = sim.rng;
+  const limit = Math.floor(m.n / 30);
+  let land = 0;
+  for (let i = 0; i < m.n; i++) if (m.isLand(i)) land++;
+  const fill = BALANCE.wildFill * st.biodiversity;
+  const allowed = SPECIES.filter((s) => (st.alien ? s.alien || s.flying : !s.alien) && (!s.megafauna || st.startEra <= 2));
+  const grazers = allowed.filter((s) => !s.aquatic && s.diet !== 'predator');
+  const placed: { x: number; y: number; key: string; count: number; meat: number; pred: boolean; aquatic: boolean; claim: number }[] = [];
+  const total = () => placed.length;
+  const spawnAt = (sp: SpeciesDef, i: number, count: number) => {
+    const h = spawnHerd(sim, sp.key, m.xOf(i), m.yOf(i), count);
+    if (h) placed.push({ x: h.x, y: h.y, key: sp.key, count, meat: sp.meat, pred: sp.diet === 'predator', aquatic: !!sp.aquatic, claim: 0 });
+  };
+  const seed = (budget: number, onTile: (i: number) => boolean, pick: (i: number) => SpeciesDef | undefined) => {
+    for (let tries = 0, n = 0; tries < budget * 8 && n < budget && total() < limit; tries++) {
+      const i = rng.int(0, m.n - 1);
+      if (!onTile(i)) continue;
+      const sp = pick(i);
+      if (!sp || habitat(sim, sp, i) < 0.5) continue; // good habitat only
+      const x = m.xOf(i) + 0.5, y = m.yOf(i) + 0.5;
+      if (placed.some((o) => Math.hypot(o.x - x, o.y - y) < 2)) continue; // a herd to a place
+      const rivals = placed.filter((o) => o.key === sp.key && Math.hypot(o.x - x, o.y - y) <= 5).length;
+      const capacity = Math.min(sp.maxHerd, (sp.maxHerd * 1.3) / (1 + rivals * 0.5));
+      spawnAt(sp, i, Math.max(sp.start[0], Math.round(capacity * rng.range(0.6, 1))));
+      n++;
     }
-  }
+  };
+  // herbivores and omnivores on land, picked by how well each lives on the tile
+  seed(Math.round(limit * fill * (land / m.n)), (i) => m.isLand(i), (i) => {
+    const k = rng.weighted(grazers.map((sp) => habitat(sim, sp, i)));
+    return k >= 0 ? grazers[k] : undefined;
+  });
+  // fish shoals, and whales in the deep ocean
+  seed(Math.round(limit * fill * ((m.n - land) / m.n)), (i) => m.isWater(i), (i) => SPECIES_BY_KEY[m.terrain[i] === 0 && rng.chance(0.3) ? 'whale' : 'fish']);
+  // predators at about 1% of the prey biomass of their realm around them; no random draws
+  const predators = allowed.filter((s) => s.diet === 'predator');
+  const R = 12;
+  for (let y = 2; y < m.h; y += 4)
+    for (let x = 2; x < m.w; x += 4) {
+      if (total() >= limit) return;
+      const i = y * m.w + x;
+      let best: SpeciesDef | undefined;
+      let bestHab = 0.5;
+      for (const sp of predators) { const hb = habitat(sim, sp, i); if (hb >= bestHab && (sp.aquatic ? m.isWater(i) : !m.isWater(i))) { bestHab = hb; best = sp; } }
+      if (!best) continue;
+      const sp = best;
+      // each prey herd supports its share of predator biomass once: what is still unclaimed within reach
+      const near = placed.filter((o) => {
+        const q = SPECIES_BY_KEY[o.key];
+        return !o.pred && o.aquatic === !!sp.aquatic && q.diet === 'herbivore' && !q.flying && q.meat >= 0.01 && Math.hypot(o.x - x - 0.5, o.y - y - 0.5) <= R;
+      });
+      const free = (o: (typeof placed)[number]) => Math.max(0, o.count * o.meat * BALANCE.predatorPreyBiomass - o.claim);
+      const avail = near.reduce((s, o) => s + free(o), 0);
+      // and no more than its territory can feed now: a full-sized pack's share of what the prey there replaces each
+      // month (the hunters already there, wolves, cats and bears, take theirs)
+      sim.cache.herdGrid = undefined;
+      const spot = { id: 0, species: sp.key, x: x + 0.5, y: y + 0.5, tx: x + 0.5, ty: y + 0.5, count: sp.start[1], hunger: 0, genes: [], subspeciesId: 0, owner: 0 } as Herd;
+      const fed = herdsNear(sim, spot.x, spot.y, BALANCE.huntReach).reduce((s, o) => {
+        const q = SPECIES_BY_KEY[o.species];
+        return q?.diet === 'herbivore' && !q.flying && !!q.aquatic === !!sp.aquatic ? s + preyShare(sim, o, spot) : s;
+      }, 0) / (huntNeed(spot, sp) / spot.count); // over what one of them needs a month
+      const units = Math.min(avail / sp.meat, fed);
+      if (units < sp.start[0]) continue;
+      const n = Math.min(units, sp.start[1]);
+      const share = (n * sp.meat) / avail;
+      for (const o of near) o.claim += free(o) * share;
+      spawnAt(sp, i, n);
+      sim.cache.herdGrid = undefined;
+    }
 }
 
 function pickStartSites(sim: Sim, count: number): number[] {

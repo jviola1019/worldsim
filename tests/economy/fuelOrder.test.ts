@@ -27,21 +27,29 @@ const clone = (s: Simulation) => { s.syncRng(); return new Simulation(decodeWorl
  */
 describe('fuel order', () => {
   it('a nation that mines coal runs the fossil plants it owns', () => {
-    const base = makeSim('int-elec', 96, (c) => { c.settings.startEra = 7; });
-    base.runYears(2);
-    const civ = [...base.w.civs.values()].find((c) => c.alive && c.settlements.length && c.caps.electrification === 0 && !c.techs.electric_power?.known)!;
-    const need = (t: string): void => { for (const p of TECH_BY_ID.get(t)!.prereqs) need(p); if (!civ.techs[t]?.known) grantTech(base, civ, t, 'god'); };
-    need('electric_power');
-    base.runYears(13);
-    let plants = 0, coal = 0, energy = 0;
-    for (let mo = 0; mo < 12; mo++) {
-      base.runTicks(10);
-      coal += civ.acc.prod[Good.COAL] ?? 0;
-      energy += civ.acc.prod[Good.ENERGY] ?? 0;
+    // task 5 (mature ecosystems) changed every world's history: on 'int-elec' the chosen nation now has 44 fossil plants
+    // but no coal in reach (a scenario precondition, not the fuel order). Re-measured over four worlds: every nation that
+    // mines coal and owns plants must make energy, and at least two of the four must meet both preconditions.
+    let met = 0;
+    for (const seed of ['int-elec', 'int-elec-1', 'int-elec-2', 'int-elec-3']) {
+      const base = makeSim(seed, 96, (c) => { c.settings.startEra = 7; });
+      base.runYears(2);
+      const civ = [...base.w.civs.values()].find((c) => c.alive && c.settlements.length && c.caps.electrification === 0 && !c.techs.electric_power?.known);
+      if (!civ) continue;
+      const need = (t: string): void => { for (const p of TECH_BY_ID.get(t)!.prereqs) need(p); if (!civ.techs[t]?.known) grantTech(base, civ, t, 'god'); };
+      need('electric_power');
+      base.runYears(13);
+      let plants = 0, coal = 0, energy = 0;
+      for (let mo = 0; mo < 12; mo++) {
+        base.runTicks(10);
+        coal += civ.acc.prod[Good.COAL] ?? 0;
+        energy += civ.acc.prod[Good.ENERGY] ?? 0;
+      }
+      for (const sid of civ.settlements) plants += base.w.settlements.get(sid)?.bld[BUILDINGS.findIndex((b) => b?.key === 'POWER_FOSSIL')] ?? 0;
+      if (plants <= 0 || coal <= 0) continue;
+      met++;
+      expect(energy, seed).toBeGreaterThan(0);
     }
-    for (const sid of civ.settlements) plants += base.w.settlements.get(sid)?.bld[BUILDINGS.findIndex((b) => b?.key === 'POWER_FOSSIL')] ?? 0;
-    expect(plants, 'precondition: fossil plants').toBeGreaterThan(0);
-    expect(coal, 'precondition: coal mined').toBeGreaterThan(0);
-    expect(energy).toBeGreaterThan(0);
-  }, 180000);
+    expect(met, 'worlds with a coal-mining nation that owns fossil plants').toBeGreaterThanOrEqual(2);
+  }, 600000);
 });

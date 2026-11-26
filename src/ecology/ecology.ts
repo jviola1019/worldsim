@@ -134,10 +134,79 @@ export function spawnHerd(sim: Sim, key: string, x: number, y: number, count?: n
   return h;
 }
 
+/** Carrying capacity of a herd where it stands: room for its species, less for each rival herd of it within 5 tiles. */
+export function herdCapacity(sim: Sim, h: Herd, sp: SpeciesDef = SPECIES_BY_KEY[h.species]): number {
+  const rivals = countSpeciesNear(sim, h.x, h.y, 5, h.species, h);
+  return (sp.maxHerd * 1.3) / (1 + rivals * 0.5);
+}
+
+/**
+ * What predators may take from a prey herd in a month (task 5, owner option C): tied to what the herd can replace. A
+ * herd above half its capacity yields its growth at half capacity (the most it can replace), so it is cropped down
+ * towards half; below half it yields only part of its growth, the less the scarcer it is (scarce prey is harder to
+ * find), so it grows back towards half; and it is never hunted below the refuge share of its capacity. Prey outside its
+ * own habitat is not growing, so it yields nothing.
+ */
+export function preyReplaceable(sim: Sim, p: Herd): number {
+  const q = SPECIES_BY_KEY[p.species];
+  if (!q) return 0;
+  const m = sim.w.map;
+  const hab = habitat(sim, q, Math.floor(p.y) * m.w + Math.floor(p.x));
+  if (hab <= 0.2) return 0;
+  const K = herdCapacity(sim, p, q);
+  const n = Math.min(p.count, K / 2);
+  const surplus = ((n * q.growth * (0.6 + 0.8 * p.genes[4]) * hab * (1 - n / K)) / 12) * Math.min(1, (2 * p.count) / K);
+  return Math.max(0, Math.min(surplus, p.count - K * BALANCE.predationRefuge));
+}
+
+/**
+ * Task 5: prey a hunter needs in a month: predators all of their food (cold-blooded ones far less, their `upkeep`),
+ * omnivores the meat part of theirs.
+ */
+export function huntNeed(h: Herd, sp: SpeciesDef = SPECIES_BY_KEY[h.species]): number {
+  return Math.max(0.5, h.count * BALANCE.preyPerPredator) * (sp.diet === 'omnivore' ? BALANCE.omnivoreMeat : 1) * (sp.upkeep ?? 1);
+}
+
+/**
+ * Task 5: what the hunters whose ranges cover a prey herd need in all (predators of its realm within their hunting
+ * territory, omnivores within their 2.5-tile reach). They share what the herd can replace in proportion to need, so
+ * overlapping territories do not each take it all, and a pack gains nothing by splitting.
+ */
+export function huntDemand(sim: Sim, p: Herd): number {
+  const q = SPECIES_BY_KEY[p.species];
+  let n = 0;
+  for (const o of herdsNear(sim, p.x, p.y, BALANCE.huntReach)) {
+    const s = SPECIES_BY_KEY[o.species];
+    if (!s || o.owner !== 0) continue;
+    if (s.diet === 'predator' && !!s.aquatic === !!q?.aquatic) n += huntNeed(o, s);
+    else if (s.diet === 'omnivore' && !q?.aquatic && (o.x - p.x) ** 2 + (o.y - p.y) ** 2 <= 2.5 * 2.5) n += huntNeed(o, s);
+  }
+  return n;
+}
+
+/** Task 5: the part of what a prey herd can replace that hunter `h` gets: shared with the other hunters there by need. */
+export function preyShare(sim: Sim, p: Herd, h: Herd): number {
+  const r = preyReplaceable(sim, p);
+  if (r <= 0) return 0;
+  const sp = SPECIES_BY_KEY[h.species];
+  const need = sp ? huntNeed(h, sp) : Math.max(0.5, h.count * BALANCE.preyPerPredator);
+  const reach = sp?.diet === 'omnivore' ? 2.5 : BALANCE.huntReach;
+  const counted = !!sp && h.owner === 0 && (p.x - h.x) ** 2 + (p.y - h.y) ** 2 <= reach * reach;
+  return (r * need) / Math.max(need, huntDemand(sim, p) + (counted ? 0 : need));
+}
+
 /** Tiles a predator searches for prey standing in its habitat, and for a way home (design 6.3). */
 const HOME_SEARCH = 12;
 /** Tiles a predator ranges for any prey of its realm once home has none (design 6.3). */
 const RANGE_SEARCH = 24;
+
+/** Task 5: whether prey of its realm that can feed it grazes anywhere in the predator's hunting territory. */
+function preyInTerritory(sim: Sim, h: Herd, sp: SpeciesDef): boolean {
+  return herdsNear(sim, h.x, h.y, BALANCE.huntReach).some((o) => {
+    const q = SPECIES_BY_KEY[o.species];
+    return o.owner === 0 && q?.diet === 'herbivore' && !q.flying && !!q.aquatic === !!sp.aquatic && preyReplaceable(sim, o) > 0;
+  });
+}
 
 /** Choose where a herd heads next (exported for tests). */
 export function pickTarget(sim: Sim, h: Herd, sp: SpeciesDef = SPECIES_BY_KEY[h.species]): void {
@@ -166,14 +235,41 @@ export function pickTarget(sim: Sim, h: Herd, sp: SpeciesDef = SPECIES_BY_KEY[h.
         return;
       }
     }
+    const here = habitat(sim, sp, Math.floor(h.y) * m.w + Math.floor(h.x));
+    // task 5 (owner option C): a fed pack on good home ground with prey in its territory holds its range (wandering
+    // between prey herds led cats and crocodiles across poor and hostile land)
+    if (h.hunger === 0 && here >= 0.5 && preyInTerritory(sim, h, sp)) {
+      h.tx = h.x;
+      h.ty = h.y;
+      return;
+    }
+    // task 5: a pack hungry for months keeps heading for prey outside its territory (it is not pulled back to a home
+    // that cannot feed it)
+    if (h.hunger >= BALANCE.predatorDisperseAfter) {
+      const to = dispersalTarget(sim, h, sp);
+      if (to) {
+        h.tx = to.x;
+        h.ty = to.y;
+        return;
+      }
+    }
     // step 1, home first (round 10 addendum): only prey standing in country the predator can live in (great cats
     // followed deer up into cold mountains and died there; life audit)
     const edible = (o: Herd) => {
       const q = SPECIES_BY_KEY[o.species];
       return o !== h && q?.diet !== 'predator' && q?.meat >= 0.01;
     };
+    // task 5: and only prey that can feed it (a herd below the refuge, or out of its own habitat, yields nothing)
     const prey = herdsNear(sim, h.x, h.y, HOME_SEARCH).filter((o) => edible(o)
-      && habitat(sim, sp, Math.floor(o.y) * m.w + Math.floor(o.x)) >= 0.2);
+      && habitat(sim, sp, Math.floor(o.y) * m.w + Math.floor(o.x)) >= 0.2 && preyReplaceable(sim, o) > 0);
+    // task 5 (owner option C): prey grazing within its territory, wherever it stands, is hunted from home: a pack on home
+    // ground with such prey has found prey and stays (crocodiles walked out after deer on cold ground and, at their
+    // pace, never got back)
+    if (!prey.length && here >= 0.2 && preyInTerritory(sim, h, sp)) {
+      h.tx = h.x;
+      h.ty = h.y;
+      return;
+    }
     // step 2 (design 6.3): home has none, so range for prey anywhere it can stand, in its own realm
     // (the realm rule the monthly feeding uses: same water or land, not flying, a herbivore)
     const ranged = prey.length ? prey : herdsNear(sim, h.x, h.y, RANGE_SEARCH).filter((o) => {
@@ -183,11 +279,30 @@ export function pickTarget(sim: Sim, h: Herd, sp: SpeciesDef = SPECIES_BY_KEY[h.
     });
     if (ranged.length) {
       // round 10 addendum: head for the richest prey nearby, not merely the nearest herd (chasing small, straying
-      // herds led packs away from their prey base until they starved; life audit)
-      const value = (o: Herd) => o.count / (1 + Math.hypot(o.x - h.x, o.y - h.y) / 4);
-      ranged.sort((a, b) => value(b) - value(a) || a.id - b.id);
-      h.tx = ranged[0].x;
-      h.ty = ranged[0].y;
+      // herds led packs away from their prey base until they starved; life audit). Task 5: richest in what this pack
+      // would get of what it replaces each month (shared with the hunters already there), then in numbers (prey out of
+      // its own habitat replaces nothing but may still be all there is)
+      const near = (o: Herd) => 1 + Math.hypot(o.x - h.x, o.y - h.y) / 4;
+      const yields = new Map(ranged.map((o) => [o, preyShare(sim, o, h) / near(o)]));
+      ranged.sort((a, b) => yields.get(b)! - yields.get(a)! || b.count / near(b) - a.count / near(a) || a.id - b.id);
+      const to = ranged[0];
+      h.tx = to.x;
+      h.ty = to.y;
+      // task 5 (owner option C): with prey at home the pack hunts it across its territory, so it beds down on its best
+      // ground within half its reach of the prey rather than on the prey's own tile (great cats and crocodiles followed
+      // deer into forest and cold grass at a quarter of their growth, paying the hostile-land toll on the way; life audit)
+      if (prey.length) {
+        const r = BALANCE.huntReach / 2;
+        let best = habitat(sim, sp, Math.floor(to.y) * m.w + Math.floor(to.x));
+        let bd = 0;
+        for (let y = Math.max(0, Math.floor(to.y - r)); y <= Math.min(m.h - 1, Math.floor(to.y + r)); y++)
+          for (let x = Math.max(0, Math.floor(to.x - r)); x <= Math.min(m.w - 1, Math.floor(to.x + r)); x++) {
+            const d = Math.hypot(x + 0.5 - to.x, y + 0.5 - to.y);
+            if (d > r) continue;
+            const hb = habitat(sim, sp, y * m.w + x);
+            if (hb > best || (hb === best && hb > 0 && d < bd)) { best = hb; bd = d; h.tx = x + 0.5; h.ty = y + 0.5; }
+          }
+      }
       return;
     }
   }
@@ -209,6 +324,38 @@ export function pickTarget(sim: Sim, h: Herd, sp: SpeciesDef = SPECIES_BY_KEY[h.
   }
   h.tx = bx;
   h.ty = by;
+}
+
+/**
+ * Task 5 (owner option C): where a hungry predator herd disperses to: the prey herd outside its hunting territory but
+ * within its 24-tile range that can feed it best (its share of what the herd replaces, after the hunters already
+ * there, so hungry packs do not all converge on one place), standing in country it can live in and reached through
+ * such country. Null when there is none.
+ */
+export function dispersalTarget(sim: Sim, h: Herd, sp: SpeciesDef = SPECIES_BY_KEY[h.species]): Herd | null {
+  const m = sim.w.map;
+  // herds walk straight lines: the way must be country it can live in all along (they stop at the shore, and a slow
+  // crocodile sent across cold hills died there before it arrived; life audit)
+  const clear = (o: Herd) => {
+    const d = Math.hypot(o.x - h.x, o.y - h.y);
+    for (let s = 0.5; s < d; s += 0.5) {
+      const i = Math.floor(h.y + ((o.y - h.y) * s) / d) * m.w + Math.floor(h.x + ((o.x - h.x) * s) / d);
+      if (habitat(sim, sp, i) < 0.2) return false;
+    }
+    return true;
+  };
+  const cands = herdsNear(sim, h.x, h.y, RANGE_SEARCH).filter((o) => {
+    const q = SPECIES_BY_KEY[o.species];
+    return o !== h && o.owner === 0 && q?.diet === 'herbivore' && !q.flying && !!q.aquatic === !!sp.aquatic
+      && Math.hypot(o.x - h.x, o.y - h.y) > BALANCE.huntReach
+      && m.isWater(Math.floor(o.y) * m.w + Math.floor(o.x)) === !!sp.aquatic;
+  });
+  const score = new Map(cands.map((o) => [o, preyShare(sim, o, h) / (1 + Math.hypot(o.x - h.x, o.y - h.y) / 4)]));
+  // home only (design 6.3: it leaves home only when no prey can be found, and then pickTarget ranges for it)
+  const pool = cands.filter((o) => score.get(o)! > 0 && habitat(sim, sp, Math.floor(o.y) * m.w + Math.floor(o.x)) >= 0.2 && clear(o));
+  if (!pool.length) return null;
+  pool.sort((a, b) => score.get(b)! - score.get(a)! || a.id - b.id);
+  return pool[0];
 }
 
 /** Per-tick herd movement. */
@@ -268,23 +415,36 @@ export function herdsMonthly(sim: Sim): void {
         return o !== h && o.owner === 0 && q?.diet === 'herbivore' && !q.flying && !!q.aquatic === !!sp.aquatic;
       });
       if (prey.length) {
-        // round 10 addendum: a pack hunts every prey herd in reach, taking at most predationCap of each in a month
-        const need = Math.max(0.5, h.count * BALANCE.preyPerPredator);
+        // round 10 addendum: a pack hunts every prey herd in reach; task 5: taking at most what each herd can replace
+        // (a flat 2% a month was above most prey's real growth, so herds and packs ratcheted down together)
+        const need = huntNeed(h, sp);
         let kills = 0;
         for (const p of prey) {
           if (kills >= need) break;
-          // never more than the prey's own monthly growth: slow breeders (buffalo, elephants) were hunted down
-          const cap = Math.min(BALANCE.predationCap, (SPECIES_BY_KEY[p.species]?.growth ?? 0) / 12);
-          const k = Math.min(p.count * cap, need - kills);
+          const k = Math.min(preyShare(sim, p, h), need - kills);
           p.count -= k;
           kills += k;
         }
         fed = Math.min(1, kills / need);
         // design 6.3: only a real meal resets hunger (a token herd in reach used to wipe it)
         h.hunger = sp.diet !== 'predator' || fed >= 0.5 ? 0 : h.hunger + 1;
+        // task 5: body reserves carry a pack through a short lean spell, as when no prey is in reach at all (a little
+        // prey must not be worse than none: one lean month took 12% of a pack, a year of a crocodile's growth)
+        if (sp.diet === 'predator' && fed < 0.5) fed = Math.max(fed, h.hunger > 3 ? 0.2 : 0.6);
       } else if (sp.diet === 'predator') {
         h.hunger++;
         fed = h.hunger > 3 ? 0.2 : 0.6;
+      }
+      // task 5 (owner option C): a pack hungry for months disperses towards prey instead of starving in place
+      if (sp.diet === 'predator' && h.hunger >= BALANCE.predatorDisperseAfter) {
+        const to = dispersalTarget(sim, h, sp);
+        if (to && h.count >= 2 * sp.start[0] && w.herds.size + spawn.length < m.n / 30) {
+          h.count /= 2;
+          spawn.push({ id: 0, species: h.species, x: h.x, y: h.y, tx: to.x, ty: to.y, count: h.count, hunger: h.hunger, genes: h.genes.slice(), subspeciesId: h.subspeciesId, owner: h.owner });
+        } else if (to) {
+          h.tx = to.x;
+          h.ty = to.y;
+        }
       }
     }
     if (sp.diet !== 'predator' && sp.graze > 0 && !sp.aquatic) {
@@ -307,8 +467,7 @@ export function herdsMonthly(sim: Sim): void {
       fed = sp.diet === 'omnivore' ? Math.max(fed * 0.5, herbFed) : herbFed;
     }
     // logistic growth vs starvation and climate stress
-    const rivals = countSpeciesNear(sim, h.x, h.y, 5, h.species, h);
-    const capacity = (sp.maxHerd * 1.3) / (1 + rivals * 0.5);
+    const capacity = herdCapacity(sim, h, sp);
     if (fed >= 0.75 && hab > 0.2) h.count += (h.count * sp.growth * (0.6 + 0.8 * h.genes[4]) * hab * (1 - h.count / capacity)) / 12;
     else if (fed < 0.5) h.count -= h.count * (0.5 - fed) * 0.25;
     if (hab < 0.2) h.count -= h.count * 0.04;

@@ -21,6 +21,13 @@ None of them is a calibration target fitted to data.
 | Wolf (`wolf`) | 0.30 | Unexploited wolf populations: mean growth near 0 (they sit at equilibrium), year-to-year λ about 0.86–1.14 | [USGS / Mech & Fieberg 2015](https://pubs.usgs.gov/publication/70138809) | That is equilibrium variation, not a maximum; no maximum found. **[S]**, kept |
 | Deer, elk, horse, goat, sheep, aurochs, boar, junglefowl, camel, hare, mammoth, crocodile, bear, great cat, penguin, fish, birds | see `species.ts` | The searches gave no reliable species-level maximum rates (Fagan et al. 2013, Proc. R. Soc. B 280, has predicted values in its supplement, which could not be read) | [Lynch & Fagan 2009](https://science.umd.edu/biology/faganlab/abstracts/LynchFagan2009.html); [Fagan et al. 2013](https://experts.umn.edu/en/publications/phylogenetic-prediction-of-the-maximum-per-capita-rate-of-populat-2/) | **[S] stylized.** The ordering is plausible: small, fast breeders (hares, fowl, fish) are highest; mammoths, whales and elephants lowest |
 
+**Predator density and food needs (task 5, owner options A + C, collected 2026-11-26):**
+
+| Quantity (model use) | Model value | Reference | Source | Verdict |
+|---|---|---|---|---|
+| Predator biomass per prey biomass (`BALANCE.predatorPreyBiomass`: how many predators a natural world starts with) | **0.01** (herd units times `meat` as the biomass measure) | About 10,000 kg of prey supports about 90 kg of a given carnivore species, whatever the carnivore's size (about 1:111) | Carbone & Gittleman 2002, *A common rule for the scaling of carnivore density*, Science 295: 2273-2276, [doi:10.1126/science.1067994](https://doi.org/10.1126/science.1067994) (abstract read; full text not read) | **[E]** set from the source. Seeding also caps each pack at what its territory's prey can replace, so the realised start is at or below 1:100 (tests/ecology/predation.test.ts asserts 1:300 to 1:100) |
+| Crocodile food need relative to a warm-blooded predator (`upkeep` in `species.ts`) | **0.1** | Wild juvenile Nile crocodiles (Okavango) ate 0.48% (yearlings) and 0.23% (juveniles) of body mass a day, and the larger the crocodile the less it eats for its size. Minnesota wolves in winter ate about 2.0 kg of deer a wolf a day, about 6% of body mass. The ratio is about 0.04-0.08 | Okavango diet study ([J. Herpetology 42(2), BioOne](https://bioone.org/journals/journal-of-herpetology/volume-42/issue-2/07-1071.1/Diet-of-the-Nile-Crocodile-Crocodylus-niloticus-in-the-Okavango/10.1670/07-1071.1.full)) and the related thesis; wolf figure from a Minnesota winter study as summarised in search results ([Fuller 1989](https://wrrb.ca/sites/default/files/Fuller%201989.pdf)); field metabolic rates of reptiles scale more steeply than mammals' (Nagy, Girard & Brown 1999, Annu. Rev. Nutr. 19: 247) | Rounded up from the measured 0.04-0.08 (conservative). The pages were seen through search summaries, not read in full |
+
 **Caveat:** Lynch & Fagan (2009) show that some survivorship models inflate r estimates. Published values also vary with years, removals and density. These are ranges, not single truths.
 
 ## 2. Human (forager) growth
@@ -54,6 +61,9 @@ Queries, all run on 2026-11-25 (standard web search, US results):
 6. bison population growth rate per year Yellowstone; seal population growth rate; llama guanaco growth rate; water buffalo feral growth rate Australia
 7. grey seal harbour seal population annual growth rate percent recovery; humpback whale population growth rate 7% per year
 8. guanaco population growth rate per year Patagonia study; feral water buffalo Northern Territory population increase rate per year
+9. (2026-11-26, task 5) Carbone Gittleman 2002 common rule scaling of carnivore density 10,000 kg prey supports 90 kg carnivore; "10,000 kg of prey" supports "90 kg" carnivore Carbone Gittleman Science 2002
+10. (2026-11-26, task 5) Nagy Girard Brown 1999 field metabolic rate reptiles compared to mammals same body mass times lower; crocodile food requirement compared to mammal same size; Nagy 2005 field metabolic rate and body size (intercepts not confirmed, not used)
+11. (2026-11-26, task 5) Nile crocodile annual food consumption percent body mass per year wild adult feeding rate; wolf food consumption kg per wolf per day kill rate study average body mass percent
 
 The queries carried no personal or project-identifying details.
 
