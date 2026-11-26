@@ -2,9 +2,9 @@
  "generated": "2026-11-26",
  "totals": {
   "srcFiles": 152,
-  "srcLines": 44622,
+  "srcLines": 44627,
   "testFiles": 69,
-  "testCases": 507
+  "testCases": 508
  },
  "folders": [
   {
@@ -50,7 +50,7 @@
   {
    "name": "civilizations",
    "files": 10,
-   "lines": 2809,
+   "lines": 2814,
    "deps": {
     "world": 7,
     "sim": 21,
@@ -381,7 +381,7 @@
   {
    "path": "src/civilizations/settlement.ts",
    "folder": "civilizations",
-   "lines": 371,
+   "lines": 376,
    "about": "Settlements: founding, the monthly cycle (economy -> demography -> construction -> health/migration), yearly upkeep (territory, education, access), transfer between civilizations and destruction."
   },
   {
@@ -1527,7 +1527,7 @@
   },
   {
    "path": "tests/sim/pace.test.ts",
-   "cases": 9,
+   "cases": 10,
    "about": "Round 10: Slow pace. Placed humans take generations to settle and centuries to build cities; Standard pace is untouched (every lever exactly 1)."
   },
   {

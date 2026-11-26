@@ -239,6 +239,11 @@ export function destroySettlement(sim: Sim, s: Settlement, cause: string): void 
 
 const qScratch = new Float64Array(AGE_BANDS);
 
+/** A town's fertility (children per woman) this month: the demographic model and the pace's birth lever. Exported for tests. */
+export function townFertility(sim: Sim, s: Settlement, civ: Civ, q0: number, adequacy: number): number {
+  return tfrFor(civ, s, q0, adequacy, s.species) * birthPaceMult(sim.w.meta.settings, fertilityTransition(civ, s, q0));
+}
+
 /** The monthly cycle of one settlement. */
 export function settlementMonthly(sim: Sim, s: Settlement): void {
   const w = sim.w;
@@ -254,7 +259,7 @@ export function settlementMonthly(sim: Sim, s: Settlement): void {
     const urban = 1 + 0.35 * (1 - clamp01(civ.caps.sanitation)) * Math.min(1, Math.log10(s.pop / 5000));
     for (let b = 0; b < AGE_BANDS; b++) q[b] = Math.min(0.95, q[b] * urban);
   }
-  let tfr = tfrFor(civ, s, q[0], econ.adequacy, s.species) * birthPaceMult(sim.w.meta.settings, fertilityTransition(civ, s, q[0]));
+  let tfr = townFertility(sim, s, civ, q[0], econ.adequacy);
   // an infertility pandemic sterilizes adults; generations born to the fertile slowly replace them
   if (s.sterility) {
     tfr *= 1 - s.sterility;

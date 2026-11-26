@@ -10,7 +10,7 @@ import { encodeWorld, decodeWorld } from '../../src/persistence/serialize';
 import { Simulation } from '../../src/sim/simulation';
 import { makeSim } from '../helpers';
 import { presetByKey, eraPeopleDefault } from '../../src/config/laws';
-import { foundSettlement } from '../../src/civilizations/settlement';
+import { foundSettlement, townFertility } from '../../src/civilizations/settlement';
 import { residents, boundaryPopulation, emptyLedger, LEDGER_KEYS, LEDGER_SIGN } from '../../src/population/ledger';
 
 /** An empty world with one band of 24 humans placed next to fresh water (as in scripts/pace-calibrate.ts). */
@@ -130,6 +130,29 @@ describe('Slow pace in a developed world', () => {
     const ratio = (slow.w.popLedger?.births ?? 0) / (standard.w.popLedger?.births ?? 1);
     expect(ratio).toBeGreaterThan(0.85);
   }, 120000);
+
+  // Fix round 1: a direct check on the town birth-rate function (no world run, so research and build pace cannot drift
+  // the ratio). One fixed modern town and one fixed pre-modern town, each under Slow and Standard pace.
+  it('town fertility: a fixed modern town keeps its fertility at Slow pace; a fixed pre-modern town gets the full lever', () => {
+    const fixedTown = (era: number, t: { education: number; prosperity: number; pop: number }, q0: number, contraception: number) => {
+      const sim = makeSim('fert-town', 48, (c) => { c.settings.startEra = era; c.settings.startCivs = 1; });
+      const civ = [...sim.w.civs.values()].find((c) => c.settlements.length)!;
+      const s = sim.w.settlements.get(civ.settlements[0])!;
+      Object.assign(s, t);
+      civ.caps.contraception = contraception; // fixed, so the test does not depend on which techs the start drew
+      const at = (pace: 'slow' | 'standard') => { sim.w.meta.settings.pace = pace; return townFertility(sim, s, civ, q0, 1); };
+      return { slow: at('slow'), standard: at('standard') };
+    };
+    // modern: schooled, prosperous city with modern child survival, modern contraception and family planning both fully
+    // adopted (0.35 + 0.35, the most the tech tree gives); the lever then takes under 4%
+    const modern = fixedTown(10, { education: 0.9, prosperity: 2, pop: 300000 }, 0.004, 0.7);
+    expect(modern.standard).toBeLessThan(2.6); // through the transition
+    expect(modern.slow / modern.standard).toBeGreaterThan(0.95);
+    // pre-modern: unschooled farming village with pre-modern child mortality (era 3)
+    const early = fixedTown(3, { education: 0, prosperity: 1, pop: 2000 }, 0.06, 0);
+    expect(early.standard).toBeGreaterThan(5); // natural fertility
+    expect(early.slow / early.standard).toBeCloseTo(BALANCE.slowBirthMult, 12);
+  });
 
   it('the birth lever keeps its calibrated value before the transition and fades out across it', () => {
     const slow = { pace: 'slow' } as never;
