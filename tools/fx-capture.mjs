@@ -1,6 +1,6 @@
 // Round 10 second addendum (Task 7): capture every disaster and disease effect for the design review, at 2x.
 //   node tools/fx-capture.mjs                 (starts its own Vite dev server; writes tools/output/fx/*.png)
-//   OUT=<dir> REDUCED=1 SCALE=2 ONLY=volcano,storm node tools/fx-capture.mjs
+//   OUT=<dir> REDUCED=1 ZOOM=2 SEED=<seed> SCALE=2 ONLY=volcano,storm node tools/fx-capture.mjs
 // The dev server serves the source modules, so the tool can reach the running world: it wraps Renderer.frame to
 // find the renderer (and through it the world and camera), then sets off each effect through the real code path
 // (a god power, a disaster, a logged event or a pandemic closing). Capture-only: nothing here ships in the game.
@@ -18,6 +18,8 @@ const REDUCED = process.env.REDUCED === '1';
 const ONLY = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;
 /** A pinned seed: before and after captures show the same world and the same sites (override with SEED=). */
 const SEED = process.env.SEED ?? 'fx-capture-6'; // this seed's world has volcanic vents
+/** ZOOM=2 shoots the same effects twice as close (the player's close zoom); clips grow with it, up to the view. */
+const ZMUL = Number(process.env.ZOOM ?? 1);
 const TIMES = REDUCED ? [300, 1500] : [120, 450, 900, 1600, 2600, 3800];
 mkdirSync(OUT, { recursive: true });
 
@@ -44,9 +46,11 @@ await page.waitForSelector('canvas.canvas', { timeout: 60000 });
 if (await page.getByText('Skip').count()) await page.getByText('Skip').click();
 await page.getByLabel('Paused').click();
 await page.waitForFunction(() => !!window.__fxr);
+await page.evaluate((z) => { window.__fxZoom = z; }, ZMUL);
 
 /** Center the camera on a world tile at a zoom (screen px per art px) and return its screen position. */
 const look = (x, y, zoom = 2.2) => page.evaluate(([x, y, zoom]) => {
+  zoom *= window.__fxZoom ?? 1;
   const r = window.__fxr;
   r.cam.x = (x + 0.5) * 8;
   r.cam.y = (y + 0.5) * 8;
@@ -100,12 +104,12 @@ async function shoot(name, site, fire, opts = {}) {
   await page.evaluate(() => { window.__fxr.sim.fx.length = 0; });
   await page.evaluate(fire, site);
   const t0 = Date.now();
-  const w = opts.w ?? 220, h = opts.h ?? 200;
+  const w = Math.min(900, (opts.w ?? 220) * ZMUL), h = Math.min(700, (opts.h ?? 200) * ZMUL);
   const clip = opts.top ? { x: 0, y: 0, width: 900, height: 240 } : { x: Math.max(0, sx - w / 2), y: Math.max(0, sy - h * 0.7), width: w, height: h };
   for (const ms of opts.times ?? TIMES) {
     const wait = ms - (Date.now() - t0);
     if (wait > 0) await page.waitForTimeout(wait);
-    const file = `${OUT}/${name}${REDUCED ? '-reduced' : ''}-${String(ms).padStart(4, '0')}.png`;
+    const file = `${OUT}/${name}${REDUCED ? '-reduced' : ''}${ZMUL !== 1 ? `-z${ZMUL}` : ''}-${String(ms).padStart(4, '0')}.png`;
     await page.screenshot({ path: file, clip });
     const c = page.locator('canvas.canvas');
     console.log(`${name} ${ms}ms: fx="${await c.getAttribute('data-fx')}" motion="${await c.getAttribute('data-fx-motion')}" sick="${await c.getAttribute('data-sick')}" aurora="${await c.getAttribute('data-aurora')}"`);

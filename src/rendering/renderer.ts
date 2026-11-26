@@ -27,7 +27,8 @@ import { HAZARD } from '../world/tilemap';
 import { B, eraToTier } from '../civilizations/buildingTypes';
 import { SPECIES_BY_KEY, MONSTERS } from '../ecology/species';
 import { hash3 } from '../core/rng';
-import { fxFrame, sickMarker, auroraAlpha, stillKind, pallShowsSymbol } from './fxMotion';
+import { fxFrame, sickMarker, auroraAlpha, stillKind, pallShowsSymbol, LOOP_FPS } from './fxMotion';
+import { fxLayout, fxShadow, fillsRing, labelFade, sickMarkerY, spreadOffset, TALL_FX, type Rect } from './fxLayout';
 
 export interface Brush {
   x: number;
@@ -711,6 +712,8 @@ export class Renderer {
     let motion = ''; // what each effect looks like this frame (ring size, sprite frame): a test hook for movement
     const reduce = this.reduceMotion;
     this.aurora = null;
+    this.covers = [];
+    const drawn = new Map<string, number[]>(); // anchors already drawn this frame, per kind (duplicates spread apart)
     for (let k = fx.length - 1; k >= 0; k--) {
       const f = fx[k];
       if (reduce && f.then) collapseSequence(f); // Reduce motion: the sequence shows one still (its characteristic step)
@@ -745,7 +748,8 @@ export class Renderer {
         // area ring: grows to the concept's radius and fades; a still ring under Reduce motion
         const grow = reduce ? 1 : 0.35 + 0.65 * progress;
         const rgb = f.kind === 'fx.nuke' ? '255,255,255' : f.kind === 'fx.pall' ? '196,208,150' : '248,232,137'; // sickness: a pale green-grey ring, not gold
-        ctx.strokeStyle = `rgba(${rgb},${reduce ? 0.6 : (f.kind === 'fx.nuke' ? 0.85 : 0.8) * (1 - progress)})`;
+        const faint = fillsRing(f.kind) ? 0.4 : 1; // the body fills the area: the ring only marks its edge
+        ctx.strokeStyle = `rgba(${rgb},${faint * (reduce ? 0.6 : (f.kind === 'fx.nuke' ? 0.85 : 0.8) * (1 - progress))})`;
         ctx.lineWidth = 2 / this.cam.zoom;
         ctx.beginPath();
         ctx.arc(f.x * TILE + 4, f.y * TILE + 4, f.ring * TILE * grow, 0, Math.PI * 2);
@@ -754,8 +758,14 @@ export class Renderer {
       }
       // weather and sickness loop, blasts play once; one still frame under Reduce motion (fxMotion.ts)
       const frame = spr ? fxFrame(f.kind, spr.frames, progress, this.time, reduce) : 0;
-      if (f.kind === 'fx.pall') this.drawPall(f.x, f.y, frame);
-      else atlas.draw(ctx, f.kind, f.x * TILE + 4, f.y * TILE + 6, frame);
+      // several of one effect in one place spread apart instead of stacking into a blob
+      const seen = drawn.get(f.kind) ?? [];
+      let n = 0;
+      for (let j = 0; j < seen.length; j += 2) if ((seen[j] - f.x) ** 2 + (seen[j + 1] - f.y) ** 2 <= 2.25) n++;
+      seen.push(f.x, f.y);
+      drawn.set(f.kind, seen);
+      const [ox, oy] = spreadOffset(n);
+      this.drawBody(f, frame, ox, oy);
       kinds.add(f.kind);
       motion += `f${frame};`;
     }
@@ -775,17 +785,43 @@ export class Renderer {
     }
   }
 
+  /** Bodies of tall effects drawn this frame (world px): the name labels they cover fade (drawLabels). */
+  private covers: Rect[] = [];
+
   /**
-   * Fix round 1: the sickness pall is a see-through haze (the town shows through a sickly tint), topped by the
-   * sickbed symbol only where the town does not already carry the sick-town marker: one symbol per sick town.
+   * Fix round 1 (owner: full size, depth): an effect's body. It fills its ring with a whole-number scale or tiled
+   * copies (fxLayout); things in the air first cast a soft shadow down-right on the ground (fxShadow). The sickness
+   * pall is a see-through haze, topped by the sickbed only where the town does not already carry the sick-town
+   * marker. Copies of a looping effect are out of step; under Reduce motion every copy shows the still frame.
    */
-  private drawPall(x: number, y: number, frame: number): void {
+  private drawBody(f: VisualFx, frame: number, ox: number, oy: number): void {
     const { ctx, atlas } = this;
+    const spr = atlas.get(f.kind);
+    if (!spr) return;
+    const places = fxLayout(f.kind, fillsRing(f.kind) ? f.ring ?? f.data ?? 0 : 0, spr.w, spr.h);
+    const x0 = f.x * TILE + 4 + ox, y0 = f.y * TILE + 6 + oy;
+    for (const p of places) {
+      const sh = fxShadow(f.kind, p.scale, spr.w, spr.h);
+      if (!sh) break;
+      ctx.save();
+      ctx.globalAlpha = sh.alpha;
+      ctx.fillStyle = '#120d17';
+      ctx.beginPath();
+      ctx.ellipse(x0 + p.dx + sh.dx, y0 + p.dy + sh.dy, sh.rx, sh.ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    const offset = !this.reduceMotion && !!LOOP_FPS[f.kind];
+    const pall = f.kind === 'fx.pall';
     ctx.save();
-    ctx.globalAlpha = 0.55;
-    atlas.draw(ctx, 'fx.pall', x * TILE + 4, y * TILE + 6, frame);
+    if (pall) ctx.globalAlpha = 0.55;
+    for (const p of places) {
+      const x = x0 + p.dx, y = y0 + p.dy, k = p.scale;
+      atlas.draw(ctx, f.kind, x, y, frame + (offset ? p.frame : 0), undefined, !!p.flip, false, k);
+      if (TALL_FX.has(f.kind)) this.covers.push({ x0: x - spr.ax * k, y0: y - spr.ay * k, x1: x + (spr.w - spr.ax) * k, y1: y + (spr.h - spr.ay) * k });
+    }
     ctx.restore();
-    if (pallShowsSymbol(this.sim.w.settlements.values(), x, y)) atlas.draw(ctx, 'fx.sick', x * TILE + 4, y * TILE - 1, 0);
+    if (pall && pallShowsSymbol(this.sim.w.settlements.values(), f.x, f.y)) atlas.draw(ctx, 'fx.sick', f.x * TILE + 4, f.y * TILE - 1, 0);
   }
 
   /** CSS px of the view hidden under the top HUD (set by the game); the aurora hangs just below it. */
@@ -844,7 +880,7 @@ export class Renderer {
       if (!mark) continue;
       ctx.save();
       ctx.globalAlpha = mark.alpha;
-      atlas.draw(ctx, 'fx.sick', (s.x + 0.5) * TILE + 6 * k, (s.y + 0.5) * TILE + 2 * k, 0, undefined, false, false, k); // just right of the town's centre
+      atlas.draw(ctx, 'fx.sick', (s.x + 0.5) * TILE + 6 * k, sickMarkerY(s.y, k, cam.zoom), 0, undefined, false, false, k); // right of the centre, below the label
       ctx.restore();
       if (!n) pulse = mark.alpha.toFixed(2);
       n++;
@@ -966,6 +1002,18 @@ export class Renderer {
       placed.push([x0, y0, x1, y1]);
       return true;
     };
+    // fix round 1: a label under a tall effect (an ash column, a fireball, a storm) fades so the effect shows
+    const covers = this.covers.map((c) => {
+      const [x0, y0] = cam.worldToScreen(c.x0, c.y0);
+      const [x1, y1] = cam.worldToScreen(c.x1, c.y1);
+      return { x0, y0, x1, y1 };
+    });
+    let faded = 0;
+    const fade = (x0: number, y0: number, x1: number, y1: number) => {
+      const a = covers.length ? labelFade({ x0, y0, x1, y1 }, covers) : 1;
+      if (a < 1) faded++;
+      ctx.globalAlpha = a;
+    };
     if (tilePx >= 5) {
       ctx.font = `${tilePx >= 12 ? 13 : 11}px "Pixelify Sans", ui-monospace, monospace`;
       for (const s of [...w.settlements.values()].sort((a, b) => Number(b.capital) - Number(a.capital) || b.pop - a.pop)) {
@@ -977,6 +1025,7 @@ export class Renderer {
         ctx.fillStyle = 'rgba(13,20,36,0.75)';
         const tw = ctx.measureText(text).width;
         if (!free(sx - tw / 2 - (s.capital ? 20 : 4), sy - 15, sx + tw / 2 + 4, sy)) continue;
+        fade(sx - tw / 2 - (s.capital ? 20 : 4), sy - 15, sx + tw / 2 + 4, sy);
         ctx.fillRect(sx - tw / 2 - 4, sy - 15, tw + 8, 15);
         if (s.capital && civ) {
           ctx.imageSmoothingEnabled = false;
@@ -996,6 +1045,7 @@ export class Renderer {
         ctx.fillStyle = 'rgba(13,20,36,0.7)';
         const tw = ctx.measureText(civ.name).width;
         if (!free(sx - tw / 2 - 22, sy - 16, sx + tw / 2 + 4, sy)) continue;
+        fade(sx - tw / 2 - 22, sy - 16, sx + tw / 2 + 4, sy);
         ctx.fillRect(sx - tw / 2 - 22, sy - 16, tw + 26, 15);
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(flagCanvas(civ), Math.round(sx - tw / 2 - 19), Math.round(sy - 14), 15, 10);
@@ -1005,6 +1055,8 @@ export class Renderer {
         ctx.fillText(civ.name, sx + 2, sy - 3);
       }
     }
+    ctx.globalAlpha = 1;
+    this.setData('labelsFaded', String(faded));
   }
 
   /** Thumbnail data URL of the world overview (for save slots). */

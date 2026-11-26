@@ -1,16 +1,16 @@
 {
  "generated": "2026-11-26",
  "totals": {
-  "srcFiles": 151,
-  "srcLines": 44369,
-  "testFiles": 68,
-  "testCases": 491
+  "srcFiles": 152,
+  "srcLines": 44599,
+  "testFiles": 69,
+  "testCases": 505
  },
  "folders": [
   {
    "name": "rendering",
-   "files": 33,
-   "lines": 19178,
+   "files": 34,
+   "lines": 19408,
    "deps": {
     "sim": 14,
     "world": 10,
@@ -777,7 +777,7 @@
   {
    "path": "src/rendering/art/effects_disaster.ts",
    "folder": "rendering",
-   "lines": 335,
+   "lines": 340,
    "about": "Round 10 second addendum (Task 7): realistic disaster and disease effects, on the master palette and the 8-art-pixels-per-tile scale."
   },
   {
@@ -895,6 +895,12 @@
    "about": "Procedural pixel flags from a civilization's emblem (field division + charge) and its two colors."
   },
   {
+   "path": "src/rendering/fxLayout.ts",
+   "folder": "rendering",
+   "lines": 173,
+   "about": "Round 10 second addendum, fix round 1 (owner: \"depth, design, full size and spacing\"): where and how big an effect is drawn."
+  },
+  {
    "path": "src/rendering/fxMotion.ts",
    "folder": "rendering",
    "lines": 81,
@@ -921,7 +927,7 @@
   {
    "path": "src/rendering/renderer.ts",
    "folder": "rendering",
-   "lines": 1061,
+   "lines": 1113,
    "about": "Frame renderer. Draws (back to front): cached world chunks (or the far-zoom overview), the overlay, animated tiles (volcanoes, fires, smoke, windmills), living things and agents, traffic derived from real infrastructure and trade, effects, labels, selection an"
   },
   {
@@ -1475,6 +1481,11 @@
    "about": "Round 10 second addendum (Task 7): realistic disaster and disease visuals."
   },
   {
+   "path": "tests/rendering/fxLayout.test.ts",
+   "cases": 14,
+   "about": "Round 10 second addendum, fix round 1 (owner: full size, depth, spacing)."
+  },
+  {
    "path": "tests/rendering/hand.test.ts",
    "cases": 4,
    "about": "Round 10 addendum: a WorldBox-style pixel hand drops placed people and animals onto the map."
@@ -1663,7 +1674,7 @@
   },
   {
    "path": "tools/fx-capture.mjs",
-   "lines": 179,
+   "lines": 183,
    "about": "Round 10 second addendum (Task 7): capture every disaster and disease effect for the design review, at 2x."
   },
   {

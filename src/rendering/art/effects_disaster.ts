@@ -157,36 +157,41 @@ function eruptionFrame(step: number): string[] {
 D['fx.eruption'] = S([0, 1, 2, 3, 4, 5].map(eruptionFrame), { fps: 2 });
 
 // ---------------------------------------------------------------- airburst
-/** A fireball in the sky above the ground point (the anchor), a shock ring around it, then smoke. */
+/**
+ * A meteoroid bursting in the sky: the fireball high above the ground point (the anchor, at the ring's centre), and
+ * the blast wave reaching the ground as a flattened ring below it (seen at an angle), then a smoke ball.
+ */
 function airburstFrame(step: number): string[] {
-  const c = canvas(24, 26);
-  const cx = 12, cy = 8;
+  const c = canvas(24, 24);
+  const cx = 12, cy = 6; // the fireball, about 2 tiles up
+  const gy = 20; // the ground under it
+  const groundRing = (rx: number, pick: (x: number, y: number) => string | null) => strokeEllipse(c, cx, gy, rx, Math.max(1.6, rx * 0.3), pick);
   switch (step) {
     case 0: // the flash
       fillEllipse(c, cx, cy, 4, 4, 'O');
       fillEllipse(c, cx, cy, 2.6, 2.6, '7');
-      for (const [x, y] of [[cx, 1], [cx, 15], [5, cy], [19, cy], [7, 3], [17, 3], [7, 13], [17, 13]]) plot(c, x, y, 'O');
+      for (const [x, y] of [[cx, 0], [cx, 12], [5, cy], [19, cy], [7, 1], [17, 1], [7, 11], [17, 11]]) plot(c, x, y, 'O');
       break;
-    case 1: // fireball inside the shock ring
-      strokeEllipse(c, cx, cy, 8, 7, (x, y) => ((x + y) % 2 === 0 ? '7' : '6'));
-      cloud(c, [[cx, cy, 3.6]], FIRE);
+    case 1: // the fireball, and the blast wave reaching the ground below it
+      groundRing(6, (x, y) => ((x + y) % 2 === 0 ? '7' : '6'));
+      cloud(c, [[cx, cy, 3.4]], FIRE);
       fillEllipse(c, cx - 0.8, cy - 0.8, 1.5, 1.5, '7');
       break;
-    case 2: // the ring spreads and thins, the fireball cools
-      strokeEllipse(c, cx, cy, 11, 9.5, (x, y) => (Math.floor(((Math.atan2(y + 0.5 - cy, x + 0.5 - cx) + Math.PI) / (2 * Math.PI)) * 16) % 2 ? '6' : null));
-      cloud(c, [[cx, cy, 3.4], [cx - 1.5, cy + 1.6, 2]], BURN);
+    case 2: // the ground ring spreads and thins, the fireball cools
+      groundRing(9, (x) => (x % 3 === 0 ? null : '6'));
+      cloud(c, [[cx, cy, 3.2], [cx - 1.5, cy + 1.6, 1.8]], BURN);
       break;
-    case 3: // a smoke ball with an ember core, the last of the ring
-      strokeEllipse(c, cx, cy, 11.8, 10.4, (x, y) => ((x + 2 * y) % 4 === 0 ? '5' : null));
-      cloud(c, [[cx, cy - 0.5, 3.6], [cx - 3, cy + 1.5, 2.2], [cx + 3, cy + 1.5, 2.2]], SMOKE);
-      cloud(c, [[cx, cy + 0.6, 1.8]], EMBER);
+    case 3: // a smoke ball with an ember core; the last of the ring
+      groundRing(11, (x) => (x % 2 === 0 ? '5' : null));
+      cloud(c, [[cx, cy - 0.5, 3.4], [cx - 3, cy + 1.5, 2], [cx + 3, cy + 1.5, 2]], SMOKE);
+      cloud(c, [[cx, cy + 0.6, 1.6]], EMBER);
       break;
     default: // smoke drifts apart
       cloud(c, [[cx - 3, cy - 1, 2.2], [cx + 2.5, cy - 2, 2.4], [cx, cy + 2, 2]], HAZE);
   }
   return rowsOf(c);
 }
-D['fx.airburst'] = S([0, 1, 2, 3, 4].map(airburstFrame), { fps: 3, ax: 12, ay: 19 }); // the burst about 1.4 tiles up: below a town's name label
+D['fx.airburst'] = S([0, 1, 2, 3, 4].map(airburstFrame), { fps: 3, ax: 12, ay: 20 });
 
 // ---------------------------------------------------------------- sickness
 /**
