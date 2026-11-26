@@ -208,7 +208,7 @@ t('rocketry', 'Rocketry', 10, 'space', ['jet_engines', 'nuclear_fission'], { spa
 t('ballistic_missiles', 'Strategic Missiles', 10, 'military', ['rocketry', 'nuclear_weapons'], { missiles: 0.7 }, 'Intercontinental delivery of strategic weapons; silos and deterrence doctrines.', { k: 1.1, adv: true, unlock: ['SILO'] });
 t('satellites', 'Satellites', 10, 'space', ['rocketry', 'transistors'], { spaceTier: 2, communication: 0.6, intelligence: 0.3 }, 'Orbiting satellites for communication, weather and reconnaissance.', { k: 1 });
 t('crewed_spaceflight', 'Crewed Spaceflight', 10, 'space', ['satellites'], { spaceTier: 3, culturalOutput: 0.2 }, 'Humans in orbit.', { k: 1.1 });
-t('transistors', 'Transistors and Early Computers', 10, 'computing', ['radio', 'industrial_research'], { computing: 0.5, research: 0.6, adminCapacity: 0.6 }, 'Electronic computation.', { k: 1 });
+t('transistors', 'Transistors and Early Computers', 10, 'computing', ['radio', 'industrial_research'], { computing: 0.5, research: 0.6, adminCapacity: 0.6 }, 'Electronic computation; the first semiconductor plants make transistors.', { k: 1, unlock: ['CHIP_FAB'] }); // Task 8d: fabs came with transistors (1950s), not microprocessors; era-10 spaceports, labs and airports need electronics
 t('green_revolution', 'Green Revolution', 10, 'agriculture', ['mechanized_agriculture', 'chemical_fertilizer'], { farming: 2.0, farmMechanization: 0.1 }, 'High-yield crop varieties and irrigation multiply harvests.', { k: 1 });
 t('television', 'Television', 10, 'communication', ['radio', 'transistors'], { mediaReach: 0.6, culturalOutput: 0.2, communication: 0.6 }, 'Mass visual media.', { k: 0.9 });
 t('international_organizations', 'International Organizations', 10, 'civic', ['telephone', 'universal_suffrage'], { internationalOrgs: 1 }, 'Permanent bodies for diplomacy, standards and collective security.', { k: 1 });
@@ -220,7 +220,7 @@ t('combined_arms', 'Combined Arms Doctrine', 10, 'military', ['armored_warfare',
 t('rare_earth_processing', 'Rare Metal Processing', 10, 'materials', ['nuclear_fission', 'bessemer_steel'], { rareExtraction: 1, metalTier: 6 }, 'Extracting and refining lithium, rare earths and specialty alloys.', { k: 1 });
 
 // ===================================================================== Era 11 — Digital
-t('microprocessors', 'Microprocessors', 11, 'computing', ['transistors', 'rare_earth_processing'], { computing: 1, research: 0.5, automation: 0.05 }, 'Integrated circuits put computers everywhere; rare metals make fabs far more productive.', { k: 1.1, unlock: ['CHIP_FAB'] });
+t('microprocessors', 'Microprocessors', 11, 'computing', ['transistors', 'rare_earth_processing'], { computing: 1, research: 0.5, automation: 0.05 }, 'Integrated circuits put computers everywhere; rare metals make fabs far more productive.', { k: 1.1 });
 t('internet', 'Internet', 11, 'communication', ['microprocessors', 'satellites'], { communication: 1.5, research: 0.8, literacy: 0.1, adminCapacity: 0.6, mediaReach: 0.8, computing: 0.5 }, 'A global network of computers.', { k: 1.1, unlock: ['DATA_CENTER'] });
 t('mobile_telecom', 'Mobile Telecommunications', 11, 'communication', ['internet'], { communication: 0.8, markets: 0.1 }, 'Phones in every pocket.', { k: 0.9 });
 t('industrial_robots', 'Industrial Robots', 11, 'industry', ['microprocessors', 'assembly_line'], { automation: 0.15, robotics: 0.2 }, 'Programmable machines take over repetitive factory work.', { k: 1 });

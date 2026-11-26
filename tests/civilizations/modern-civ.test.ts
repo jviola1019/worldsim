@@ -75,4 +75,19 @@ describe('round-4 modern civilizations', () => {
     expect(launched).toBe(true);
     expect(sim.w.events.some((e) => e.cat === 'space')).toBe(true);
   }, 180000);
+  it('an atomic-age economy can make electronics: chip fabs come with transistors (Task 8d)', async () => {
+    // Era-10 buildings need electronics (spaceport 300, airport, lab, nuclear plant) and era-10 households buy them,
+    // but the only producer, the chip fab, was unlocked by microprocessors (era 11). In Space Race world 1 no nation
+    // had a fab for 40 years, every electronics stock ran to 0, and the first spaceport waited until year ~205.
+    const { configFor } = await import('../../scripts/mode-audit');
+    const { createSimulation } = await import('../../src/sim/bootstrap');
+    const { hasUnlocked } = await import('../../src/technology/research');
+    const sim = createSimulation(configFor('space_race', 'audit-space_race-1'));
+    const withTransistors = [...sim.w.civs.values()].filter((c) => c.alive && (c.techs.transistors?.adoption ?? 0) >= 0.25);
+    expect(withTransistors.length).toBeGreaterThan(0);
+    for (const c of withTransistors) expect(hasUnlocked(c, B.CHIP_FAB), c.name).toBe(true);
+    sim.runYears(15);
+    const fabs = [...sim.w.settlements.values()].reduce((a, s) => a + s.bld[B.CHIP_FAB], 0);
+    expect(fabs, 'chip fabs in an era-10 world after 15 years').toBeGreaterThan(0);
+  }, 180000);
 });
