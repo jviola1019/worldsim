@@ -41,13 +41,34 @@ export function snapshot(sim: Simulation): Snapshot {
   };
 }
 
-/** Spearman rank correlation. */
-function spearman(xs: number[], ys: number[]): number {
-  const rank = (v: number[]) => { const o = v.map((x, i) => [x, i]).sort((a, b) => a[0] - b[0]); const r = new Array(v.length); o.forEach(([, i], k) => (r[i] = k)); return r; };
-  const rx = rank(xs), ry = rank(ys), n = xs.length;
+/** Spearman rank correlation: Pearson on ranks, ties given their average rank (Task 8c: ties were ranked by array order). */
+export function spearman(xs: number[], ys: number[]): number {
+  const rank = (v: number[]) => {
+    const o = v.map((x, i) => [x, i] as const).sort((a, b) => a[0] - b[0]);
+    const r = new Array<number>(v.length);
+    for (let i = 0; i < o.length; ) {
+      let j = i;
+      while (j + 1 < o.length && o[j + 1][0] === o[i][0]) j++;
+      for (let k = i; k <= j; k++) r[o[k][1]] = (i + j) / 2;
+      i = j + 1;
+    }
+    return r;
+  };
+  const n = xs.length;
   if (n < 3) return 0;
-  const d2 = rx.reduce((a, r, i) => a + (r - ry[i]) ** 2, 0);
-  return 1 - (6 * d2) / (n * (n * n - 1));
+  const rx = rank(xs), ry = rank(ys);
+  const mx = rx.reduce((a, b) => a + b, 0) / n, my = ry.reduce((a, b) => a + b, 0) / n;
+  let sxy = 0, sxx = 0, syy = 0;
+  for (let i = 0; i < n; i++) { sxy += (rx[i] - mx) * (ry[i] - my); sxx += (rx[i] - mx) ** 2; syy += (ry[i] - my) ** 2; }
+  return sxx && syy ? sxy / Math.sqrt(sxx * syy) : 0;
+}
+
+/** Task 8c: how far a nation has industrialised: adoption summed over the era-7 and era-8 (industrial) techs. */
+const INDUSTRIAL_TECHS = TECHS.filter((t) => t.era === 7 || t.era === 8).map((t) => t.id);
+export function industrialisation(civ: { techs: Record<string, { known: boolean; adoption: number } | undefined> }): number {
+  let a = 0;
+  for (const id of INDUSTRIAL_TECHS) { const st = civ.techs[id]; if (st?.known) a += st.adoption; }
+  return a;
 }
 
 /** No monsters, horrors, alien wildlife, fantasy peoples or exotic matter. */
@@ -102,10 +123,12 @@ export const MODES: ModeSpec[] = [
   { key: 'industrial', kind: 'preset', horizon: 120, promises: [
     { id: 'gunpowder', text: 'Renaissance-era empires at start', at: 'start', check: (_s, st) => st.minEra >= 6 },
     { id: 'steam', text: 'someone reaches the industrial era', at: 'horizon', check: (s) => maxEra(s) >= 7 },
-    { id: 'coal', text: 'coal-rich nations industrialise first (rank correlation > 0)', at: 'horizon', check: (s, st) => {
-      const ids = [...st.coal.keys()].filter((id) => s.w.civs.get(id)?.alive);
+    // Task 8c: every nation of the start (coal-less ones too), coal tiles at the start against industrial-tech
+    // adoption at the horizon; the era label was tied at 7 for nearly all and reachable without coal
+    { id: 'coal', text: 'coal-rich nations industrialise first (rank correlation of coal with industrial-tech adoption > 0)', at: 'horizon', check: (s, st) => {
+      const ids = [...st.known.keys()].filter((id) => s.w.civs.get(id)?.alive);
       if (ids.length < 3) return false;
-      return spearman(ids.map((id) => st.coal.get(id) ?? 0), ids.map((id) => s.w.civs.get(id)!.era)) > 0;
+      return spearman(ids.map((id) => st.coal.get(id) ?? 0), ids.map((id) => industrialisation(s.w.civs.get(id)!))) > 0;
     } },
   ] },
   { key: 'modern', kind: 'preset', horizon: 60, promises: [
