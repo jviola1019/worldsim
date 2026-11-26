@@ -149,23 +149,26 @@ describe('predators hunt in their own realm (review fix)', () => {
     const far = site(base, (j) => !m.isWater(j) && Math.hypot(m.xOf(j) - m.xOf(coast), m.yOf(j) - m.yOf(coast)) > 30);
     let farSea = -1;
     for (let j = 0; j < m.n && farSea < 0; j++) if (m.isWater(j) && Math.hypot(m.xOf(j) - m.xOf(coast), m.yOf(j) - m.yOf(coast)) > 30) farSea = j;
-    const run = (near: boolean) => {
+    // the same predators, with the same random draws, each placed beside the prey or far away (fix round 1: one
+    // hunter at a time, so a hunter crossing realms shows as a loss the other realm's hunter cannot explain)
+    const run = (wolvesNear: boolean, sealsNear: boolean) => {
       base.syncRng();
       const sim = new Simulation(decodeWorld(encodeWorld(base.w)));
       const fish = spawnHerd(sim, 'fish', m.xOf(sea), m.yOf(sea), 200)!;
       const deer = spawnHerd(sim, 'deer', m.xOf(coast), m.yOf(coast), 30)!;
-      // the same predators, with the same random draws: beside the prey, or far away (the control)
-      spawnHerd(sim, 'wolf', near ? m.xOf(coast) : m.xOf(far), near ? m.yOf(coast) : m.yOf(far), 8);
-      spawnHerd(sim, 'seal', near ? m.xOf(sea) : m.xOf(farSea), near ? m.yOf(sea) : m.yOf(farSea), 16);
+      spawnHerd(sim, 'wolf', wolvesNear ? m.xOf(coast) : m.xOf(far), wolvesNear ? m.yOf(coast) : m.yOf(far), 8);
+      spawnHerd(sim, 'seal', sealsNear ? m.xOf(sea) : m.xOf(farSea), sealsNear ? m.yOf(sea) : m.yOf(farSea), 16);
       sim.runTicks(10);
       return { fish: sim.w.herds.get(fish.id)?.count ?? 0, deer: sim.w.herds.get(deer.id)?.count ?? 0 };
     };
-    const control = run(false), hunted = run(true);
-    // each prey herd loses at most what one hunter may take, its yield at half capacity (plus that month's growth on
-    // it): seals take fish, wolves take deer, nobody crosses over (before the fix wolves also took fish: twice the loss)
-    const yieldMax = (k: 'fish' | 'deer') => (SPECIES_BY_KEY[k].growth * 1.4 * SPECIES_BY_KEY[k].maxHerd * 1.3 * 0.25) / 12;
-    expect(control.fish - hunted.fish).toBeLessThanOrEqual(yieldMax('fish') * (1 + SPECIES_BY_KEY.fish.growth / 12));
-    expect(control.deer - hunted.deer).toBeLessThanOrEqual(yieldMax('deer') * (1 + SPECIES_BY_KEY.deer.growth / 12));
+    const control = run(false, false), wolves = run(true, false), seals = run(false, true);
+    // no hunter eats in the other realm: wolves beside the shoal take no fish, seals beside the deer take no deer (before
+    // the review fix wolves took fish; with the realm filter removed this assertion fails, fix round 1)
+    expect(Math.abs(control.fish - wolves.fish), 'fish taken by wolves').toBeLessThan(0.05);
+    expect(Math.abs(control.deer - seals.deer), 'deer taken by seals').toBeLessThan(0.05);
+    // and each does eat in its own (so the zeros above are not just hunters that never hunt)
+    expect(control.deer - wolves.deer, 'deer taken by wolves').toBeGreaterThan(0.05);
+    expect(control.fish - seals.fish, 'fish taken by seals').toBeGreaterThan(0.5);
   });
 });
 

@@ -190,12 +190,15 @@ describe('disease, ecology, society', () => {
   }, 120000);
 
   it('predatorsReducePrey: prey herds fare worse with wolves nearby (counterfactual)', () => {
-    // task 5: a pack now takes what a herd can replace (about 1% of a deer herd a month, was a flat 2%), so one world's
-    // random draws drowned the effect after a few years; re-measured over four worlds and three months, with the same
-    // wolves placed far away in the control so both runs make the same draws
+    // task 5 fix round 1: the original 4-year horizon, with equal draws (the same wolves placed far away in the control).
+    // A pack now takes what a herd can replace (about 1% of a deer herd a month, was a flat 2%), and each world's herd
+    // fate (whether it splits, where it wanders and grazes) diverges once the wolves' own draws differ, so one world can
+    // go either way: measured over 12 worlds, the hunted deer were fewer in 9, and 27% fewer in all (253 against 345).
+    // The assertion is the aggregate and a majority of worlds.
     const deer = (sim: Simulation) => [...sim.w.herds.values()].filter((h) => h.species === 'deer').reduce((a, h) => a + h.count, 0);
-    let control = 0, hunted = 0;
-    for (const seed of ['plan-eco', 'plan-eco-1', 'plan-eco-2', 'plan-eco-3']) {
+    let control = 0, hunted = 0, fewer = 0;
+    const seeds = ['plan-eco', ...Array.from({ length: 11 }, (_, k) => `plan-eco-${k + 1}`)];
+    for (const seed of seeds) {
       const base = makeSim(seed, 96);
       const m = base.w.map;
       let x = -1, y = -1;
@@ -208,11 +211,13 @@ describe('disease, ecology, society', () => {
       const A = clone(base), B = clone(base);
       spawnHerd(A, 'wolf', fx, fy, 12);
       spawnHerd(B, 'wolf', x, y, 12);
-      A.runTicks(30); B.runTicks(30);
+      A.runYears(4); B.runYears(4);
       control += deer(A); hunted += deer(B);
+      if (deer(B) < deer(A)) fewer++;
     }
-    expect(hunted).toBeLessThan(control);
-  }, 120000);
+    expect(hunted).toBeLessThan(control * 0.9);
+    expect(fewer).toBeGreaterThan(seeds.length / 2);
+  }, 600000);
 });
 
 describe('future systems', () => {
