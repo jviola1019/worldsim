@@ -1,0 +1,2 @@
+y0: pop 2174031 water tiles 5773 farm tiles 388 (in a town's sites 388, settled 388) mean fert 185 mean pollution 0 mean crop suit 0.82 farmPot 266 | buildings FARM:388 SCHOOL:53 FACTORY:50 TOWER:30 WORKSHOP:24 HOUSE:22 POWER_FOSSIL:10 PARK:8 HOSPITAL:6 SMITHY:4
+y500: pop 1330469 water tiles 6639 farm tiles 316 (in a town's sites 316, settled 316) mean fert 156 mean pollution 0 mean crop suit 0.65 farmPot 156 | buildings FARM:316 POWER_FOSSIL:230 SCHOOL:133 QUARRY:123 PARK:109 FACTORY:92 HOSPITAL:61 MINE:60 LAB:37 TEMPLE:33

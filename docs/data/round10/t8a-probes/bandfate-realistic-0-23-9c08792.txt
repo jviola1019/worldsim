@@ -1,0 +1,24 @@
+k0: size 19 women 8 (15-44: 5, partnered 5) -> alive, not settled by y120 (74 people) births 180 deaths 125 famine 0
+k1: size 19 women 9 (15-44: 6, partnered 6) -> settled y71 births 75 deaths 61 famine 0
+k2: size 18 women 6 (15-44: 3, partnered 3) -> alive, not settled by y120 (13 people) births 55 deaths 60 famine 0
+k3: size 24 women 17 (15-44: 10, partnered 3) -> alive, not settled by y120 (208 people) births 391 deaths 207 famine 0
+k4: size 24 women 10 (15-44: 6, partnered 7) -> settled y78 births 143 deaths 100 famine 0
+k5: size 26 women 14 (15-44: 9, partnered 7) -> settled y92 births 274 deaths 161 famine 0
+k6: size 21 women 7 (15-44: 5, partnered 5) -> alive, not settled by y120 (90 people) births 193 deaths 124 famine 0
+k7: size 24 women 14 (15-44: 10, partnered 5) -> settled y114 births 559 deaths 315 famine 0
+k8: size 26 women 17 (15-44: 11, partnered 5) -> settled y104 births 389 deaths 208 famine 0
+k9: size 24 women 11 (15-44: 7, partnered 6) -> settled y104 births 417 deaths 241 famine 0
+k10: size 23 women 11 (15-44: 7, partnered 6) -> alive, not settled by y120 (316 people) births 574 deaths 281 famine 0
+k11: size 20 women 9 (15-44: 6, partnered 5) -> settled y89 births 393 deaths 181 famine 0
+k12: size 24 women 13 (15-44: 7, partnered 7) -> settled y104 births 237 deaths 121 famine 0
+k13: size 26 women 12 (15-44: 6, partnered 8) -> alive, not settled by y120 (266 people) births 578 deaths 338 famine 0
+k14: size 28 women 12 (15-44: 8, partnered 8) -> settled y118 births 368 deaths 226 famine 0
+k15: size 21 women 13 (15-44: 8, partnered 5) -> alive, not settled by y120 (331 people) births 555 deaths 245 famine 0
+k16: size 26 women 13 (15-44: 9, partnered 7) -> alive, not settled by y120 (79 people) births 188 deaths 135 famine 0
+k17: size 18 women 6 (15-44: 3, partnered 3) -> alive, not settled by y120 (144 people) births 274 deaths 148 famine 0
+k18: size 26 women 9 (15-44: 5, partnered 6) -> settled y71 births 159 deaths 85 famine 0
+k19: size 19 women 13 (15-44: 9, partnered 3) -> alive, not settled by y120 (99 people) births 243 deaths 163 famine 0
+k20: size 20 women 9 (15-44: 5, partnered 6) -> alive, not settled by y120 (80 people) births 201 deaths 141 famine 0
+k21: size 24 women 14 (15-44: 9, partnered 6) -> alive, not settled by y120 (137 people) births 303 deaths 190 famine 0
+k22: size 25 women 13 (15-44: 8, partnered 8) -> alive, not settled by y120 (114 people) births 247 deaths 158 famine 0
+k23: size 20 women 11 (15-44: 6, partnered 6) -> alive, not settled by y120 (296 people) births 635 deaths 359 famine 0

@@ -1,0 +1,134 @@
+# Slow-pace calibration after fix(pace) 9c08792 (cur) against its base 639ab4a (base): CHECKPOINT=<dir> npx tsx scripts/pace-calibrate.ts 1600 slow <seed>, one process per seed.
+# Documented calibration (563a06d, VALIDATION §R10): villages 58-147, cities 829-1,056, at most 28 bands, largest checkpoint 16 MB.
+
+## base
+pace-a	village at 98
+pace-a	year 100: largest settlement 89 · bands 2 · person records 244
+pace-a	year 200: largest settlement 167 · bands 0 · person records 426
+pace-a	year 300: largest settlement 359 · bands 0 · person records 205
+pace-a	year 400: largest settlement 748 · bands 0 · person records 71
+pace-a	year 500: largest settlement 1568 · bands 0 · person records 344
+pace-a	town at 533
+pace-a	year 600: largest settlement 2327 · bands 0 · person records 84
+pace-a	year 700: largest settlement 4661 · bands 0 · person records 83
+pace-a	year 800: largest settlement 8993 · bands 0 · person records 92
+pace-a	slow	village 98	town 533	city 818	died -	era 3	year 818
+pace-b	year 100: largest settlement 0 · bands 3 · person records 165
+pace-b	village at 122
+pace-b	year 200: largest settlement 170 · bands 0 · person records 326
+pace-b	year 300: largest settlement 383 · bands 0 · person records 339
+pace-b	year 400: largest settlement 756 · bands 0 · person records 249
+pace-b	year 500: largest settlement 1636 · bands 0 · person records 96
+pace-b	town at 526
+pace-b	year 600: largest settlement 3395 · bands 0 · person records 332
+pace-b	year 700: largest settlement 7738 · bands 0 · person records 71
+pace-b	slow	village 122	town 526	city 755	died -	era 3	year 755
+pace-c	year 100: largest settlement 0 · bands 2 · person records 147
+pace-c	village at 145
+pace-c	year 200: largest settlement 140 · bands 2 · person records 682
+pace-c	year 300: largest settlement 318 · bands 6 · person records 844
+pace-c	year 400: largest settlement 801 · bands 4 · person records 923
+pace-c	year 500: largest settlement 1804 · bands 0 · person records 554
+pace-c	town at 525
+pace-c	year 600: largest settlement 3066 · bands 0 · person records 164
+pace-c	year 700: largest settlement 5959 · bands 0 · person records 605
+pace-c	slow	village 145	town 525	city 778	died -	era 4	year 778
+pace-d	year 100: largest settlement 0 · bands 1 · person records 94
+pace-d	village at 147
+pace-d	year 200: largest settlement 115 · bands 7 · person records 718
+pace-d	year 300: largest settlement 174 · bands 7 · person records 1695
+pace-d	year 400: largest settlement 415 · bands 8 · person records 2917
+pace-d	year 500: largest settlement 829 · bands 9 · person records 3172
+pace-d	year 600: largest settlement 1504 · bands 16 · person records 4311
+pace-d	town at 639
+pace-d	year 700: largest settlement 3112 · bands 26 · person records 5764
+pace-d	year 800: largest settlement 5804 · bands 48 · person records 8029
+pace-d	slow	village 147	town 639	city 892	died -	era 4	year 892
+pace-e	year 100: largest settlement 0 · bands 3 · person records 212
+pace-e	village at 151
+pace-e	year 200: largest settlement 127 · bands 14 · person records 1447
+pace-e	year 300: largest settlement 305 · bands 13 · person records 2379
+pace-e	year 400: largest settlement 990 · bands 21 · person records 3544
+pace-e	year 500: largest settlement 1822 · bands 26 · person records 4497
+pace-e	town at 516
+pace-e	year 600: largest settlement 3244 · bands 53 · person records 8876
+pace-e	year 700: largest settlement 3057 · bands 54 · person records 10119
+pace-e	year 800: largest settlement 4831 · bands 66 · person records 9578
+pace-e	slow	village 151	town 516	city 849	died -	era 5	year 849
+
+## cur
+pace-a	village at 98
+pace-a	year 100: largest settlement 89 · bands 2 · person records 244
+pace-a	year 200: largest settlement 167 · bands 0 · person records 426
+pace-a	year 300: largest settlement 359 · bands 0 · person records 205
+pace-a	year 400: largest settlement 748 · bands 0 · person records 71
+pace-a	year 500: largest settlement 1568 · bands 0 · person records 344
+pace-a	town at 533
+pace-a	year 600: largest settlement 2327 · bands 0 · person records 84
+pace-a	year 700: largest settlement 4661 · bands 0 · person records 83
+pace-a	year 800: largest settlement 8993 · bands 0 · person records 92
+pace-a	slow	village 98	town 533	city 818	died -	era 3	year 818
+pace-b	year 100: largest settlement 0 · bands 3 · person records 165
+pace-b	village at 122
+pace-b	year 200: largest settlement 170 · bands 0 · person records 326
+pace-b	year 300: largest settlement 383 · bands 0 · person records 339
+pace-b	year 400: largest settlement 756 · bands 0 · person records 249
+pace-b	year 500: largest settlement 1636 · bands 0 · person records 96
+pace-b	town at 526
+pace-b	year 600: largest settlement 3395 · bands 0 · person records 332
+pace-b	year 700: largest settlement 7738 · bands 0 · person records 71
+pace-b	slow	village 122	town 526	city 755	died -	era 3	year 755
+pace-c	year 100: largest settlement 0 · bands 2 · person records 147
+pace-c	village at 145
+pace-c	year 200: largest settlement 140 · bands 2 · person records 682
+pace-c	year 300: largest settlement 318 · bands 6 · person records 844
+pace-c	year 400: largest settlement 801 · bands 4 · person records 923
+pace-c	year 500: largest settlement 1804 · bands 0 · person records 554
+pace-c	town at 525
+pace-c	year 600: largest settlement 3066 · bands 0 · person records 164
+pace-c	year 700: largest settlement 5959 · bands 0 · person records 605
+pace-c	slow	village 145	town 525	city 778	died -	era 4	year 778
+pace-d	year 100: largest settlement 0 · bands 1 · person records 94
+pace-d	village at 147
+pace-d	year 200: largest settlement 115 · bands 7 · person records 718
+pace-d	year 300: largest settlement 174 · bands 7 · person records 1695
+pace-d	year 400: largest settlement 415 · bands 8 · person records 2917
+pace-d	year 500: largest settlement 829 · bands 9 · person records 3172
+pace-d	year 600: largest settlement 1504 · bands 16 · person records 4311
+pace-d	town at 639
+pace-d	year 700: largest settlement 3112 · bands 26 · person records 5764
+pace-d	year 800: largest settlement 5804 · bands 48 · person records 8029
+pace-d	slow	village 147	town 639	city 892	died -	era 4	year 892
+pace-e	year 100: largest settlement 0 · bands 3 · person records 212
+pace-e	village at 151
+pace-e	year 200: largest settlement 127 · bands 14 · person records 1447
+pace-e	year 300: largest settlement 305 · bands 13 · person records 2379
+pace-e	year 400: largest settlement 990 · bands 21 · person records 3544
+pace-e	year 500: largest settlement 1822 · bands 26 · person records 4497
+pace-e	town at 516
+pace-e	year 600: largest settlement 3244 · bands 53 · person records 8876
+pace-e	year 700: largest settlement 3057 · bands 54 · person records 10119
+pace-e	year 800: largest settlement 4300 · bands 70 · person records 9707
+pace-e	slow	village 151	town 516	city 855	died -	era 5	year 855
+
+## largest checkpoint files at the end of the runs (last save; pace-d and pace-e at year 800)
+1180060 cal-base/calibrate-pace-a-slow-1600y.bin
+1072676 cal-base/calibrate-pace-b-slow-1600y.bin
+1752180 cal-base/calibrate-pace-c-slow-1600y.bin
+13671644 cal-base/calibrate-pace-d-slow-1600y.bin
+13034540 cal-base/calibrate-pace-e-slow-1600y.bin
+1180060 cal-cur/calibrate-pace-a-slow-1600y.bin
+1072676 cal-cur/calibrate-pace-b-slow-1600y.bin
+1752180 cal-cur/calibrate-pace-c-slow-1600y.bin
+13671644 cal-cur/calibrate-pace-d-slow-1600y.bin
+13141256 cal-cur/calibrate-pace-e-slow-1600y.bin
+
+## birth lever by start era (Realistic, 128², year 1; mean over people): see lever-by-era
+ERA 3: share of people in towns with transition>0 0% · mean transition 0.000 · mean birth lever 0.650 (full lever 0.65)
+ERA 4: share of people in towns with transition>0 47% · mean transition 0.010 · mean birth lever 0.653 (full lever 0.65)
+ERA 5: share of people in towns with transition>0 90% · mean transition 0.063 · mean birth lever 0.672 (full lever 0.65)
+ERA 6: share of people in towns with transition>0 100% · mean transition 0.146 · mean birth lever 0.701 (full lever 0.65)
+ERA 7: share of people in towns with transition>0 100% · mean transition 0.312 · mean birth lever 0.759 (full lever 0.65)
+ERA 8: share of people in towns with transition>0 100% · mean transition 0.448 · mean birth lever 0.807 (full lever 0.65)
+ERA 9: share of people in towns with transition>0 100% · mean transition 0.565 · mean birth lever 0.848 (full lever 0.65)
+ERA 10: share of people in towns with transition>0 100% · mean transition 0.674 · mean birth lever 0.886 (full lever 0.65)

@@ -1,0 +1,66 @@
+climate anomaly 0.00 year 0
+y3 world famine 736 pop 3158205
+   s22 Glakross civ8 e10 pop 37874 famine 736 (1.9%) food 0 need/mo 2841 farms 9 terr 193 emp-food 1197 civStock 0 civNeed/yr 57714 civShort 3.0% access 1.00 occupied 0 prosperity 4.21 farmPot 1.6 sitesFarms 9 rain -0.25 temp 5.0 eco 0.15 mech 0.75 farming 3.90 tfrdev
+y4 world famine 4355 pop 3209173
+   s5 Shiamar civ2 e10 pop 348893 famine 3493 (1.0%) food 0 need/mo 26167 farms 76 terr 106 emp-food 29859 civStock 0 civNeed/yr 649405 civShort 4.6% access 1.00 occupied 0 prosperity 1.39 farmPot 40.3 sitesFarms 76 rain 0.14 temp 18.0 eco 0.03 mech 0.25 farming 3.60 tfrdev
+   s22 Glakross civ8 e10 pop 37853 famine 862 (2.3%) food 0 need/mo 2839 farms 9 terr 193 emp-food 1197 civStock 0 civNeed/yr 58916 civShort 6.7% access 1.00 occupied 0 prosperity 3.75 farmPot 1.6 sitesFarms 9 rain -0.21 temp 5.0 eco 0.15 mech 0.75 farming 3.90 tfrdev
+y5 world famine 11050 pop 3252044
+   s5 Shiamar civ2 e10 pop 343561 famine 8867 (2.6%) food 47044 need/mo 25767 farms 76 terr 106 emp-food 29448 civStock 0 civNeed/yr 647186 civShort 0.0% access 1.00 occupied 0 prosperity 1.32 farmPot 40.3 sitesFarms 76 rain 0.06 temp 18.0 eco 0.03 mech 0.26 farming 3.61 tfrdev
+   s22 Glakross civ8 e10 pop 36499 famine 2183 (6.0%) food 0 need/mo 2737 farms 9 terr 193 emp-food 1189 civStock 0 civNeed/yr 59494 civShort 10.4% access 1.00 occupied 0 prosperity 2.71 farmPot 1.6 sitesFarms 9 rain -0.40 temp 5.0 eco 0.15 mech 0.75 farming 3.90 tfrdev
+y6 world famine 5 pop 3311779
+
+y7 world famine 7536 pop 3361772
+   s5 Shiamar civ2 e10 pop 346853 famine 7536 (2.2%) food 3357 need/mo 26014 farms 76 terr 106 emp-food 28496 civStock 0 civNeed/yr 663860 civShort 0.0% access 1.00 occupied 0 prosperity 1.31 farmPot 40.3 sitesFarms 76 rain -0.33 temp 18.0 eco 0.03 mech 0.28 farming 3.62 tfrdev
+y8 world famine 9611 pop 3406916
+   s5 Shiamar civ2 e10 pop 341643 famine 9611 (2.8%) food 49982 need/mo 25623 farms 76 terr 106 emp-food 28092 civStock 73948 civNeed/yr 666933 civShort 0.0% access 1.00 occupied 0 prosperity 1.28 farmPot 40.3 sitesFarms 76 rain 0.09 temp 18.0 eco 0.03 mech 0.29 farming 3.63 tfrdev
+y11 world famine 31989 pop 3544339
+   s1 Quellwyn civ1 e10 pop 535242 famine 31989 (6.0%) food 0 need/mo 40143 farms 54 terr 323 emp-food 4253 civStock 8546 civNeed/yr 943964 civShort 13.8% access 1.00 occupied 0 prosperity 1.43 farmPot 0.0 sitesFarms 0 rain 0.04 temp 20.0 eco 0.16 mech 0.85 farming 5.90 tfrdev
+y12 world famine 3628 pop 3607404
+
+y13 world famine 59822 pop 3597367
+   s1 Quellwyn civ1 e10 pop 486810 famine 52317 (10.7%) food 0 need/mo 36511 farms 54 terr 323 emp-food 4244 civStock 500 civNeed/yr 932859 civShort 19.3% access 1.00 occupied 0 prosperity 1.37 farmPot 42.6 sitesFarms 54 rain -0.54 temp 20.0 eco 0.16 mech 0.85 farming 5.90 tfrdev
+   s2 Wequuss civ1 e10 pop 193523 famine 6223 (3.2%) food 0 need/mo 14514 farms 37 terr 205 emp-food 2918 civStock 500 civNeed/yr 932859 civShort 19.3% access 0.99 occupied 0 prosperity 2.60 farmPot 0.0 sitesFarms 0 rain -0.41 temp 7.0 eco 0.18 mech 0.85 farming 5.90 tfrdev
+   s15 Hoahyton civ5 e10 pop 56730 famine 1229 (2.2%) food 4239 need/mo 4255 farms 47 terr 92 emp-food 5804 civStock 0 civNeed/yr 50772 civShort 0.0% access 1.00 occupied 0 prosperity 3.43 farmPot 8.8 sitesFarms 47 rain 0.09 temp 1.0 eco 0.03 mech 0.77 farming 4.24 tfrdev
+   s29 Wypellford civ10 e9 pop 2864 famine 53 (1.9%) food 0 need/mo 215 farms 0 terr 41 emp-food 125 civStock 0 civNeed/yr 299906 civShort 0.0% access 0.95 occupied 0 prosperity 1.90 farmPot 0.0 sitesFarms 0 rain 0.10 temp 21.0 eco 0.03 mech 0.85 farming 5.88 tfrdev
+y14 world famine 54355 pop 3599180
+   s1 Quellwyn civ1 e10 pop 459108 famine 28942 (6.3%) food 0 need/mo 34433 farms 58 terr 321 emp-food 4559 civStock 28108 civNeed/yr 879774 civShort 13.1% access 1.00 occupied 0 prosperity 1.43 farmPot 45.6 sitesFarms 58 rain -0.31 temp 20.0 eco 0.16 mech 0.85 farming 5.90 tfrdev
+   s2 Wequuss civ1 e10 pop 170258 famine 22188 (13.0%) food 0 need/mo 12769 farms 37 terr 205 emp-food 2922 civStock 28108 civNeed/yr 879774 civShort 13.1% access 0.99 occupied 0 prosperity 2.50 farmPot 0.0 sitesFarms 0 rain -0.14 temp 7.0 eco 0.17 mech 0.85 farming 5.90 tfrdev
+   s15 Hoahyton civ5 e10 pop 55970 famine 888 (1.6%) food 0 need/mo 4198 farms 47 terr 92 emp-food 5743 civStock 0 civNeed/yr 50099 civShort 0.6% access 1.00 occupied 0 prosperity 3.34 farmPot 8.8 sitesFarms 47 rain -0.54 temp 1.0 eco 0.03 mech 0.77 farming 4.28 tfrdev
+   s22 Glakross civ8 e10 pop 67191 famine 2287 (3.4%) food 0 need/mo 5039 farms 9 terr 193 emp-food 1184 civStock 0 civNeed/yr 89331 civShort 9.3% access 1.00 occupied 0 prosperity 2.37 farmPot 1.6 sitesFarms 9 rain -0.11 temp 5.0 eco 0.17 mech 0.77 farming 4.35 tfrdev
+y15 world famine 21306 pop 3643490
+   s2 Wequuss civ1 e10 pop 169352 famine 3599 (2.1%) food 16760 need/mo 12701 farms 37 terr 205 emp-food 2925 civStock 2219 civNeed/yr 849907 civShort 0.0% access 0.99 occupied 0 prosperity 2.65 farmPot 0.0 sitesFarms 0 rain 0.07 temp 7.0 eco 0.17 mech 0.85 farming 5.90 tfrdev
+   s15 Hoahyton civ5 e10 pop 44468 famine 11306 (25.4%) food 0 need/mo 3335 farms 47 terr 92 emp-food 5693 civStock 0 civNeed/yr 47091 civShort 67.3% access 1.00 occupied 0 prosperity 3.11 farmPot 8.8 sitesFarms 47 rain -0.55 temp 1.0 eco 0.03 mech 0.77 farming 4.32 tfrdev
+   s20 Biskoum civ7 e9 pop 40238 famine 654 (1.6%) food 0 need/mo 3018 farms 11 terr 27 emp-food 970 civStock 0 civNeed/yr 251342 civShort 1.9% access 1.00 occupied 0 prosperity 1.85 farmPot 1.9 sitesFarms 11 rain 0.06 temp 0.0 eco 0.02 mech 0.85 farming 5.89 tfrdev
+   s22 Glakross civ8 e10 pop 74607 famine 2579 (3.5%) food 0 need/mo 5596 farms 9 terr 193 emp-food 1175 civStock 0 civNeed/yr 100172 civShort 9.6% access 1.00 occupied 0 prosperity 1.72 farmPot 0.0 sitesFarms 0 rain 0.10 temp 5.0 eco 0.16 mech 0.77 farming 4.39 tfrdev
+y20 world famine 25785 pop 3869746
+   s1 Quellwyn civ1 e10 pop 498731 famine 8243 (1.7%) food 0 need/mo 37405 farms 60 terr 321 emp-food 4721 civStock 3154 civNeed/yr 932190 civShort 2.2% access 1.00 occupied 0 prosperity 1.64 farmPot 0.0 sitesFarms 0 rain 0.01 temp 20.0 eco 0.16 mech 0.85 farming 5.90 tfrdev
+   s19 Zhiathoum civ7 e9 pop 48049 famine 656 (1.4%) food 9025 need/mo 3604 farms 24 terr 94 emp-food 2186 civStock 8187 civNeed/yr 250221 civShort 0.2% access 1.00 occupied 0 prosperity 2.12 farmPot 5.5 sitesFarms 24 rain 0.15 temp 1.0 eco 0.00 mech 0.85 farming 5.86 tfrdev
+   s20 Biskoum civ7 e9 pop 32482 famine 2447 (7.5%) food 4752 need/mo 2436 farms 11 terr 27 emp-food 977 civStock 8187 civNeed/yr 250221 civShort 0.2% access 1.00 occupied 0 prosperity 1.86 farmPot 1.9 sitesFarms 11 rain 0.27 temp 0.0 eco 0.02 mech 0.85 farming 5.86 tfrdev
+   s22 Glakross civ8 e10 pop 66530 famine 8319 (12.5%) food 2837 need/mo 4990 farms 9 terr 193 emp-food 1122 civStock 0 civNeed/yr 91128 civShort 0.0% access 1.00 occupied 0 prosperity 1.97 farmPot 1.6 sitesFarms 9 rain 0.26 temp 5.0 eco 0.16 mech 0.79 farming 4.61 tfrdev
+   s25 Treivraelt civ9 e9 pop 105796 famine 4891 (4.6%) food 0 need/mo 7935 farms 21 terr 73 emp-food 1812 civStock 0 civNeed/yr 98910 civShort 48.4% access 1.00 occupied 0 prosperity 2.38 farmPot 12.6 sitesFarms 21 rain -0.25 temp 21.0 eco 0.09 mech 0.85 farming 5.80 tfrdev
+y25 world famine 27124 pop 3988204
+   s1 Quellwyn civ1 e10 pop 499840 famine 8988 (1.8%) food 0 need/mo 37488 farms 60 terr 321 emp-food 4718 civStock 2220 civNeed/yr 972065 civShort 5.1% access 1.00 occupied 0 prosperity 1.65 farmPot 0.0 sitesFarms 0 rain -0.17 temp 20.0 eco 0.15 mech 0.85 farming 5.90 tfrdev
+   s3 Quekia civ1 e10 pop 266499 famine 2867 (1.1%) food 6255 need/mo 19987 farms 35 terr 143 emp-food 2806 civStock 2220 civNeed/yr 972065 civShort 5.1% access 0.94 occupied 0 prosperity 2.39 farmPot 0.0 sitesFarms 0 rain -0.19 temp 25.0 eco 0.02 mech 0.85 farming 5.90 tfrdev
+   s22 Glakross civ8 e10 pop 59223 famine 1633 (2.8%) food 4671 need/mo 4442 farms 9 terr 193 emp-food 1074 civStock 0 civNeed/yr 90512 civShort 0.0% access 1.00 occupied 0 prosperity 0.93 farmPot 1.6 sitesFarms 9 rain -0.12 temp 5.0 eco 0.16 mech 0.80 farming 4.81 tfrdev
+   s26 Lounmar civ10 e9 pop 242848 famine 11822 (4.9%) food 0 need/mo 18214 farms 41 terr 86 emp-food 3301 civStock 0 civNeed/yr 340458 civShort 18.2% access 1.00 occupied 0 prosperity 1.17 farmPot 24.1 sitesFarms 41 rain -0.08 temp 28.0 eco 0.03 mech 0.85 farming 5.81 tfrdev
+y30 world famine 11656 pop 4105958
+   s26 Lounmar civ10 e10 pop 242202 famine 10238 (4.2%) food 0 need/mo 18165 farms 42 terr 86 emp-food 3372 civStock 0 civNeed/yr 365348 civShort 17.5% access 1.00 occupied 0 prosperity 1.28 farmPot 24.3 sitesFarms 42 rain -0.25 temp 28.0 eco 0.03 mech 0.85 farming 5.80 tfrdev
+y35 world famine 17495 pop 4225395
+   s12 Yuhaburg civ3 e10 pop 50150 famine 3001 (6.0%) food 10898 need/mo 3761 farms 21 terr 92 emp-food 1966 civStock 0 civNeed/yr 322608 civShort 17.5% access 1.00 occupied 0 prosperity 1.56 farmPot 5.9 sitesFarms 21 rain 0.18 temp -1.0 eco 0.00 mech 0.85 farming 5.80 tfrdev
+   s13 Quassquek civ3 e10 pop 59291 famine 833 (1.4%) food 0 need/mo 4447 farms 9 terr 24 emp-food 788 civStock 0 civNeed/yr 322608 civShort 17.5% access 1.00 occupied 0 prosperity 1.65 farmPot 6.5 sitesFarms 9 rain -0.01 temp 23.0 eco 0.00 mech 0.85 farming 5.80 tfrdev
+   s18 Thastpolis civ7 e10 pop 109803 famine 9743 (8.9%) food 0 need/mo 8235 farms 51 terr 98 emp-food 4071 civStock 0 civNeed/yr 231692 civShort 5.4% access 1.00 occupied 0 prosperity 1.89 farmPot 13.4 sitesFarms 51 rain -0.26 temp 9.0 eco 0.00 mech 0.85 farming 5.80 tfrdev
+   s20 Biskoum civ7 e10 pop 17036 famine 1903 (11.2%) food 0 need/mo 1278 farms 11 terr 27 emp-food 955 civStock 0 civNeed/yr 231692 civShort 5.4% access 1.00 occupied 0 prosperity 2.02 farmPot 1.9 sitesFarms 11 rain -0.30 temp 0.0 eco 0.02 mech 0.85 farming 5.80 tfrdev
+y40 world famine 7560 pop 4350742
+   s20 Biskoum civ7 e10 pop 17487 famine 1088 (6.2%) food 2558 need/mo 1312 farms 11 terr 27 emp-food 955 civStock 0 civNeed/yr 208778 civShort 0.0% access 1.00 occupied 0 prosperity 2.21 farmPot 1.9 sitesFarms 11 rain -0.15 temp 0.0 eco 0.02 mech 0.85 farming 5.80 tfrdev
+   s22 Glakross civ8 e10 pop 31557 famine 6472 (20.5%) food 0 need/mo 2367 farms 9 terr 190 emp-food 874 civStock 0 civNeed/yr 85419 civShort 21.4% access 1.00 occupied 0 prosperity 0.55 farmPot 1.6 sitesFarms 9 rain 0.13 temp 5.0 eco 0.15 mech 0.84 farming 5.60 tfrdev
+total famine 757075
+s1 Quellwyn famine 200794 births 481917 deaths 148994 years 10 first 11,13,14,20,21,22,25,26,27,32
+s26 Lounmar famine 102307 births 226744 deaths 61707 years 11 first 23,24,25,26,30,31,32,33,36,37,38
+s18 Thastpolis famine 79491 births 103626 deaths 33391 years 13 first 16,22,23,24,27,28,32,33,34,35,36,37
+s11 Genwelflaik famine 77650 births 214410 deaths 81031 years 8 first 21,22,27,28,29,32,33,34
+s22 Glakross famine 72987 births 57488 deaths 12693 years 21 first 3,4,5,14,15,16,17,18,19,20,21,22
+s2 Wequuss famine 33787 births 196081 deaths 60398 years 3 first 13,14,15
+s20 Biskoum famine 33115 births 28765 deaths 7127 years 19 first 15,16,17,19,20,22,23,24,26,27,28,32
+s14 Pezsvau famine 29789 births 134397 deaths 60715 years 5 first 29,32,33,34,36
+s5 Shiamar famine 29508 births 371904 deaths 133413 years 4 first 4,5,7,8
+s19 Zhiathoum famine 25835 births 41858 deaths 12636 years 8 first 16,20,32,33,34,36,37,38

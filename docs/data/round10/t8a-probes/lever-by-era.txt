@@ -1,0 +1,8 @@
+ERA 3: share of people in towns with transition>0 0% · mean transition 0.000 · mean birth lever 0.650 (full lever 0.65)
+ERA 4: share of people in towns with transition>0 47% · mean transition 0.010 · mean birth lever 0.653 (full lever 0.65)
+ERA 5: share of people in towns with transition>0 90% · mean transition 0.063 · mean birth lever 0.672 (full lever 0.65)
+ERA 6: share of people in towns with transition>0 100% · mean transition 0.146 · mean birth lever 0.701 (full lever 0.65)
+ERA 7: share of people in towns with transition>0 100% · mean transition 0.312 · mean birth lever 0.759 (full lever 0.65)
+ERA 8: share of people in towns with transition>0 100% · mean transition 0.448 · mean birth lever 0.807 (full lever 0.65)
+ERA 9: share of people in towns with transition>0 100% · mean transition 0.565 · mean birth lever 0.848 (full lever 0.65)
+ERA 10: share of people in towns with transition>0 100% · mean transition 0.674 · mean birth lever 0.886 (full lever 0.65)

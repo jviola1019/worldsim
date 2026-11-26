@@ -1,0 +1,2 @@
+import { loadCheckpoint } from '../../../../scripts/lib/checkpoint';
+for (const p of process.argv.slice(2)) { const c = loadCheckpoint<{ y: number }>(p)!; const w = c.sim.w; let pop = 0; for (const s of w.settlements.values()) pop += s.pop; console.log(p.split('/').pop(), 'year', c.sim.year, 'co2', Math.round(w.climate.co2), 'anomaly', w.climate.anomaly.toFixed(2), 'cumE', w.climate.cumulativeEmissions.toExponential(2), 'pop', Math.round(pop), 'map', w.map.w); }
