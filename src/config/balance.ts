@@ -68,6 +68,8 @@ export const BALANCE = {
   // ---------------- monsters and exploration (round 10)
   /** [C] Round 10: monthly damage a settlement deals a monster at its gates, per point of defence (garrison + 1% of people); set so a town of 2,000 wears a giant down in about two years and a hamlet cannot (tests/ecology/monsters.test.ts; VALIDATION §R10). */
   monsterDamage: 0.5,
+  /** [S] Task 8b: radius in tiles (about 10 km each) within which the strongest town sends a hunting party against a monster each month, a few days' march out and back. Before, only towns within 3 tiles fought, and those were hamlets of about 10 people (median, mode audit), so a monster was slain in 2 of 6 Fantasy worlds in 200 years. */
+  monsterHuntRadius: 10,
   /** [S] Round 10: yearly chance a sailing nation (naval tier ≥ 2) with a coastal town sends an exploring voyage (effect measured in the mode audit, VALIDATION §R10). */
   explorerChance: 0.15,
 

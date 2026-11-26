@@ -6,6 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { makeSim } from '../helpers';
 import { spawnMonster, monstersMonthly } from '../../src/ecology/ecology';
+import { BALANCE } from '../../src/config/balance';
 
 const fantasyTown = (seed: string, pop: number) => {
   const sim = makeSim(seed, 64, (c) => { c.settings.fantasy = true; c.gen.fantasy = true; c.laws.fantasyCreatures = true; c.settings.startEra = 4; c.settings.startCivs = 2; });
@@ -25,8 +26,22 @@ describe('monsters can be slain', () => {
     expect(sim.w.events.some((e) => e.type === 'monster_slain')).toBe(true);
   });
 
-  it('a hamlet of 150 cannot slay a giant in a year', () => {
+  it('a town of 2,000 sends hunters after a giant roaming 8 tiles away and slays it within three years (Task 8b)', () => {
+    // Before: only settlements within 3 tiles fought. In the mode audit's Fantasy worlds the towns monsters met were
+    // hamlets of about 10 people (median), and a town of 2,000 or more had a monster within 3 tiles in 0-5 months of
+    // 200 years, so a monster was slain in 2 of 6 worlds.
+    const { sim, s } = fantasyTown('mon-4', 2000);
+    for (const o of sim.w.settlements.values()) if (o.id !== s.id) o.pop = 10; // no other strong town nearby
+    const m = spawnMonster(sim, 'giant', s.x + 8, s.y)!;
+    let months = 0;
+    while (sim.w.monsters.has(m.id) && months < 36) { m.x = s.x + 8.5; m.y = s.y + 0.5; monstersMonthly(sim); s.pop = Math.max(s.pop, 2000); months++; }
+    expect(sim.w.monsters.has(m.id), `after ${months} months hp ${Math.round(m.hp)}`).toBe(false);
+    expect(sim.w.events.some((e) => e.type === 'monster_slain' && e.settlements?.includes(s.id))).toBe(true);
+  });
+
+  it('a hamlet of 150 cannot slay a giant in a year (with no strong town within hunting range)', () => {
     const { sim, s } = fantasyTown('mon-2', 150);
+    for (const o of sim.w.settlements.values()) if (o.id !== s.id) o.pop = 10; // Task 8b: a strong neighbour would send hunters
     const m = spawnMonster(sim, 'giant', s.x + 1, s.y)!;
     for (let k = 0; k < 12; k++) { m.x = s.x + 1.5; m.y = s.y + 0.5; monstersMonthly(sim); }
     expect(sim.w.monsters.has(m.id)).toBe(true);
@@ -40,7 +55,7 @@ describe('monsters can be slain', () => {
       const d = Math.min(...[...sim.w.settlements.values()].map((t) => (t.x - x) ** 2 + (t.y - y) ** 2));
       if (d > far) { far = d; best = [x, y]; }
     }
-    expect(far).toBeGreaterThan(9);
+    expect(far).toBeGreaterThan(BALANCE.monsterHuntRadius ** 2); // beyond the gates and beyond any hunting party (Task 8b)
     const m = spawnMonster(sim, 'giant', best[0], best[1])!;
     m.hp = 100;
     monstersMonthly(sim);

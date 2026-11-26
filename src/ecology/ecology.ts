@@ -7,7 +7,7 @@
 import { realWorld } from '../powers/powerSet';
 import { flow } from '../population/ledger';
 import type { Sim } from '../sim/context';
-import type { Herd, Monster, Subspecies } from '../sim/types';
+import type { Herd, Monster, Settlement, Subspecies } from '../sim/types';
 import { SPECIES, SPECIES_BY_KEY, MONSTERS, type SpeciesDef } from './species';
 import { TERRAIN, isWaterTerrain } from '../world/terrain';
 import { vegCapacity } from '../world/worldgen';
@@ -685,13 +685,15 @@ export function monstersMonthly(sim: Sim): void {
     const def = MONSTERS.find((d) => d.kind === mo.kind);
     if (!def) continue;
     let fought = false;
+    let slain = false;
+    const atGates = new Set<number>();
+    const defenseOf = (s: Settlement) => (s.garrison + s.pop * 0.01) * (1 + (w.civs.get(s.civId)?.caps.landTier ?? 0) * 0.6);
     for (const s of w.settlements.values()) {
       if ((s.x - mo.x) ** 2 + (s.y - mo.y) ** 2 > 9) continue;
       fought = true;
-      const civ = w.civs.get(s.civId);
-      const defense = (s.garrison + s.pop * 0.01) * (1 + (civ?.caps.landTier ?? 0) * 0.6);
+      atGates.add(s.id);
       // round 10: a town of 2,000 wears a giant down in about two years; a hamlet cannot (was ×0.05, less than regrowth)
-      mo.hp -= defense * BALANCE.monsterDamage;
+      mo.hp -= defenseOf(s) * BALANCE.monsterDamage;
       const harm = Math.min(s.pop * 0.05, def.harm * sim.rng.range(0.4, 1));
       if (harm > 0.5) {
         const dead = removePeople(sim, s, harm, 'monster attack');
@@ -703,8 +705,25 @@ export function monstersMonthly(sim: Sim): void {
       }
       if (mo.hp <= 0) {
         dead.push(mo.id);
+        slain = true;
         logEvent(sim, { type: 'monster_slain', cat: 'nature', title: `The people of ${s.name} slew a ${def.name.toLowerCase()}`, civs: [s.civId], settlements: [s.id], x: s.x, y: s.y, importance: 2 });
         break;
+      }
+    }
+    // Task 8b: the strongest town within a few days' march sends a hunting party. Monsters roam wild country, where
+    // the towns at their gates were hamlets of ~10 people; a strong town 2,000+ almost never stood within 3 tiles.
+    // Threatened communities hunt dangerous beasts down rather than wait at the gate (e.g. man-eater hunts, Corbett 1944).
+    if (!slain) {
+      const r2 = BALANCE.monsterHuntRadius ** 2;
+      let hunter: Settlement | undefined;
+      for (const s of w.settlements.values()) if ((s.x - mo.x) ** 2 + (s.y - mo.y) ** 2 <= r2 && (!hunter || s.pop > hunter.pop)) hunter = s;
+      if (hunter && !atGates.has(hunter.id)) {
+        fought = true;
+        mo.hp -= defenseOf(hunter) * BALANCE.monsterDamage;
+        if (mo.hp <= 0) {
+          dead.push(mo.id);
+          logEvent(sim, { type: 'monster_slain', cat: 'nature', title: `Hunters from ${hunter.name} slew a ${def.name.toLowerCase()}`, civs: [hunter.civId], settlements: [hunter.id], x: mo.x, y: mo.y, importance: 2 });
+        }
       }
     }
     if (!fought) mo.hp = Math.min(def.hp, mo.hp + def.hp * 0.02); // round 10: wounds heal only away from a fight
