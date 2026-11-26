@@ -71,7 +71,7 @@ export const SCENARIOS: Scenario[] = [
       c.scenario = 'standoff';
     },
     objectives: [
-      { id: 'org', label: 'An international organization is founded', check: (s) => [...s.w.orgs.values()].some((o) => o.founded > s.w.meta.startYear) }, // round 10: not the bloc the world starts with
+      { id: 'org', label: 'An international organization is founded', check: (s) => [...s.w.orgs.values()].some((o) => !o.atStart) }, // round 10: not the bloc the world starts with; Task 8e: one founded in year 0 counts (`founded > startYear` skipped it)
       { id: 'no_nukes', label: '100 years pass without a nuclear strike', check: (s) => s.year - s.w.meta.startYear >= 100 && !s.w.events.some((e) => e.type === 'nuclear_strike' || e.type === 'god_nuke') },
     ],
   },

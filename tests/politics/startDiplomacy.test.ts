@@ -42,6 +42,23 @@ describe('scenario objectives are not pre-completed (review fix)', () => {
     expect(org.check(bloc)).toBe(false); // …which is not "founded" during play
   });
 
+  it('The Long Standoff: an organization founded in the first year of play counts (Task 8e)', async () => {
+    // The check was `founded > startYear`, meant to skip the bloc seeded at world creation. Founding is yearly, so
+    // an organization founded during year 0 has founded === startYear and was skipped too: audit worlds 2 and 3
+    // founded theirs in year 0 (tick 111 in world 3) and were scored as failures.
+    const { configFor } = await import('../../scripts/mode-audit');
+    const { createSimulation } = await import('../../src/sim/bootstrap');
+    const { scenarioObjectives } = await import('../../src/scenarios/scenarios');
+    const org = scenarioObjectives('standoff').find((o) => o.id === 'org')!;
+    const sim = createSimulation(configFor('standoff', 'audit-standoff-3'));
+    expect(sim.w.orgs.size).toBe(0);
+    sim.runYears(1);
+    const founded = [...sim.w.orgs.values()];
+    expect(founded.length, 'world 3 founds an organization in its first year').toBeGreaterThan(0);
+    expect(founded[0].founded).toBe(sim.w.meta.startYear);
+    expect(org.check(sim)).toBe(true);
+  }, 120000);
+
   it('the seeded organization binds only nations that are not cold to one another', () => {
     for (const seed of ['dip-a', 'dip-b', 'dip-d']) {
       const sim = makeSim(seed, 128, (c) => { c.settings.startEra = 10; c.settings.startCivs = 8; });
@@ -60,7 +77,7 @@ describe('The Long Standoff can reach its own goal (final audit fix)', () => {
     const { createSimulation } = await import('../../src/sim/bootstrap');
     const { scenarioObjectives } = await import('../../src/scenarios/scenarios');
     // round 10 addendum: world 1 (was 0). This test checks the goal can be reached; the rate is measured by the mode
-    // audit: 3 of 5 worlds within the 110-year horizon after this round's history changes (worlds 0 and 2: none)
+    // audit (Task 8e: 6 of 6 audit worlds within the 110-year horizon once year-0 foundings count)
     const sim = createSimulation(configFor('standoff', 'audit-standoff-1'));
     expect(sim.w.orgs.size).toBe(0); // founding one is the scenario's goal
     expect([...sim.w.relations.values()].some((r) => r.opinion > 30 && r.trust > 0.5)).toBe(true);

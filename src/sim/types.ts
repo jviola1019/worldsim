@@ -982,6 +982,8 @@ export interface IntlOrg {
   founder: number;
   members: number[];
   dissolved?: number;
+  /** Round 10 (Task 8e): seeded at world creation (a developed start's bloc), not founded during play. */
+  atStart?: boolean;
 }
 
 export interface TradeRoute {

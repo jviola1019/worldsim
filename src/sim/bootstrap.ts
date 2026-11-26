@@ -470,7 +470,7 @@ function seedDiplomaticPast(sim: Sim): void {
   const founder = w.civs.get(members[0])!;
   const phon = phonOfCulture(sim, founder.cultureId);
   const word = phon ? makeName(rng, phon, 'word') : 'Concord';
-  const org: IntlOrg = { id: ++w.ids.org, name: `${word} ${rng.pick(['Treaty Organization', 'Pact', 'Alliance', 'Compact'])}`, kind: 'alliance', founded: w.meta.startYear, founder: founder.id, members };
+  const org: IntlOrg = { id: ++w.ids.org, name: `${word} ${rng.pick(['Treaty Organization', 'Pact', 'Alliance', 'Compact'])}`, kind: 'alliance', founded: w.meta.startYear, founder: founder.id, members, atStart: true };
   w.orgs.set(org.id, org);
   logEvent(sim, { type: 'org_founded', cat: 'diplomacy', title: `The ${org.name} binds ${org.members.length} nations in mutual defence`, civs: org.members, importance: 3 });
 }
