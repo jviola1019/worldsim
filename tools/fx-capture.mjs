@@ -16,6 +16,8 @@ const OUT = process.env.OUT ?? 'tools/output/fx';
 const SCALE = Number(process.env.SCALE ?? 2);
 const REDUCED = process.env.REDUCED === '1';
 const ONLY = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;
+/** A pinned seed: before and after captures show the same world and the same sites (override with SEED=). */
+const SEED = process.env.SEED ?? 'fx-capture-6'; // this seed's world has volcanic vents
 const TIMES = REDUCED ? [300, 1500] : [120, 450, 900, 1600, 2600, 3800];
 mkdirSync(OUT, { recursive: true });
 
@@ -34,6 +36,7 @@ await page.evaluate(async () => {
   R.Renderer.prototype.frame = function (dt) { window.__fxr = this; return frame.call(this, dt); };
 });
 await page.getByText('New world').first().click();
+await page.locator('#wseed').fill(SEED);
 await page.getByRole('slider', { name: 'Start in era' }).fill('6').catch(() => {});
 await page.getByRole('button', { name: 'Create world' }).click();
 await page.getByRole('dialog', { name: /^Start in the/ }).getByRole('button', { name: /^Start in/ }).click({ timeout: 5000 }).catch(() => {});
@@ -56,25 +59,36 @@ const sites = await page.evaluate(() => {
   const sim = window.__fxr.sim;
   const m = sim.w.map;
   const towns = [...sim.w.settlements.values()].sort((a, b) => b.pop - a.pop).map((s) => ({ id: s.id, x: s.x, y: s.y, civ: s.civId }));
-  let coast = null, inland = null;
+  let coast = null, inland = null, warmCoast = null, mildCoast = null;
   for (const t of towns) {
-    for (let dy = -6; dy <= 6 && !(coast && inland); dy++) for (let dx = -6; dx <= 6; dx++) {
+    for (let dy = -6; dy <= 6; dy++) for (let dx = -6; dx <= 6; dx++) {
       const x = t.x + dx, y = t.y + dy;
       if (!m.inBounds(x, y)) continue;
       const i = m.idx(x, y);
       if (!m.isLand(i)) continue;
       if (!coast && m.isCoastal(i)) coast = { x, y };
+      // natural storm sites (warm coastal land, as environment.ts isStormSite), split at the cyclone sea temperature
+      const site = m.isCoastal(i) && m.temp[i] > 20;
+      if (site && !warmCoast && m.temp[i] >= 26.5) warmCoast = { x, y };
+      if (site && !mildCoast && m.temp[i] < 26.5) mildCoast = { x, y };
       let water = 0;
       m.forRadius(x, y, 6, (j) => { if (!m.isLand(j)) water++; });
       if (!inland && water === 0) inland = { x, y };
     }
-    if (coast && inland) break;
+    if (coast && inland && warmCoast && mildCoast) break;
+  }
+  // storm sites anywhere on the map if none lies near a town
+  for (let i = 0; i < m.n && !(warmCoast && mildCoast); i++) {
+    if (!(m.isLand(i) && m.isCoastal(i) && m.temp[i] > 20)) continue;
+    if (!warmCoast && m.temp[i] >= 26.5) warmCoast = { x: m.xOf(i), y: m.yOf(i) };
+    if (!mildCoast && m.temp[i] < 26.5) mildCoast = { x: m.xOf(i), y: m.yOf(i) };
   }
   let vent = null; // a volcanic vent, where eruptions happen naturally (HAZARD.VENT = 8)
   for (let i = 0; i < m.n && !vent; i++) if (m.hazard[i] & 8) vent = { x: m.xOf(i), y: m.yOf(i) };
-  return { towns, coast, inland, vent };
+  return { towns, coast, inland, vent, warmCoast, mildCoast };
 });
-console.log(`world: ${sites.towns.length} towns, coast ${JSON.stringify(sites.coast)}, inland ${JSON.stringify(sites.inland)}, vent ${JSON.stringify(sites.vent)}`);
+console.log(`world (seed ${SEED}): ${sites.towns.length} towns, coast ${JSON.stringify(sites.coast)}, inland ${JSON.stringify(sites.inland)}, vent ${JSON.stringify(sites.vent)}, warm coast ${JSON.stringify(sites.warmCoast)}, mild coast ${JSON.stringify(sites.mildCoast)}`);
+if (!sites.vent) console.log('warning: no volcanic vent in this world; the volcano is captured inland');
 if (sites.towns.length < 6) console.log('warning: few towns; some captures share a place');
 const town = (k) => sites.towns[k % sites.towns.length];
 
@@ -114,10 +128,14 @@ await viaPower('volcano', 'dis_volcano', sites.vent ?? sites.inland ?? town(2));
 await viaPower('flood', 'dis_flood', town(3));
 await viaPower('tsunami', 'dis_tsunami', sites.coast ?? town(4));
 await viaPower('storm-inland', 'dis_storm', sites.inland ?? town(5));
-await shoot('storm-coastal', sites.coast ?? town(4), async (site) => {
-  const { triggerDisaster } = await import('/src/world/environment.ts');
-  triggerDisaster(window.__fxr.sim, 'storm', site.x, site.y, 5, true); // a natural storm: coastal, radius 5
-});
+// natural storms (radius 5 on warm coastal land): a hurricane over sea >= 26.5 C, else a squall
+const naturalStorm = async (site) => {
+  const { triggerDisaster, NATURAL_STORM_RADIUS } = await import('/src/world/environment.ts');
+  triggerDisaster(window.__fxr.sim, 'storm', site.x, site.y, NATURAL_STORM_RADIUS ?? 5, true); // 5 before the constant existed
+};
+if (sites.warmCoast) await shoot('storm-coastal', sites.warmCoast, naturalStorm);
+else console.log('warning: no coast warm enough for a hurricane in this world');
+if (sites.mildCoast) await shoot('storm-mild-coast', sites.mildCoast, naturalStorm);
 await viaPower('drought', 'dis_drought', town(6));
 await viaPower('blizzard', 'dis_blizzard', town(7));
 await viaPower('wildfire', 'dis_fire', sites.inland ?? town(8), 2);

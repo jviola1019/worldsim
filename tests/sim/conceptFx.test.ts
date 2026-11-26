@@ -7,13 +7,13 @@ import { readFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { makeSim } from '../helpers';
 import { POWERS, applyPower } from '../../src/powers/powers';
-import { FX_BY_POWER, FX_BY_EVENT, DISASTER_FX, STATE_FX, UNUSED_SPRITES, eventEntry, isSpec, emitFx, type FxEntry, type FxSpec } from '../../src/sim/conceptFx';
+import { FX_BY_POWER, FX_BY_EVENT, DISASTER_FX, STATE_FX, UNUSED_SPRITES, CYCLONE_SEA_TEMP, eventEntry, isSpec, emitFx, type FxEntry, type FxSpec } from '../../src/sim/conceptFx';
 import { EFFECT_SPRITES } from '../../src/rendering/art/effects';
 import { logEvent } from '../../src/history/events';
 import { encodeWorld, decodeWorld } from '../../src/persistence/serialize';
 import { Simulation } from '../../src/sim/simulation';
 import type { Sim } from '../../src/sim/context';
-import { triggerDisaster } from '../../src/world/environment';
+import { triggerDisaster, isStormSite, NATURAL_STORM_RADIUS } from '../../src/world/environment';
 import { asteroidImpact } from '../../src/world/catastrophes';
 import { closePandemics } from '../../src/population/pandemic';
 import type { Disease } from '../../src/sim/types';
@@ -208,9 +208,13 @@ describe('Task 7: realistic disaster and disease visuals', () => {
     expect(UNUSED_SPRITES['fx.tornado']).toMatch(/tornado/);
   });
 
-  it('triggerDisaster draws a hurricane for a large coastal storm and a squall inland or small', () => {
+  it('triggerDisaster draws a hurricane for a large storm on a warm coast, and a squall inland or small', () => {
     const sim = makeSim('fx-storm', 64, (c) => { c.settings.startCivs = 0; });
-    const { inland, coast } = landSites(sim);
+    const { inland } = landSites(sim);
+    const m = sim.w.map;
+    let coast: [number, number] | null = null; // a coast warm enough for a tropical cyclone
+    for (let i = 0; i < m.n && !coast; i++) if (m.isLand(i) && m.isCoastal(i) && m.temp[i] >= CYCLONE_SEA_TEMP) coast = [m.xOf(i), m.yOf(i)];
+    if (!coast) throw new Error('no warm coast');
     const play = (x: number, y: number, r: number) => { sim.fx.length = 0; triggerDisaster(sim, 'storm', x, y, r, true); return sim.fx.map((f) => f.kind); };
     expect(play(coast[0], coast[1], 5)).toEqual(['fx.hurricane']);
     expect(play(inland[0], inland[1], 6)).toEqual(['fx.squall']);
@@ -303,4 +307,31 @@ describe('Task 7: realistic disaster and disease visuals', () => {
     expect(a.fx.length).toBeGreaterThan(0);
     expect(Buffer.from(encodeWorld(a.w)).equals(Buffer.from(encodeWorld(b.w)))).toBe(true);
   }, 120000);
+
+  it('fix round 1: a natural storm is a hurricane only over warm sea (>= 26.5 C), else a squall', () => {
+    expect(CYCLONE_SEA_TEMP).toBe(26.5);
+    const sim = makeSim('test', 128, (c) => { c.settings.startCivs = 0; });
+    const m = sim.w.map;
+    sim.w.climate.anomaly = 0;
+    // real natural storm sites of this generated world (the same rule the yearly disaster draw uses), split by warmth
+    let warm = -1, mild = -1;
+    for (let i = 0; i < m.n && (warm < 0 || mild < 0); i++) {
+      if (!isStormSite(m, i)) continue;
+      if (m.temp[i] >= CYCLONE_SEA_TEMP && warm < 0) warm = i;
+      if (m.temp[i] < CYCLONE_SEA_TEMP && mild < 0) mild = i;
+    }
+    expect(warm >= 0 && mild >= 0).toBe(true);
+    const play = (i: number) => { sim.fx.length = 0; triggerDisaster(sim, 'storm', m.xOf(i), m.yOf(i), NATURAL_STORM_RADIUS, true); return sim.fx.map((f) => f.kind); };
+    expect(play(warm)).toEqual(['fx.hurricane']);
+    expect(play(mild)).toEqual(['fx.squall']);
+    // a warmer world warms the sea: the same mild site can host a hurricane once warming lifts it past the threshold
+    sim.w.climate.anomaly = CYCLONE_SEA_TEMP - m.temp[mild] + 0.1;
+    expect(play(mild)).toEqual(['fx.hurricane']);
+  });
+
+  it('fix round 1: gradual sea-level rise laps the coast gently; the breaking crest stays for tsunamis', () => {
+    expect(kindsOf(eventEntry('sea_level'))).not.toContain('fx.wave');
+    expect(kindsOf(eventEntry('sea_level'))[0]).toBe('fx.foam');
+    expect(kindsOf(DISASTER_FX.tsunami)[0]).toBe('fx.wave');
+  });
 });

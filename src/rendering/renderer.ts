@@ -27,7 +27,7 @@ import { HAZARD } from '../world/tilemap';
 import { B, eraToTier } from '../civilizations/buildingTypes';
 import { SPECIES_BY_KEY, MONSTERS } from '../ecology/species';
 import { hash3 } from '../core/rng';
-import { fxFrame, sickMarker, auroraAlpha, stillKind } from './fxMotion';
+import { fxFrame, sickMarker, auroraAlpha, stillKind, pallShowsSymbol } from './fxMotion';
 
 export interface Brush {
   x: number;
@@ -754,7 +754,8 @@ export class Renderer {
       }
       // weather and sickness loop, blasts play once; one still frame under Reduce motion (fxMotion.ts)
       const frame = spr ? fxFrame(f.kind, spr.frames, progress, this.time, reduce) : 0;
-      atlas.draw(ctx, f.kind, f.x * TILE + 4, f.y * TILE + 6, frame);
+      if (f.kind === 'fx.pall') this.drawPall(f.x, f.y, frame);
+      else atlas.draw(ctx, f.kind, f.x * TILE + 4, f.y * TILE + 6, frame);
       kinds.add(f.kind);
       motion += `f${frame};`;
     }
@@ -772,6 +773,19 @@ export class Renderer {
         ctx.stroke();
       }
     }
+  }
+
+  /**
+   * Fix round 1: the sickness pall is a see-through haze (the town shows through a sickly tint), topped by the
+   * sickbed symbol only where the town does not already carry the sick-town marker: one symbol per sick town.
+   */
+  private drawPall(x: number, y: number, frame: number): void {
+    const { ctx, atlas } = this;
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    atlas.draw(ctx, 'fx.pall', x * TILE + 4, y * TILE + 6, frame);
+    ctx.restore();
+    if (pallShowsSymbol(this.sim.w.settlements.values(), x, y)) atlas.draw(ctx, 'fx.sick', x * TILE + 4, y * TILE - 1, 0);
   }
 
   /** CSS px of the view hidden under the top HUD (set by the game); the aurora hangs just below it. */
@@ -798,12 +812,14 @@ export class Renderer {
     // the sky darkens from the top of the view down past the curtains (under the HUD too: it hangs from above)
     const bottom = top + h + 24;
     const sky = ctx.createLinearGradient(0, 0, 0, bottom);
-    sky.addColorStop(0, `rgba(13,20,36,${0.85 * alpha})`);
-    sky.addColorStop((top + h * 0.75) / bottom, `rgba(13,20,36,${0.8 * alpha})`);
-    sky.addColorStop(1, 'rgba(13,20,36,0)');
+    sky.addColorStop(0, `rgba(8,12,26,${0.95 * alpha})`);
+    sky.addColorStop((top + h * 0.8) / bottom, `rgba(8,12,26,${0.9 * alpha})`);
+    sky.addColorStop(1, 'rgba(8,12,26,0)');
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, this.cam.viewW, bottom);
-    ctx.globalAlpha = alpha * 1.15; // the land shows faintly through the light
+    // light adds to the night sky: the curtains glow instead of painting over it
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = alpha;
     ctx.imageSmoothingEnabled = false;
     const frame = fxFrame('fx.aurora', spr.frames, a.p, this.time, this.reduceMotion);
     for (let x = 0; x < this.cam.viewW; x += spr.w * k) atlas.draw(ctx, 'fx.aurora', x, top + 2, frame, undefined, false, false, k);

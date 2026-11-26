@@ -2,15 +2,15 @@
  "generated": "2026-11-26",
  "totals": {
   "srcFiles": 151,
-  "srcLines": 44312,
+  "srcLines": 44369,
   "testFiles": 68,
-  "testCases": 485
+  "testCases": 491
  },
  "folders": [
   {
    "name": "rendering",
    "files": 33,
-   "lines": 19139,
+   "lines": 19178,
    "deps": {
     "sim": 14,
     "world": 10,
@@ -68,7 +68,7 @@
   {
    "name": "sim",
    "files": 11,
-   "lines": 2671,
+   "lines": 2681,
    "deps": {
     "powers": 3,
     "culture": 5,
@@ -90,7 +90,7 @@
   {
    "name": "world",
    "files": 8,
-   "lines": 2493,
+   "lines": 2501,
    "deps": {
     "sim": 7,
     "core": 12,
@@ -777,7 +777,7 @@
   {
    "path": "src/rendering/art/effects_disaster.ts",
    "folder": "rendering",
-   "lines": 322,
+   "lines": 335,
    "about": "Round 10 second addendum (Task 7): realistic disaster and disease effects, on the master palette and the 8-art-pixels-per-tile scale."
   },
   {
@@ -897,7 +897,7 @@
   {
    "path": "src/rendering/fxMotion.ts",
    "folder": "rendering",
-   "lines": 71,
+   "lines": 81,
    "about": "Round 10 second addendum (Task 7): how effects move, kept apart from the renderer so it can be tested."
   },
   {
@@ -921,7 +921,7 @@
   {
    "path": "src/rendering/renderer.ts",
    "folder": "rendering",
-   "lines": 1045,
+   "lines": 1061,
    "about": "Frame renderer. Draws (back to front): cached world chunks (or the far-zoom overview), the overlay, animated tiles (volcanoes, fires, smoke, windmills), living things and agents, traffic derived from real infrastructure and trade, effects, labels, selection an"
   },
   {
@@ -963,7 +963,7 @@
   {
    "path": "src/sim/conceptFx.ts",
    "folder": "sim",
-   "lines": 258,
+   "lines": 268,
    "about": "Round 7: the one place that decides what every concept shows on the map."
   },
   {
@@ -1203,7 +1203,7 @@
   {
    "path": "src/world/environment.ts",
    "folder": "world",
-   "lines": 370,
+   "lines": 378,
    "about": "Environment & climate."
   },
   {
@@ -1471,7 +1471,7 @@
   },
   {
    "path": "tests/rendering/disasterFx.test.ts",
-   "cases": 10,
+   "cases": 14,
    "about": "Round 10 second addendum (Task 7): realistic disaster and disease visuals."
   },
   {
@@ -1506,7 +1506,7 @@
   },
   {
    "path": "tests/sim/conceptFx.test.ts",
-   "cases": 20,
+   "cases": 22,
    "about": "Round 7: every concept shows on the map."
   },
   {
@@ -1663,7 +1663,7 @@
   },
   {
    "path": "tools/fx-capture.mjs",
-   "lines": 161,
+   "lines": 179,
    "about": "Round 10 second addendum (Task 7): capture every disaster and disease effect for the design review, at 2x."
   },
   {

@@ -155,8 +155,16 @@ export function climateMonthly(sim: Sim): void {
     const kinds = ['earthquake', 'volcano', 'flood', 'storm'];
     const kind = rng.pick(kinds);
     const site = pickHazardSite(sim, kind);
-    if (site >= 0) triggerDisaster(sim, kind, site % m.w, (site / m.w) | 0, kind === 'storm' ? 5 : 3, true);
+    if (site >= 0) triggerDisaster(sim, kind, site % m.w, (site / m.w) | 0, kind === 'storm' ? NATURAL_STORM_RADIUS : 3, true);
   }
+}
+
+/** Radius in tiles of a natural storm. */
+export const NATURAL_STORM_RADIUS = 5;
+
+/** Where a natural storm can strike: warm coastal land (annual mean above 20 C). */
+export function isStormSite(m: Sim['w']['map'], i: number): boolean {
+  return m.isLand(i) && m.isCoastal(i) && m.temp[i] > 20;
 }
 
 function pickHazardSite(sim: Sim, kind: string): number {
@@ -172,7 +180,7 @@ function pickHazardSite(sim: Sim, kind: string): number {
       const cell = (((i / m.w) | 0) / c.cellSize | 0) * c.cellsX + ((i % m.w) / c.cellSize | 0);
       if (c.rain[cell] > 0.35) return i;
     }
-    if (kind === 'storm' && m.isLand(i) && m.isCoastal(i) && m.temp[i] > 20) return i;
+    if (kind === 'storm' && isStormSite(m, i)) return i;
   }
   return -1;
 }

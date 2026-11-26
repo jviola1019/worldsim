@@ -39,19 +39,28 @@ export const DISASTER_FX: Record<string, FxSpec> = {
   plague: fx('pall', 3, { area: true }),
 };
 
-/** A storm this large over or beside the sea is drawn as a hurricane. */
+/** A storm this large over or beside the sea can be drawn as a hurricane. */
 export const HURRICANE_RADIUS = 5;
+/**
+ * Tropical cyclones form only over sea at least about 26.5 C warm (Gray 1968, "Global view of the origin of
+ * tropical disturbances and storms", Mon. Wea. Rev. 96: 669-700; the threshold is restated by Dare & McBride 2011,
+ * J. Climate 24: 4570-4576). The map keeps no sea temperature, so the storm tile's annual mean temperature plus the
+ * world's warming anomaly stands in for the sea beside it.
+ */
+export const CYCLONE_SEA_TEMP = 26.5;
 
 /**
  * The effect a disaster plays. `look` names another DISASTER_FX entry (an airburst is a meteor that bursts in the
- * air). A storm of radius HURRICANE_RADIUS or more over the sea or on the coast is a hurricane. Reads the map only.
+ * air). A storm of radius HURRICANE_RADIUS or more, over the sea or on the coast, where the water is warm enough
+ * for a tropical cyclone (CYCLONE_SEA_TEMP), is a hurricane; any other storm is a rain squall. Reads the map only.
  */
 export function disasterFx(sim: Sim, kind: string, x: number, y: number, r: number, look?: string): FxSpec {
   if (look && DISASTER_FX[look]) return DISASTER_FX[look];
   if (kind === 'storm' && r >= HURRICANE_RADIUS) {
     const m = sim.w.map;
     const i = m.inBounds(x, y) ? m.idx(x, y) : -1;
-    if (i >= 0 && (!m.isLand(i) || m.isCoastal(i))) return DISASTER_FX.hurricane;
+    const warm = i >= 0 && m.temp[i] + (sim.w.climate.anomaly ?? 0) >= CYCLONE_SEA_TEMP;
+    if (warm && (!m.isLand(i) || m.isCoastal(i))) return DISASTER_FX.hurricane;
   }
   return DISASTER_FX[kind] ?? DISASTER_FX.fire;
 }
@@ -175,7 +184,8 @@ export const FX_BY_EVENT: Record<string, FxEntry> = {
   pandemic: fx('pall', 3, { area: true, radius: 3, flash: 'sick' }), // and the pall on each reached town (STATE_FX.pandemicTown)
   peace: fx('ring', 2, { area: true, radius: 3 }), religion_extinct: fx('smoke', 2), religion_founded: fx('star', 2),
   revolution: fx('fire', 1.5, { then: fx('flag', 1.5) }), royal_marriage: fx('heal', 1.5), ruler_death: none(FREQUENT), scenario: none('scenario goals'),
-  schism: fx('clash', 1.5), sea_level: fx('wave', 2), secession: fx('flag', 2), secularization: none('gradual process'),
+  schism: fx('clash', 1.5), sea_level: fx('foam', 2.5), // gradual rise: foam lapping the coast, not a breaking crest
+  secession: fx('flag', 2), secularization: none('gradual process'),
   settlement_founded: fx('banner', 1.5), settlement_lost: fx('smoke_dark', 2), settlement_transfer: fx('flag', 1.5), siege: fx('smoke', 1.5),
   'space_*': fx('steam', 2), species_extinct: fx('skull', 1.5), sports_champion: fx('firework', 2), sports_cup: fx('firework', 2),
   state_religion: fx('star', 1.5), subspecies: fx('sparkle', 1.5), succession_crisis: none('court politics: shown in the news feed'),

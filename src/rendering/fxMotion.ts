@@ -62,9 +62,19 @@ export function sickMarker(s: Settlement, time: number, reduce: boolean): { alph
   return { alpha: 0.75 + 0.2 * Math.sin(time * Math.PI) };
 }
 
-/** The aurora band's opacity: fades in over the first 15% of its life and out over the last 25%; fixed under Reduce motion. */
+/**
+ * Whether a sickness pall at (x, y) shows the sickbed symbol itself. Not where a town within 2 tiles already carries
+ * the sick-town marker (one symbol per sick town, not two). An epidemic is logged as it ends, so its town has often
+ * recovered: then the pall shows the symbol.
+ */
+export function pallShowsSymbol(settlements: Iterable<Settlement>, x: number, y: number): boolean {
+  for (const s of settlements) if ((s.x - x) ** 2 + (s.y - y) ** 2 <= 4 && infectedShare(s) > SICK_SHARE) return false;
+  return true;
+}
+
+/** The aurora band's opacity: fades in over the first 15% of its life and out over the last 25%; fixed (at full) under Reduce motion. */
 export function auroraAlpha(progress: number, reduce: boolean): number {
-  if (reduce) return 0.6;
+  if (reduce) return 0.9;
   const p = Math.max(0, Math.min(1, progress));
-  return 0.7 * Math.min(1, p / 0.15, (1 - p) / 0.25);
+  return 0.9 * Math.min(1, p / 0.15, (1 - p) / 0.25);
 }

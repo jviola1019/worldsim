@@ -5,9 +5,9 @@
  *   hurricane   a turning two-armed spiral with a clear eye (large coastal storms)
  *   eruption    an ash column rising from a glowing vent, ash falling from its spreading top, then dark smoke
  *   airburst    a fireball high in the sky inside a white shock ring, then a smoke ball (no ground blast)
- *   pall        a pale green-grey haze over a town with a red plague cross (natural disease: never a skull)
- *   sick        the small red cross a town carries while more than 1% of it is sick
- *   aurora      green curtains with a purple fringe, tiled across the top of the view
+ *   pall        a see-through pale yellow-green haze over a town (natural disease: never a skull)
+ *   sick        a figure in a sickbed: the symbol on a town while more than 1% of it is sick (and on a pall elsewhere)
+ *   aurora      cyan-green curtains of light with a purple top, glowing across the top of the view
  *   heat        a drought: cracked dry ground under a heat shimmer
  *   blizzard    a grey snow cloud with wind-driven snow
  *   flood       muddy floodwater spreading with ripples
@@ -189,32 +189,43 @@ function airburstFrame(step: number): string[] {
 D['fx.airburst'] = S([0, 1, 2, 3, 4].map(airburstFrame), { fps: 3, ax: 12, ay: 19 }); // the burst about 1.4 tiles up: below a town's name label
 
 // ---------------------------------------------------------------- sickness
-/** The plague cross (red, dark outline) shared by the pall and the sick-town marker. */
-const CROSS = ['..000..', '..0n0..', '000n000', '0nnnnm0', '000n000', '..0m0..', '..000..'];
 /**
- * A low veil of pale green-grey haze over the town: soft puffs, every other pixel left open so the town shows
- * through, drifting a pixel a frame; the plague cross floats above it.
+ * The sickness symbol: a figure in a sickbed (face on a white pillow, a pale blue blanket, a brown bed), with a
+ * dark outline so it reads on any town. Not a cross: a red cross reads as aid or healing and is a protected emblem.
+ */
+const SICKBED = [
+  '0000.......',
+  '0c600......',
+  '0c6SS000000',
+  '0c6SSLLLLL0',
+  '0cNLLLLLLL0',
+  '0cdddddddc0',
+  '0c0000000c0',
+  '000.....000',
+];
+/**
+ * A low veil of pale yellow-green haze over the town, solid and soft-edged: the renderer draws it see-through, so
+ * the town shows through a sickly tint. It drifts a pixel a frame. It carries no symbol itself: the renderer adds the
+ * sickbed only where the town does not already carry the sick-town marker (pallShowsSymbol).
  */
 function pallFrame(f: number): string[] {
-  const c = canvas(24, 16);
-  const veil = canvas(24, 16);
+  const c = canvas(24, 12);
   const dx = [0, 1, 0][f];
-  cloud(veil, [[5.5 + dx, 10.5, 3.8], [12 - dx, 9.2, 4.6], [18.5 + dx, 10.8, 3.8], [8.5 - dx, 12.6, 3.2], [15.5 + dx, 12.6, 3.2]], { s: 'Y', m: '4', l: '5' }); // grey-green fog with a sickly olive edge
-  for (let y = 0; y < 16; y++)
-    for (let x = 0; x < 24; x++) if (veil[y][x] !== '.' && (x + y + f) % 2 === 0) plot(c, x, y, veil[y][x]);
-  stamp(c, 9, 0, CROSS);
+  cloud(c, [[5.5 + dx, 6.5, 3.8], [12 - dx, 5.2, 4.6], [18.5 + dx, 6.8, 3.8], [8.5 - dx, 8.6, 3.2], [15.5 + dx, 8.6, 3.2]], { s: 'Y', m: 'k', l: 'l' });
+  // a ragged, drifting edge: a few wisps off the veil's rim
+  for (const [x, y] of [[1 + dx, 7], [22 - dx, 6], [4 - dx, 3], [20 + dx, 3]]) plot(c, x, y, 'Y');
   return rowsOf(c);
 }
-D['fx.pall'] = S([0, 1, 2].map(pallFrame), { fps: 3, ax: 12, ay: 12 });
-/** The sick-town marker (a one-frame badge; the renderer pulses its opacity). */
-D['fx.sick'] = S(CROSS, { ax: 3, ay: 6 });
+D['fx.pall'] = S([0, 1, 2].map(pallFrame), { fps: 3, ax: 12, ay: 8 });
+/** The sickness symbol (a one-frame badge: the renderer pulses its opacity on sick towns, and tops a pall with it). */
+D['fx.sick'] = S(SICKBED, { ax: 5, ay: 7 });
 
 // ---------------------------------------------------------------- aurora
 /**
- * Curtains of light, 64 px wide and tileable (every wave has a whole number of periods across the width): a thin
- * bright green ribbon folds across the band, and streaks rise from it on every other column, fading through green
- * into a sparse purple top. Sparse on purpose: light, not a solid shape. The folds ripple sideways from frame to
- * frame. The renderer draws a dark night-sky wash behind it.
+ * Curtains of light, 64 px wide and tileable (every wave has a whole number of periods across the width). Cyan-green
+ * light, off the grass greens on purpose: a soft, broken lower edge (bright only where the curtain is strong) and
+ * streaks rising from it on every other column, fading from cyan through pale blue into a sparse purple top. The
+ * renderer adds it to a night-sky wash ('lighter'), so it glows rather than paints. The folds ripple sideways.
  */
 function auroraFrame(f: number): string[] {
   const W = 64, H = 20;
@@ -223,18 +234,20 @@ function auroraFrame(f: number): string[] {
   for (let x = 0; x < W; x++) {
     const a = (2 * Math.PI * x) / W;
     const glow = 0.55 + 0.3 * Math.sin(3 * a - ph) + 0.15 * Math.sin(7 * a + ph);
+    if (glow < 0.2) continue; // a thin place in the curtain
     const base = Math.round(15 + 2.4 * Math.sin(a + ph / 2) + 1.2 * Math.sin(3 * a - ph));
-    plot(c, x, base, glow > 0.45 ? 'l' : 'k'); // the ribbon
-    plot(c, x, base - 1, 'k');
-    if ((x + base) % 2 === 0) plot(c, x, base + 1, 'i'); // its glow below
+    // the lower edge: bright glow only where the curtain is strong, every other pixel elsewhere
+    if (glow > 0.7) plot(c, x, base, 'H');
+    else if ((x + base) % 2 === 0) plot(c, x, base, 'G');
     const tall = x % 2 === 0;
     const len = tall ? Math.round(6 + glow * 8 + ((x * 7) % 3)) : glow > 0.5 ? 4 : 2;
-    for (let k = 2; k < len; k++) {
+    for (let k = 1; k < len; k++) {
       const y = base - k;
       if (y < 0) break;
       const t = k / len;
       // dithered by column pairs so the fading streaks do not line up in rows
-      const ch = t < 0.35 ? 'j' : t < 0.7 ? ((y + (x >> 1)) % 2 === 0 ? 'i' : '.') : (y + (x >> 1)) % 3 === 0 ? (glow > 0.7 ? 'Q' : 'P') : '.';
+      const d = (y + (x >> 1)) % 2 === 0;
+      const ch = t < 0.3 ? 'G' : t < 0.55 ? (d ? 'G' : 'z') : t < 0.75 ? (d ? 'q' : '.') : (y + (x >> 1)) % 3 === 0 ? (glow > 0.7 ? 'Q' : 'P') : '.';
       if (ch !== '.') plot(c, x, y, ch);
     }
   }

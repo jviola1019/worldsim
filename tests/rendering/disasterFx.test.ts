@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { EFFECT_SPRITES } from '../../src/rendering/art/effects';
-import { fxFrame, sickMarker, auroraAlpha, stillKind, STILL_FRAME, SICK_SHARE } from '../../src/rendering/fxMotion';
+import { fxFrame, sickMarker, auroraAlpha, stillKind, pallShowsSymbol, STILL_FRAME, SICK_SHARE } from '../../src/rendering/fxMotion';
 import { DISASTER_FX, FX_BY_EVENT, FX_BY_POWER, STATE_FX, UNUSED_SPRITES, isSpec, type FxEntry, type FxSpec } from '../../src/sim/conceptFx';
 import type { Settlement } from '../../src/sim/types';
 
@@ -107,5 +107,40 @@ describe('Reduce motion: each new effect returns its still frame', () => {
     expect(fxFrame('fx.fire', 4, 0.5, 1.0, false)).toBe(8);
     expect(fxFrame('fx.explosion', 5, 0.5, 0, false)).toBe(2);
     expect(fxFrame('fx.explosion', 5, 0.9, 0, true)).toBe(2);
+  });
+});
+
+describe('fix round 1: sickness symbol, pall haze, aurora light', () => {
+  const keys = (id: string) => new Set(EFFECT_SPRITES[id].frames.flat().join(''));
+  const RED = ['n', 'm', 'r'];
+  it('the sick-town marker is a figure in bed, not a red cross (no red keys; skin and pillow present)', () => {
+    const k = keys('fx.sick');
+    for (const r of RED) expect(k.has(r), r).toBe(false);
+    expect(k.has('S')).toBe(true); // a face on the pillow
+  });
+
+  it('the pall carries no symbol of its own (no red cross) and is a pale green haze, not grey', () => {
+    const k = keys('fx.pall');
+    for (const r of RED) expect(k.has(r), r).toBe(false);
+    const px = EFFECT_SPRITES['fx.pall'].frames[0].join('').replace(/\./g, '');
+    const greens = [...px].filter((c) => 'Ykl'.includes(c)).length;
+    expect(greens / px.length).toBeGreaterThan(0.6);
+  });
+
+  it('a pall shows the sickbed symbol only where no sick-town marker already does', () => {
+    const at = (x: number, y: number, i: number) => ({ x, y, epidemics: i > 0 ? [{ diseaseId: 1, s: 1 - i, i, r: 0, deaths: 0 }] : [] }) as unknown as Settlement;
+    expect(pallShowsSymbol([at(10, 10, 0.05)], 10, 10)).toBe(false); // the marker is there: one symbol, not two
+    expect(pallShowsSymbol([at(10, 10, 0)], 10, 10)).toBe(true); // recovered town (an epidemic is logged as it ends)
+    expect(pallShowsSymbol([at(30, 30, 0.05)], 10, 10)).toBe(true); // a sick town elsewhere does not count
+    const renderer = readFileSync('src/rendering/renderer.ts', 'utf8');
+    expect(renderer).toContain('pallShowsSymbol(');
+  });
+
+  it('the aurora is light, not grass: no grass palette keys, and it is composited additively', () => {
+    const k = keys('fx.aurora');
+    for (const g of ['l', 'k', 'j', 'i']) expect(k.has(g), g).toBe(false);
+    expect(k.has('G') || k.has('H')).toBe(true);
+    const renderer = readFileSync('src/rendering/renderer.ts', 'utf8');
+    expect(renderer).toMatch(/globalCompositeOperation = 'lighter'/);
   });
 });
