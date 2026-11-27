@@ -1,10 +1,12 @@
 /**
- * Task 8 part C (catastrophe realism): an airburst explodes in the air and leaves no crater.
+ * Task 8 part C (catastrophe realism): an airburst explodes in the air and leaves no crater; a geomagnetic storm's
+ * aurora shows whether or not anyone has electricity, and only electrified nations lose power.
  */
 import { describe, it, expect } from 'vitest';
 import { makeSim } from '../helpers';
-import { asteroidImpact, AIRBURST_RADIUS } from '../../src/world/catastrophes';
+import { asteroidImpact, solarStorm, AIRBURST_RADIUS } from '../../src/world/catastrophes';
 import { B } from '../../src/civilizations/buildingTypes';
+import { Good } from '../../src/world/resources';
 import type { Sim } from '../../src/sim/context';
 
 /** A land tile with only land within 4 tiles. */
@@ -39,5 +41,34 @@ describe('an airburst (Tunguska-class) leaves no crater', () => {
     expect(flattened).toBeGreaterThanOrEqual(19);
     expect(flattened).toBeLessThanOrEqual(25);
     expect(burning).toBeGreaterThan(0);
+  });
+});
+
+describe('a geomagnetic storm shows its aurora whether or not anyone has electricity', () => {
+  it('in a world with no electrified nation the storm is logged and the aurora drawn, and nobody loses power', () => {
+    const sim = makeSim('aurora-1', 64, (c) => { c.settings.startEra = 4; });
+    expect([...sim.w.civs.values()].some((c) => c.alive && c.caps.electrification > 0)).toBe(false);
+    const energy = [...sim.w.civs.values()].map((c) => c.stock[Good.ENERGY]);
+    const events = sim.w.events.length;
+    sim.fx.length = 0;
+    solarStorm(sim, false);
+    const logged = sim.w.events.slice(events).filter((e) => e.type === 'geomagnetic_storm');
+    expect(logged.length).toBe(1);
+    expect(logged[0].title).toMatch(/aurora/i);
+    expect(sim.fx.map((f) => [f.kind, f.x])).toEqual([['fx.aurora', -1]]);
+    expect([...sim.w.civs.values()].map((c) => c.stock[Good.ENERGY])).toEqual(energy);
+  });
+
+  it('electrified nations still lose their grids, and the storm says how many', () => {
+    const sim = makeSim('aurora-2', 64, (c) => { c.settings.startEra = 10; });
+    const lit = [...sim.w.civs.values()].filter((c) => c.alive && c.caps.electrification > 0);
+    expect(lit.length).toBeGreaterThan(0);
+    for (const c of lit) c.stock[Good.ENERGY] = 100;
+    const events = sim.w.events.length;
+    solarStorm(sim, false);
+    for (const c of lit) expect(c.stock[Good.ENERGY]).toBe(0);
+    const logged = sim.w.events.slice(events).filter((e) => e.type === 'geomagnetic_storm');
+    expect(logged.length).toBe(1);
+    expect(logged[0].title).toContain(`${lit.length} nation`);
   });
 });

@@ -7,7 +7,7 @@
  *   extinction-class impact (~10 km)         1 / 1e8
  *   VEI-7 eruption                           1 / 1,000    ("year without a summer")
  *   supervolcano (VEI-8)                     1 / 60,000   (volcanic winter, ash)
- *   severe geomagnetic storm                 1 / 150      (grids and electronics only)
+ *   severe geomagnetic storm                 1 / 150      (auroras always; damage to grids and electronics only)
  *   solar superflare                         1 / 20,000   (grids, ozone loss)
  *   nearby gamma-ray burst                   1 / 1e8      (radiation, ozone stripped)
  *   natural infertility pathogen             1 / 40,000
@@ -164,12 +164,16 @@ export function solarStorm(sim: Sim, superflare: boolean): void {
   }
   if (superflare) e.uv = Math.min(1, e.uv + 0.4);
   logCatastrophe(sim, superflare ? 'superflare' : 'geomagnetic_storm', -1, -1);
-  if (hit || superflare)
-    logEvent(sim, {
-      type: superflare ? 'superflare' : 'geomagnetic_storm', cat: 'disaster',
-      title: superflare ? `A solar superflare burned out power grids in ${hit} nations and thinned the ozone layer` : `A geomagnetic storm knocked out power grids in ${hit} nations`,
-      importance: superflare ? 5 : 3, causes: [{ label: superflare ? 'A superflare on the sun' : 'A coronal mass ejection', weight: 1 }],
-    });
+  // task 8 part C: the aurora shows whether or not anyone has electricity (in 1859 it was seen as far south as the
+  // Caribbean); only the damage needs grids, so the storm is always logged (its event draws the aurora)
+  const grids = `${hit} ${hit === 1 ? 'nation' : 'nations'}`;
+  logEvent(sim, {
+    type: superflare ? 'superflare' : 'geomagnetic_storm', cat: 'disaster',
+    title: superflare
+      ? hit ? `A solar superflare burned out power grids in ${grids} and thinned the ozone layer` : 'A solar superflare thinned the ozone layer and filled the skies with auroras'
+      : hit ? `A geomagnetic storm knocked out power grids in ${grids}; auroras lit the skies far from the poles` : 'A geomagnetic storm lit the skies with auroras far from the poles',
+    importance: superflare ? 5 : hit ? 3 : 2, causes: [{ label: superflare ? 'A superflare on the sun' : 'A coronal mass ejection', weight: 1 }],
+  });
 }
 
 /** A nearby gamma-ray burst: radiation on one hemisphere and the ozone layer stripped for years. */
