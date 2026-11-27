@@ -564,6 +564,35 @@ describe('mature ecosystems: natural worlds start near carrying capacity (task 5
     expect(pred / prey).toBeLessThanOrEqual(1 / 100 + 1e-9);
   });
 
+  it('natural worlds with cold coasts and fish start with seals, placed against the fish around them (task 8 part C)', () => {
+    // before: the 1:100 rule weighed fish by `meat` (0.01 a shoal unit, a fishing catch value, not biomass), so a founding
+    // group of 10 seals needed about five times the fish within 12 tiles that any sea held, and seals were placed only
+    // beside whales (which they do not eat) in about half the worlds
+    let worlds = 0, withSeals = 0;
+    for (const seed of ['wild-0', 'wild-2', 'wild-3', 'wild-5']) {
+      const c = defaultConfig();
+      PRESETS.find((p) => p.key === 'realistic')!.apply(c);
+      c.gen.seed = seed; c.gen.width = 128; c.gen.height = 128;
+      const sim = createSimulation(c);
+      const m = sim.w.map;
+      const herds = [...sim.w.herds.values()];
+      const fish = herds.filter((h) => h.species === 'fish');
+      let coldSea = false;
+      for (let i = 0; i < m.n && !coldSea; i++) if (m.isWater(i) && habitat(sim, SPECIES_BY_KEY.seal, i) >= 0.5) coldSea = true;
+      if (!coldSea || !fish.length) continue;
+      worlds++;
+      const seals = herds.filter((h) => h.species === 'seal');
+      if (seals.length) withSeals++;
+      for (const s of seals) {
+        const sea = herds.filter((f) => SPECIES_BY_KEY[f.species].aquatic && SPECIES_BY_KEY[f.species].diet === 'herbivore');
+        const near = sea.filter((f) => Math.hypot(f.x - s.x, f.y - s.y) <= 12).reduce((t, f) => t + f.count, 0);
+        expect(s.count, `${seed} seals at most 1% of the sea prey units (fish, whales) within 12 tiles`).toBeLessThanOrEqual(near * BALANCE.predatorPreyBiomass + 1e-9);
+      }
+    }
+    expect(worlds).toBe(4);
+    expect(withSeals).toBe(worlds);
+  });
+
   it('seeding is deterministic', () => {
     const a = world('eco-det', false), b = world('eco-det', false);
     expect(JSON.stringify([...a.w.herds.values()])).toBe(JSON.stringify([...b.w.herds.values()]));

@@ -170,7 +170,12 @@ function seedWildlife(sim: Sim): void {
         const q = SPECIES_BY_KEY[o.key];
         return !o.pred && o.aquatic === !!sp.aquatic && q.diet === 'herbivore' && !q.flying && q.meat >= 0.01 && Math.hypot(o.x - x - 0.5, o.y - y - 0.5) <= R;
       });
-      const free = (o: (typeof placed)[number]) => Math.max(0, o.count * o.meat * BALANCE.predatorPreyBiomass - o.claim);
+      // task 8 part C: sea prey is weighed by head, one prey unit per predator unit (the feeding model's own measure: every
+      // hunter needs the same prey units a month whatever the prey). A fish shoal's `meat` (0.01 a unit, a whole shoal less
+      // food than one whale) is a fishing catch value, not the biomass the shoal stands for, so weighed by it no sea held
+      // the fish a founding group of seals needed, and seals were placed only beside whales, which they do not eat
+      const weight = (o: (typeof placed)[number]) => (sp.aquatic ? sp.meat : o.meat);
+      const free = (o: (typeof placed)[number]) => Math.max(0, o.count * weight(o) * BALANCE.predatorPreyBiomass - o.claim);
       const avail = near.reduce((s, o) => s + free(o), 0);
       // and no more than its territory can feed now: a full-sized pack's share of what the prey there replaces each
       // month (the hunters already there, wolves, cats and bears, take theirs)
