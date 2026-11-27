@@ -193,12 +193,12 @@ function settlementsNear(sim: Sim, x: number, y: number, r: number): Settlement[
 
 const DISASTER_NAMES: Record<string, string> = {
   earthquake: 'An earthquake', volcano: 'A volcanic eruption', flood: 'A great flood', storm: 'A storm', meteor: 'A meteor strike',
-  tsunami: 'A tsunami', drought: 'A drought', blizzard: 'A blizzard', lightning: 'Lightning', fire: 'A fire', plague: 'A plague',
+  tsunami: 'A tsunami', airburst: 'A meteor airburst', drought: 'A drought', blizzard: 'A blizzard', lightning: 'Lightning', fire: 'A fire', plague: 'A plague',
 };
 
 /**
  * Apply a disaster's physical and human effects. Also used by god powers. `look` only changes what is drawn (a
- * DISASTER_FX entry: an airburst is a meteor that bursts in the air); it never changes what happens.
+ * DISASTER_FX entry); it never changes what happens. An airburst is its own kind (task 8 part C: no crater).
  */
 export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r: number, natural = false, pressure: EndingType = 'disaster', severityMult = 1, causes?: Cause[], look?: string): void {
   const w = sim.w;
@@ -206,7 +206,7 @@ export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r:
   const rng = sim.rng;
   let deaths = 0;
   let destroyed = 0;
-  const severity = (kind === 'meteor' ? 1 : kind === 'volcano' ? 0.8 : kind === 'earthquake' ? 0.6 : kind === 'tsunami' ? 0.7 : 0.4) * severityMult;
+  const severity = (kind === 'meteor' || kind === 'airburst' ? 1 : kind === 'volcano' ? 0.8 : kind === 'earthquake' ? 0.6 : kind === 'tsunami' ? 0.7 : 0.4) * severityMult;
   m.forRadius(x, y, r, (i, tx, ty, d2) => {
     const close = 1 - Math.sqrt(d2) / (r + 0.01);
     switch (kind) {
@@ -243,6 +243,19 @@ export function triggerDisaster(sim: Sim, kind: string, x: number, y: number, r:
         if (m.isLand(i)) {
           m.veg[i] = Math.round(m.veg[i] * 0.85);
           if (m.bld[i] && rng.chance(0.08 * close)) {
+            removeBuilding(sim, i, true);
+            destroyed++;
+          }
+        }
+        break;
+      case 'airburst':
+        // task 8 part C: a meteoroid that explodes 5-10 km up (Tunguska, 1908) leaves no crater. Its blast flattens the
+        // forest across the whole radius and wrecks buildings, and its heat flash sets fires near ground zero only (about
+        // 100 km² charred; the blast wave put most fires out)
+        if (m.isLand(i)) {
+          m.veg[i] = Math.round(m.veg[i] * 0.3);
+          if (d2 === 0) ignite(sim, i, 200);
+          if (m.bld[i] && rng.chance(0.4 * close)) {
             removeBuilding(sim, i, true);
             destroyed++;
           }

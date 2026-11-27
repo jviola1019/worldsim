@@ -44,6 +44,8 @@ None of them is a calibration target fitted to data.
 |---|---|---|
 | Earthquakes of magnitude 7 or more | About 16 a year (long-term average since 1900); magnitude 8 or more about 1 a year | [USGS FAQ](https://www.usgs.gov/faqs/why-are-we-having-so-many-earthquakes-has-naturally-occurring-earthquake-activity-been) |
 | Volcanic eruptions | 64–89 under way each year since 2000 (average 78), about 36 starting or ending; most are VEI 2 or smaller; the VEI 4+ rate has been steady for over a century | [GVP via Discover](https://www.discovermagazine.com/volcanic-activity-isnt-increasing-across-the-planet-44448) |
+| What a Tunguska-class airburst does (task 8 part C: `AIRBURST_RADIUS` 2.6 tiles, no crater, vegetation down to 30% across it, fire on the ground-zero tile only) | The 1908 object exploded about 5-10 km up, flattening several million trees over more than 2,150 km² (21 tiles at ~100 km² a tile, a radius of 2.6); at ground zero the trees were stripped but left standing, and no crater was found. The heat pulse "ignited several sporadic fires"; more than 100 km² of forest was charred, and the blast wave put most fires out | [Wikipedia, Tunguska event](https://en.wikipedia.org/wiki/Tunguska_event) (read through a page summary, first part only; it cites Krinov 1966, Svetsov & Shuvalov 2008 and Jenniskens et al. 2019); the 100 km² charred figure is from a search summary of Britannica's article (page not readable) |
+| Auroras do not need electricity (task 8 part C: a geomagnetic storm is always logged and its aurora drawn; only electrified nations lose power) | The 1859 Carrington storm's aurora was seen at low latitudes (Caribbean, Cuba, Hawaii and south-central Mexico in different accounts), before any power grid; telegraphs failed and sparked. The March 1989 storm blacked out Hydro-Québec's grid for about nine hours | [Carrington Event](https://en.wikipedia.org/wiki/Carrington_Event) and a CBC article, seen through a search summary only (pages not read in full) |
 | Rare catastrophes (Tunguska-class airburst 1/800 yr, VEI-7 1/1,000 yr, supervolcano 1/60,000 yr, severe geomagnetic storm 1/150 yr, and others) | As documented in `src/world/catastrophes.ts`, round 5, of real order of magnitude | (existing, unchanged) |
 
 **What this means for EPOCH:**
@@ -69,6 +71,7 @@ Queries, all run on 2026-11-25 (standard web search, US results):
 12. (2026-11-27, task 8 part C) Wallace Leslie 2008 diet of the Nile crocodile Okavango Delta fish proportion Journal of Herpetology
 13. (2026-11-27, task 8 part C) IUCN Red List Panthera pardus habitat forest; Panthera onca habitat tropical forest; tiger habitat temperate boreal forest (then the three Wikipedia pages above)
 14. (2026-11-27, task 8 part C) Palomares Caro 1999 interspecific killing among mammalian carnivores American Naturalist body mass ratio; Miquelle 2005 tigers and wolves in the Russian Far East competitive exclusion functional redundancy (an interference-competition variant was measured and not adopted; see the task 8 part C report)
+15. (2026-11-27, task 8 part C) Tunguska event 2150 km2 flattened forest burned area no crater; Carrington event 1859 aurora seen Caribbean telegraph NOAA; March 1989 Quebec blackout geomagnetic storm
 
 The queries carried no personal or project-identifying details.
 

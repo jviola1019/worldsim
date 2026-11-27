@@ -2,7 +2,7 @@
  * Rare natural catastrophes (yearly, world level), with base rates of the real order of magnitude so
  * that rare things stay rare (rates are per world-year, scaled by the disaster-frequency setting):
  *
- *   regional airburst (~50-100 m impactor)   1 / 800      (Tunguska-class)
+ *   regional airburst (~50-100 m impactor)   1 / 800      (Tunguska-class: no crater, forest flattened and charred)
  *   major impact (~1 km)                     1 / 300,000  (impact winter)
  *   extinction-class impact (~10 km)         1 / 1e8
  *   VEI-7 eruption                           1 / 1,000    ("year without a summer")
@@ -42,6 +42,12 @@ export const CATASTROPHE_RATES = {
   gammaRayBurst: 1e-8,
   infertility: 1 / 40000,
 } as const;
+
+/**
+ * Task 8 part C: an airburst flattens forest over about 2,150 km² (Tunguska, 1908); at ~100 km² a tile that is 21 tiles,
+ * a radius of 2.6. It explodes 5-10 km up, so it leaves no crater (research-notes.md §3).
+ */
+export const AIRBURST_RADIUS = 2.6;
 
 export function catastrophesYearly(sim: Sim): void {
   const w = sim.w;
@@ -91,7 +97,7 @@ export function asteroidImpact(sim: Sim, x: number, y: number, size: 'airburst' 
   const e = worldEndings(sim);
   const c: Cause[] = causes ?? [{ label: size === 'airburst' ? 'A stony meteoroid exploded in the atmosphere' : `An impactor about ${size === 'major' ? '1 km' : '10 km'} across`, weight: 1 }];
   if (size === 'airburst') {
-    triggerDisaster(sim, 'meteor', x, y, 2, true, 'asteroid', 1, c, 'airburst');
+    triggerDisaster(sim, 'airburst', x, y, AIRBURST_RADIUS, true, 'asteroid', 1, c);
     logCatastrophe(sim, 'airburst', x, y);
     return;
   }
