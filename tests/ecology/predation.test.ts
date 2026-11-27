@@ -198,6 +198,23 @@ describe('crocodiles fish (task 8 part C)', () => {
   });
 });
 
+describe('the home search looks only for prey the pack can eat (task 8 part C)', () => {
+  it('a hungry wolf pack passes over a boar sounder beside it for the deer further off (it never eats omnivores)', () => {
+    const sim = world('pred-omni', true);
+    const m = sim.w.map;
+    const i = site(sim, (j) => !m.isWater(j) && m.temp[j] > 0 && m.temp[j] < 20);
+    m.forRadius(m.xOf(i), m.yOf(i), 12, (j) => { if (!m.isWater(j)) { m.terrain[j] = T.FOREST; m.temp[j] = 10; } });
+    const wolves = spawnHerd(sim, 'wolf', m.xOf(i), m.yOf(i), 6)!;
+    wolves.hunger = 1; // hungry: it picks its prey
+    const boar = spawnHerd(sim, 'boar', m.xOf(i), m.yOf(i), SPECIES_BY_KEY.boar.maxHerd)!;
+    boar.x = boar.tx = wolves.x + 3; boar.y = boar.ty = wolves.y;
+    const deer = spawnHerd(sim, 'deer', m.xOf(i), m.yOf(i), SPECIES_BY_KEY.deer.maxHerd)!;
+    deer.x = deer.tx = wolves.x - 10; deer.y = deer.ty = wolves.y;
+    pickTarget(sim, wolves);
+    expect(Math.hypot(wolves.tx - deer.x, wolves.ty - deer.y), 'heads for the deer').toBeLessThanOrEqual(BALANCE.huntReach / 2);
+  });
+});
+
 describe('predators hunt at home first, then range, and go back (design 6.3)', () => {
   const cat = (sim: ReturnType<typeof world>) => {
     const m = sim.w.map;

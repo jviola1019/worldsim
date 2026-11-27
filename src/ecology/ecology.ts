@@ -265,9 +265,11 @@ export function pickTarget(sim: Sim, h: Herd, sp: SpeciesDef = SPECIES_BY_KEY[h.
     }
     // step 1, home first (round 10 addendum): only prey standing in country the predator can live in (great cats
     // followed deer up into cold mountains and died there; life audit)
+    // task 8 part C: prey it can eat (herbivores of its realm, as the monthly feeding takes them), not omnivores: wolves
+    // and great cats set off after boar and bears they never eat
     const edible = (o: Herd) => {
       const q = SPECIES_BY_KEY[o.species];
-      return o !== h && q?.diet !== 'predator' && q?.meat >= 0.01;
+      return o !== h && hunts(sp, q) && q!.meat >= 0.01;
     };
     // task 5: and only prey that can feed it (a herd below the refuge, or out of its own habitat, yields nothing)
     const prey = herdsNear(sim, h.x, h.y, HOME_SEARCH).filter((o) => edible(o)
