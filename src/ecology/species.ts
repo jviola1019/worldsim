@@ -34,6 +34,10 @@ export interface SpeciesDef {
    *  for their size: wild juvenile Nile crocodiles 0.2-0.5% of body mass a day (Okavango), wolves about 6% (Minnesota
    *  winter); research-notes.md §1. */
   upkeep?: number;
+  /** Task 8 part C: a land predator that also takes fish shoals from the water in its territory. Nile crocodiles live
+   *  mainly on fish until they are large (Okavango stomach study, research-notes.md §1); without fish they competed with
+   *  wolves and great cats for land prey and were lost in 18 of 30 hand-placed drops. */
+  fishes?: boolean;
   alien?: boolean;
 }
 
@@ -53,7 +57,7 @@ export const SPECIES: SpeciesDef[] = [
   { key: 'camel', name: 'Camel', sprite: 'ani.camel', diet: 'herbivore', biomes: [T.DESERT, T.STEPPE, T.SAVANNA], temp: [0, 40], meat: 0.35, speed: 0.06, maxHerd: 30, start: [6, 16], growth: 0.15, graze: 0.2, domesticable: true, danger: 0 },
   { key: 'rabbit', name: 'Hare', sprite: 'ani.rabbit', diet: 'herbivore', biomes: [T.GRASS, T.STEPPE, T.TUNDRA, T.FOREST], temp: [-20, 30], meat: 0.005, speed: 0.08, maxHerd: 120, start: [30, 80], growth: 1.2, graze: 0.02, domesticable: false, danger: 0 },
   { key: 'mammoth', name: 'Mammoth', sprite: 'ani.mammoth', diet: 'herbivore', biomes: [T.TUNDRA, T.STEPPE, T.TAIGA, T.SNOW], temp: [-30, 8], meat: 3, speed: 0.035, maxHerd: 20, start: [4, 12], growth: 0.06, graze: 1.6, domesticable: false, danger: 0.15, megafauna: true },
-  { key: 'crocodile', name: 'Crocodile', sprite: 'ani.crocodile', diet: 'predator', biomes: [T.SWAMP, T.JUNGLE], temp: [18, 40], meat: 0.2, speed: 0.03, maxHerd: 10, start: [2, 6], growth: 0.12, graze: 0, domesticable: false, danger: 0.4, upkeep: 0.1 },
+  { key: 'crocodile', name: 'Crocodile', sprite: 'ani.crocodile', diet: 'predator', biomes: [T.SWAMP, T.JUNGLE], temp: [18, 40], meat: 0.2, speed: 0.03, maxHerd: 10, start: [2, 6], growth: 0.12, graze: 0, domesticable: false, danger: 0.4, upkeep: 0.1, fishes: true },
   { key: 'wolf', name: 'Wolf', sprite: 'ani.wolf', diet: 'predator', biomes: [T.FOREST, T.TAIGA, T.STEPPE, T.TUNDRA, T.HILLS], temp: [-30, 26], meat: 0.05, speed: 0.09, maxHerd: 14, start: [4, 10], growth: 0.3, graze: 0, domesticable: true, danger: 0.3 },
   { key: 'bear', name: 'Bear', sprite: 'ani.bear', diet: 'omnivore', biomes: [T.FOREST, T.TAIGA, T.HILLS, T.MOUNTAIN], temp: [-25, 22], meat: 0.4, speed: 0.05, maxHerd: 4, start: [1, 3], growth: 0.12, graze: 0.3, domesticable: false, danger: 0.5 },
   { key: 'bigcat', name: 'Great cat', sprite: 'ani.bigcat', diet: 'predator', biomes: [T.SAVANNA, T.JUNGLE, T.GRASS], temp: [12, 38], meat: 0.15, speed: 0.08, maxHerd: 8, start: [2, 6], growth: 0.2, graze: 0, domesticable: false, danger: 0.6 },

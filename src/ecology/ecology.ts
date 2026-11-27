@@ -160,6 +160,16 @@ export function preyReplaceable(sim: Sim, p: Herd): number {
 }
 
 /**
+ * Whether hunter `sp` can hunt prey species `q`: herbivores of its own realm (review fix: wolves lived off fish shoals
+ * and seals took deer from beaches), not birds; and fish shoals for a land predator that fishes (task 8 part C:
+ * crocodiles).
+ */
+export function hunts(sp: SpeciesDef, q: SpeciesDef | undefined): boolean {
+  if (!q || q.diet !== 'herbivore' || q.flying) return false;
+  return !!q.aquatic === !!sp.aquatic || (!!sp.fishes && q.key === 'fish');
+}
+
+/**
  * Task 5: prey a hunter needs in a month: predators all of their food (cold-blooded ones far less, their `upkeep`),
  * omnivores the meat part of theirs.
  */
@@ -178,7 +188,7 @@ export function huntDemand(sim: Sim, p: Herd): number {
   for (const o of herdsNear(sim, p.x, p.y, BALANCE.huntReach)) {
     const s = SPECIES_BY_KEY[o.species];
     if (!s || o.owner !== 0) continue;
-    if (s.diet === 'predator' && !!s.aquatic === !!q?.aquatic) n += huntNeed(o, s);
+    if (s.diet === 'predator' && hunts(s, q)) n += huntNeed(o, s);
     else if (s.diet === 'omnivore' && !q?.aquatic && (o.x - p.x) ** 2 + (o.y - p.y) ** 2 <= 2.5 * 2.5) n += huntNeed(o, s);
   }
   return n;
@@ -204,7 +214,7 @@ const RANGE_SEARCH = 24;
 function preyInTerritory(sim: Sim, h: Herd, sp: SpeciesDef): boolean {
   return herdsNear(sim, h.x, h.y, BALANCE.huntReach).some((o) => {
     const q = SPECIES_BY_KEY[o.species];
-    return o.owner === 0 && q?.diet === 'herbivore' && !q.flying && !!q.aquatic === !!sp.aquatic && preyReplaceable(sim, o) > 0;
+    return o.owner === 0 && hunts(sp, q) && preyReplaceable(sim, o) > 0;
   });
 }
 
@@ -409,11 +419,9 @@ export function herdsMonthly(sim: Sim): void {
     const hab = habitat(sim, sp, i);
     let fed = 1;
     if (sp.diet === 'predator' || sp.diet === 'omnivore') {
-      // prey of the hunter's own realm (review fix: wolves lived off fish shoals and seals took deer from beaches), not birds
-      const prey = herdsNear(sim, h.x, h.y, sp.diet === 'predator' ? BALANCE.huntReach : 2.5).filter((o) => {
-        const q = SPECIES_BY_KEY[o.species];
-        return o !== h && o.owner === 0 && q?.diet === 'herbivore' && !q.flying && !!q.aquatic === !!sp.aquatic;
-      });
+      // prey of the hunter's own realm (review fix: wolves lived off fish shoals and seals took deer from beaches), not
+      // birds; crocodiles also fish (task 8 part C)
+      const prey = herdsNear(sim, h.x, h.y, sp.diet === 'predator' ? BALANCE.huntReach : 2.5).filter((o) => o !== h && o.owner === 0 && hunts(sp, SPECIES_BY_KEY[o.species]));
       if (prey.length) {
         // round 10 addendum: a pack hunts every prey herd in reach; task 5: taking at most what each herd can replace
         // (a flat 2% a month was above most prey's real growth, so herds and packs ratcheted down together)

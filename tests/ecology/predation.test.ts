@@ -172,6 +172,32 @@ describe('predators hunt in their own realm (review fix)', () => {
   });
 });
 
+describe('crocodiles fish (task 8 part C)', () => {
+  it('a crocodile on a warm shore lives on the fish shoal beside it, while wolves on the same shore still take no fish', () => {
+    const base = world('pred-croc-fish', true);
+    const m = base.w.map;
+    const shore = site(base, (j) => !m.isWater(j) && m.isCoastal(j) && m.temp[j] >= 19 && m.temp[j] <= 25);
+    let sea = -1;
+    m.forRadius(m.xOf(shore), m.yOf(shore), 2, (j) => { if (sea < 0 && m.isWater(j)) sea = j; });
+    m.forRadius(m.xOf(shore), m.yOf(shore), 1, (j) => { if (!m.isWater(j)) m.terrain[j] = T.SWAMP; }); // crocodile country
+    const far = site(base, (j) => !m.isWater(j) && Math.hypot(m.xOf(j) - m.xOf(shore), m.yOf(j) - m.yOf(shore)) > 30);
+    base.syncRng();
+    // the same hunters with the same draws, beside the shoal or far away; no land prey anywhere
+    const run = (crocNear: boolean, wolvesNear: boolean) => {
+      const sim = new Simulation(decodeWorld(encodeWorld(base.w)));
+      const fish = spawnHerd(sim, 'fish', m.xOf(sea), m.yOf(sea), 200)!;
+      const croc = spawnHerd(sim, 'crocodile', crocNear ? m.xOf(shore) : m.xOf(far), crocNear ? m.yOf(shore) : m.yOf(far), 6)!;
+      spawnHerd(sim, 'wolf', wolvesNear ? m.xOf(shore) : m.xOf(far) + 1, wolvesNear ? m.yOf(shore) : m.yOf(far), 8);
+      sim.runTicks(10);
+      return { fish: sim.w.herds.get(fish.id)?.count ?? 0, crocHunger: sim.w.herds.get(croc.id)?.hunger ?? -1 };
+    };
+    const control = run(false, false), crocs = run(true, false), wolves = run(false, true);
+    expect(control.fish - crocs.fish, 'fish taken by crocodiles').toBeGreaterThan(0.1);
+    expect(crocs.crocHunger, 'a crocodile beside fish has eaten').toBe(0);
+    expect(Math.abs(control.fish - wolves.fish), 'fish taken by wolves').toBeLessThan(0.05);
+  });
+});
+
 describe('predators hunt at home first, then range, and go back (design 6.3)', () => {
   const cat = (sim: ReturnType<typeof world>) => {
     const m = sim.w.map;
