@@ -146,13 +146,22 @@ describe('#5 electricity adoption enables dependent industries', () => {
     const need = (t: string): void => { for (const p of TECH_BY_ID.get(t)!.prereqs) need(p); if (!cb.techs[t]?.known) grantTech(B, cb, t, 'god'); };
     need('electric_power');
     expect(cb.caps.electrification).toBeGreaterThan(0);
-    A.runYears(15);
-    B.runYears(15);
+    // task 8 part C: energy is summed month by month over the 15 years. After that task's history change the nation
+    // given electricity built 52 plants and used energy for years, then ran out of fuel at war in its last two years
+    // (no coal of its own), so the old check of the final month alone read 0 against 0
     const ca = A.w.civs.get(id)!;
+    let useA = 0, useB = 0, madeB = 0;
+    for (let mo = 0; mo < 15 * 12; mo++) {
+      A.runTicks(10);
+      B.runTicks(10);
+      useA += ca.econ.energyUse;
+      useB += cb.econ.energyUse;
+      madeB += cb.acc.prod[Good.ENERGY] ?? 0;
+    }
     const plants = (sim: Simulation, c: Civ) => c.settlements.reduce((n, sid) => { const s = sim.w.settlements.get(sid); return n + (s ? s.bld.reduce((a, v, t) => a + (t > 0 && /POWER|HYDRO|SOLAR|WIND|FUSION/.test(String(BUILDINGS[t]?.key)) ? v : 0), 0) : 0); }, 0);
     expect(plants(B, cb)).toBeGreaterThan(plants(A, ca));
-    expect(cb.econ.energyUse).toBeGreaterThan(ca.econ.energyUse);
-    expect(cb.stock[Good.ENERGY] + cb.acc.prod[Good.ENERGY] + cb.econ.energyUse).toBeGreaterThan(0);
+    expect(useB).toBeGreaterThan(useA);
+    expect(madeB).toBeGreaterThan(0);
   }, 180000);
 });
 

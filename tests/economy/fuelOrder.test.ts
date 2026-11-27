@@ -30,8 +30,10 @@ describe('fuel order', () => {
     // task 5 (mature ecosystems) changed every world's history: on 'int-elec' the chosen nation now has 44 fossil plants
     // but no coal in reach (a scenario precondition, not the fuel order). Re-measured over four worlds: every nation that
     // mines coal and owns plants must make energy, and at least two of the four must meet both preconditions.
+    // task 8 part C (seal seeding changed every natural world's history): 1 of those four met both preconditions, so the
+    // check now runs eight worlds (4 of 8 met them when re-measured; docs/data/round10/t8c-probes/fuel.ts)
     let met = 0;
-    for (const seed of ['int-elec', 'int-elec-1', 'int-elec-2', 'int-elec-3']) {
+    for (const seed of ['int-elec', 'int-elec-1', 'int-elec-2', 'int-elec-3', 'int-elec-4', 'int-elec-5', 'int-elec-6', 'int-elec-7']) {
       const base = makeSim(seed, 96, (c) => { c.settings.startEra = 7; });
       base.runYears(2);
       const civ = [...base.w.civs.values()].find((c) => c.alive && c.settlements.length && c.caps.electrification === 0 && !c.techs.electric_power?.known);
@@ -51,5 +53,5 @@ describe('fuel order', () => {
       expect(energy, seed).toBeGreaterThan(0);
     }
     expect(met, 'worlds with a coal-mining nation that owns fossil plants').toBeGreaterThanOrEqual(2);
-  }, 600000);
+  }, 900000);
 });
