@@ -198,6 +198,22 @@ describe('crocodiles fish (task 8 part C)', () => {
   });
 });
 
+describe('great cats live in forest too (task 8 part C)', () => {
+  it('warm forest is home ground for a great cat (tigers, leopards and jaguars are forest cats); steppe and hills are not', () => {
+    const sim = world('pred-cat-forest', true);
+    const m = sim.w.map;
+    const i = site(sim, (j) => !m.isWater(j) && m.temp[j] > 15);
+    const cat = SPECIES_BY_KEY.bigcat;
+    m.temp[i] = 20;
+    m.terrain[i] = T.FOREST;
+    expect(habitat(sim, cat, i), 'forest').toBe(1);
+    m.terrain[i] = T.STEPPE;
+    expect(habitat(sim, cat, i), 'steppe').toBe(0.25);
+    m.terrain[i] = T.HILLS;
+    expect(habitat(sim, cat, i), 'hills').toBe(0.25);
+  });
+});
+
 describe('the home search looks only for prey the pack can eat (task 8 part C)', () => {
   it('a hungry wolf pack passes over a boar sounder beside it for the deer further off (it never eats omnivores)', () => {
     const sim = world('pred-omni', true);
@@ -555,7 +571,7 @@ describe('mature ecosystems: natural worlds start near carrying capacity (task 5
 });
 
 describe('territorial hunting: a pack keeps to good home ground near its prey (task 5, owner option C)', () => {
-  it('a great cat hunting deer that stand in forest beds down on savanna within reach of them, not on the forest tile', () => {
+  it('a great cat hunting deer that stand in hills beds down on savanna within reach of them, not on the hills tile', () => {
     const sim = world('terr-home', true);
     const m = sim.w.map;
     const i = site(sim, (j) => m.terrain[j] === T.SAVANNA || (m.terrain[j] === T.GRASS && m.temp[j] > 18));
@@ -563,7 +579,7 @@ describe('territorial hunting: a pack keeps to good home ground near its prey (t
     m.forRadius(m.xOf(i), m.yOf(i), 7, (j) => { if (!m.isWater(j)) { m.terrain[j] = T.SAVANNA; m.temp[j] = 25; } });
     const deer = spawnHerd(sim, 'deer', m.xOf(i) + 5, m.yOf(i), SPECIES_BY_KEY.deer.maxHerd)!;
     const t = Math.floor(deer.y) * m.w + Math.floor(deer.x);
-    m.terrain[t] = T.FOREST; m.temp[t] = 15; // the deer's own ground: only 0.25 for a cat
+    m.terrain[t] = T.HILLS; m.temp[t] = 15; // the deer's own ground: only 0.25 for a cat (task 8 part C: hills, as forest is now cat country)
     expect(habitat(sim, SPECIES_BY_KEY.bigcat, t)).toBeLessThan(0.5);
     cat.hunger = 1; // not fed last month, so it is looking for its prey
     pickTarget(sim, cat);
