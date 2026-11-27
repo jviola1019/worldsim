@@ -1,4 +1,5 @@
 # mode-audit all 6 on d525d04 (Task 8 Part B); each mode run as its own process (npx tsx scripts/mode-audit.ts <mode> 6), concatenated in MODES order: identical to 'all 6', every mode's worlds are independent
+# Follow-up (controller rulings): industrial and space_race sections rerun with their revised promises (histories identical; Space Race now reports the colony year in each seed's metrics)
 
 ## realistic (preset, 250 years, 6 seeds)
   empty      6/6  starts empty at year 0, with wildlife and no people
@@ -47,8 +48,8 @@
   seed 5: {"era":5,"nations":9,"tribes":0,"wars":30,"settlements":87,"pop":712474,"year":100}
 
 ## industrial (preset, 120 years, 6 seeds)
-  gunpowder  6/6  Renaissance-era empires at start
-  steam      6/6  someone reaches the industrial era
+  industrial 6/6  every nation starts in the Early Industrial era
+  late       3/6  someone reaches the Late Industrial era within 120 years
   coal       4/6  coal-rich nations industrialise first (rank correlation of coal with industrial-tech adoption > 0)
   seed 0: {"era":7,"nations":8,"tribes":0,"wars":44,"settlements":56,"pop":2643318,"year":120}
   seed 1: {"era":7,"nations":10,"tribes":0,"wars":34,"settlements":57,"pop":2818107,"year":120}
@@ -144,14 +145,14 @@
   seed 5: {"era":10,"nations":6,"tribes":0,"wars":4,"settlements":42,"pop":3679520,"year":110}
 
 ## space_race (scenario, 150 years, 6 seeds)
+  race       3/6  objective: two rival nations launch rockets into space
   station    4/6  objective: a space station
-  colony     1/6  objective: an off-world colony
-  seed 0: {"era":11,"nations":5,"tribes":0,"wars":0,"settlements":54,"pop":3406962,"year":150}
-  seed 1: {"era":11,"nations":5,"tribes":0,"wars":3,"settlements":51,"pop":3063942,"year":150}
-  seed 2: {"era":13,"nations":5,"tribes":0,"wars":6,"settlements":73,"pop":5831185,"year":150}
-  seed 3: {"era":11,"nations":5,"tribes":0,"wars":2,"settlements":53,"pop":3345156,"year":150}
-  seed 4: {"era":11,"nations":5,"tribes":0,"wars":4,"settlements":56,"pop":5544359,"year":150}
-  seed 5: {"era":11,"nations":6,"tribes":0,"wars":4,"settlements":53,"pop":3815780,"year":150}
+  seed 0: {"era":11,"nations":5,"tribes":0,"wars":0,"settlements":54,"pop":3406962,"year":150,"colony":null}
+  seed 1: {"era":11,"nations":5,"tribes":0,"wars":3,"settlements":51,"pop":3063942,"year":150,"colony":null}
+  seed 2: {"era":13,"nations":5,"tribes":0,"wars":6,"settlements":73,"pop":5831185,"year":150,"colony":147}
+  seed 3: {"era":11,"nations":5,"tribes":0,"wars":2,"settlements":53,"pop":3345156,"year":150,"colony":null}
+  seed 4: {"era":11,"nations":5,"tribes":0,"wars":4,"settlements":56,"pop":5544359,"year":150,"colony":null}
+  seed 5: {"era":11,"nations":6,"tribes":0,"wars":4,"settlements":53,"pop":3815780,"year":150,"colony":null}
 
 ## fantasy (scenario, 200 years, 6 seeds)
   peoples    6/6  four peoples share the land

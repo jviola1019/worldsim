@@ -179,7 +179,7 @@ export const START_VARIANTS: StartVariant[] = [
   {
     key: 'industrial',
     name: 'Industrializing World',
-    description: 'Gunpowder empires on the brink of the steam age. Coal decides the future.',
+    description: 'Steam-age nations at the dawn of industry. Coal decides who pulls ahead.',
     apply: (c) => {
       c.settings.startEra = 7;
       c.settings.startCivs = 8;

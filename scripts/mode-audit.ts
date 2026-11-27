@@ -20,7 +20,7 @@ import { Deposit } from '../src/world/resources';
 import { countPeoples } from '../src/sim/peoples';
 
 export interface Promise { id: string; text: string; at: 'start' | 'horizon' | 'any'; check: (sim: Simulation, start: Snapshot) => boolean }
-export interface ModeSpec { key: string; kind: 'preset' | 'scenario'; horizon: number; promises: Promise[]; /** Round 10 addendum: what the player does first (Realistic: drop people and animals by hand). */ setup?: (sim: Simulation) => void }
+export interface ModeSpec { key: string; kind: 'preset' | 'scenario'; horizon: number; promises: Promise[]; /** Round 10 addendum: what the player does first (Realistic: drop people and animals by hand). */ setup?: (sim: Simulation) => void; /** Task 8 Part B follow-up: long-run figures reported with the metrics, not pass/fail. */ report?: (sim: Simulation) => Record<string, unknown> }
 export interface Snapshot { nations: number; tribes: number; maxEra: number; minEra: number; ruins: number; known: Map<number, Set<string>>; coal: Map<number, number> }
 
 const alive = (sim: Simulation) => [...sim.w.civs.values()].filter((c) => c.alive);
@@ -121,8 +121,11 @@ export const MODES: ModeSpec[] = [
     { id: 'rivalry', text: 'a war within 100 years (rivalries)', at: 'horizon', check: (s) => s.w.wars.size > 0 },
   ] },
   { key: 'industrial', kind: 'preset', horizon: 120, promises: [
-    { id: 'gunpowder', text: 'Renaissance-era empires at start', at: 'start', check: (_s, st) => st.minEra >= 6 },
-    { id: 'steam', text: 'someone reaches the industrial era', at: 'horizon', check: (s) => maxEra(s) >= 7 },
+    // Task 8 Part B follow-up: the world starts in era 7 (the description now says so), so "someone reaches the industrial
+    // era" held at year 0. The next step can fail: Britain went from early steam (c. 1760) to the second industrial
+    // revolution (c. 1870) in about 110 years.
+    { id: 'industrial', text: 'every nation starts in the Early Industrial era', at: 'start', check: (_s, st) => st.minEra >= 7 },
+    { id: 'late', text: 'someone reaches the Late Industrial era within 120 years', at: 'any', check: (s) => maxEra(s) >= 8 },
     // Task 8c: every nation of the start (coal-less ones too), coal tiles at the start against industrial-tech
     // adoption at the horizon; the era label was tied at 7 for nearly all and reachable without coal
     { id: 'coal', text: 'coal-rich nations industrialise first (rank correlation of coal with industrial-tech adoption > 0)', at: 'horizon', check: (s, st) => {
@@ -172,9 +175,11 @@ export const MODES: ModeSpec[] = [
     { id: 'no_nukes', text: 'objective: 100 years without a nuclear strike', at: 'horizon', check: (s) => objective('standoff', 'no_nukes')(s) },
     { id: 'brink', text: 'on the brink: at least one war or crisis', at: 'horizon', check: (s) => s.w.wars.size > 0 || ev(s, /crisis|standoff|arms/) },
   ] },
-  { key: 'space_race', kind: 'scenario', horizon: 150, promises: [
+  // Task 8 Part B follow-up: the colony (an era-14 technology, 4 eras above the start) is a long-term goal, reported in
+  // each seed's metrics (`colony`: first year, or null) and measured over 450 years by t8b-probes/space-probe.ts
+  { key: 'space_race', kind: 'scenario', horizon: 150, report: (s) => ({ colony: s.w.milestones['space:colony'] === undefined ? null : s.w.milestones['space:colony'] - s.w.meta.startYear }), promises: [
+    { id: 'race', text: 'objective: two rival nations launch rockets into space', at: 'any', check: (s) => objective('space_race', 'race')(s) },
     { id: 'station', text: 'objective: a space station', at: 'any', check: (s) => objective('space_race', 'station')(s) },
-    { id: 'colony', text: 'objective: an off-world colony', at: 'any', check: (s) => objective('space_race', 'colony')(s) },
   ] },
   { key: 'fantasy', kind: 'scenario', horizon: 200, promises: [
     { id: 'peoples', text: 'four peoples share the land', at: 'start', check: (s) => new Set([...s.w.civs.values()].map((c) => c.species)).size >= 4 || new Set([...s.w.bands.values()].map((b) => b.species)).size >= 4 },
@@ -212,7 +217,7 @@ export function auditMode(spec: ModeSpec, seed: string) {
   for (const p of spec.promises) if (p.at === 'horizon') met[p.id] = p.check(sim, st);
   for (const p of spec.promises) met[p.id] ??= false;
   const c = countPeoples(sim.w);
-  const metrics = { era: maxEra(sim), nations: c.nations, tribes: c.tribes, wars: sim.w.wars.size, settlements: sim.w.settlements.size, pop: Math.round(c.people), year: sim.year };
+  const metrics = { era: maxEra(sim), nations: c.nations, tribes: c.tribes, wars: sim.w.wars.size, settlements: sim.w.settlements.size, pop: Math.round(c.people), year: sim.year, ...spec.report?.(sim) };
   return { met, metrics };
 }
 

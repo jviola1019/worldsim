@@ -78,7 +78,7 @@ export const SCENARIOS: Scenario[] = [
   {
     key: 'space_race',
     name: 'Space Race',
-    description: 'Near-future powers with rockets on the pad. Who settles another world first?',
+    description: 'Atomic-age rivals race to orbit. Who gets there first, and who one day settles another world?',
     apply: (c) => {
       // round 10 second addendum: no start past Atomic & Space (era 10); the space age is reached by playing
       c.settings.startEra = 10;
@@ -88,8 +88,11 @@ export const SCENARIOS: Scenario[] = [
       c.scenario = 'space_race';
     },
     objectives: [
+      // Task 8 Part B follow-up: from era 10 the race to orbit is the near goal; a colony needs an era-14 technology and
+      // came in 2 of 6 audit worlds in 450 years, so it is named a long-term goal
+      { id: 'race', label: 'Two rival nations launch rockets into space', check: (s) => [...s.w.civs.values()].filter((c) => c.space.launches > 0).length >= 2 },
       { id: 'station', label: 'A space station is built', check: (s) => [...s.w.civs.values()].some((c) => c.space.stations > 0) },
-      { id: 'colony', label: 'A permanent off-world colony is founded', check: (s) => s.w.colonies.size > 0 },
+      { id: 'colony', label: 'Long-term goal: a permanent off-world colony is founded', check: (s) => s.w.colonies.size > 0 },
     ],
   },
   {
