@@ -9,6 +9,7 @@ import { BALANCE } from '../../src/config/balance';
 import { encodeWorld, decodeWorld } from '../../src/persistence/serialize';
 import { Simulation } from '../../src/sim/simulation';
 import { SECTOR } from '../../src/civilizations/buildings';
+import { TICKS_PER_MONTH } from '../../src/core/time';
 
 const clone = (s: Simulation) => { s.syncRng(); return new Simulation(decodeWorld(encodeWorld(s.w))); };
 const person = (o: Partial<Person>): Person => ({ id: 1, name: 'A', female: false, born: 0, species: 'human', civId: 1, settlementId: 1, bandId: 0, cultureId: 1, religionId: 0, fatherId: 0, motherId: 0, spouseId: 0, children: [], dynastyId: 0, role: 'commoner', job: 'laborer', traits: [], ...o } as Person);
@@ -60,22 +61,28 @@ describe('readable sprites up close', () => {
 describe('round 9 simulation: elder care and power urgency', () => {
   it('elder care is a job source: one month on, settlements with elders employ more in services with care than without', () => {
     // Deterministic mechanism check (economy/production.ts: careJobs = elders * careWorkersPerElder). Two identical
-    // clones take the same single month; only the coefficient differs, so no chaotic divergence is involved.
+    // clones take the same single tick; only the coefficient differs, so no chaotic divergence is involved.
     // (A multi-year unemployment counterfactual was dropped: its sign flips from world to world.)
     const base = makeSim('r9-care2', 96, (c) => { c.settings.startEra = 13; });
     base.runYears(10);
-    const on = clone(base), off = clone(base);
-    const prev = BALANCE.careWorkersPerElder;
-    try {
-      on.step();
-      BALANCE.careWorkersPerElder = 0;
-      off.step();
-    } finally { BALANCE.careWorkersPerElder = prev; }
+    // task 8 part C: each town updates on its own tick of the month (id % TICKS_PER_MONTH), so every tick of one month is
+    // checked from the same history; a single tick whose towns had no free labour showed no difference after a history
+    // change (the seal seeding of this task)
     let more = 0, fewer = 0;
-    for (const [id, s] of on.w.settlements) {
-      const o = off.w.settlements.get(id)!;
-      const d = s.employment[SECTOR.SERVICES] - o.employment[SECTOR.SERVICES];
-      if (d > 1e-9) more++; else if (d < -1e-9) fewer++;
+    const prev = BALANCE.careWorkersPerElder;
+    for (let k = 0; k < TICKS_PER_MONTH; k++) {
+      const on = clone(base), off = clone(base);
+      try {
+        on.step();
+        BALANCE.careWorkersPerElder = 0;
+        off.step();
+      } finally { BALANCE.careWorkersPerElder = prev; }
+      for (const [id, s] of on.w.settlements) {
+        const o = off.w.settlements.get(id)!;
+        const d = s.employment[SECTOR.SERVICES] - o.employment[SECTOR.SERVICES];
+        if (d > 1e-9) more++; else if (d < -1e-9) fewer++;
+      }
+      base.step();
     }
     expect(more).toBeGreaterThan(0);
     expect(fewer).toBe(0);
