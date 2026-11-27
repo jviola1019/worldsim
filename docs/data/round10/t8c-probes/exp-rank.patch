@@ -1,0 +1,45 @@
+diff --git a/src/ecology/ecology.ts b/src/ecology/ecology.ts
+index fa6eb13..d0d8f79 100644
+--- a/src/ecology/ecology.ts
++++ b/src/ecology/ecology.ts
+@@ -182,16 +182,25 @@ export function huntNeed(h: Herd, sp: SpeciesDef = SPECIES_BY_KEY[h.species]): n
+  * territory, omnivores within their 2.5-tile reach). They share what the herd can replace in proportion to need, so
+  * overlapping territories do not each take it all, and a pack gains nothing by splitting.
+  */
+-export function huntDemand(sim: Sim, p: Herd): number {
++export function huntDemand(sim: Sim, p: Herd, rank?: number): { above: number; at: number } {
+   const q = SPECIES_BY_KEY[p.species];
+-  let n = 0;
++  let above = 0, at = 0;
+   for (const o of herdsNear(sim, p.x, p.y, BALANCE.huntReach)) {
+     const s = SPECIES_BY_KEY[o.species];
+     if (!s || o.owner !== 0) continue;
+-    if (s.diet === 'predator' && hunts(s, q)) n += huntNeed(o, s);
+-    else if (s.diet === 'omnivore' && !q?.aquatic && (o.x - p.x) ** 2 + (o.y - p.y) ** 2 <= 2.5 * 2.5) n += huntNeed(o, s);
++    let n = 0;
++    if (s.diet === 'predator' && hunts(s, q)) n = huntNeed(o, s);
++    else if (s.diet === 'omnivore' && !q?.aquatic && (o.x - p.x) ** 2 + (o.y - p.y) ** 2 <= 2.5 * 2.5) n = huntNeed(o, s);
++    if (!n) continue;
++    const k = huntRank(s);
++    if (rank !== undefined && k > rank) above += n;
++    else at += n;
+   }
+-  return n;
++  return { above, at };
++}
++
++export function huntRank(sp: SpeciesDef): number {
++  return (globalThis as any).process?.env?.T8_RANK && sp.diet === 'predator' ? sp.meat : 0;
+ }
+ 
+ /** Task 5: the part of what a prey herd can replace that hunter `h` gets: shared with the other hunters there by need. */
+@@ -202,7 +211,8 @@ export function preyShare(sim: Sim, p: Herd, h: Herd): number {
+   const need = sp ? huntNeed(h, sp) : Math.max(0.5, h.count * BALANCE.preyPerPredator);
+   const reach = sp?.diet === 'omnivore' ? 2.5 : BALANCE.huntReach;
+   const counted = !!sp && h.owner === 0 && (p.x - h.x) ** 2 + (p.y - h.y) ** 2 <= reach * reach;
+-  return (r * need) / Math.max(need, huntDemand(sim, p) + (counted ? 0 : need));
++  const { above, at } = huntDemand(sim, p, sp ? huntRank(sp) : 0);
++  return (Math.max(0, r - above) * need) / Math.max(need, at + (counted ? 0 : need));
+ }
+ 
+ /** Tiles a predator searches for prey standing in its habitat, and for a way home (design 6.3). */

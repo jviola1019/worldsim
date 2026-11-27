@@ -1,0 +1,9 @@
+airburst at capital (46,20): deaths 12298 · standing buildings within 4 tiles 33 -> 31 (craters 0 -> 0) · burning tiles 1, a month later 1 · flattened land tiles 16 · land tiles burned to <10% of their vegetation a month later 1
+airburst at wild woodland (87,40): deaths 0 · standing buildings within 4 tiles 0 -> 0 (craters 0 -> 0) · burning tiles 1, a month later 1 · flattened land tiles 19 · land tiles burned to <10% of their vegetation a month later 1
+t8c-storm-0: 300 years · storms drawn 3 · storm events logged 3 · an electrified nation at the end: false
+t8c-storm-1: 300 years · storms drawn 2 · storm events logged 2 · an electrified nation at the end: false
+t8c-storm-2: 300 years · storms drawn 0 · storm events logged 0 · an electrified nation at the end: false
+t8c-storm-3: 300 years · storms drawn 0 · storm events logged 0 · an electrified nation at the end: false
+t8c-storm-4: 300 years · storms drawn 1 · storm events logged 1 · an electrified nation at the end: false
+t8c-storm-5: 300 years · storms drawn 1 · storm events logged 1 · an electrified nation at the end: false
+geomagnetic storms over 6 worlds × 300 years: drawn 7, logged (aurora shown) 7; worlds electrified by the end: 0/6

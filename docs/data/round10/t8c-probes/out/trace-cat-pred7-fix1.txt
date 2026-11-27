@@ -1,0 +1,102 @@
+bigcat pred-7 home 33,59 GRASS 12C prey within 8: 241; start 3
+  0 tot   3.0 herds 1 | n   3.0 hung   0 hab 1.00 GRASS 12C d0.7 | need 0.90 get 2.37 fed~1.00 | prey rabbit113/3.95/1.35 llama28/0.13/0.13 goat38/0.46/0.46 goat34/0.43/0.43 | hunters bigcat2.8
+  6 tot   3.2 herds 1 | n   3.2 hung   0 hab 1.00 GRASS 12C d0.7 | need 0.95 get 1.02 fed~1.00 | prey llama28/0.13/0.13 goat39/0.46/0.46 goat35/0.43/0.43 | hunters 
+ 12 tot   3.3 herds 1 | n   3.3 hung   0 hab 1.00 GRASS 12C d0.7 | need 1.00 get 0.56 fed~0.56 | prey llama29/0.13/0.13 goat37/0.43/0.43 | hunters 
+ 18 tot   3.1 herds 1 | n   3.1 hung   4 hab 1.00 JUNGLE 23C d1.5 | need 0.93 get 0.13 fed~0.14 | prey llama28/0.13/0.13 | hunters 
+ 24 tot   3.0 herds 1 | n   3.0 hung   0 hab 0.25 FOREST 18C d5.9 | need 0.90 get 4.03 fed~1.00 | prey cow30/0.06/0.06 rabbit80/3.97/3.97 | hunters 
+ 30 tot   3.2 herds 1 | n   3.2 hung   0 hab 1.00 GRASS 19C d6.5 | need 0.96 get 5.42 fed~1.00 | prey rabbit103/2.64/2.64 rabbit87/2.65/2.65 llama30/0.13/0.13 | hunters 
+ 36 tot   3.4 herds 1 | n   3.4 hung   0 hab 1.00 GRASS 21C d7.2 | need 1.02 get 3.94 fed~1.00 | prey cow31/0.22/0.22 elephant19/0.04/0.04 rabbit104/2.64/2.64 rabbit91/0.66/0.66 deer25/0.37/0.37 | hunters 
+ 42 tot   3.6 herds 1 | n   3.6 hung   0 hab 1.00 GRASS 21C d7.8 | need 1.09 get 2.76 fed~1.00 | prey cow31/0.06/0.06 elephant19/0.04/0.04 rabbit92/2.66/2.66 | hunters 
+ 48 tot   3.8 herds 1 | n   3.8 hung   0 hab 1.00 GRASS 21C d7.8 | need 1.15 get 0.93 fed~0.81 | prey cow28/0.22/0.22 elephant19/0.04/0.04 rabbit99/0.66/0.66 | hunters 
+ 54 tot   4.0 herds 1 | n   4.0 hung   0 hab 1.00 SAVANNA 20C d10.5 | need 1.20 get 5.41 fed~1.00 | prey cow28/0.06/0.06 elephant19/0.04/0.04 rabbit98/2.65/2.65 rabbit103/2.66/2.66 | hunters 
+ 60 tot   4.2 herds 1 | n   4.2 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 1.27 get 1.60 fed~1.00 | prey cow28/0.22/0.22 elephant19/0.04/0.04 rabbit96/0.67/0.67 rabbit102/0.66/0.66 | hunters 
+ 66 tot   4.5 herds 1 | n   4.5 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 1.35 get 3.59 fed~1.00 | prey cow28/0.22/0.22 elephant19/0.04/0.04 rabbit93/0.67/0.67 rabbit101/2.65/2.65 | hunters 
+ 72 tot   4.8 herds 1 | n   4.8 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 1.43 get 2.05 fed~1.00 | prey cow24/0.05/0.05 elephant19/0.01/0.01 rabbit91/1.00/1.00 rabbit102/0.99/0.99 | hunters 
+ 78 tot   5.0 herds 1 | n   5.0 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 1.50 get 5.16 fed~1.00 | prey buffalo36/0.13/0.13 cow15/0.03/0.03 elephant19/0.04/0.04 rabbit115/3.96/3.96 rabbit99/1.00/1.00 | hunters 
+ 84 tot   5.3 herds 1 | n   5.3 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 1.58 get 3.39 fed~1.00 | prey buffalo36/0.03/0.03 cow14/0.02/0.02 elephant19/0.04/0.04 rabbit105/0.67/0.67 rabbit123/2.62/2.62 | hunters 
+ 90 tot   5.5 herds 1 | n   5.5 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 1.66 get 5.38 fed~1.00 | prey buffalo36/0.03/0.03 cow14/0.02/0.02 elephant19/0.04/0.04 rabbit99/2.66/2.66 rabbit112/2.62/2.62 | hunters 
+ 96 tot   5.8 herds 1 | n   5.8 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 1.73 get 3.47 fed~1.00 | prey buffalo36/0.13/0.13 cow12/0.00/0.00 elephant19/0.01/0.01 rabbit94/2.67/2.67 rabbit110/0.65/0.65 | hunters 
+102 tot   6.0 herds 1 | n   6.0 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 1.81 get 1.46 fed~0.81 | prey buffalo36/0.13/0.13 cow10/0.00/0.00 elephant19/0.01/0.01 rabbit92/0.67/0.67 rabbit105/0.65/0.65 | hunters 
+108 tot   6.3 herds 1 | n   6.3 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 1.88 get 5.44 fed~1.00 | prey buffalo36/0.13/0.13 cow10/0.00/0.00 elephant19/0.04/0.04 rabbit88/2.67/2.67 rabbit104/2.59/2.59 | hunters 
+114 tot   6.5 herds 1 | n   6.5 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 1.96 get 3.39 fed~1.00 | prey buffalo36/0.13/0.13 cow10/0.00/0.00 rabbit87/0.67/0.67 rabbit102/2.59/2.59 | hunters 
+120 tot   6.7 herds 1 | n   6.7 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 2.02 get 5.25 fed~1.00 | prey cow11/0.00/0.00 rabbit85/2.65/2.65 rabbit100/2.60/2.60 | hunters 
+126 tot   7.0 herds 1 | n   7.0 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 2.09 get 4.90 fed~1.00 | prey cow12/0.00/0.00 elephant19/0.01/0.01 rabbit83/0.99/0.99 rabbit108/3.89/3.89 | hunters 
+132 tot   7.2 herds 1 | n   7.2 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 2.16 get 5.04 fed~1.00 | prey buffalo37/0.13/0.13 cow13/0.00/0.00 elephant19/0.01/0.01 rabbit90/1.00/1.00 rabbit112/3.90/3.90 | hunters 
+138 tot   7.3 herds 1 | n   7.3 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 2.20 get 1.15 fed~0.52 | prey buffalo36/0.13/0.13 cow13/0.00/0.00 elephant19/0.04/0.04 rabbit113/0.98/0.98 | hunters 
+144 tot   7.4 herds 1 | n   7.4 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 2.22 get 1.12 fed~0.50 | prey buffalo36/0.13/0.13 cow13/0.02/0.02 elephant16/0.00/0.00 rabbit112/0.97/0.97 | hunters 
+150 tot   7.5 herds 1 | n   7.5 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 2.24 get 2.19 fed~0.98 | prey buffalo36/0.13/0.13 cow13/0.09/0.09 rabbit107/1.00/1.00 rabbit113/0.97/0.97 | hunters 
+156 tot   7.7 herds 1 | n   7.7 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 2.30 get 2.18 fed~0.95 | prey buffalo36/0.13/0.13 cow14/0.09/0.09 rabbit113/1.00/1.00 rabbit116/0.96/0.96 | hunters 
+162 tot   7.9 herds 1 | n   7.9 hung   0 hab 1.00 SAVANNA 20C d10.7 | need 2.36 get 8.08 fed~1.00 | prey buffalo36/0.13/0.13 cow14/0.10/0.10 rabbit114/4.00/4.00 rabbit121/3.86/3.86 | hunters 
+168 tot   8.0 herds 1 | n   8.0 hung   1 hab 1.00 SAVANNA 20C d10.7 | need 2.40 get 1.15 fed~0.48 | prey buffalo36/0.13/0.13 cow15/0.03/0.03 rabbit120/1.00/1.00 | hunters 
+174 tot   8.0 herds 1 | n   8.0 hung   3 hab 1.00 SAVANNA 21C d7.9 | need 2.41 get 0.28 fed~0.12 | prey buffalo36/0.13/0.13 cow15/0.11/0.11 bison33/0.07/0.04 | hunters wolf4.5
+180 tot   6.9 herds 1 | n   6.9 hung   0 hab 1.00 GRASS 21C d11.3 | need 2.06 get 1.14 fed~0.55 | prey buffalo36/0.13/0.13 cow15/0.03/0.03 elephant14/0.00/0.00 rabbit125/0.99/0.99 | hunters 
+186 tot   7.1 herds 1 | n   7.1 hung   0 hab 1.00 GRASS 21C d11.9 | need 2.13 get 4.02 fed~1.00 | prey buffalo36/0.03/0.03 cow15/0.03/0.03 rabbit125/3.96/3.96 | hunters 
+192 tot   7.1 herds 1 | n   7.1 hung   0 hab 1.00 JUNGLE 20C d13.1 | need 2.13 get 1.14 fed~0.53 | prey buffalo36/0.03/0.03 cow16/0.12/0.12 rabbit123/0.99/0.99 | hunters 
+198 tot   7.2 herds 1 | n   7.2 hung   0 hab 1.00 JUNGLE 20C d13.3 | need 2.16 get 1.09 fed~0.50 | prey elephant14/0.04/0.04 buffalo36/0.03/0.03 cow16/0.03/0.03 rabbit124/0.99/0.99 | hunters 
+204 tot   7.2 herds 1 | n   7.2 hung   0 hab 1.00 JUNGLE 20C d13.5 | need 2.16 get 1.27 fed~0.59 | prey buffalo36/0.13/0.13 cow16/0.12/0.12 elephant14/0.04/0.04 rabbit122/0.99/0.99 | hunters 
+210 tot   7.2 herds 1 | n   7.2 hung   0 hab 1.00 JUNGLE 20C d13.5 | need 2.16 get 1.28 fed~0.59 | prey buffalo35/0.13/0.13 cow17/0.13/0.13 elephant14/0.04/0.04 rabbit120/0.99/0.99 | hunters 
+216 tot   7.3 herds 1 | n   7.3 hung   0 hab 1.00 JUNGLE 20C d13.5 | need 2.20 get 4.25 fed~1.00 | prey elephant14/0.04/0.04 buffalo35/0.13/0.13 cow17/0.13/0.13 rabbit120/3.95/3.95 | hunters 
+222 tot   7.4 herds 1 | n   7.4 hung   0 hab 1.00 JUNGLE 20C d13.5 | need 2.21 get 1.19 fed~0.54 | prey buffalo35/0.13/0.13 cow17/0.03/0.03 elephant14/0.04/0.04 rabbit121/0.99/0.99 | hunters 
+228 tot   7.5 herds 1 | n   7.5 hung   0 hab 1.00 JUNGLE 20C d13.5 | need 2.25 get 4.28 fed~1.00 | prey buffalo35/0.13/0.13 cow18/0.14/0.14 elephant14/0.04/0.04 rabbit120/3.98/3.98 | hunters 
+234 tot   7.6 herds 1 | n   7.6 hung   0 hab 1.00 JUNGLE 20C d13.5 | need 2.29 get 4.29 fed~1.00 | prey buffalo35/0.13/0.13 cow18/0.14/0.14 elephant14/0.04/0.04 rabbit124/3.98/3.98 | hunters 
+240 tot   7.7 herds 1 | n   7.7 hung   0 hab 1.00 JUNGLE 20C d13.5 | need 2.31 get 1.30 fed~0.56 | prey buffalo35/0.13/0.13 elephant14/0.04/0.04 cow18/0.15/0.15 rabbit126/0.99/0.99 | hunters 
+246 tot   7.7 herds 1 | n   7.7 hung   0 hab 1.00 JUNGLE 20C d13.5 | need 2.31 get 1.30 fed~0.56 | prey buffalo35/0.13/0.13 cow19/0.15/0.15 elephant14/0.04/0.04 rabbit124/0.99/0.99 | hunters 
+252 tot   7.1 herds 1 | n   7.1 hung   4 hab 1.00 GRASS 20C d13.2 | need 2.14 get 0.19 fed~0.09 | prey buffalo35/0.03/0.03 cow19/0.15/0.15 elephant15/0.01/0.01 | hunters 
+258 tot   6.2 herds 1 | n   6.2 hung   5 hab 1.00 GRASS 18C d14.0 | need 1.87 get 0.19 fed~0.10 | prey buffalo35/0.03/0.03 cow19/0.16/0.16 | hunters 
+264 tot   5.4 herds 1 | n   5.4 hung   0 hab 0.25 DESERT 18C d13.1 | need 1.61 get 1.15 fed~0.71 | prey buffalo35/0.13/0.13 cow19/0.04/0.04 rabbit126/0.98/0.98 | hunters 
+270 tot   4.7 herds 1 | n   4.7 hung   6 hab 0.25 DESERT 19C d12.5 | need 1.41 get 0.44 fed~0.31 | prey cow20/0.16/0.16 rabbit124/0.98/0.28 | hunters 
+276 tot   4.7 herds 1 | n   4.7 hung   0 hab 0.25 STEPPE 18C d11.3 | need 1.40 get 4.46 fed~1.00 | prey bison31/0.26/0.26 rabbit120/3.95/3.95 rabbit78/0.94/0.26 | hunters bear3.5
+282 tot   4.8 herds 1 | n   4.8 hung   0 hab 1.00 SAVANNA 19C d10.7 | need 1.44 get 1.10 fed~0.77 | prey rabbit121/0.99/0.99 bison32/0.27/0.12 | hunters wolf6.5
+288 tot   5.0 herds 1 | n   5.0 hung   0 hab 1.00 SAVANNA 19C d10.7 | need 1.51 get 1.13 fed~0.75 | prey bison31/0.07/0.03 rabbit119/0.98/0.98 camel24/0.03/0.01 bison31/0.24/0.11 | hunters wolf5.8
+294 tot   5.1 herds 1 | n   5.1 hung   0 hab 0.25 STEPPE 18C d10.3 | need 1.53 get 2.10 fed~1.00 | prey bison32/0.27/0.13 rabbit118/3.92/1.85 bison33/0.26/0.12 | hunters wolf5.7
+300 tot   5.1 herds 1 | n   5.1 hung   3 hab 0.25 DESERT 20C d8.7 | need 1.54 get 0.45 fed~0.29 | prey buffalo38/0.13/0.13 cow23/0.20/0.20 bison25/0.00/0.00 bison35/0.28/0.13 | hunters wolf6.3
+306 tot   4.9 herds 1 | n   4.9 hung   0 hab 0.25 STEPPE 17C d10.2 | need 1.47 get 2.06 fed~1.00 | prey bison15/0.00/0.00 chicken43/0.40/0.11 goat32/0.44/0.19 rabbit122/3.94/1.64 bison36/0.29/0.12 | hunters wolf6.9
+312 tot   5.1 herds 1 | n   5.1 hung   0 hab 1.00 SAVANNA 19C d10.5 | need 1.54 get 2.06 fed~1.00 | prey chicken44/0.40/0.08 goat32/0.44/0.18 rabbit122/3.95/1.63 camel25/0.13/0.05 bison36/0.29/0.12 | hunters wolf7.3
+318 tot   5.4 herds 1 | n   5.4 hung   0 hab 1.00 SAVANNA 19C d10.5 | need 1.62 get 2.00 fed~1.00 | prey goat32/0.29/0.12 rabbit118/3.95/1.59 camel25/0.13/0.05 bison36/0.30/0.12 goat39/0.28/0.11 | hunters wolf8.0
+324 tot   5.7 herds 1 | n   5.7 hung   0 hab 1.00 SAVANNA 19C d10.5 | need 1.70 get 1.86 fed~1.00 | prey goat31/0.44/0.17 rabbit114/3.96/1.57 bison36/0.30/0.12 | hunters wolf8.6
+330 tot   5.9 herds 1 | n   5.9 hung   0 hab 1.00 SAVANNA 19C d10.5 | need 1.78 get 1.89 fed~1.00 | prey goat31/0.29/0.11 rabbit110/3.96/1.54 bison38/0.31/0.12 goat43/0.29/0.11 | hunters wolf9.3
+336 tot   6.2 herds 1 | n   6.2 hung   0 hab 1.00 SAVANNA 19C d10.5 | need 1.85 get 1.81 fed~0.97 | prey goat30/0.29/0.11 rabbit106/3.96/1.51 bison38/0.08/0.03 goat41/0.30/0.11 deer45/0.10/0.04 | hunters wolf10.0
+342 tot   6.4 herds 1 | n   6.4 hung   0 hab 1.00 SAVANNA 19C d10.5 | need 1.93 get 2.04 fed~1.00 | prey rabbit103/3.96/1.49 camel19/0.03/0.01 bison38/0.32/0.12 goat40/0.42/0.16 deer45/0.40/0.15 goat40/0.30/0.11 | hunters wolf10.7
+348 tot   5.9 herds 1 | n   5.9 hung   5 hab 0.25 STEPPE 18C d9.7 | need 1.77 get 0.61 fed~0.34 | prey rabbit103/0.98/0.35 camel19/0.12/0.04 deer44/0.10/0.04 bison37/0.08/0.03 goat39/0.42/0.15 | hunters wolf10.7
+354 tot   5.6 herds 1 | n   5.6 hung   4 hab 0.25 DESERT 20C d8.9 | need 1.69 get 0.55 fed~0.33 | prey buffalo41/0.13/0.13 cow24/0.05/0.05 bison21/0.00/0.00 rabbit103/0.98/0.37 | hunters 
+360 tot   5.1 herds 1 | n   5.1 hung   0 hab 0.25 DESERT 21C d9.5 | need 1.53 get 1.63 fed~1.00 | prey buffalo41/0.13/0.13 bison22/0.00/0.00 rabbit101/3.95/1.39 goat39/0.11/0.11 | hunters 
+366 tot   4.7 herds 1 | n   4.7 hung   4 hab 0.25 DESERT 21C d9.6 | need 1.42 get 0.00 fed~0.00 | prey bison23/0.00/0.00 | hunters 
+372 tot   4.4 herds 1 | n   4.4 hung   4 hab 0.25 DESERT 20C d11.8 | need 1.32 get 0.26 fed~0.19 | prey buffalo41/0.03/0.03 cow25/0.22/0.22 bison23/0.00/0.00 | hunters 
+378 tot   2.9 herds 1 | n   2.9 hung  10 hab 1.00 SAVANNA 20C d11.8 | need 0.86 get 0.26 fed~0.30 | prey buffalo41/0.03/0.03 cow25/0.22/0.22 bison24/0.00/0.00 | hunters 
+384 tot   2.1 herds 1 | n   2.1 hung  16 hab 0.25 DESERT 19C d11.1 | need 0.64 get 0.22 fed~0.35 | prey cow25/0.22/0.22 bison26/0.00/0.00 | hunters 
+390 tot   1.8 herds 1 | n   1.8 hung   0 hab 0.25 DESERT 20C d10.6 | need 0.53 get 0.27 fed~0.52 | prey cow25/0.22/0.22 bison27/0.05/0.05 | hunters 
+396 tot   1.8 herds 1 | n   1.8 hung   3 hab 0.25 DESERT 18C d13.2 | need 0.53 get 0.26 fed~0.49 | prey cow25/0.06/0.06 bison27/0.20/0.20 | hunters 
+402 tot   1.8 herds 1 | n   1.8 hung   0 hab 0.25 FOREST 18C d14.1 | need 0.53 get 0.35 fed~0.65 | prey cow25/0.22/0.22 elephant14/0.04/0.04 buffalo42/0.03/0.03 bison28/0.05/0.05 | hunters 
+408 tot   1.8 herds 1 | n   1.8 hung   0 hab 1.00 GRASS 21C d10.6 | need 0.55 get 0.62 fed~1.00 | prey buffalo42/0.13/0.13 cow26/0.23/0.23 elephant14/0.04/0.04 bison29/0.23/0.23 | hunters 
+414 tot   1.9 herds 1 | n   1.9 hung   0 hab 1.00 SAVANNA 20C d10.0 | need 0.58 get 0.43 fed~0.74 | prey buffalo42/0.13/0.13 cow26/0.06/0.06 elephant14/0.01/0.01 bison30/0.24/0.24 | hunters 
+420 tot   1.9 herds 1 | n   1.9 hung   4 hab 1.00 JUNGLE 20C d10.0 | need 0.58 get 0.25 fed~0.43 | prey buffalo41/0.13/0.13 cow22/0.05/0.05 elephant13/0.01/0.01 bison30/0.06/0.06 | hunters 
+426 tot   1.8 herds 1 | n   1.8 hung   0 hab 1.00 JUNGLE 20C d9.9 | need 0.53 get 0.41 fed~0.78 | prey buffalo41/0.13/0.13 cow16/0.03/0.03 elephant12/0.00/0.00 bison31/0.25/0.25 | hunters 
+432 tot   1.8 herds 1 | n   1.8 hung   4 hab 1.00 GRASS 21C d9.1 | need 0.53 get 0.22 fed~0.41 | prey buffalo41/0.13/0.13 cow15/0.03/0.03 elephant11/0.00/0.00 bison32/0.07/0.07 | hunters 
+438 tot   1.8 herds 1 | n   1.8 hung   0 hab 1.00 JUNGLE 19C d10.9 | need 0.53 get 0.31 fed~0.58 | prey buffalo41/0.03/0.03 elephant10/0.01/0.01 bison32/0.27/0.27 | hunters 
+444 tot   1.6 herds 1 | n   1.6 hung   4 hab 1.00 JUNGLE 20C d9.6 | need 0.50 get 0.11 fed~0.22 | prey buffalo41/0.03/0.03 elephant10/0.01/0.01 bison33/0.07/0.07 | hunters 
+450 tot   1.5 herds 1 | n   1.5 hung   0 hab 0.25 FOREST 18C d5.2 | need 0.50 get 0.51 fed~1.00 | prey bison34/0.07/0.07 goat33/0.30/0.30 llama31/0.13/0.13 | hunters 
+456 tot   1.5 herds 1 | n   1.5 hung   1 hab 0.25 FOREST 18C d8.3 | need 0.50 get 0.07 fed~0.15 | prey bison34/0.07/0.07 | hunters 
+462 tot   1.6 herds 1 | n   1.6 hung   0 hab 1.00 JUNGLE 20C d12.7 | need 0.50 get 0.35 fed~0.71 | prey buffalo41/0.03/0.03 elephant10/0.02/0.02 bison34/0.30/0.30 | hunters 
+468 tot   1.6 herds 1 | n   1.6 hung   1 hab 1.00 JUNGLE 20C d13.3 | need 0.50 get 0.13 fed~0.27 | prey buffalo41/0.03/0.03 cow12/0.00/0.00 elephant10/0.03/0.03 bison36/0.08/0.08 | hunters 
+474 tot   1.6 herds 1 | n   1.6 hung   0 hab 1.00 JUNGLE 20C d13.7 | need 0.50 get 0.56 fed~1.00 | prey elephant11/0.03/0.03 buffalo40/0.13/0.13 cow13/0.09/0.09 bison36/0.32/0.32 | hunters 
+480 tot   1.8 herds 1 | n   1.8 hung   0 hab 1.00 JUNGLE 20C d13.7 | need 0.53 get 0.32 fed~0.60 | prey elephant11/0.03/0.03 buffalo40/0.13/0.13 cow14/0.10/0.10 bison33/0.07/0.07 | hunters 
+486 tot   1.9 herds 1 | n   1.9 hung   0 hab 1.00 JUNGLE 20C d13.7 | need 0.57 get 0.46 fed~0.82 | prey buffalo40/0.13/0.13 cow14/0.03/0.03 elephant11/0.03/0.03 bison34/0.29/0.29 | hunters 
+492 tot   2.0 herds 1 | n   2.0 hung   1 hab 1.00 JUNGLE 20C d13.7 | need 0.60 get 0.24 fed~0.40 | prey buffalo40/0.13/0.13 cow15/0.11/0.11 elephant11/0.01/0.01 | hunters 
+498 tot   2.0 herds 1 | n   2.0 hung   3 hab 0.25 FOREST 18C d14.1 | need 0.60 get 0.24 fed~0.40 | prey buffalo40/0.13/0.13 cow15/0.03/0.03 elephant11/0.01/0.01 bison36/0.08/0.08 | hunters 
+504 tot   1.9 herds 1 | n   1.9 hung   0 hab 1.00 JUNGLE 19C d12.3 | need 0.56 get 0.47 fed~0.84 | prey bison36/0.32/0.32 buffalo39/0.13/0.13 cow15/0.03/0.03 elephant11/0.01/0.01 | hunters 
+510 tot   1.9 herds 1 | n   1.9 hung   0 hab 0.25 FOREST 18C d14.0 | need 0.57 get 0.33 fed~0.57 | prey buffalo39/0.13/0.13 cow15/0.11/0.11 elephant11/0.01/0.01 bison37/0.08/0.08 | hunters 
+516 tot   1.9 herds 1 | n   1.9 hung   0 hab 0.25 FOREST 18C d16.4 | need 0.57 get 0.36 fed~0.62 | prey elephant11/0.03/0.03 bison37/0.33/0.33 | hunters 
+522 tot   1.9 herds 1 | n   1.9 hung   2 hab 1.00 GRASS 16C d17.0 | need 0.57 get 0.08 fed~0.15 | prey elephant11/0.01/0.01 bison35/0.08/0.08 | hunters 
+528 tot   1.7 herds 1 | n   1.7 hung   0 hab 0.25 STEPPE 17C d14.2 | need 0.50 get 0.40 fed~0.81 | prey buffalo39/0.12/0.12 cow17/0.03/0.03 elephant11/0.01/0.01 bison30/0.24/0.24 | hunters 
+534 tot   1.7 herds 1 | n   1.7 hung   0 hab 1.00 SAVANNA 19C d13.7 | need 0.52 get 0.32 fed~0.63 | prey buffalo39/0.03/0.03 cow17/0.03/0.03 elephant11/0.01/0.01 bison31/0.25/0.25 | hunters 
+540 tot   1.7 herds 1 | n   1.7 hung   1 hab 1.00 SAVANNA 19C d13.7 | need 0.52 get 0.22 fed~0.43 | prey buffalo39/0.12/0.12 cow17/0.03/0.03 bison32/0.07/0.07 | hunters 
+546 tot   1.7 herds 1 | n   1.7 hung   0 hab 0.25 HILLS 16C d15.1 | need 0.52 get 0.43 fed~0.83 | prey buffalo39/0.12/0.12 cow17/0.03/0.03 elephant10/0.00/0.00 bison33/0.27/0.27 | hunters 
+552 tot   1.7 herds 1 | n   1.7 hung   0 hab 1.00 GRASS 18C d14.0 | need 0.52 get 0.34 fed~0.66 | prey buffalo39/0.03/0.03 cow17/0.04/0.04 elephant9/0.00/0.00 bison33/0.27/0.27 | hunters 
+558 tot   1.8 herds 1 | n   1.8 hung   0 hab 0.25 FOREST 18C d13.8 | need 0.53 get 0.33 fed~0.63 | prey buffalo39/0.03/0.03 cow17/0.04/0.04 elephant9/0.02/0.02 bison31/0.25/0.25 | hunters 
+564 tot   1.6 herds 1 | n   1.6 hung   4 hab 1.00 SAVANNA 19C d13.8 | need 0.50 get 0.12 fed~0.24 | prey buffalo39/0.03/0.03 cow17/0.04/0.04 bison28/0.05/0.05 | hunters 
+570 tot   1.6 herds 1 | n   1.6 hung   1 hab 0.25 FOREST 17C d16.1 | need 0.50 get 0.22 fed~0.43 | prey buffalo39/0.03/0.03 cow18/0.15/0.15 elephant9/0.02/0.02 bison29/0.22/0.02 | hunters 
+576 tot   1.7 herds 1 | n   1.7 hung   0 hab 1.00 JUNGLE 20C d16.1 | need 0.50 get 0.42 fed~0.83 | prey buffalo39/0.12/0.12 cow18/0.04/0.04 elephant9/0.02/0.02 bison30/0.24/0.24 | hunters 
+582 tot   1.7 herds 1 | n   1.7 hung   0 hab 0.25 BEACH 23C d19.6 | need 0.52 get 1.92 fed~1.00 | prey bison31/0.25/0.25 cow18/0.15/0.15 chicken71/1.51/1.51 | hunters 
+588 tot   1.8 herds 1 | n   1.8 hung   0 hab 0.25 BEACH 23C d18.3 | need 0.53 get 0.55 fed~1.00 | prey cow18/0.15/0.15 bison32/0.26/0.26 chicken67/1.51/0.13 | hunters 
+594 tot   1.9 herds 1 | n   1.9 hung   0 hab 1.00 GRASS 20C d17.7 | need 0.58 get 0.49 fed~0.85 | prey buffalo39/0.03/0.03 cow19/0.04/0.04 bison33/0.28/0.28 chicken64/1.51/0.14 | hunters 
+600 tot   2.0 herds 1 | n   2.0 hung   0 hab 1.00 GRASS 15C d14.7 | need 0.61 get 0.57 fed~0.94 | prey buffalo39/0.12/0.12 cow19/0.16/0.16 elephant9/0.00/0.00 bison34/0.29/0.29 | hunters 

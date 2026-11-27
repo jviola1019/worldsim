@@ -1,0 +1,30 @@
+bigcat pred-6 home 60,67 GRASS 17C prey within 8: 228; start 6
+  0 tot   6.0 herds 1 | n   6.0 hung   0 hab 1.00 GRASS 17C d0.7 | need 1.80 get 3.30 fed~1.00 | prey goat37/0.45/0.45 chicken50/1.53/1.53 cow28/0.23/0.23 bison70/0.50/0.50 penguin71/0.58/0.58 | hunters bear3.0
+  6 tot   6.2 herds 1 | n   6.2 hung   2 hab 1.00 GRASS 16C d0.3 | need 1.85 get 0.89 fed~0.48 | prey chicken49/0.77/0.77 bison70/0.12/0.12 | hunters bear3.0
+ 12 tot   4.8 herds 1 | n   4.8 hung   0 hab 0.03 MOUNTAIN 5C d4.9 | need 1.45 get 1.00 fed~0.69 | prey chicken43/0.38/0.38 llama19/0.12/0.12 bison68/0.50/0.50 | hunters 
+ 18 tot   4.2 herds 1 | n   4.2 hung   0 hab 1.00 JUNGLE 23C d9.4 | need 1.25 get 1.65 fed~1.00 | prey chicken44/1.53/1.53 llama20/0.12/0.12 | hunters bear3.2
+ 24 tot   4.4 herds 1 | n   4.4 hung   0 hab 1.00 JUNGLE 23C d9.4 | need 1.32 get 1.64 fed~1.00 | prey chicken44/1.54/1.54 llama20/0.12/0.10 | hunters bear3.3
+ 30 tot   3.9 herds 1 | n   3.9 hung   6 hab 1.00 JUNGLE 25C d11.0 | need 1.17 get 0.36 fed~0.31 | prey chicken37/0.00/0.00 goat24/0.42/0.36 | hunters bear3.4
+ 36 tot   3.5 herds 1 | n   3.5 hung   0 hab 1.00 JUNGLE 25C d11.0 | need 1.06 get 1.75 fed~1.00 | prey chicken33/1.25/1.25 llama21/0.12/0.12 goat25/0.44/0.38 | hunters bear3.1
+ 42 tot   3.6 herds 1 | n   3.6 hung   3 hab 1.00 JUNGLE 25C d11.9 | need 1.07 get 1.53 fed~1.00 | prey chicken49/1.41/1.41 chicken27/0.00/0.00 goat25/0.11/0.10 llama21/0.03/0.03 | hunters bear2.9
+ 48 tot   3.8 herds 1 | n   3.8 hung   0 hab 1.00 JUNGLE 25C d12.0 | need 1.13 get 1.54 fed~1.00 | prey chicken30/1.11/1.11 goat27/0.46/0.40 llama21/0.03/0.03 | hunters bear3.0
+ 54 tot   4.0 herds 1 | n   4.0 hung   0 hab 1.00 JUNGLE 25C d12.0 | need 1.19 get 1.76 fed~1.00 | prey chicken31/1.19/1.19 goat29/0.46/0.46 llama21/0.12/0.12 | hunters bear3.1
+ 60 tot   4.2 herds 1 | n   4.2 hung   0 hab 1.00 JUNGLE 25C d12.0 | need 1.26 get 1.79 fed~1.00 | prey chicken32/1.21/1.21 goat32/0.46/0.46 llama22/0.12/0.12 | hunters bear3.1
+ 66 tot   4.4 herds 1 | n   4.4 hung   0 hab 1.00 JUNGLE 25C d12.0 | need 1.33 get 1.38 fed~1.00 | prey chicken33/1.28/1.28 llama23/0.12/0.10 | hunters bear3.1
+ 72 tot   4.6 herds 1 | n   4.6 hung   1 hab 1.00 JUNGLE 25C d12.0 | need 1.39 get 0.33 fed~0.24 | prey chicken34/0.33/0.33 | hunters 
+ 78 tot   4.4 herds 1 | n   4.4 hung   0 hab 1.00 JUNGLE 25C d12.0 | need 1.32 get 1.24 fed~0.94 | prey chicken32/1.24/1.24 | hunters 
+ 84 tot   4.5 herds 1 | n   4.5 hung   3 hab 1.00 JUNGLE 25C d12.0 | need 1.36 get 0.27 fed~0.20 | prey chicken29/0.27/0.27 | hunters bear3.3
+ 90 tot   2.9 herds 1 | n   2.9 hung   9 hab 1.00 JUNGLE 25C d12.0 | need 0.88 get 0.00 fed~0.00 | prey chicken26/0.00/0.00 | hunters bear3.4
+ 96 tot   2.8 herds 1 | n   2.8 hung   0 hab 1.00 JUNGLE 25C d12.0 | need 0.83 get 0.74 fed~0.89 | prey chicken27/0.56/0.56 chicken22/0.18/0.18 | hunters bear3.4
+102 tot   2.9 herds 1 | n   2.9 hung   0 hab 1.00 JUNGLE 25C d12.0 | need 0.86 get 0.73 fed~0.86 | prey chicken23/0.73/0.73 | hunters bear3.4
+108 tot   2.9 herds 1 | n   2.9 hung   2 hab 1.00 JUNGLE 25C d12.0 | need 0.87 get 0.00 fed~0.00 | prey  | hunters bear3.5
+114 tot   2.0 herds 1 | n   2.0 hung   8 hab 1.00 JUNGLE 25C d12.0 | need 0.59 get 0.00 fed~0.00 | prey  | hunters bear3.2
+120 tot   1.2 herds 1 | n   1.2 hung  14 hab 1.00 JUNGLE 25C d12.0 | need 0.50 get 0.74 fed~1.00 | prey chicken37/1.03/0.74 | hunters bear3.2
+126 tot   1.3 herds 1 | n   1.3 hung   0 hab 1.00 JUNGLE 25C d12.0 | need 0.50 get 2.23 fed~1.00 | prey chicken29/0.68/0.68 chicken40/1.55/1.55 | hunters bear3.3
+132 tot   1.4 herds 1 | n   1.4 hung   1 hab 1.00 JUNGLE 25C d12.0 | need 0.50 get 0.00 fed~0.00 | prey chicken36/0.00/0.00 | hunters bear3.3
+138 tot   1.3 herds 1 | n   1.3 hung   0 hab 1.00 JUNGLE 25C d12.0 | need 0.50 get 1.03 fed~1.00 | prey chicken34/1.03/1.03 | hunters bear3.4
+144 tot   1.4 herds 1 | n   1.4 hung   0 hab 1.00 JUNGLE 25C d12.0 | need 0.50 get 1.48 fed~1.00 | prey chicken38/1.48/1.48 | hunters 
+150 tot   1.6 herds 1 | n   1.6 hung   0 hab 1.00 JUNGLE 25C d12.0 | need 0.50 get 1.02 fed~1.00 | prey chicken41/1.02/1.02 | hunters 
+156 tot   1.6 herds 1 | n   1.6 hung   3 hab 1.00 JUNGLE 25C d12.0 | need 0.50 get 0.00 fed~0.00 | prey  | hunters 
+162 tot   1.0 herds 1 | n   1.0 hung   9 hab 1.00 JUNGLE 25C d12.0 | need 0.50 get 0.00 fed~0.00 | prey  | hunters 
+163 extinct

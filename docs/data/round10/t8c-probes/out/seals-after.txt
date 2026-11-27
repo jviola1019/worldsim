@@ -1,0 +1,7 @@
+wild-0: seal herds 18 (229 seals) | fish shoals 194 (41214) | seal-habitat grid spots 236 | best spot: 16 shoals, fish biomass 32.92 vs 150 needed for 10 seals at 1:100
+wild-1: seal herds 20 (251 seals) | fish shoals 206 (43514) | seal-habitat grid spots 220 | best spot: 18 shoals, fish biomass 33.83 vs 150 needed for 10 seals at 1:100
+wild-2: seal herds 25 (290 seals) | fish shoals 222 (47789) | seal-habitat grid spots 282 | best spot: 15 shoals, fish biomass 29.67 vs 150 needed for 10 seals at 1:100
+wild-3: seal herds 22 (266 seals) | fish shoals 211 (44405) | seal-habitat grid spots 272 | best spot: 14 shoals, fish biomass 31.66 vs 150 needed for 10 seals at 1:100
+wild-4: seal herds 26 (340 seals) | fish shoals 224 (47443) | seal-habitat grid spots 356 | best spot: 17 shoals, fish biomass 35.84 vs 150 needed for 10 seals at 1:100
+wild-5: seal herds 21 (266 seals) | fish shoals 208 (43176) | seal-habitat grid spots 253 | best spot: 22 shoals, fish biomass 39.82 vs 150 needed for 10 seals at 1:100
+worlds with seals at year 0: 6/6; worlds with cold seal water and fish: 6/6

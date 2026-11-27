@@ -1,0 +1,147 @@
+wild audit · 6 natural Realistic worlds (no people) · 200 years · 128² · totals at years 0, 50, 100, 200
+wild-0: 550 herds at year 200 (limit 546)
+  omnivore  bear          75   103   101   111  persists   control    121
+  predator  bigcat        20     2     0     0  LOST    
+  herbivore bird        1052  3400  3521  3475  persists   control   3311
+  herbivore bison        440   262   231   251  persists   control    257
+  omnivore  boar         204   550   565   460  persists   control    635
+  herbivore buffalo       65   156   146   140  persists   control    137
+  herbivore camel         19    21    21     0  LOST       control     20  LOST TO PREDATION
+  herbivore chicken      128   128   103   141  persists   control    116
+  herbivore cow          190   345   393   365  persists   control    258
+  predator  crocodile      2    11     2     0  LOST    
+  herbivore deer         372   598   667   593  persists   control    757
+  herbivore elephant      71    33    12     0  LOST       control      0
+  herbivore elk          321   386   428   432  persists   control    488
+  herbivore fish       41214 30386 29008 29328  persists   control  35558
+  herbivore goat         351   579   545   626  persists   control    784
+  herbivore horse         64   111   119   134  persists   control    101
+  herbivore llama        263   373   338   315  persists   control    410
+  herbivore mammoth       79    37    46    46  persists   control     55
+  herbivore penguin      256   376   425   377  persists   control    416
+  herbivore rabbit       557   825   864  1003  persists   control   2348
+  predator  seal         229   868   972   856  persists
+  herbivore sheep        372   623   583   565  persists   control    971
+  herbivore whale        241   330   356   374  persists   control    367
+  predator  wolf          69    98   120   103  persists
+wild-1: 547 herds at year 200 (limit 546)
+  omnivore  bear          85   121   107   102  persists   control    106
+  predator  bigcat        14    10    10    10  persists
+  herbivore bird         981  3140  3058  2965  persists   control   3106
+  herbivore bison         68    49    51    53  persists   control     62
+  omnivore  boar         138   389   405   359  persists   control    393
+  herbivore buffalo      188   235   232   240  persists   control    311
+  herbivore camel         43    58    51    46  persists   control     75
+  herbivore chicken      209   229   221   273  persists   control    488
+  herbivore cow          145   180   205   205  persists   control    309
+  herbivore deer         321   473   480   444  persists   control    704
+  herbivore elephant      39    27     6    16  persists   control     59
+  herbivore elk          177   251   267   280  persists   control    347
+  herbivore fish       43514 35218 31787 32747  persists   control  39332
+  herbivore goat         285   316   412   370  persists   control    496
+  herbivore horse        185   206   240   266  persists   control    378
+  herbivore llama        237   198   195   220  persists   control    258
+  herbivore mammoth      180   106   115    99  persists   control    112
+  herbivore penguin      439   712   728   587  persists   control    908
+  herbivore rabbit      1122  2160  1684  1884  persists   control   3163
+  predator  seal         251   937   957  1091  persists
+  herbivore sheep         61   104   117   118  persists   control    237
+  herbivore whale        176   238   256   257  persists   control    272
+  predator  wolf         110   195   198   191  persists
+wild-2: 547 herds at year 200 (limit 546)
+  omnivore  bear          63   102    98    92  persists   control     93
+  predator  bigcat        22    25    25    23  persists
+  herbivore bird         881  3421  3312  3233  persists   control   3348
+  herbivore bison        286   145   150   156  persists   control    177
+  omnivore  boar         196   517   498   463  persists   control    527
+  herbivore buffalo      101    56    73    55  persists   control     56
+  herbivore camel         85    29    45    45  persists   control     67
+  herbivore chicken      267   284   277   289  persists   control    393
+  herbivore cow          106   121   145   124  persists   control    154
+  herbivore deer         450   678   757   750  persists   control    925
+  herbivore elephant     114    20    16    17  persists   control      4
+  herbivore elk          296   400   395   379  persists   control    355
+  herbivore fish       47789 42404 41018 38578  persists   control  46296
+  herbivore goat         322   398   382   449  persists   control    686
+  herbivore horse         90    60   106    94  persists   control    179
+  herbivore llama        265   331   369   426  persists   control    447
+  herbivore mammoth      207   154   154   164  persists   control    141
+  herbivore penguin      393   617   562   563  persists   control    778
+  herbivore rabbit       666   742  1001   830  persists   control   1605
+  predator  seal         290  1131  1146  1185  persists
+  herbivore sheep        170   315   351   408  persists   control    428
+  herbivore whale         64    95   115   137  persists   control    114
+  predator  wolf          96    92   111    65  persists
+wild-3: 547 herds at year 200 (limit 546)
+  omnivore  bear          90   119   116   110  persists   control    118
+  predator  bigcat        25    13    14    11  persists
+  herbivore bird         731  2971  2882  3105  persists   control   2661
+  herbivore bison        205   117   109    94  persists   control    159
+  omnivore  boar          99   316   255   333  persists   control    361
+  herbivore buffalo      154   111    95   111  persists   control    160
+  herbivore camel         30     4     0     0  LOST       control      0
+  herbivore chicken      296   236   256   253  persists   control    445
+  herbivore cow           87   110   107   110  persists   control    212
+  herbivore deer         421   500   548   603  persists   control    721
+  herbivore elephant     112    75    66    55  persists   control     66
+  herbivore elk          352   357   350   347  persists   control    480
+  herbivore fish       44405 37874 37970 35527  persists   control  42731
+  herbivore goat         382   501   517   542  persists   control    905
+  herbivore llama        273   353   378   368  persists   control    552
+  herbivore mammoth      164   105    96    94  persists   control    116
+  herbivore penguin      122   256   147   215  persists   control    220
+  herbivore rabbit       591   558   586   640  persists   control   2472
+  predator  seal         266   995  1048  1105  persists
+  herbivore sheep        314   391   365   429  persists   control    681
+  herbivore whale        140   205   224   237  persists   control    237
+  predator  wolf         119   125   121   116  persists
+wild-4: 550 herds at year 200 (limit 546)
+  omnivore  bear          79   106    90    95  persists   control     95
+  predator  bigcat         9    22    16    18  persists
+  herbivore bird         800  3033  2622  3098  persists   control   3256
+  herbivore bison        205    76    92    80  persists   control    182
+  omnivore  boar          77   247   296   270  persists   control    273
+  herbivore buffalo      103   155   173   153  persists   control    164
+  herbivore camel        128   121   117   119  persists   control    171
+  herbivore chicken      313   291   223   269  persists   control    284
+  herbivore cow           57    75    64    73  persists   control    111
+  herbivore deer         148   245   267   287  persists   control    333
+  herbivore elephant      39    48    49    29  persists   control     43
+  herbivore elk          119   158   154   178  persists   control    153
+  herbivore fish       47443 39410 38142 37687  persists   control  48214
+  herbivore goat         565   838   858   777  persists   control    869
+  herbivore horse        242   296   252   254  persists   control    381
+  herbivore llama        424   536   514   539  persists   control    588
+  herbivore mammoth       96    79    67    83  persists   control     69
+  herbivore penguin      347   637   694   615  persists   control    532
+  herbivore rabbit       396  1384  1114  1123  persists   control   1943
+  predator  seal         340  1352  1389  1455  persists
+  herbivore sheep        231   321   424   371  persists   control    601
+  herbivore whale        116   169   174   173  persists   control    225
+  predator  wolf          50   114    98   119  persists
+wild-5: 547 herds at year 200 (limit 546)
+  omnivore  bear          62   102    94   108  persists   control     95
+  predator  bigcat        15    17     8     8  persists
+  herbivore bird         926  3254  3078  3182  persists   control   3514
+  herbivore bison        195   147   119    98  persists   control     88
+  omnivore  boar         123   273   263   246  persists   control    320
+  herbivore buffalo       51    23    24    38  persists   control     72
+  herbivore camel         93    84    83   108  persists   control    122
+  herbivore chicken      169   141   110   142  persists   control    190
+  herbivore cow           40    66    73    61  persists   control     97
+  herbivore deer         291   406   443   411  persists   control    694
+  herbivore elephant      53    35    37    53  persists   control     28
+  herbivore elk          173   203   231   203  persists   control    319
+  herbivore fish       43176 34777 33461 32468  persists   control  37717
+  herbivore goat         427   566   569   523  persists   control    857
+  herbivore horse         81    71    84    83  persists   control    187
+  herbivore llama        353   377   302   319  persists   control    501
+  herbivore mammoth      124    76    99    87  persists   control     97
+  herbivore penguin      613   662   734   521  persists   control   1068
+  herbivore rabbit      1301  2600  2850  2748  persists   control   5337
+  predator  seal         266   917  1066   784  persists
+  herbivore sheep        345   280   279   293  persists   control    768
+  herbivore whale        153   213   234   264  persists   control    257
+  predator  wolf         102   201   170   186  persists
+
+predator species persisting: 17/19 · herbivore species persisting: 104/107 · herbivore species lost to predation (kept in the predator-free control): 1

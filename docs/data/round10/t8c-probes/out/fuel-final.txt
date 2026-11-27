@@ -1,0 +1,8 @@
+int-elec: Kingdom of Raichuk fossil plants 49 · coal mined a year 0 · energy a year 0 · alive true
+int-elec-1: Traetraerdese Oligarchy fossil plants 38 · coal mined a year 0 · energy a year 0 · alive true
+int-elec-2: Kingdom of Trairn fossil plants 34 · coal mined a year 8822 · energy a year 68978 · alive true
+int-elec-3: Kingdom of Equerd fossil plants 33 · coal mined a year 0 · energy a year 28319 · alive true
+int-elec-4: Kingdom of Zianaerk fossil plants 0 · coal mined a year 52654 · energy a year 0 · alive true
+int-elec-5: Kingdom of Sudeor fossil plants 30 · coal mined a year 7824 · energy a year 33299 · alive true
+int-elec-6: Jiafajuishian Oligarchy fossil plants 22 · coal mined a year 9725 · energy a year 320803 · alive true
+int-elec-7: Holy State of Flongtong fossil plants 48 · coal mined a year 18176 · energy a year 109227 · alive true

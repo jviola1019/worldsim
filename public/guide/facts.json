@@ -1,10 +1,10 @@
 {
- "generated": "2026-11-26",
+ "generated": "2026-11-27",
  "totals": {
   "srcFiles": 152,
-  "srcLines": 44627,
-  "testFiles": 69,
-  "testCases": 508
+  "srcLines": 44698,
+  "testFiles": 72,
+  "testCases": 524
  },
  "folders": [
   {
@@ -68,7 +68,7 @@
   {
    "name": "sim",
    "files": 11,
-   "lines": 2695,
+   "lines": 2702,
    "deps": {
     "powers": 3,
     "culture": 5,
@@ -90,7 +90,7 @@
   {
    "name": "world",
    "files": 8,
-   "lines": 2501,
+   "lines": 2524,
    "deps": {
     "sim": 7,
     "core": 12,
@@ -235,7 +235,7 @@
   {
    "name": "ecology",
    "files": 2,
-   "lines": 811,
+   "lines": 847,
    "deps": {
     "powers": 1,
     "population": 2,
@@ -261,7 +261,7 @@
   {
    "name": "config",
    "files": 2,
-   "lines": 599,
+   "lines": 601,
    "deps": {
     "sim": 1,
     "world": 3
@@ -305,7 +305,7 @@
   {
    "name": "scenarios",
    "files": 1,
-   "lines": 114,
+   "lines": 117,
    "deps": {
     "config": 1,
     "sim": 1
@@ -399,7 +399,7 @@
   {
    "path": "src/config/balance.ts",
    "folder": "config",
-   "lines": 328,
+   "lines": 330,
    "about": "Balance parameters. Every gameplay coefficient lives here (not scattered as magic numbers) so it can be tuned, tested for sensitivity and adjusted at runtime from the developer panel."
   },
   {
@@ -471,13 +471,13 @@
   {
    "path": "src/ecology/ecology.ts",
    "folder": "ecology",
-   "lines": 714,
+   "lines": 743,
    "about": "Ecosystems: vegetation regrowth, animal herds (movement, grazing, logistic growth limited by local vegetation, predation, starvation, climate stress), human hunting, extinction, slow evolution into subspecies, and optional fantasy monsters."
   },
   {
    "path": "src/ecology/species.ts",
    "folder": "ecology",
-   "lines": 97,
+   "lines": 104,
    "about": "Animal species. Habitat suitability, diet and growth parameters are stylized; predator–prey coupling follows Lotka–Volterra-style dynamics (prey growth limited by vegetation, predators by prey encounters)."
   },
   {
@@ -939,7 +939,7 @@
   {
    "path": "src/scenarios/scenarios.ts",
    "folder": "scenarios",
-   "lines": 114,
+   "lines": 117,
    "about": "Scenario worlds: preset configurations with OPTIONAL objectives."
   },
   {
@@ -957,7 +957,7 @@
   {
    "path": "src/sim/bootstrap.ts",
    "folder": "sim",
-   "lines": 477,
+   "lines": 482,
    "about": "Seeding a new world: wildlife, optional fantasy monsters, and starting peoples."
   },
   {
@@ -1011,7 +1011,7 @@
   {
    "path": "src/sim/types.ts",
    "folder": "sim",
-   "lines": 1147,
+   "lines": 1149,
    "about": "EPOCH world state model."
   },
   {
@@ -1203,13 +1203,13 @@
   {
    "path": "src/world/catastrophes.ts",
    "folder": "world",
-   "lines": 199,
-   "about": "Rare natural catastrophes (yearly, world level), with base rates of the real order of magnitude so that rare things stay rare (rates are per world-year, scaled by the disaster-frequency setting): regional airburst (~50-100 m impactor) 1 / 800 (Tunguska-class) "
+   "lines": 209,
+   "about": "Rare natural catastrophes (yearly, world level), with base rates of the real order of magnitude so that rare things stay rare (rates are per world-year, scaled by the disaster-frequency setting): regional airburst (~50-100 m impactor) 1 / 800 (Tunguska-class: "
   },
   {
    "path": "src/world/environment.ts",
    "folder": "world",
-   "lines": 378,
+   "lines": 391,
    "about": "Environment & climate."
   },
   {
@@ -1267,7 +1267,7 @@
   },
   {
    "path": "tests/civilizations/modern-civ.test.ts",
-   "cases": 5,
+   "cases": 6,
    "about": "Round-4 fixes that let modern civilizations keep building, go to space and govern themselves plausibly."
   },
   {
@@ -1302,7 +1302,7 @@
   },
   {
    "path": "tests/ecology/monsters.test.ts",
-   "cases": 3,
+   "cases": 4,
    "about": "Round 10 (mode audit): \"Realms of Legend\" promises a monster can be slain by a settlement."
   },
   {
@@ -1312,7 +1312,7 @@
   },
   {
    "path": "tests/ecology/predation.test.ts",
-   "cases": 39,
+   "cases": 43,
    "about": "Round 10 addendum (life audit): predators coexist with their prey."
   },
   {
@@ -1386,6 +1386,16 @@
    "about": "Media & AI (round 4): era-appropriate outlets, platform life cycles, named AI systems, and their causal effects, tested as counterfactuals on identical clones (one intervention, compare)."
   },
   {
+   "path": "tests/modes/coalPromise.test.ts",
+   "cases": 2,
+   "about": "Task 8c: the mode audit's \"coal-rich nations industrialise first\" check measured the wrong thing."
+  },
+  {
+   "path": "tests/modes/promiseCanFail.test.ts",
+   "cases": 4,
+   "about": "Task 8 Part B follow-up (controller rulings): the Space Race and Industrializing promises measure something that can fail within their horizons."
+  },
+  {
    "path": "tests/modes/promises.test.ts",
    "cases": 3,
    "about": "Round 10, Task 9: every kept game mode keeps the promises its description makes (the cheap, start-of-world ones; the long ones are measured by scripts/mode-audit.ts and recorded in VALIDATION §R10)."
@@ -1412,7 +1422,7 @@
   },
   {
    "path": "tests/politics/startDiplomacy.test.ts",
-   "cases": 5,
+   "cases": 6,
    "about": "Round 10 (mode audit): developed worlds start with a diplomatic past."
   },
   {
@@ -1581,6 +1591,11 @@
    "about": "Round 10 addendum (CI #73/#75, axe target-size on WebKit desktop): clickable chips were about 22 px tall on a fine pointer (2 px padding, 13 px text), under WCAG 2.5.8's 24 px minimum where chips sit side by side (a ruler's family links in the person inspector"
   },
   {
+   "path": "tests/world/catastrophes.test.ts",
+   "cases": 3,
+   "about": "Task 8 part C (catastrophe realism): an airburst explodes in the air and leaves no crater; a geomagnetic storm's aurora shows whether or not anyone has electricity, and only electrified nations lose power."
+  },
+  {
    "path": "tests/world/fire-determinism.test.ts",
    "cases": 2,
    "about": "Regression (round 6): fires set outside ignite() were missing from the cached fire set, so a save made while they burned resumed differently (the reloaded world burned them, the running one did not)."
@@ -1629,7 +1644,7 @@
   },
   {
    "path": "scripts/mode-audit.ts",
-   "lines": 210,
+   "lines": 238,
    "about": "Round 10: game-mode audit."
   },
   {

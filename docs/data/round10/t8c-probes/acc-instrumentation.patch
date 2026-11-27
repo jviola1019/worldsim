@@ -1,0 +1,23 @@
+--- a/src/ecology/ecology.ts
++++ b/src/ecology/ecology.ts
+@@ -424,6 +424,7 @@
+       // prey of the hunter's own realm (review fix: wolves lived off fish shoals and seals took deer from beaches), not
+       // birds; crocodiles also fish (task 8 part C)
+       const prey = herdsNear(sim, h.x, h.y, sp.diet === 'predator' ? BALANCE.huntReach : 2.5).filter((o) => o !== h && o.owner === 0 && hunts(sp, SPECIES_BY_KEY[o.species]));
++      if ((globalThis as any).__t8acc) { const A = (globalThis as any).__t8acc; A.lastPrey = prey.length > 0; if (h.species === A.key && h.id > A.maxId) { const seen = new Set<number>(); for (const p of prey) for (const o of herdsNear(sim, p.x, p.y, BALANCE.huntReach)) { if (o === h || seen.has(o.id) || o.owner) continue; const s2 = SPECIES_BY_KEY[o.species]; if (s2?.diet !== 'predator' || s2.aquatic) continue; seen.add(o.id); const hb = habitat(sim, s2, Math.floor(o.y) * m.w + Math.floor(o.x)); const k2 = o.species + (hb >= 0.5 ? '@home' : '@edge'); A.rivals[k2] = (A.rivals[k2] ?? 0) + huntNeed(o, s2); } A.ownNeed += huntNeed(h, sp); } } // TEMP-T8
+       if (prey.length) {
+         // round 10 addendum: a pack hunts every prey herd in reach; task 5: taking at most what each herd can replace
+         // (a flat 2% a month was above most prey's real growth, so herds and packs ratcheted down together)
+@@ -478,9 +479,12 @@
+     }
+     // logistic growth vs starvation and climate stress
+     const capacity = herdCapacity(sim, h, sp);
++    const T8 = (globalThis as any).__t8acc; const c0 = h.count; // TEMP-T8 instrumentation
+     if (fed >= 0.75 && hab > 0.2) h.count += (h.count * sp.growth * (0.6 + 0.8 * h.genes[4]) * hab * (1 - h.count / capacity)) / 12;
+     else if (fed < 0.5) h.count -= h.count * (0.5 - fed) * 0.25;
++    const c1 = h.count; // TEMP-T8
+     if (hab < 0.2) h.count -= h.count * 0.04;
++    if (T8 && h.species === T8.key && h.id > T8.maxId) { T8.months++; if (c1 > c0) T8.grow += c1 - c0; else T8.starve += c0 - c1; T8.hostile += c1 - h.count; if (hab < 0.2) T8.hostileM++; if (fed < 0.5) { T8.hungry++; if (T8.lastPrey) T8.short++; else T8.empty++; } else if (fed < 0.75) T8.mid++; } // TEMP-T8
+     // split only where the range is not already crowded with the same species
+     if (h.count > sp.maxHerd && rng.chance(0.3) && w.herds.size < (m.n / 30) && countSpeciesNear(sim, h.x, h.y, 8, h.species) < 3) {
+       const half = h.count / 2;

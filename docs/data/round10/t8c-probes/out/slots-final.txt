@@ -1,0 +1,8 @@
+wild-2 year 0: herds 427/546 · land 170 (share 214) · sea 257 (share 332), of which seals 25 (290 seals)
+wild-2 year 25: herds 548/546 · land 249 (share 214) · sea 299 (share 332), of which seals 24 (972 seals)
+wild-2 year 50: herds 548/546 · land 249 (share 214) · sea 299 (share 332), of which seals 22 (1194 seals)
+wild-2 year 100: herds 548/546 · land 247 (share 214) · sea 301 (share 332), of which seals 23 (1266 seals)
+wild-3 year 0: herds 427/546 · land 172 (share 213) · sea 255 (share 333), of which seals 22 (266 seals)
+wild-3 year 25: herds 547/546 · land 253 (share 213) · sea 294 (share 333), of which seals 22 (682 seals)
+wild-3 year 50: herds 549/546 · land 255 (share 213) · sea 294 (share 333), of which seals 22 (900 seals)
+wild-3 year 100: herds 547/546 · land 252 (share 213) · sea 295 (share 333), of which seals 22 (993 seals)
